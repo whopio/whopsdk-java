@@ -10,8 +10,12 @@ public final class CreateCheckoutConfigurationsRequestThreeDsLevel {
     public static final CreateCheckoutConfigurationsRequestThreeDsLevel MANDATE_CHALLENGE =
             new CreateCheckoutConfigurationsRequestThreeDsLevel(Value.MANDATE_CHALLENGE, "mandate_challenge");
 
-    public static final CreateCheckoutConfigurationsRequestThreeDsLevel FRICTIONLESS =
-            new CreateCheckoutConfigurationsRequestThreeDsLevel(Value.FRICTIONLESS, "frictionless");
+    public static final CreateCheckoutConfigurationsRequestThreeDsLevel MANDATE_IF_REQUIRED =
+            new CreateCheckoutConfigurationsRequestThreeDsLevel(Value.MANDATE_IF_REQUIRED, "mandate_if_required");
+
+    public static final CreateCheckoutConfigurationsRequestThreeDsLevel FRICTIONLESS_IF_REQUIRED =
+            new CreateCheckoutConfigurationsRequestThreeDsLevel(
+                    Value.FRICTIONLESS_IF_REQUIRED, "frictionless_if_required");
 
     private final Value value;
 
@@ -48,8 +52,10 @@ public final class CreateCheckoutConfigurationsRequestThreeDsLevel {
         switch (value) {
             case MANDATE_CHALLENGE:
                 return visitor.visitMandateChallenge();
-            case FRICTIONLESS:
-                return visitor.visitFrictionless();
+            case MANDATE_IF_REQUIRED:
+                return visitor.visitMandateIfRequired();
+            case FRICTIONLESS_IF_REQUIRED:
+                return visitor.visitFrictionlessIfRequired();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -61,8 +67,10 @@ public final class CreateCheckoutConfigurationsRequestThreeDsLevel {
         switch (value) {
             case "mandate_challenge":
                 return MANDATE_CHALLENGE;
-            case "frictionless":
-                return FRICTIONLESS;
+            case "mandate_if_required":
+                return MANDATE_IF_REQUIRED;
+            case "frictionless_if_required":
+                return FRICTIONLESS_IF_REQUIRED;
             default:
                 return new CreateCheckoutConfigurationsRequestThreeDsLevel(Value.UNKNOWN, value);
         }
@@ -71,7 +79,9 @@ public final class CreateCheckoutConfigurationsRequestThreeDsLevel {
     public enum Value {
         MANDATE_CHALLENGE,
 
-        FRICTIONLESS,
+        MANDATE_IF_REQUIRED,
+
+        FRICTIONLESS_IF_REQUIRED,
 
         UNKNOWN
     }
@@ -79,7 +89,9 @@ public final class CreateCheckoutConfigurationsRequestThreeDsLevel {
     public interface Visitor<T> {
         T visitMandateChallenge();
 
-        T visitFrictionless();
+        T visitMandateIfRequired();
+
+        T visitFrictionlessIfRequired();
 
         T visitUnknown(String unknownType);
     }

@@ -112,7 +112,6 @@ public final class AdGroupDevicesBodyOperatingSystemsItem {
 
         private Optional<String> minimumVersion = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -125,7 +124,6 @@ public final class AdGroupDevicesBodyOperatingSystemsItem {
         }
 
         /**
-         * <p>Operating system to target.</p>
          * <p>Operating system to target.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -159,6 +157,14 @@ public final class AdGroupDevicesBodyOperatingSystemsItem {
         @java.lang.Override
         public AdGroupDevicesBodyOperatingSystemsItem build() {
             return new AdGroupDevicesBodyOperatingSystemsItem(minimumVersion, os, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("minimum_version") || key.equalsIgnoreCase("os")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

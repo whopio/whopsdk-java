@@ -9,36 +9,52 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.verifications.types.CreateVerificationsRequestBody;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateVerificationsRequest.Builder.class)
 public final class CreateVerificationsRequest {
-    private final String accountId;
+    private final Optional<String> accountId;
+
+    private final Optional<String> userId;
 
     private final CreateVerificationsRequestBody body;
 
     private final Map<String, Object> additionalProperties;
 
     private CreateVerificationsRequest(
-            String accountId, CreateVerificationsRequestBody body, Map<String, Object> additionalProperties) {
+            Optional<String> accountId,
+            Optional<String> userId,
+            CreateVerificationsRequestBody body,
+            Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.userId = userId;
         this.body = body;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Account or user ID whose identity you want to verify. Use a <code>biz_</code> account ID for account verifications, or the caller's <code>user_</code> ID for personal verification.
+     * @return Business account whose identity you want to verify, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.
      */
     @JsonProperty("account_id")
-    public String getAccountId() {
+    public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The caller's own user ID, prefixed <code>user_</code>, for a personal verification. Provide this or <code>account_id</code>.
+     */
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
     }
 
     @JsonProperty("body")
@@ -58,12 +74,12 @@ public final class CreateVerificationsRequest {
     }
 
     private boolean equalTo(CreateVerificationsRequest other) {
-        return accountId.equals(other.accountId) && body.equals(other.body);
+        return accountId.equals(other.accountId) && userId.equals(other.userId) && body.equals(other.body);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.body);
+        return Objects.hash(this.accountId, this.userId, this.body);
     }
 
     @java.lang.Override
@@ -71,21 +87,14 @@ public final class CreateVerificationsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static BodyStage builder() {
         return new Builder();
-    }
-
-    public interface AccountIdStage {
-        /**
-         * <p>Account or user ID whose identity you want to verify. Use a <code>biz_</code> account ID for account verifications, or the caller's <code>user_</code> ID for personal verification.</p>
-         */
-        BodyStage accountId(@NotNull String accountId);
-
-        Builder from(CreateVerificationsRequest other);
     }
 
     public interface BodyStage {
         _FinalStage body(@NotNull CreateVerificationsRequestBody body);
+
+        Builder from(CreateVerificationsRequest other);
     }
 
     public interface _FinalStage {
@@ -94,15 +103,30 @@ public final class CreateVerificationsRequest {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Business account whose identity you want to verify, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, for a personal verification. Provide this or <code>account_id</code>.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AccountIdStage, BodyStage, _FinalStage {
-        private String accountId;
-
+    public static final class Builder implements BodyStage, _FinalStage {
         private CreateVerificationsRequestBody body;
 
-        @JsonAnySetter
+        private Optional<String> userId = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -110,19 +134,8 @@ public final class CreateVerificationsRequest {
         @java.lang.Override
         public Builder from(CreateVerificationsRequest other) {
             accountId(other.getAccountId());
+            userId(other.getUserId());
             body(other.getBody());
-            return this;
-        }
-
-        /**
-         * <p>Account or user ID whose identity you want to verify. Use a <code>biz_</code> account ID for account verifications, or the caller's <code>user_</code> ID for personal verification.</p>
-         * <p>Account or user ID whose identity you want to verify. Use a <code>biz_</code> account ID for account verifications, or the caller's <code>user_</code> ID for personal verification.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("account_id")
-        public BodyStage accountId(@NotNull String accountId) {
-            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
@@ -133,9 +146,57 @@ public final class CreateVerificationsRequest {
             return this;
         }
 
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, for a personal verification. Provide this or <code>account_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>The caller's own user ID, prefixed <code>user_</code>, for a personal verification. Provide this or <code>account_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        /**
+         * <p>Business account whose identity you want to verify, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>Business account whose identity you want to verify, prefixed <code>biz_</code>. Provide this or <code>user_id</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
         @java.lang.Override
         public CreateVerificationsRequest build() {
-            return new CreateVerificationsRequest(accountId, body, additionalProperties);
+            return new CreateVerificationsRequest(accountId, userId, body, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("user_id") || key.equalsIgnoreCase("body")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

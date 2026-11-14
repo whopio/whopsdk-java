@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +38,8 @@ public final class UpdateDisputesRequestEvidence {
     private final Optional<String> customerEmailAddress;
 
     private final Optional<String> customerName;
+
+    private final Optional<List<UpdateDisputesRequestEvidenceDocumentsItem>> documents;
 
     private final Optional<String> notes;
 
@@ -62,6 +65,7 @@ public final class UpdateDisputesRequestEvidence {
             Optional<UpdateDisputesRequestEvidenceCustomerCommunicationAttachment> customerCommunicationAttachment,
             Optional<String> customerEmailAddress,
             Optional<String> customerName,
+            Optional<List<UpdateDisputesRequestEvidenceDocumentsItem>> documents,
             Optional<String> notes,
             Optional<String> productDescription,
             Optional<UpdateDisputesRequestEvidenceRefundPolicyAttachment> refundPolicyAttachment,
@@ -77,6 +81,7 @@ public final class UpdateDisputesRequestEvidence {
         this.customerCommunicationAttachment = customerCommunicationAttachment;
         this.customerEmailAddress = customerEmailAddress;
         this.customerName = customerName;
+        this.documents = documents;
         this.notes = notes;
         this.productDescription = productDescription;
         this.refundPolicyAttachment = refundPolicyAttachment;
@@ -110,7 +115,7 @@ public final class UpdateDisputesRequestEvidence {
     }
 
     /**
-     * @return The cancellation policy document.
+     * @return The cancellation policy document. Defaults to the account's cancellation policy, then its terms of service, when not set.
      */
     @JsonIgnore
     public Optional<UpdateDisputesRequestEvidenceCancellationPolicyAttachment> getCancellationPolicyAttachment() {
@@ -165,6 +170,14 @@ public final class UpdateDisputesRequestEvidence {
     }
 
     /**
+     * @return The full set of evidence documents the dispute should carry, beyond the four fixed evidence slots. Replaces all previously uploaded documents; an empty list removes them all. Send up to 10, 10MB each and 25MB in total. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected. Upload files through <code>POST /files</code> and reference them by <code>id</code>, or send the files as multipart file parts to upload and attach in one call. Policy documents (<code>return_policy</code>, <code>shipping_policy</code>, <code>cancellation_policy</code>, <code>terms_of_service</code>) default from the account's own documents; uploading one here replaces the account copy for this dispute, and a <code>cancellation_policy</code> or <code>return_policy</code> upload also takes precedence over the matching fixed evidence slot.
+     */
+    @JsonProperty("documents")
+    public Optional<List<UpdateDisputesRequestEvidenceDocumentsItem>> getDocuments() {
+        return documents;
+    }
+
+    /**
      * @return Any additional context for the processor reviewing the dispute.
      */
     @JsonIgnore
@@ -187,7 +200,7 @@ public final class UpdateDisputesRequestEvidence {
     }
 
     /**
-     * @return The refund policy document.
+     * @return The refund policy document. Defaults to the account's return policy when not set.
      */
     @JsonIgnore
     public Optional<UpdateDisputesRequestEvidenceRefundPolicyAttachment> getRefundPolicyAttachment() {
@@ -345,6 +358,7 @@ public final class UpdateDisputesRequestEvidence {
                 && customerCommunicationAttachment.equals(other.customerCommunicationAttachment)
                 && customerEmailAddress.equals(other.customerEmailAddress)
                 && customerName.equals(other.customerName)
+                && documents.equals(other.documents)
                 && notes.equals(other.notes)
                 && productDescription.equals(other.productDescription)
                 && refundPolicyAttachment.equals(other.refundPolicyAttachment)
@@ -364,6 +378,7 @@ public final class UpdateDisputesRequestEvidence {
                 this.customerCommunicationAttachment,
                 this.customerEmailAddress,
                 this.customerName,
+                this.documents,
                 this.notes,
                 this.productDescription,
                 this.refundPolicyAttachment,
@@ -400,6 +415,8 @@ public final class UpdateDisputesRequestEvidence {
 
         private Optional<String> customerName = Optional.empty();
 
+        private Optional<List<UpdateDisputesRequestEvidenceDocumentsItem>> documents = Optional.empty();
+
         private Optional<String> notes = Optional.empty();
 
         private Optional<String> productDescription = Optional.empty();
@@ -415,7 +432,6 @@ public final class UpdateDisputesRequestEvidence {
         private Optional<UpdateDisputesRequestEvidenceUncategorizedAttachment> uncategorizedAttachment =
                 Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -428,6 +444,7 @@ public final class UpdateDisputesRequestEvidence {
             customerCommunicationAttachment(other.getCustomerCommunicationAttachment());
             customerEmailAddress(other.getCustomerEmailAddress());
             customerName(other.getCustomerName());
+            documents(other.getDocuments());
             notes(other.getNotes());
             productDescription(other.getProductDescription());
             refundPolicyAttachment(other.getRefundPolicyAttachment());
@@ -489,7 +506,7 @@ public final class UpdateDisputesRequestEvidence {
         }
 
         /**
-         * <p>The cancellation policy document.</p>
+         * <p>The cancellation policy document. Defaults to the account's cancellation policy, then its terms of service, when not set.</p>
          */
         @JsonSetter(value = "cancellation_policy_attachment", nulls = Nulls.SKIP)
         public Builder cancellationPolicyAttachment(
@@ -622,6 +639,20 @@ public final class UpdateDisputesRequestEvidence {
         }
 
         /**
+         * <p>The full set of evidence documents the dispute should carry, beyond the four fixed evidence slots. Replaces all previously uploaded documents; an empty list removes them all. Send up to 10, 10MB each and 25MB in total. Accepted content types: application/pdf, application/json, image/jpeg, image/png, image/webp — any other type is rejected. Upload files through <code>POST /files</code> and reference them by <code>id</code>, or send the files as multipart file parts to upload and attach in one call. Policy documents (<code>return_policy</code>, <code>shipping_policy</code>, <code>cancellation_policy</code>, <code>terms_of_service</code>) default from the account's own documents; uploading one here replaces the account copy for this dispute, and a <code>cancellation_policy</code> or <code>return_policy</code> upload also takes precedence over the matching fixed evidence slot.</p>
+         */
+        @JsonSetter(value = "documents", nulls = Nulls.SKIP)
+        public Builder documents(Optional<List<UpdateDisputesRequestEvidenceDocumentsItem>> documents) {
+            this.documents = documents;
+            return this;
+        }
+
+        public Builder documents(List<UpdateDisputesRequestEvidenceDocumentsItem> documents) {
+            this.documents = Optional.ofNullable(documents);
+            return this;
+        }
+
+        /**
          * <p>Any additional context for the processor reviewing the dispute.</p>
          */
         @JsonSetter(value = "notes", nulls = Nulls.SKIP)
@@ -672,7 +703,7 @@ public final class UpdateDisputesRequestEvidence {
         }
 
         /**
-         * <p>The refund policy document.</p>
+         * <p>The refund policy document. Defaults to the account's return policy when not set.</p>
          */
         @JsonSetter(value = "refund_policy_attachment", nulls = Nulls.SKIP)
         public Builder refundPolicyAttachment(
@@ -811,6 +842,7 @@ public final class UpdateDisputesRequestEvidence {
                     customerCommunicationAttachment,
                     customerEmailAddress,
                     customerName,
+                    documents,
                     notes,
                     productDescription,
                     refundPolicyAttachment,
@@ -819,6 +851,28 @@ public final class UpdateDisputesRequestEvidence {
                     serviceDate,
                     uncategorizedAttachment,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_activity_log")
+                    || key.equalsIgnoreCase("billing_address")
+                    || key.equalsIgnoreCase("cancellation_policy_attachment")
+                    || key.equalsIgnoreCase("cancellation_policy_disclosure")
+                    || key.equalsIgnoreCase("customer_communication_attachment")
+                    || key.equalsIgnoreCase("customer_email_address")
+                    || key.equalsIgnoreCase("customer_name")
+                    || key.equalsIgnoreCase("documents")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("product_description")
+                    || key.equalsIgnoreCase("refund_policy_attachment")
+                    || key.equalsIgnoreCase("refund_policy_disclosure")
+                    || key.equalsIgnoreCase("refund_refusal_explanation")
+                    || key.equalsIgnoreCase("service_date")
+                    || key.equalsIgnoreCase("uncategorized_attachment")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

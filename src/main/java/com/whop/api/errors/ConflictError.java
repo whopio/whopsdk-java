@@ -4,21 +4,20 @@
 package com.whop.api.errors;
 
 import com.whop.api.core.WhopApiApiException;
-import com.whop.api.types.V1ErrorResponse;
 import okhttp3.Response;
 
 public final class ConflictError extends WhopApiApiException {
     /**
      * The body of the response that triggered the exception.
      */
-    private final V1ErrorResponse body;
+    private final Object body;
 
-    public ConflictError(V1ErrorResponse body) {
+    public ConflictError(Object body) {
         super("ConflictError", 409, body);
         this.body = body;
     }
 
-    public ConflictError(V1ErrorResponse body, Response rawResponse) {
+    public ConflictError(Object body, Response rawResponse) {
         super("ConflictError", 409, body, rawResponse);
         this.body = body;
     }
@@ -27,7 +26,7 @@ public final class ConflictError extends WhopApiApiException {
      * @return the body
      */
     @java.lang.Override
-    public V1ErrorResponse body() {
+    public Object body() {
         return this.body;
     }
 }

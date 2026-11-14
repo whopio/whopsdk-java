@@ -15,6 +15,9 @@ public final class ListAdGroupsRequestOrder {
     public static final ListAdGroupsRequestOrder COST_PER_CLICK =
             new ListAdGroupsRequestOrder(Value.COST_PER_CLICK, "cost_per_click");
 
+    public static final ListAdGroupsRequestOrder LINK_CLICKS =
+            new ListAdGroupsRequestOrder(Value.LINK_CLICKS, "link_clicks");
+
     public static final ListAdGroupsRequestOrder FREQUENCY = new ListAdGroupsRequestOrder(Value.FREQUENCY, "frequency");
 
     public static final ListAdGroupsRequestOrder RESULTS = new ListAdGroupsRequestOrder(Value.RESULTS, "results");
@@ -83,6 +86,8 @@ public final class ListAdGroupsRequestOrder {
                 return visitor.visitCostPerResult();
             case COST_PER_CLICK:
                 return visitor.visitCostPerClick();
+            case LINK_CLICKS:
+                return visitor.visitLinkClicks();
             case FREQUENCY:
                 return visitor.visitFrequency();
             case RESULTS:
@@ -120,6 +125,8 @@ public final class ListAdGroupsRequestOrder {
                 return COST_PER_RESULT;
             case "cost_per_click":
                 return COST_PER_CLICK;
+            case "link_clicks":
+                return LINK_CLICKS;
             case "frequency":
                 return FREQUENCY;
             case "results":
@@ -160,6 +167,8 @@ public final class ListAdGroupsRequestOrder {
 
         CLICKS,
 
+        LINK_CLICKS,
+
         UNIQUE_CLICKS,
 
         FREQUENCY,
@@ -191,6 +200,8 @@ public final class ListAdGroupsRequestOrder {
         T visitReach();
 
         T visitClicks();
+
+        T visitLinkClicks();
 
         T visitUniqueClicks();
 

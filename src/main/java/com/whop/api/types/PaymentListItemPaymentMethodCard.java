@@ -180,7 +180,6 @@ public final class PaymentListItemPaymentMethodCard {
 
         private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -322,6 +321,18 @@ public final class PaymentListItemPaymentMethodCard {
         public PaymentListItemPaymentMethodCard build() {
             return new PaymentListItemPaymentMethodCard(
                     brand, expMonth, expYear, fingerprint, last4, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("brand")
+                    || key.equalsIgnoreCase("exp_month")
+                    || key.equalsIgnoreCase("exp_year")
+                    || key.equalsIgnoreCase("fingerprint")
+                    || key.equalsIgnoreCase("last4")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

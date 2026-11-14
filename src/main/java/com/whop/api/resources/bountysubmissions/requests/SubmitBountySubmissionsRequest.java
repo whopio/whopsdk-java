@@ -35,7 +35,7 @@ public final class SubmitBountySubmissionsRequest {
     }
 
     /**
-     * @return Work to attach to the submission. Combine <code>urls</code>, <code>file_ids</code>, and <code>caption</code> freely; all are optional.
+     * @return Work to attach to a livestream attempt. Combine <code>urls</code>, <code>file_ids</code>, and <code>caption</code> freely; all are optional. If the attempt already went to review when its stream ended, the deliverable attaches to it once, until reviewers start voting. Data capture attempts take no deliverable.
      */
     @JsonIgnore
     public Optional<SubmitBountySubmissionsRequestDeliverable> getDeliverable() {
@@ -84,7 +84,6 @@ public final class SubmitBountySubmissionsRequest {
     public static final class Builder {
         private Optional<SubmitBountySubmissionsRequestDeliverable> deliverable = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -95,7 +94,7 @@ public final class SubmitBountySubmissionsRequest {
         }
 
         /**
-         * <p>Work to attach to the submission. Combine <code>urls</code>, <code>file_ids</code>, and <code>caption</code> freely; all are optional.</p>
+         * <p>Work to attach to a livestream attempt. Combine <code>urls</code>, <code>file_ids</code>, and <code>caption</code> freely; all are optional. If the attempt already went to review when its stream ended, the deliverable attaches to it once, until reviewers start voting. Data capture attempts take no deliverable.</p>
          */
         @JsonSetter(value = "deliverable", nulls = Nulls.SKIP)
         public Builder deliverable(Optional<SubmitBountySubmissionsRequestDeliverable> deliverable) {
@@ -121,6 +120,14 @@ public final class SubmitBountySubmissionsRequest {
 
         public SubmitBountySubmissionsRequest build() {
             return new SubmitBountySubmissionsRequest(deliverable, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deliverable")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

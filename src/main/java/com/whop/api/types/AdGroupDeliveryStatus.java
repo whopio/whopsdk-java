@@ -22,7 +22,11 @@ public final class AdGroupDeliveryStatus {
 
     public static final AdGroupDeliveryStatus LEARNING = new AdGroupDeliveryStatus(Value.LEARNING, "learning");
 
+    public static final AdGroupDeliveryStatus IN_REVIEW = new AdGroupDeliveryStatus(Value.IN_REVIEW, "in_review");
+
     public static final AdGroupDeliveryStatus NO_ADS = new AdGroupDeliveryStatus(Value.NO_ADS, "no_ads");
+
+    public static final AdGroupDeliveryStatus IN_APPEAL = new AdGroupDeliveryStatus(Value.IN_APPEAL, "in_appeal");
 
     public static final AdGroupDeliveryStatus CAMPAIGN_PAUSED =
             new AdGroupDeliveryStatus(Value.CAMPAIGN_PAUSED, "campaign_paused");
@@ -85,8 +89,12 @@ public final class AdGroupDeliveryStatus {
                 return visitor.visitDraft();
             case LEARNING:
                 return visitor.visitLearning();
+            case IN_REVIEW:
+                return visitor.visitInReview();
             case NO_ADS:
                 return visitor.visitNoAds();
+            case IN_APPEAL:
+                return visitor.visitInAppeal();
             case CAMPAIGN_PAUSED:
                 return visitor.visitCampaignPaused();
             case PAUSED:
@@ -122,8 +130,12 @@ public final class AdGroupDeliveryStatus {
                 return DRAFT;
             case "learning":
                 return LEARNING;
+            case "in_review":
+                return IN_REVIEW;
             case "no_ads":
                 return NO_ADS;
+            case "in_appeal":
+                return IN_APPEAL;
             case "campaign_paused":
                 return CAMPAIGN_PAUSED;
             case "paused":
@@ -142,6 +154,8 @@ public final class AdGroupDeliveryStatus {
     }
 
     public enum Value {
+        IN_APPEAL,
+
         ALL_ADS_REJECTED,
 
         REJECTED,
@@ -153,6 +167,8 @@ public final class AdGroupDeliveryStatus {
         CAMPAIGN_PAUSED,
 
         PAUSED,
+
+        IN_REVIEW,
 
         PROCESSING,
 
@@ -174,6 +190,8 @@ public final class AdGroupDeliveryStatus {
     }
 
     public interface Visitor<T> {
+        T visitInAppeal();
+
         T visitAllAdsRejected();
 
         T visitRejected();
@@ -185,6 +203,8 @@ public final class AdGroupDeliveryStatus {
         T visitCampaignPaused();
 
         T visitPaused();
+
+        T visitInReview();
 
         T visitProcessing();
 

@@ -5,7 +5,10 @@ package com.whop.api.resources.apps;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.apps.categories.AsyncCategoriesClient;
 import com.whop.api.resources.apps.requests.CreateAppsRequest;
 import com.whop.api.resources.apps.requests.DeleteAppsRequest;
 import com.whop.api.resources.apps.requests.DeployAppsRequest;
@@ -13,7 +16,6 @@ import com.whop.api.resources.apps.requests.ListAppsRequest;
 import com.whop.api.resources.apps.requests.LogsAppsRequest;
 import com.whop.api.resources.apps.requests.RetrieveAppsRequest;
 import com.whop.api.resources.apps.requests.UpdateAppsRequest;
-import com.whop.api.resources.apps.requests.UpdatePermissionsAppRequest;
 import com.whop.api.resources.apps.requests.UpdatePermissionsAppsRequest;
 import com.whop.api.resources.apps.types.DeleteAppsResponse;
 import com.whop.api.resources.apps.types.LogsAppsResponseDataItem;
@@ -21,15 +23,19 @@ import com.whop.api.types.App;
 import com.whop.api.types.AppDeployment;
 import com.whop.api.types.AppListItem;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class AsyncAppsClient {
     protected final ClientOptions clientOptions;
 
     private final AsyncRawAppsClient rawClient;
 
+    protected final Supplier<AsyncCategoriesClient> categoriesClient;
+
     public AsyncAppsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawAppsClient(clientOptions);
+        this.categoriesClient = Suppliers.memoize(() -> new AsyncCategoriesClient(clientOptions));
     }
 
     /**
@@ -40,120 +46,190 @@ public class AsyncAppsClient {
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public CompletableFuture<SyncPagingIterable<AppListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<AppListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public CompletableFuture<SyncPagingIterable<AppListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<AppListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public CompletableFuture<SyncPagingIterable<AppListItem>> list(ListAppsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AppListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists apps on the Whop platform: the app store's live apps, or — with <code>account_id</code> and developer access to that account — every app the account owns. Requires authentication, except for the publicly readable lists: <code>verified_apps_only=true</code>, and <code>app_type=website</code> with no <code>account_id</code>, which returns every live deployed website that Whop has not verified — verified templates are the curated <code>verified_apps_only=true</code> list instead.
+     * Lists published apps approved for the app store without authentication. With <code>account_id</code> and developer access, also includes unpublished apps that the account owns. Public website discovery includes built official blueprints and built, live community blueprints that Whop recommends.
      */
     public CompletableFuture<SyncPagingIterable<AppListItem>> list(
             ListAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AppListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AppListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Registers a new app on the Whop developer platform. Apps provide custom experiences that can be added to products.
      */
     public CompletableFuture<App> create(CreateAppsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Registers a new app on the Whop developer platform. Apps provide custom experiences that can be added to products.
      */
     public CompletableFuture<App> create(CreateAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Boolean> updatePermissionsApp(String appId, UpdatePermissionsAppRequest request) {
-        return this.rawClient.updatePermissionsApp(appId, request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Updates the permission requirements for an app
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:update_app_authorization</code></li>
-     * </ul>
-     */
-    public CompletableFuture<Boolean> updatePermissionsApp(
-            String appId, UpdatePermissionsAppRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .updatePermissionsApp(appId, request, requestOptions)
-                .thenApply(response -> response.body());
-    }
-
-    /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public CompletableFuture<App> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public CompletableFuture<App> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public CompletableFuture<App> retrieve(String id, RetrieveAppsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves an app by ID, claimed route, or proxy domain id. Credential fields (api_key, default_api_key, secrets) render <code>null</code> unless the caller has the corresponding developer permission on the owning account.
+     * Retrieves an app by ID, claimed route, active verified custom hostname, or proxy domain id. Authentication is optional; credential fields stay <code>null</code> unless you have the matching developer permission on the owning account.
      */
     public CompletableFuture<App> retrieve(String id, RetrieveAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an app. The app stops resolving within seconds — a website's site stops serving, and any claimed subdomain is reserved for a month before it can be claimed again.
      */
     public CompletableFuture<DeleteAppsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAppsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteAppsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an app. The app stops resolving within seconds — a website's site stops serving, and any claimed subdomain is reserved for a month before it can be claimed again.
      */
     public CompletableFuture<DeleteAppsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAppsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteAppsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes an app. The app stops resolving within seconds — a website's site stops serving, and any claimed subdomain is reserved for a month before it can be claimed again.
      */
     public CompletableFuture<DeleteAppsResponse> delete(String id, DeleteAppsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAppsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteAppsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -161,56 +237,113 @@ public class AsyncAppsClient {
      */
     public CompletableFuture<DeleteAppsResponse> delete(
             String id, DeleteAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteAppsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteAppsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the settings, metadata, or status of an app. Fields that are omitted keep their current value.
      */
     public CompletableFuture<App> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the settings, metadata, or status of an app. Fields that are omitted keep their current value.
      */
     public CompletableFuture<App> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the settings, metadata, or status of an app. Fields that are omitted keep their current value.
      */
     public CompletableFuture<App> update(String id, UpdateAppsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates the settings, metadata, or status of an app. Fields that are omitted keep their current value.
      */
     public CompletableFuture<App> update(String id, UpdateAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Builds the app's current source and ships it. Returns the run it started, so the caller can render progress from this response and then follow it on the app's <code>deployment</code> field. Only one deployment runs per app at a time — calling this while one is in flight reports that run rather than starting a second, and calling it with nothing to publish reports that instead of starting one.
      */
     public CompletableFuture<AppDeployment> deploy(String id) {
-        return this.rawClient.deploy(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppDeployment>> rawFuture = this.rawClient.deploy(id);
+        CompletableFuture<AppDeployment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Builds the app's current source and ships it. Returns the run it started, so the caller can render progress from this response and then follow it on the app's <code>deployment</code> field. Only one deployment runs per app at a time — calling this while one is in flight reports that run rather than starting a second, and calling it with nothing to publish reports that instead of starting one.
      */
     public CompletableFuture<AppDeployment> deploy(String id, RequestOptions requestOptions) {
-        return this.rawClient.deploy(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppDeployment>> rawFuture = this.rawClient.deploy(id, requestOptions);
+        CompletableFuture<AppDeployment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Builds the app's current source and ships it. Returns the run it started, so the caller can render progress from this response and then follow it on the app's <code>deployment</code> field. Only one deployment runs per app at a time — calling this while one is in flight reports that run rather than starting a second, and calling it with nothing to publish reports that instead of starting one.
      */
     public CompletableFuture<AppDeployment> deploy(String id, DeployAppsRequest request) {
-        return this.rawClient.deploy(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppDeployment>> rawFuture = this.rawClient.deploy(id, request);
+        CompletableFuture<AppDeployment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -218,44 +351,95 @@ public class AsyncAppsClient {
      */
     public CompletableFuture<AppDeployment> deploy(
             String id, DeployAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.deploy(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AppDeployment>> rawFuture =
+                this.rawClient.deploy(id, request, requestOptions);
+        CompletableFuture<AppDeployment> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> logs(String id) {
-        return this.rawClient.logs(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>>> rawFuture =
+                this.rawClient.logs(id);
+        CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> logs(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.logs(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>>> rawFuture =
+                this.rawClient.logs(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> logs(String id, LogsAppsRequest request) {
-        return this.rawClient.logs(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>>> rawFuture =
+                this.rawClient.logs(id, request);
+        CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.app hosting. Logs are retained for 7 days.
+     * Lists a hosted app's server runtime logs, most recent first: console output, uncaught exceptions, and failed-request summaries captured on whop.site hosting. Logs are retained for 7 days.
      */
     public CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> logs(
             String id, LogsAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.logs(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<LogsAppsResponseDataItem>>> rawFuture =
+                this.rawClient.logs(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<LogsAppsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Replaces the set of permissions the app requests from users when they install it. Requires a user session: the <code>developer:update_app_authorization</code> scope cannot be delegated to API keys. Sensitive permissions require step-up verification.
      */
     public CompletableFuture<App> updatePermissions(String id, UpdatePermissionsAppsRequest request) {
-        return this.rawClient.updatePermissions(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture = this.rawClient.updatePermissions(id, request);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -263,6 +447,18 @@ public class AsyncAppsClient {
      */
     public CompletableFuture<App> updatePermissions(
             String id, UpdatePermissionsAppsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.updatePermissions(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<App>> rawFuture =
+                this.rawClient.updatePermissions(id, request, requestOptions);
+        CompletableFuture<App> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    public AsyncCategoriesClient categories() {
+        return this.categoriesClient.get();
     }
 }

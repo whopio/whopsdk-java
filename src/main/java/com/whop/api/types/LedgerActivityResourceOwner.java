@@ -134,7 +134,6 @@ public final class LedgerActivityResourceOwner {
 
         private Optional<LedgerActivityResourceOwnerOwner> owner = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,7 +147,6 @@ public final class LedgerActivityResourceOwner {
         }
 
         /**
-         * <p>Ledger account ID.</p>
          * <p>Ledger account ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -194,6 +192,14 @@ public final class LedgerActivityResourceOwner {
         @java.lang.Override
         public LedgerActivityResourceOwner build() {
             return new LedgerActivityResourceOwner(id, object, owner, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("object") || key.equalsIgnoreCase("owner")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

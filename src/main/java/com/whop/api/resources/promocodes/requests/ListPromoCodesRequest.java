@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ListPromoCodesRequest {
     private final Optional<List<String>> productIds;
 
-    private final Optional<List<String>> planIds;
+    private final Optional<List<String>> variantIds;
 
     private final String accountId;
 
@@ -51,11 +51,13 @@ public final class ListPromoCodesRequest {
 
     private final Optional<String> before;
 
+    private final Optional<Boolean> includeTotalCount;
+
     private final Map<String, Object> additionalProperties;
 
     private ListPromoCodesRequest(
             Optional<List<String>> productIds,
-            Optional<List<String>> planIds,
+            Optional<List<String>> variantIds,
             String accountId,
             Optional<ListPromoCodesRequestStatus> status,
             Optional<OffsetDateTime> createdBefore,
@@ -66,9 +68,10 @@ public final class ListPromoCodesRequest {
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
         this.productIds = productIds;
-        this.planIds = planIds;
+        this.variantIds = variantIds;
         this.accountId = accountId;
         this.status = status;
         this.createdBefore = createdBefore;
@@ -79,6 +82,7 @@ public final class ListPromoCodesRequest {
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
     }
 
@@ -91,11 +95,11 @@ public final class ListPromoCodesRequest {
     }
 
     /**
-     * @return Only promo codes scoped to these plan IDs.
+     * @return Only promo codes scoped to these variant IDs.
      */
-    @JsonProperty("plan_ids")
-    public Optional<List<String>> getPlanIds() {
-        return planIds;
+    @JsonProperty("variant_ids")
+    public Optional<List<String>> getVariantIds() {
+        return variantIds;
     }
 
     /**
@@ -147,7 +151,7 @@ public final class ListPromoCodesRequest {
     }
 
     /**
-     * @return Number of promo codes to return from the start of the window.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -155,7 +159,7 @@ public final class ListPromoCodesRequest {
     }
 
     /**
-     * @return Cursor to paginate forwards from.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -163,7 +167,7 @@ public final class ListPromoCodesRequest {
     }
 
     /**
-     * @return Number of promo codes to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -171,11 +175,19 @@ public final class ListPromoCodesRequest {
     }
 
     /**
-     * @return Cursor to paginate backwards from.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -191,7 +203,7 @@ public final class ListPromoCodesRequest {
 
     private boolean equalTo(ListPromoCodesRequest other) {
         return productIds.equals(other.productIds)
-                && planIds.equals(other.planIds)
+                && variantIds.equals(other.variantIds)
                 && accountId.equals(other.accountId)
                 && status.equals(other.status)
                 && createdBefore.equals(other.createdBefore)
@@ -201,14 +213,15 @@ public final class ListPromoCodesRequest {
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
-                && before.equals(other.before);
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
                 this.productIds,
-                this.planIds,
+                this.variantIds,
                 this.accountId,
                 this.status,
                 this.createdBefore,
@@ -218,7 +231,8 @@ public final class ListPromoCodesRequest {
                 this.first,
                 this.after,
                 this.last,
-                this.before);
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -256,13 +270,13 @@ public final class ListPromoCodesRequest {
         _FinalStage productIds(String productIds);
 
         /**
-         * <p>Only promo codes scoped to these plan IDs.</p>
+         * <p>Only promo codes scoped to these variant IDs.</p>
          */
-        _FinalStage planIds(Optional<List<String>> planIds);
+        _FinalStage variantIds(Optional<List<String>> variantIds);
 
-        _FinalStage planIds(List<String> planIds);
+        _FinalStage variantIds(List<String> variantIds);
 
-        _FinalStage planIds(String planIds);
+        _FinalStage variantIds(String variantIds);
 
         /**
          * <p>Promo-code status. <code>expired</code> groups inactive and archived codes.</p>
@@ -300,37 +314,46 @@ public final class ListPromoCodesRequest {
         _FinalStage direction(ListPromoCodesRequestDirection direction);
 
         /**
-         * <p>Number of promo codes to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         _FinalStage first(Optional<Integer> first);
 
         _FinalStage first(Integer first);
 
         /**
-         * <p>Cursor to paginate forwards from.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         _FinalStage after(Optional<String> after);
 
         _FinalStage after(String after);
 
         /**
-         * <p>Number of promo codes to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         _FinalStage last(Optional<Integer> last);
 
         _FinalStage last(Integer last);
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         _FinalStage before(Optional<String> before);
 
         _FinalStage before(String before);
+
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        _FinalStage includeTotalCount(Optional<Boolean> includeTotalCount);
+
+        _FinalStage includeTotalCount(Boolean includeTotalCount);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements AccountIdStage, _FinalStage {
         private String accountId;
+
+        private Optional<Boolean> includeTotalCount = Optional.empty();
 
         private Optional<String> before = Optional.empty();
 
@@ -350,11 +373,10 @@ public final class ListPromoCodesRequest {
 
         private Optional<ListPromoCodesRequestStatus> status = Optional.empty();
 
-        private Optional<List<String>> planIds = Optional.empty();
+        private Optional<List<String>> variantIds = Optional.empty();
 
         private Optional<List<String>> productIds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -362,7 +384,7 @@ public final class ListPromoCodesRequest {
         @java.lang.Override
         public Builder from(ListPromoCodesRequest other) {
             productIds(other.getProductIds());
-            planIds(other.getPlanIds());
+            variantIds(other.getVariantIds());
             accountId(other.getAccountId());
             status(other.getStatus());
             createdBefore(other.getCreatedBefore());
@@ -373,11 +395,11 @@ public final class ListPromoCodesRequest {
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             return this;
         }
 
         /**
-         * <p>Account whose promo codes are listed (<code>biz_</code> tag).</p>
          * <p>Account whose promo codes are listed (<code>biz_</code> tag).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -389,7 +411,27 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
+            return this;
+        }
+
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public _FinalStage includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -399,7 +441,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Cursor to paginate backwards from.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
@@ -409,7 +451,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Number of promo codes to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -419,7 +461,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Number of promo codes to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
@@ -429,7 +471,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Cursor to paginate forwards from.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -439,7 +481,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Cursor to paginate forwards from.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
@@ -449,7 +491,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Number of promo codes to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -459,7 +501,7 @@ public final class ListPromoCodesRequest {
         }
 
         /**
-         * <p>Number of promo codes to return from the start of the window.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -569,28 +611,28 @@ public final class ListPromoCodesRequest {
         }
 
         @java.lang.Override
-        public _FinalStage planIds(String planIds) {
-            this.planIds = Optional.of(Collections.singletonList(planIds));
+        public _FinalStage variantIds(String variantIds) {
+            this.variantIds = Optional.of(Collections.singletonList(variantIds));
             return this;
         }
 
         /**
-         * <p>Only promo codes scoped to these plan IDs.</p>
+         * <p>Only promo codes scoped to these variant IDs.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage planIds(List<String> planIds) {
-            this.planIds = Optional.ofNullable(planIds);
+        public _FinalStage variantIds(List<String> variantIds) {
+            this.variantIds = Optional.ofNullable(variantIds);
             return this;
         }
 
         /**
-         * <p>Only promo codes scoped to these plan IDs.</p>
+         * <p>Only promo codes scoped to these variant IDs.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "plan_ids", nulls = Nulls.SKIP)
-        public _FinalStage planIds(Optional<List<String>> planIds) {
-            this.planIds = planIds;
+        @JsonSetter(value = "variant_ids", nulls = Nulls.SKIP)
+        public _FinalStage variantIds(Optional<List<String>> variantIds) {
+            this.variantIds = variantIds;
             return this;
         }
 
@@ -624,7 +666,7 @@ public final class ListPromoCodesRequest {
         public ListPromoCodesRequest build() {
             return new ListPromoCodesRequest(
                     productIds,
-                    planIds,
+                    variantIds,
                     accountId,
                     status,
                     createdBefore,
@@ -635,7 +677,28 @@ public final class ListPromoCodesRequest {
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("variant_ids")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -107,7 +107,6 @@ public final class FormCompanyAccountsRequestShareStructure {
 
         private double value;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class FormCompanyAccountsRequestShareStructure {
 
         /**
          * <p>Number of shares the company authorizes. Must be greater than <code>0</code>.</p>
-         * <p>Number of shares the company authorizes. Must be greater than <code>0</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class FormCompanyAccountsRequestShareStructure {
         }
 
         /**
-         * <p>Par value per share, in USD. Must be greater than <code>0</code>; fractional values like <code>0.01</code> are allowed.</p>
          * <p>Par value per share, in USD. Must be greater than <code>0</code>; fractional values like <code>0.01</code> are allowed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class FormCompanyAccountsRequestShareStructure {
         @java.lang.Override
         public FormCompanyAccountsRequestShareStructure build() {
             return new FormCompanyAccountsRequestShareStructure(numberOfShares, value, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("number_of_shares") || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.experiences;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.experiences.requests.AttachExperiencesRequest;
 import com.whop.api.resources.experiences.requests.CreateExperiencesRequest;
@@ -36,59 +37,114 @@ public class AsyncExperiencesClient {
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public CompletableFuture<SyncPagingIterable<ExperienceListItem>> list(ListExperiencesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ExperienceListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of experiences belonging to a company, with optional filtering by product and app.
+     * Lists the experiences in an account, optionally filtered to those attached to one product or powered by one app.
      */
     public CompletableFuture<SyncPagingIterable<ExperienceListItem>> list(
             ListExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ExperienceListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> create(CreateExperiencesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Creates an experience for an account, powered by an app such as courses, forums, or chat. Attach it to a product with <code>POST /experiences/:id/attach</code> to give that product's customers access.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> create(CreateExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing experience.
      */
     public CompletableFuture<Experience> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing experience.
      */
     public CompletableFuture<Experience> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing experience.
      */
     public CompletableFuture<Experience> retrieve(String id, RetrieveExperiencesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -96,104 +152,184 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<Experience> retrieve(
             String id, RetrieveExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteExperiencesRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Deletes an experience and detaches it from every product, removing customer access to it. Returns <code>true</code> on success.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:delete</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> delete(
             String id, DeleteExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> update(String id, UpdateExperiencesRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Required permissions:
+     * Updates an experience's name, logo, visibility, or notification setting, or moves it to another section or position.
+     * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:update</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> update(
             String id, UpdateExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> attach(String id, AttachExperiencesRequest request) {
-        return this.rawClient.attach(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.attach(id, request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Attach an experience to a product, making it accessible to the product's customers.
+     * Attaches an experience to a product, giving the product's customers access to it.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:attach</code></li>
@@ -201,22 +337,37 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<Experience> attach(
             String id, AttachExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.attach(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture =
+                this.rawClient.attach(id, request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> detach(String id, DetachExperiencesRequest request) {
-        return this.rawClient.detach(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.detach(id, request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Detach an experience from a product, removing customer access to it through that product.
+     * Detaches an experience from a product, removing customer access to it through that product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:detach</code></li>
@@ -224,52 +375,73 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<Experience> detach(
             String id, DetachExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.detach(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture =
+                this.rawClient.detach(id, request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> duplicate(String id) {
-        return this.rawClient.duplicate(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.duplicate(id);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> duplicate(String id, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.duplicate(id, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
      * </ul>
      */
     public CompletableFuture<Experience> duplicate(String id, DuplicateExperiencesRequest request) {
-        return this.rawClient.duplicate(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture = this.rawClient.duplicate(id, request);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Duplicates an existing experience. The name will be copied, unless provided. The new experience will be attached to the same products as the original experience.
-     * If duplicating a Forum or Chat experience, the new experience will have the same settings as the original experience, e.g. who can post, who can comment, etc.
-     * No content, e.g. posts, messages, lessons from within the original experience will be copied.
+     * Duplicates an experience and attaches the copy to the same products as the original. Forum and chat copies keep the original's settings, such as who can post or comment. No content, such as posts, messages, or lessons, is copied.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>experience:create</code></li>
@@ -277,6 +449,14 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<Experience> duplicate(
             String id, DuplicateExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.duplicate(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Experience>> rawFuture =
+                this.rawClient.duplicate(id, request, requestOptions);
+        CompletableFuture<Experience> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

@@ -376,7 +376,6 @@ public final class MediaAsset {
 
         private Optional<Double> amountCharged = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -399,7 +398,6 @@ public final class MediaAsset {
 
         /**
          * <p>ISO 8601 timestamp when the generation was requested.</p>
-         * <p>ISO 8601 timestamp when the generation was requested.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -410,7 +408,6 @@ public final class MediaAsset {
         }
 
         /**
-         * <p>Currency of <code>amount_charged</code>. Always <code>usd</code>.</p>
          * <p>Currency of <code>amount_charged</code>. Always <code>usd</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -423,7 +420,6 @@ public final class MediaAsset {
 
         /**
          * <p>The inputs the asset was generated from.</p>
-         * <p>The inputs the asset was generated from.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -434,7 +430,6 @@ public final class MediaAsset {
         }
 
         /**
-         * <p>Media asset ID, prefixed <code>media_</code>.</p>
          * <p>Media asset ID, prefixed <code>media_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -447,7 +442,6 @@ public final class MediaAsset {
 
         /**
          * <p>The kind of media this asset holds.</p>
-         * <p>The kind of media this asset holds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -459,7 +453,6 @@ public final class MediaAsset {
 
         /**
          * <p>How the asset was created. Always <code>generated</code>.</p>
-         * <p>How the asset was created. Always <code>generated</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -470,7 +463,6 @@ public final class MediaAsset {
         }
 
         /**
-         * <p>Lifecycle state: <code>processing</code> while generation runs, <code>ready</code> when the file is available, <code>failed</code> when generation failed and the charge was refunded.</p>
          * <p>Lifecycle state: <code>processing</code> while generation runs, <code>ready</code> when the file is available, <code>failed</code> when generation failed and the charge was refunded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -640,6 +632,24 @@ public final class MediaAsset {
                     source,
                     status,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount_charged")
+                    || key.equalsIgnoreCase("completed_at")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("error_message")
+                    || key.equalsIgnoreCase("file")
+                    || key.equalsIgnoreCase("generation")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("media_type")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

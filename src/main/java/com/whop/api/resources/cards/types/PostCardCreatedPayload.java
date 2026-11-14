@@ -273,7 +273,6 @@ public final class PostCardCreatedPayload {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -293,7 +292,6 @@ public final class PostCardCreatedPayload {
 
         /**
          * <p>The API version for this webhook</p>
-         * <p>The API version for this webhook</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -312,7 +310,6 @@ public final class PostCardCreatedPayload {
 
         /**
          * <p>A unique ID for every single webhook request</p>
-         * <p>A unique ID for every single webhook request</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -324,7 +321,6 @@ public final class PostCardCreatedPayload {
 
         /**
          * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
-         * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -335,7 +331,6 @@ public final class PostCardCreatedPayload {
         }
 
         /**
-         * <p>The webhook event type</p>
          * <p>The webhook event type</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -450,6 +445,21 @@ public final class PostCardCreatedPayload {
                     timestamp,
                     type,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("api_version")
+                    || key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("data")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("previous_attributes")
+                    || key.equalsIgnoreCase("timestamp")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

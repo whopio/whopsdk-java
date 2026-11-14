@@ -15,6 +15,9 @@ public final class PermissionAction {
     public static final PermissionAction COMPANY_TOKEN_TRANSACTION_READ =
             new PermissionAction(Value.COMPANY_TOKEN_TRANSACTION_READ, "company_token_transaction:read");
 
+    public static final PermissionAction DEVELOPER_MANAGE_OIDC_TRUST =
+            new PermissionAction(Value.DEVELOPER_MANAGE_OIDC_TRUST, "developer:manage_oidc_trust");
+
     public static final PermissionAction MEMBER_STATS_EXPORT =
             new PermissionAction(Value.MEMBER_STATS_EXPORT, "member:stats:export");
 
@@ -30,16 +33,22 @@ public final class PermissionAction {
     public static final PermissionAction COMPANY_AUTHORIZED_USER_EMAIL_READ =
             new PermissionAction(Value.COMPANY_AUTHORIZED_USER_EMAIL_READ, "company:authorized_user:email:read");
 
+    public static final PermissionAction PARTNER_CREATE = new PermissionAction(Value.PARTNER_CREATE, "partner:create");
+
     public static final PermissionAction SOCIAL_ACCOUNT_DELETE =
             new PermissionAction(Value.SOCIAL_ACCOUNT_DELETE, "social_account:delete");
-
-    public static final PermissionAction PARTNER_CREATE = new PermissionAction(Value.PARTNER_CREATE, "partner:create");
 
     public static final PermissionAction WEBHOOK_RECEIVE_REFUNDS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_REFUNDS, "webhook_receive:refunds");
 
+    public static final PermissionAction WEBHOOK_RECEIVE_AD_GROUPS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_AD_GROUPS, "webhook_receive:ad_groups");
+
     public static final PermissionAction OAUTH_TOKEN_EXCHANGE =
             new PermissionAction(Value.OAUTH_TOKEN_EXCHANGE, "oauth:token_exchange");
+
+    public static final PermissionAction AUTOMATION_READ =
+            new PermissionAction(Value.AUTOMATION_READ, "automation:read");
 
     public static final PermissionAction PAYMENT_RESOLUTION_CENTER_CASE_MANAGE =
             new PermissionAction(Value.PAYMENT_RESOLUTION_CENTER_CASE_MANAGE, "payment:resolution_center_case:manage");
@@ -57,6 +66,8 @@ public final class PermissionAction {
     public static final PermissionAction WEBHOOK_RECEIVE_PRODUCTS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_PRODUCTS, "webhook_receive:products");
 
+    public static final PermissionAction EMAIL_SEND = new PermissionAction(Value.EMAIL_SEND, "email:send");
+
     public static final PermissionAction AD_CAMPAIGN_UPDATE =
             new PermissionAction(Value.AD_CAMPAIGN_UPDATE, "ad_campaign:update");
 
@@ -68,6 +79,9 @@ public final class PermissionAction {
     public static final PermissionAction INVOICE_BASIC_READ =
             new PermissionAction(Value.INVOICE_BASIC_READ, "invoice:basic:read");
 
+    public static final PermissionAction PARTNER_COMMISSION_ADVANCE_UPDATE =
+            new PermissionAction(Value.PARTNER_COMMISSION_ADVANCE_UPDATE, "partner:commission_advance:update");
+
     public static final PermissionAction DEVELOPER_MANAGE_OAUTH =
             new PermissionAction(Value.DEVELOPER_MANAGE_OAUTH, "developer:manage_oauth");
 
@@ -76,6 +90,12 @@ public final class PermissionAction {
 
     public static final PermissionAction CHECKOUT_REQUEST_CREATE =
             new PermissionAction(Value.CHECKOUT_REQUEST_CREATE, "checkout_request:create");
+
+    public static final PermissionAction WAITLIST_ENTRY_READ =
+            new PermissionAction(Value.WAITLIST_ENTRY_READ, "waitlist_entry:read");
+
+    public static final PermissionAction PARTNER_REFERRAL_REQUEST_CANCEL =
+            new PermissionAction(Value.PARTNER_REFERRAL_REQUEST_CANCEL, "partner:referral_request:cancel");
 
     public static final PermissionAction WEBHOOK_RECEIVE_ACCOUNTS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_ACCOUNTS, "webhook_receive:accounts");
@@ -125,6 +145,9 @@ public final class PermissionAction {
     public static final PermissionAction COMPANY_BALANCE_EXPORT =
             new PermissionAction(Value.COMPANY_BALANCE_EXPORT, "company:balance:export");
 
+    public static final PermissionAction WEBHOOK_RECEIVE_APP_INSTALLATIONS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_APP_INSTALLATIONS, "webhook_receive:app_installations");
+
     public static final PermissionAction WEBHOOK_RECEIVE_PAYMENTS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_PAYMENTS, "webhook_receive:payments");
 
@@ -139,27 +162,35 @@ public final class PermissionAction {
     public static final PermissionAction EXPERIENCE_DELETE =
             new PermissionAction(Value.EXPERIENCE_DELETE, "experience:delete");
 
+    public static final PermissionAction USER_ABUSE_REPORT_CREATE =
+            new PermissionAction(Value.USER_ABUSE_REPORT_CREATE, "user:abuse_report:create");
+
+    public static final PermissionAction CHECKOUT_CONFIGURATION_CREATE =
+            new PermissionAction(Value.CHECKOUT_CONFIGURATION_CREATE, "checkout_configuration:create");
+
     public static final PermissionAction PAYMENT_RESOLUTION_CENTER_CASE_EXPORT =
             new PermissionAction(Value.PAYMENT_RESOLUTION_CENTER_CASE_EXPORT, "payment:resolution_center_case:export");
 
     public static final PermissionAction WEBHOOK_RECEIVE_AD_CAMPAIGNS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_AD_CAMPAIGNS, "webhook_receive:ad_campaigns");
 
-    public static final PermissionAction CHECKOUT_CONFIGURATION_CREATE =
-            new PermissionAction(Value.CHECKOUT_CONFIGURATION_CREATE, "checkout_configuration:create");
+    public static final PermissionAction AI_CHAT_DELETE = new PermissionAction(Value.AI_CHAT_DELETE, "ai_chat:delete");
+
+    public static final PermissionAction COMPANY_SUSPEND_CHILD =
+            new PermissionAction(Value.COMPANY_SUSPEND_CHILD, "company:suspend_child");
 
     public static final PermissionAction DEVELOPER_MANAGE_API_KEY =
             new PermissionAction(Value.DEVELOPER_MANAGE_API_KEY, "developer:manage_api_key");
 
-    public static final PermissionAction AI_CHAT_DELETE = new PermissionAction(Value.AI_CHAT_DELETE, "ai_chat:delete");
+    public static final PermissionAction EMAIL_READ = new PermissionAction(Value.EMAIL_READ, "email:read");
 
     public static final PermissionAction WEBHOOK_RECEIVE_DISPUTES =
             new PermissionAction(Value.WEBHOOK_RECEIVE_DISPUTES, "webhook_receive:disputes");
 
-    public static final PermissionAction IAP_READ = new PermissionAction(Value.IAP_READ, "iap:read");
-
     public static final PermissionAction CRYPTO_WALLET_MANAGE =
             new PermissionAction(Value.CRYPTO_WALLET_MANAGE, "crypto_wallet:manage");
+
+    public static final PermissionAction IAP_READ = new PermissionAction(Value.IAP_READ, "iap:read");
 
     public static final PermissionAction SUPPORT_CHAT_CREATE =
             new PermissionAction(Value.SUPPORT_CHAT_CREATE, "support_chat:create");
@@ -167,11 +198,13 @@ public final class PermissionAction {
     public static final PermissionAction DMS_MESSAGE_MANAGE =
             new PermissionAction(Value.DMS_MESSAGE_MANAGE, "dms:message:manage");
 
-    public static final PermissionAction AUTHORIZED_USER_UPDATE =
-            new PermissionAction(Value.AUTHORIZED_USER_UPDATE, "authorized_user:update");
+    public static final PermissionAction DOMAIN_READ = new PermissionAction(Value.DOMAIN_READ, "domain:read");
 
     public static final PermissionAction APP_AUTHORIZATION_DELETE =
             new PermissionAction(Value.APP_AUTHORIZATION_DELETE, "app_authorization:delete");
+
+    public static final PermissionAction AUTHORIZED_USER_UPDATE =
+            new PermissionAction(Value.AUTHORIZED_USER_UPDATE, "authorized_user:update");
 
     public static final PermissionAction MEDIA_READ = new PermissionAction(Value.MEDIA_READ, "media:read");
 
@@ -214,6 +247,8 @@ public final class PermissionAction {
     public static final PermissionAction MEMBER_PHONE_READ =
             new PermissionAction(Value.MEMBER_PHONE_READ, "member:phone:read");
 
+    public static final PermissionAction DOMAIN_MANAGE = new PermissionAction(Value.DOMAIN_MANAGE, "domain:manage");
+
     public static final PermissionAction FORUM_POST_CREATE =
             new PermissionAction(Value.FORUM_POST_CREATE, "forum:post:create");
 
@@ -230,6 +265,9 @@ public final class PermissionAction {
 
     public static final PermissionAction WEBHOOK_RECEIVE_WITHDRAWALS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_WITHDRAWALS, "webhook_receive:withdrawals");
+
+    public static final PermissionAction USER_PAYMENT_CHARGE =
+            new PermissionAction(Value.USER_PAYMENT_CHARGE, "user:payment:charge");
 
     public static final PermissionAction WEBHOOK_RECEIVE_MEMBERSHIPS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_MEMBERSHIPS, "webhook_receive:memberships");
@@ -255,10 +293,16 @@ public final class PermissionAction {
     public static final PermissionAction MEMBER_PAYMENT_METHODS_MANAGE =
             new PermissionAction(Value.MEMBER_PAYMENT_METHODS_MANAGE, "member:payment_methods:manage");
 
+    public static final PermissionAction PARTNER_EMAIL_READ =
+            new PermissionAction(Value.PARTNER_EMAIL_READ, "partner:email:read");
+
     public static final PermissionAction PAYOUT_DELETE_DESTINATION =
             new PermissionAction(Value.PAYOUT_DELETE_DESTINATION, "payout:delete_destination");
 
     public static final PermissionAction PLAN_CREATE = new PermissionAction(Value.PLAN_CREATE, "plan:create");
+
+    public static final PermissionAction AUTOMATION_MANAGE =
+            new PermissionAction(Value.AUTOMATION_MANAGE, "automation:manage");
 
     public static final PermissionAction WEBHOOK_RECEIVE_CARD_TRANSACTIONS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_CARD_TRANSACTIONS, "webhook_receive:card_transactions");
@@ -274,6 +318,9 @@ public final class PermissionAction {
     public static final PermissionAction LEAD_BASIC_READ =
             new PermissionAction(Value.LEAD_BASIC_READ, "lead:basic:read");
 
+    public static final PermissionAction PARTNER_REFERRAL_REQUEST_CREATE =
+            new PermissionAction(Value.PARTNER_REFERRAL_REQUEST_CREATE, "partner:referral_request:create");
+
     public static final PermissionAction PAYOUT_WITHDRAWAL_EXPORT =
             new PermissionAction(Value.PAYOUT_WITHDRAWAL_EXPORT, "payout:withdrawal:export");
 
@@ -282,6 +329,12 @@ public final class PermissionAction {
     public static final PermissionAction PAYOUT_ACCOUNT_READ =
             new PermissionAction(Value.PAYOUT_ACCOUNT_READ, "payout:account:read");
 
+    public static final PermissionAction DEVELOPER_APP_INSTALLATION_UPDATE =
+            new PermissionAction(Value.DEVELOPER_APP_INSTALLATION_UPDATE, "developer:app_installation:update");
+
+    public static final PermissionAction MEMBER_REPORTING_LINE_UPDATE =
+            new PermissionAction(Value.MEMBER_REPORTING_LINE_UPDATE, "member:reporting_line:update");
+
     public static final PermissionAction PROFILE = new PermissionAction(Value.PROFILE, "profile");
 
     public static final PermissionAction DEVELOPER_BASIC_READ =
@@ -289,6 +342,9 @@ public final class PermissionAction {
 
     public static final PermissionAction ACCESS_PASS_CREATE =
             new PermissionAction(Value.ACCESS_PASS_CREATE, "access_pass:create");
+
+    public static final PermissionAction AUTOMATION_WRITE =
+            new PermissionAction(Value.AUTOMATION_WRITE, "automation:write");
 
     public static final PermissionAction WEBHOOK_RECEIVE_COURSES =
             new PermissionAction(Value.WEBHOOK_RECEIVE_COURSES, "webhook_receive:courses");
@@ -299,12 +355,18 @@ public final class PermissionAction {
     public static final PermissionAction TRACKING_LINK_STATS_EXPORT =
             new PermissionAction(Value.TRACKING_LINK_STATS_EXPORT, "tracking_link:stats:export");
 
+    public static final PermissionAction WAITLIST_ENTRY_CANCEL =
+            new PermissionAction(Value.WAITLIST_ENTRY_CANCEL, "waitlist_entry:cancel");
+
+    public static final PermissionAction WAITLIST_ENTRY_CREATE =
+            new PermissionAction(Value.WAITLIST_ENTRY_CREATE, "waitlist_entry:create");
+
     public static final PermissionAction COURSES_UPDATE = new PermissionAction(Value.COURSES_UPDATE, "courses:update");
+
+    public static final PermissionAction AI_CHAT_CREATE = new PermissionAction(Value.AI_CHAT_CREATE, "ai_chat:create");
 
     public static final PermissionAction PLAN_BASIC_EXPORT =
             new PermissionAction(Value.PLAN_BASIC_EXPORT, "plan:basic:export");
-
-    public static final PermissionAction AI_CHAT_CREATE = new PermissionAction(Value.AI_CHAT_CREATE, "ai_chat:create");
 
     public static final PermissionAction WEBHOOK_RECEIVE_MEMBERS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_MEMBERS, "webhook_receive:members");
@@ -333,11 +395,16 @@ public final class PermissionAction {
 
     public static final PermissionAction PLAN_UPDATE = new PermissionAction(Value.PLAN_UPDATE, "plan:update");
 
+    public static final PermissionAction DEVELOPER_APP_INSTALLATION_READ =
+            new PermissionAction(Value.DEVELOPER_APP_INSTALLATION_READ, "developer:app_installation:read");
+
     public static final PermissionAction MEMBER_BASIC_EXPORT =
             new PermissionAction(Value.MEMBER_BASIC_EXPORT, "member:basic:export");
 
     public static final PermissionAction COMPANY_CREATE_CHILD =
             new PermissionAction(Value.COMPANY_CREATE_CHILD, "company:create_child");
+
+    public static final PermissionAction REVIEW_DELETE = new PermissionAction(Value.REVIEW_DELETE, "review:delete");
 
     public static final PermissionAction APP_AUTHORIZATION_CREATE =
             new PermissionAction(Value.APP_AUTHORIZATION_CREATE, "app_authorization:create");
@@ -345,14 +412,17 @@ public final class PermissionAction {
     public static final PermissionAction WEBHOOK_RECEIVE_ENTRIES =
             new PermissionAction(Value.WEBHOOK_RECEIVE_ENTRIES, "webhook_receive:entries");
 
-    public static final PermissionAction WEBHOOK_RECEIVE_CARDS =
-            new PermissionAction(Value.WEBHOOK_RECEIVE_CARDS, "webhook_receive:cards");
-
     public static final PermissionAction CHECKOUT_CONFIGURATION_DELETE =
             new PermissionAction(Value.CHECKOUT_CONFIGURATION_DELETE, "checkout_configuration:delete");
 
     public static final PermissionAction USER_NOTIFICATIONS_UPDATE =
             new PermissionAction(Value.USER_NOTIFICATIONS_UPDATE, "user:notifications:update");
+
+    public static final PermissionAction WEBHOOK_RECEIVE_CARDS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_CARDS, "webhook_receive:cards");
+
+    public static final PermissionAction WEBHOOK_RECEIVE_EVENTS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_EVENTS, "webhook_receive:events");
 
     public static final PermissionAction USER_NOTIFICATIONS_READ =
             new PermissionAction(Value.USER_NOTIFICATIONS_READ, "user:notifications:read");
@@ -371,6 +441,9 @@ public final class PermissionAction {
 
     public static final PermissionAction SUPPORT_CHAT_MESSAGE_CREATE =
             new PermissionAction(Value.SUPPORT_CHAT_MESSAGE_CREATE, "support_chat:message:create");
+
+    public static final PermissionAction PARTNER_REFERRAL_REQUEST_ACCEPT =
+            new PermissionAction(Value.PARTNER_REFERRAL_REQUEST_ACCEPT, "partner:referral_request:accept");
 
     public static final PermissionAction SOCIAL_LINK_UPDATE =
             new PermissionAction(Value.SOCIAL_LINK_UPDATE, "social_link:update");
@@ -410,6 +483,9 @@ public final class PermissionAction {
     public static final PermissionAction PAYOUT_TRANSFER_FUNDS =
             new PermissionAction(Value.PAYOUT_TRANSFER_FUNDS, "payout:transfer_funds");
 
+    public static final PermissionAction WEBHOOK_RECEIVE_ADS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_ADS, "webhook_receive:ads");
+
     public static final PermissionAction WEBHOOK_RECEIVE_APP_MEMBERSHIPS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_APP_MEMBERSHIPS, "webhook_receive:app_memberships");
 
@@ -426,11 +502,20 @@ public final class PermissionAction {
 
     public static final PermissionAction EMAIL = new PermissionAction(Value.EMAIL, "email");
 
+    public static final PermissionAction EXPERIMENT_MANAGE =
+            new PermissionAction(Value.EXPERIMENT_MANAGE, "experiment:manage");
+
     public static final PermissionAction PROMO_CODE_DELETE =
             new PermissionAction(Value.PROMO_CODE_DELETE, "promo_code:delete");
 
+    public static final PermissionAction PARTNER_FEES_UPDATE =
+            new PermissionAction(Value.PARTNER_FEES_UPDATE, "partner:fees:update");
+
     public static final PermissionAction PAYOUT_ACCOUNT_UPDATE =
             new PermissionAction(Value.PAYOUT_ACCOUNT_UPDATE, "payout:account:update");
+
+    public static final PermissionAction WEBHOOK_RECEIVE_DOMAINS =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_DOMAINS, "webhook_receive:domains");
 
     public static final PermissionAction PAYOUT_TRANSFER_EXPORT =
             new PermissionAction(Value.PAYOUT_TRANSFER_EXPORT, "payout:transfer:export");
@@ -444,14 +529,14 @@ public final class PermissionAction {
     public static final PermissionAction LEAD_BASIC_EXPORT =
             new PermissionAction(Value.LEAD_BASIC_EXPORT, "lead:basic:export");
 
+    public static final PermissionAction AI_CHAT_UPDATE = new PermissionAction(Value.AI_CHAT_UPDATE, "ai_chat:update");
+
     public static final PermissionAction STATS_READ = new PermissionAction(Value.STATS_READ, "stats:read");
 
-    public static final PermissionAction AI_CHAT_UPDATE = new PermissionAction(Value.AI_CHAT_UPDATE, "ai_chat:update");
+    public static final PermissionAction AI_CHAT_READ = new PermissionAction(Value.AI_CHAT_READ, "ai_chat:read");
 
     public static final PermissionAction INCORPORATION_READ =
             new PermissionAction(Value.INCORPORATION_READ, "incorporation:read");
-
-    public static final PermissionAction AI_CHAT_READ = new PermissionAction(Value.AI_CHAT_READ, "ai_chat:read");
 
     public static final PermissionAction APP_AUTHORIZATION_UPDATE =
             new PermissionAction(Value.APP_AUTHORIZATION_UPDATE, "app_authorization:update");
@@ -461,6 +546,9 @@ public final class PermissionAction {
 
     public static final PermissionAction TRACKING_LINK_BASIC_EXPORT =
             new PermissionAction(Value.TRACKING_LINK_BASIC_EXPORT, "tracking_link:basic:export");
+
+    public static final PermissionAction USER_ABUSE_REPORT_READ =
+            new PermissionAction(Value.USER_ABUSE_REPORT_READ, "user:abuse_report:read");
 
     public static final PermissionAction ACCESS_PASS_CONTROL_CENTER =
             new PermissionAction(Value.ACCESS_PASS_CONTROL_CENTER, "access_pass:control_center");
@@ -488,6 +576,9 @@ public final class PermissionAction {
     public static final PermissionAction MEMBERSHIP_UPDATE =
             new PermissionAction(Value.MEMBERSHIP_UPDATE, "membership:update");
 
+    public static final PermissionAction PARTNER_COMMISSION_ADVANCE_ACCEPT =
+            new PermissionAction(Value.PARTNER_COMMISSION_ADVANCE_ACCEPT, "partner:commission_advance:accept");
+
     public static final PermissionAction LIVESTREAM_MANAGE_RECORDING =
             new PermissionAction(Value.LIVESTREAM_MANAGE_RECORDING, "livestream:manage_recording");
 
@@ -509,6 +600,9 @@ public final class PermissionAction {
     public static final PermissionAction AFFILIATE_BASIC_READ =
             new PermissionAction(Value.AFFILIATE_BASIC_READ, "affiliate:basic:read");
 
+    public static final PermissionAction PARTNER_REFERRAL_REQUEST_DECLINE =
+            new PermissionAction(Value.PARTNER_REFERRAL_REQUEST_DECLINE, "partner:referral_request:decline");
+
     public static final PermissionAction WEBHOOK_RECEIVE_SETUP_INTENTS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_SETUP_INTENTS, "webhook_receive:setup_intents");
 
@@ -516,6 +610,9 @@ public final class PermissionAction {
             new PermissionAction(Value.PAYMENT_DISPUTE_EXPORT, "payment:dispute:export");
 
     public static final PermissionAction EVENT_CREATE = new PermissionAction(Value.EVENT_CREATE, "event:create");
+
+    public static final PermissionAction PARTNER_REFERRAL_REQUEST_READ =
+            new PermissionAction(Value.PARTNER_REFERRAL_REQUEST_READ, "partner:referral_request:read");
 
     public static final PermissionAction PAYMENT_BASIC_READ =
             new PermissionAction(Value.PAYMENT_BASIC_READ, "payment:basic:read");
@@ -584,6 +681,9 @@ public final class PermissionAction {
     public static final PermissionAction WEBHOOK_RECEIVE_CARD_APPLICATIONS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_CARD_APPLICATIONS, "webhook_receive:card_applications");
 
+    public static final PermissionAction CRYPTO_WALLET_TRADE =
+            new PermissionAction(Value.CRYPTO_WALLET_TRADE, "crypto_wallet:trade");
+
     public static final PermissionAction MEDIA_GENERATE = new PermissionAction(Value.MEDIA_GENERATE, "media:generate");
 
     public static final PermissionAction PAYMENT_DISPUTE =
@@ -597,6 +697,8 @@ public final class PermissionAction {
 
     public static final PermissionAction CHILD_COMPANY_BASIC_EXPORT =
             new PermissionAction(Value.CHILD_COMPANY_BASIC_EXPORT, "child_company:basic:export");
+
+    public static final PermissionAction EMAIL_MANAGE = new PermissionAction(Value.EMAIL_MANAGE, "email:manage");
 
     public static final PermissionAction LIVESTREAM_DELETE =
             new PermissionAction(Value.LIVESTREAM_DELETE, "livestream:delete");
@@ -631,11 +733,14 @@ public final class PermissionAction {
     public static final PermissionAction PAYOUT_WITHDRAW_FUNDS =
             new PermissionAction(Value.PAYOUT_WITHDRAW_FUNDS, "payout:withdraw_funds");
 
+    public static final PermissionAction EXPERIENCE_ATTACH =
+            new PermissionAction(Value.EXPERIENCE_ATTACH, "experience:attach");
+
     public static final PermissionAction SOCIAL_ACCOUNT_READ =
             new PermissionAction(Value.SOCIAL_ACCOUNT_READ, "social_account:read");
 
-    public static final PermissionAction EXPERIENCE_ATTACH =
-            new PermissionAction(Value.EXPERIENCE_ATTACH, "experience:attach");
+    public static final PermissionAction CRYPTO_WALLET_TRADE_READ =
+            new PermissionAction(Value.CRYPTO_WALLET_TRADE_READ, "crypto_wallet:trade:read");
 
     public static final PermissionAction CONTENT_REWARDS_CREATE =
             new PermissionAction(Value.CONTENT_REWARDS_CREATE, "content_rewards:create");
@@ -646,23 +751,23 @@ public final class PermissionAction {
     public static final PermissionAction PLAN_WAITLIST_MANAGE =
             new PermissionAction(Value.PLAN_WAITLIST_MANAGE, "plan:waitlist:manage");
 
-    public static final PermissionAction AUTHORIZED_USER_CREATE =
-            new PermissionAction(Value.AUTHORIZED_USER_CREATE, "authorized_user:create");
-
     public static final PermissionAction AUTHORIZED_ROLE_UPDATE =
             new PermissionAction(Value.AUTHORIZED_ROLE_UPDATE, "authorized_role:update");
 
+    public static final PermissionAction AUTHORIZED_USER_CREATE =
+            new PermissionAction(Value.AUTHORIZED_USER_CREATE, "authorized_user:create");
+
     public static final PermissionAction CHECKOUT_REQUEST_BASIC_READ =
             new PermissionAction(Value.CHECKOUT_REQUEST_BASIC_READ, "checkout_request:basic:read");
+
+    public static final PermissionAction AIRDROP_LINK_MANAGE =
+            new PermissionAction(Value.AIRDROP_LINK_MANAGE, "airdrop_link:manage");
 
     public static final PermissionAction AUTHORIZED_ROLE_DELETE =
             new PermissionAction(Value.AUTHORIZED_ROLE_DELETE, "authorized_role:delete");
 
     public static final PermissionAction CUSTOM_EMOJI_UPDATE =
             new PermissionAction(Value.CUSTOM_EMOJI_UPDATE, "custom_emoji:update");
-
-    public static final PermissionAction AIRDROP_LINK_MANAGE =
-            new PermissionAction(Value.AIRDROP_LINK_MANAGE, "airdrop_link:manage");
 
     public static final PermissionAction CONTENT_REWARDS_UPDATE =
             new PermissionAction(Value.CONTENT_REWARDS_UPDATE, "content_rewards:update");
@@ -672,6 +777,9 @@ public final class PermissionAction {
 
     public static final PermissionAction ACCESS_PASS_STATS_EXPORT =
             new PermissionAction(Value.ACCESS_PASS_STATS_EXPORT, "access_pass:stats:export");
+
+    public static final PermissionAction EXPERIMENT_READ =
+            new PermissionAction(Value.EXPERIMENT_READ, "experiment:read");
 
     public static final PermissionAction MEMBER_MODERATE =
             new PermissionAction(Value.MEMBER_MODERATE, "member:moderate");
@@ -684,6 +792,12 @@ public final class PermissionAction {
     public static final PermissionAction MEMBERSHIP_TRANSFER =
             new PermissionAction(Value.MEMBERSHIP_TRANSFER, "membership:transfer");
 
+    public static final PermissionAction AD_PIXEL_MANAGE =
+            new PermissionAction(Value.AD_PIXEL_MANAGE, "ad_pixel:manage");
+
+    public static final PermissionAction USER_MAILING_ADDRESSES_READ =
+            new PermissionAction(Value.USER_MAILING_ADDRESSES_READ, "user:mailing_addresses:read");
+
     public static final PermissionAction AFFILIATE_UPDATE =
             new PermissionAction(Value.AFFILIATE_UPDATE, "affiliate:update");
 
@@ -693,14 +807,20 @@ public final class PermissionAction {
     public static final PermissionAction CHAT_MESSAGE_CREATE =
             new PermissionAction(Value.CHAT_MESSAGE_CREATE, "chat:message:create");
 
+    public static final PermissionAction PARTNER_HANDOFF =
+            new PermissionAction(Value.PARTNER_HANDOFF, "partner:handoff");
+
+    public static final PermissionAction WEBHOOK_RECEIVE_FINANCIAL_ACTIVITY =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_FINANCIAL_ACTIVITY, "webhook_receive:financial_activity");
+
     public static final PermissionAction WEBHOOK_RECEIVE_PLANS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_PLANS, "webhook_receive:plans");
 
-    public static final PermissionAction PLAN_STATS_READ =
-            new PermissionAction(Value.PLAN_STATS_READ, "plan:stats:read");
-
     public static final PermissionAction COURSE_ANALYTICS_READ =
             new PermissionAction(Value.COURSE_ANALYTICS_READ, "course_analytics:read");
+
+    public static final PermissionAction PLAN_STATS_READ =
+            new PermissionAction(Value.PLAN_STATS_READ, "plan:stats:read");
 
     public static final PermissionAction WEBHOOK_RECEIVE_RESOLUTIONS =
             new PermissionAction(Value.WEBHOOK_RECEIVE_RESOLUTIONS, "webhook_receive:resolutions");
@@ -774,6 +894,8 @@ public final class PermissionAction {
                 return visitor.visitWebhookReceiveShipments();
             case COMPANY_TOKEN_TRANSACTION_READ:
                 return visitor.visitCompanyTokenTransactionRead();
+            case DEVELOPER_MANAGE_OIDC_TRUST:
+                return visitor.visitDeveloperManageOidcTrust();
             case MEMBER_STATS_EXPORT:
                 return visitor.visitMemberStatsExport();
             case LIVESTREAM_MODERATE:
@@ -784,14 +906,18 @@ public final class PermissionAction {
                 return visitor.visitAuthorizedUserDelete();
             case COMPANY_AUTHORIZED_USER_EMAIL_READ:
                 return visitor.visitCompanyAuthorizedUserEmailRead();
-            case SOCIAL_ACCOUNT_DELETE:
-                return visitor.visitSocialAccountDelete();
             case PARTNER_CREATE:
                 return visitor.visitPartnerCreate();
+            case SOCIAL_ACCOUNT_DELETE:
+                return visitor.visitSocialAccountDelete();
             case WEBHOOK_RECEIVE_REFUNDS:
                 return visitor.visitWebhookReceiveRefunds();
+            case WEBHOOK_RECEIVE_AD_GROUPS:
+                return visitor.visitWebhookReceiveAdGroups();
             case OAUTH_TOKEN_EXCHANGE:
                 return visitor.visitOauthTokenExchange();
+            case AUTOMATION_READ:
+                return visitor.visitAutomationRead();
             case PAYMENT_RESOLUTION_CENTER_CASE_MANAGE:
                 return visitor.visitPaymentResolutionCenterCaseManage();
             case IDENTITY_WRITE:
@@ -804,6 +930,8 @@ public final class PermissionAction {
                 return visitor.visitWebhookReceiveVerifications();
             case WEBHOOK_RECEIVE_PRODUCTS:
                 return visitor.visitWebhookReceiveProducts();
+            case EMAIL_SEND:
+                return visitor.visitEmailSend();
             case AD_CAMPAIGN_UPDATE:
                 return visitor.visitAdCampaignUpdate();
             case NOTIFICATION_CREATE:
@@ -812,12 +940,18 @@ public final class PermissionAction {
                 return visitor.visitBountyCreate();
             case INVOICE_BASIC_READ:
                 return visitor.visitInvoiceBasicRead();
+            case PARTNER_COMMISSION_ADVANCE_UPDATE:
+                return visitor.visitPartnerCommissionAdvanceUpdate();
             case DEVELOPER_MANAGE_OAUTH:
                 return visitor.visitDeveloperManageOauth();
             case DMS_CHANNEL_MANAGE:
                 return visitor.visitDmsChannelManage();
             case CHECKOUT_REQUEST_CREATE:
                 return visitor.visitCheckoutRequestCreate();
+            case WAITLIST_ENTRY_READ:
+                return visitor.visitWaitlistEntryRead();
+            case PARTNER_REFERRAL_REQUEST_CANCEL:
+                return visitor.visitPartnerReferralRequestCancel();
             case WEBHOOK_RECEIVE_ACCOUNTS:
                 return visitor.visitWebhookReceiveAccounts();
             case DMS_READ:
@@ -852,6 +986,8 @@ public final class PermissionAction {
                 return visitor.visitPayoutWithdrawalRead();
             case COMPANY_BALANCE_EXPORT:
                 return visitor.visitCompanyBalanceExport();
+            case WEBHOOK_RECEIVE_APP_INSTALLATIONS:
+                return visitor.visitWebhookReceiveAppInstallations();
             case WEBHOOK_RECEIVE_PAYMENTS:
                 return visitor.visitWebhookReceivePayments();
             case TRACKING_LINK_DELETE:
@@ -862,30 +998,38 @@ public final class PermissionAction {
                 return visitor.visitChatRead();
             case EXPERIENCE_DELETE:
                 return visitor.visitExperienceDelete();
+            case USER_ABUSE_REPORT_CREATE:
+                return visitor.visitUserAbuseReportCreate();
+            case CHECKOUT_CONFIGURATION_CREATE:
+                return visitor.visitCheckoutConfigurationCreate();
             case PAYMENT_RESOLUTION_CENTER_CASE_EXPORT:
                 return visitor.visitPaymentResolutionCenterCaseExport();
             case WEBHOOK_RECEIVE_AD_CAMPAIGNS:
                 return visitor.visitWebhookReceiveAdCampaigns();
-            case CHECKOUT_CONFIGURATION_CREATE:
-                return visitor.visitCheckoutConfigurationCreate();
-            case DEVELOPER_MANAGE_API_KEY:
-                return visitor.visitDeveloperManageApiKey();
             case AI_CHAT_DELETE:
                 return visitor.visitAiChatDelete();
+            case COMPANY_SUSPEND_CHILD:
+                return visitor.visitCompanySuspendChild();
+            case DEVELOPER_MANAGE_API_KEY:
+                return visitor.visitDeveloperManageApiKey();
+            case EMAIL_READ:
+                return visitor.visitEmailRead();
             case WEBHOOK_RECEIVE_DISPUTES:
                 return visitor.visitWebhookReceiveDisputes();
-            case IAP_READ:
-                return visitor.visitIapRead();
             case CRYPTO_WALLET_MANAGE:
                 return visitor.visitCryptoWalletManage();
+            case IAP_READ:
+                return visitor.visitIapRead();
             case SUPPORT_CHAT_CREATE:
                 return visitor.visitSupportChatCreate();
             case DMS_MESSAGE_MANAGE:
                 return visitor.visitDmsMessageManage();
-            case AUTHORIZED_USER_UPDATE:
-                return visitor.visitAuthorizedUserUpdate();
+            case DOMAIN_READ:
+                return visitor.visitDomainRead();
             case APP_AUTHORIZATION_DELETE:
                 return visitor.visitAppAuthorizationDelete();
+            case AUTHORIZED_USER_UPDATE:
+                return visitor.visitAuthorizedUserUpdate();
             case MEDIA_READ:
                 return visitor.visitMediaRead();
             case MEMBER_PAYMENT_METHODS_READ:
@@ -914,6 +1058,8 @@ public final class PermissionAction {
                 return visitor.visitPartnerBasicRead();
             case MEMBER_PHONE_READ:
                 return visitor.visitMemberPhoneRead();
+            case DOMAIN_MANAGE:
+                return visitor.visitDomainManage();
             case FORUM_POST_CREATE:
                 return visitor.visitForumPostCreate();
             case INCORPORATION_WRITE:
@@ -926,6 +1072,8 @@ public final class PermissionAction {
                 return visitor.visitMemberJourneyRead();
             case WEBHOOK_RECEIVE_WITHDRAWALS:
                 return visitor.visitWebhookReceiveWithdrawals();
+            case USER_PAYMENT_CHARGE:
+                return visitor.visitUserPaymentCharge();
             case WEBHOOK_RECEIVE_MEMBERSHIPS:
                 return visitor.visitWebhookReceiveMemberships();
             case EXPERIENCE_HIDDEN_EXPERIENCE_READ:
@@ -942,10 +1090,14 @@ public final class PermissionAction {
                 return visitor.visitAccessPassBasicExport();
             case MEMBER_PAYMENT_METHODS_MANAGE:
                 return visitor.visitMemberPaymentMethodsManage();
+            case PARTNER_EMAIL_READ:
+                return visitor.visitPartnerEmailRead();
             case PAYOUT_DELETE_DESTINATION:
                 return visitor.visitPayoutDeleteDestination();
             case PLAN_CREATE:
                 return visitor.visitPlanCreate();
+            case AUTOMATION_MANAGE:
+                return visitor.visitAutomationManage();
             case WEBHOOK_RECEIVE_CARD_TRANSACTIONS:
                 return visitor.visitWebhookReceiveCardTransactions();
             case COURSES_READ:
@@ -956,30 +1108,42 @@ public final class PermissionAction {
                 return visitor.visitMemberEmailRead();
             case LEAD_BASIC_READ:
                 return visitor.visitLeadBasicRead();
+            case PARTNER_REFERRAL_REQUEST_CREATE:
+                return visitor.visitPartnerReferralRequestCreate();
             case PAYOUT_WITHDRAWAL_EXPORT:
                 return visitor.visitPayoutWithdrawalExport();
             case PLAN_DELETE:
                 return visitor.visitPlanDelete();
             case PAYOUT_ACCOUNT_READ:
                 return visitor.visitPayoutAccountRead();
+            case DEVELOPER_APP_INSTALLATION_UPDATE:
+                return visitor.visitDeveloperAppInstallationUpdate();
+            case MEMBER_REPORTING_LINE_UPDATE:
+                return visitor.visitMemberReportingLineUpdate();
             case PROFILE:
                 return visitor.visitProfile();
             case DEVELOPER_BASIC_READ:
                 return visitor.visitDeveloperBasicRead();
             case ACCESS_PASS_CREATE:
                 return visitor.visitAccessPassCreate();
+            case AUTOMATION_WRITE:
+                return visitor.visitAutomationWrite();
             case WEBHOOK_RECEIVE_COURSES:
                 return visitor.visitWebhookReceiveCourses();
             case SHIPMENT_CREATE:
                 return visitor.visitShipmentCreate();
             case TRACKING_LINK_STATS_EXPORT:
                 return visitor.visitTrackingLinkStatsExport();
+            case WAITLIST_ENTRY_CANCEL:
+                return visitor.visitWaitlistEntryCancel();
+            case WAITLIST_ENTRY_CREATE:
+                return visitor.visitWaitlistEntryCreate();
             case COURSES_UPDATE:
                 return visitor.visitCoursesUpdate();
-            case PLAN_BASIC_EXPORT:
-                return visitor.visitPlanBasicExport();
             case AI_CHAT_CREATE:
                 return visitor.visitAiChatCreate();
+            case PLAN_BASIC_EXPORT:
+                return visitor.visitPlanBasicExport();
             case WEBHOOK_RECEIVE_MEMBERS:
                 return visitor.visitWebhookReceiveMembers();
             case WEBHOOK_RECEIVE_PAYOUT_ACCOUNTS:
@@ -1000,20 +1164,26 @@ public final class PermissionAction {
                 return visitor.visitContentRewardsBasicExport();
             case PLAN_UPDATE:
                 return visitor.visitPlanUpdate();
+            case DEVELOPER_APP_INSTALLATION_READ:
+                return visitor.visitDeveloperAppInstallationRead();
             case MEMBER_BASIC_EXPORT:
                 return visitor.visitMemberBasicExport();
             case COMPANY_CREATE_CHILD:
                 return visitor.visitCompanyCreateChild();
+            case REVIEW_DELETE:
+                return visitor.visitReviewDelete();
             case APP_AUTHORIZATION_CREATE:
                 return visitor.visitAppAuthorizationCreate();
             case WEBHOOK_RECEIVE_ENTRIES:
                 return visitor.visitWebhookReceiveEntries();
-            case WEBHOOK_RECEIVE_CARDS:
-                return visitor.visitWebhookReceiveCards();
             case CHECKOUT_CONFIGURATION_DELETE:
                 return visitor.visitCheckoutConfigurationDelete();
             case USER_NOTIFICATIONS_UPDATE:
                 return visitor.visitUserNotificationsUpdate();
+            case WEBHOOK_RECEIVE_CARDS:
+                return visitor.visitWebhookReceiveCards();
+            case WEBHOOK_RECEIVE_EVENTS:
+                return visitor.visitWebhookReceiveEvents();
             case USER_NOTIFICATIONS_READ:
                 return visitor.visitUserNotificationsRead();
             case PAYMENT_DISPUTE_ALERT_READ:
@@ -1026,6 +1196,8 @@ public final class PermissionAction {
                 return visitor.visitUserBalanceRead();
             case SUPPORT_CHAT_MESSAGE_CREATE:
                 return visitor.visitSupportChatMessageCreate();
+            case PARTNER_REFERRAL_REQUEST_ACCEPT:
+                return visitor.visitPartnerReferralRequestAccept();
             case SOCIAL_LINK_UPDATE:
                 return visitor.visitSocialLinkUpdate();
             case DEVELOPER_UPDATE_APP:
@@ -1052,6 +1224,8 @@ public final class PermissionAction {
                 return visitor.visitCompanyManageLegal();
             case PAYOUT_TRANSFER_FUNDS:
                 return visitor.visitPayoutTransferFunds();
+            case WEBHOOK_RECEIVE_ADS:
+                return visitor.visitWebhookReceiveAds();
             case WEBHOOK_RECEIVE_APP_MEMBERSHIPS:
                 return visitor.visitWebhookReceiveAppMemberships();
             case CONTENT_REWARDS_BASIC_READ:
@@ -1064,10 +1238,16 @@ public final class PermissionAction {
                 return visitor.visitCryptoWalletSwap();
             case EMAIL:
                 return visitor.visitEmail();
+            case EXPERIMENT_MANAGE:
+                return visitor.visitExperimentManage();
             case PROMO_CODE_DELETE:
                 return visitor.visitPromoCodeDelete();
+            case PARTNER_FEES_UPDATE:
+                return visitor.visitPartnerFeesUpdate();
             case PAYOUT_ACCOUNT_UPDATE:
                 return visitor.visitPayoutAccountUpdate();
+            case WEBHOOK_RECEIVE_DOMAINS:
+                return visitor.visitWebhookReceiveDomains();
             case PAYOUT_TRANSFER_EXPORT:
                 return visitor.visitPayoutTransferExport();
             case USER_EMAIL_READ:
@@ -1076,20 +1256,22 @@ public final class PermissionAction {
                 return visitor.visitCompanyBasicRead();
             case LEAD_BASIC_EXPORT:
                 return visitor.visitLeadBasicExport();
-            case STATS_READ:
-                return visitor.visitStatsRead();
             case AI_CHAT_UPDATE:
                 return visitor.visitAiChatUpdate();
-            case INCORPORATION_READ:
-                return visitor.visitIncorporationRead();
+            case STATS_READ:
+                return visitor.visitStatsRead();
             case AI_CHAT_READ:
                 return visitor.visitAiChatRead();
+            case INCORPORATION_READ:
+                return visitor.visitIncorporationRead();
             case APP_AUTHORIZATION_UPDATE:
                 return visitor.visitAppAuthorizationUpdate();
             case REFERRAL_PARTNER_CREATE:
                 return visitor.visitReferralPartnerCreate();
             case TRACKING_LINK_BASIC_EXPORT:
                 return visitor.visitTrackingLinkBasicExport();
+            case USER_ABUSE_REPORT_READ:
+                return visitor.visitUserAbuseReportRead();
             case ACCESS_PASS_CONTROL_CENTER:
                 return visitor.visitAccessPassControlCenter();
             case FORUM_MODERATE:
@@ -1108,6 +1290,8 @@ public final class PermissionAction {
                 return visitor.visitAccessPassUpdate();
             case MEMBERSHIP_UPDATE:
                 return visitor.visitMembershipUpdate();
+            case PARTNER_COMMISSION_ADVANCE_ACCEPT:
+                return visitor.visitPartnerCommissionAdvanceAccept();
             case LIVESTREAM_MANAGE_RECORDING:
                 return visitor.visitLivestreamManageRecording();
             case WEBHOOK_RECEIVE_PAYOUT_METHODS:
@@ -1122,12 +1306,16 @@ public final class PermissionAction {
                 return visitor.visitExperienceUpdate();
             case AFFILIATE_BASIC_READ:
                 return visitor.visitAffiliateBasicRead();
+            case PARTNER_REFERRAL_REQUEST_DECLINE:
+                return visitor.visitPartnerReferralRequestDecline();
             case WEBHOOK_RECEIVE_SETUP_INTENTS:
                 return visitor.visitWebhookReceiveSetupIntents();
             case PAYMENT_DISPUTE_EXPORT:
                 return visitor.visitPaymentDisputeExport();
             case EVENT_CREATE:
                 return visitor.visitEventCreate();
+            case PARTNER_REFERRAL_REQUEST_READ:
+                return visitor.visitPartnerReferralRequestRead();
             case PAYMENT_BASIC_READ:
                 return visitor.visitPaymentBasicRead();
             case MEMBER_PAYMENT_METHODS_USE:
@@ -1174,6 +1362,8 @@ public final class PermissionAction {
                 return visitor.visitDeveloperUpdateAppAuthorization();
             case WEBHOOK_RECEIVE_CARD_APPLICATIONS:
                 return visitor.visitWebhookReceiveCardApplications();
+            case CRYPTO_WALLET_TRADE:
+                return visitor.visitCryptoWalletTrade();
             case MEDIA_GENERATE:
                 return visitor.visitMediaGenerate();
             case PAYMENT_DISPUTE:
@@ -1184,6 +1374,8 @@ public final class PermissionAction {
                 return visitor.visitAdCampaignRead();
             case CHILD_COMPANY_BASIC_EXPORT:
                 return visitor.visitChildCompanyBasicExport();
+            case EMAIL_MANAGE:
+                return visitor.visitEmailManage();
             case LIVESTREAM_DELETE:
                 return visitor.visitLivestreamDelete();
             case EXPERIENCE_DETACH:
@@ -1206,34 +1398,38 @@ public final class PermissionAction {
                 return visitor.visitBountyCaptureClipCreate();
             case PAYOUT_WITHDRAW_FUNDS:
                 return visitor.visitPayoutWithdrawFunds();
-            case SOCIAL_ACCOUNT_READ:
-                return visitor.visitSocialAccountRead();
             case EXPERIENCE_ATTACH:
                 return visitor.visitExperienceAttach();
+            case SOCIAL_ACCOUNT_READ:
+                return visitor.visitSocialAccountRead();
+            case CRYPTO_WALLET_TRADE_READ:
+                return visitor.visitCryptoWalletTradeRead();
             case CONTENT_REWARDS_CREATE:
                 return visitor.visitContentRewardsCreate();
             case MEMBERSHIP_RESYNC_ACCESS:
                 return visitor.visitMembershipResyncAccess();
             case PLAN_WAITLIST_MANAGE:
                 return visitor.visitPlanWaitlistManage();
-            case AUTHORIZED_USER_CREATE:
-                return visitor.visitAuthorizedUserCreate();
             case AUTHORIZED_ROLE_UPDATE:
                 return visitor.visitAuthorizedRoleUpdate();
+            case AUTHORIZED_USER_CREATE:
+                return visitor.visitAuthorizedUserCreate();
             case CHECKOUT_REQUEST_BASIC_READ:
                 return visitor.visitCheckoutRequestBasicRead();
+            case AIRDROP_LINK_MANAGE:
+                return visitor.visitAirdropLinkManage();
             case AUTHORIZED_ROLE_DELETE:
                 return visitor.visitAuthorizedRoleDelete();
             case CUSTOM_EMOJI_UPDATE:
                 return visitor.visitCustomEmojiUpdate();
-            case AIRDROP_LINK_MANAGE:
-                return visitor.visitAirdropLinkManage();
             case CONTENT_REWARDS_UPDATE:
                 return visitor.visitContentRewardsUpdate();
             case PAYMENT_DISPUTE_READ:
                 return visitor.visitPaymentDisputeRead();
             case ACCESS_PASS_STATS_EXPORT:
                 return visitor.visitAccessPassStatsExport();
+            case EXPERIMENT_READ:
+                return visitor.visitExperimentRead();
             case MEMBER_MODERATE:
                 return visitor.visitMemberModerate();
             case PLAN_STATS_EXPORT:
@@ -1242,18 +1438,26 @@ public final class PermissionAction {
                 return visitor.visitForumRead();
             case MEMBERSHIP_TRANSFER:
                 return visitor.visitMembershipTransfer();
+            case AD_PIXEL_MANAGE:
+                return visitor.visitAdPixelManage();
+            case USER_MAILING_ADDRESSES_READ:
+                return visitor.visitUserMailingAddressesRead();
             case AFFILIATE_UPDATE:
                 return visitor.visitAffiliateUpdate();
             case TRACKING_LINK_CREATE:
                 return visitor.visitTrackingLinkCreate();
             case CHAT_MESSAGE_CREATE:
                 return visitor.visitChatMessageCreate();
+            case PARTNER_HANDOFF:
+                return visitor.visitPartnerHandoff();
+            case WEBHOOK_RECEIVE_FINANCIAL_ACTIVITY:
+                return visitor.visitWebhookReceiveFinancialActivity();
             case WEBHOOK_RECEIVE_PLANS:
                 return visitor.visitWebhookReceivePlans();
-            case PLAN_STATS_READ:
-                return visitor.visitPlanStatsRead();
             case COURSE_ANALYTICS_READ:
                 return visitor.visitCourseAnalyticsRead();
+            case PLAN_STATS_READ:
+                return visitor.visitPlanStatsRead();
             case WEBHOOK_RECEIVE_RESOLUTIONS:
                 return visitor.visitWebhookReceiveResolutions();
             case COURSE_LESSON_INTERACTION_READ:
@@ -1293,6 +1497,8 @@ public final class PermissionAction {
                 return WEBHOOK_RECEIVE_SHIPMENTS;
             case "company_token_transaction:read":
                 return COMPANY_TOKEN_TRANSACTION_READ;
+            case "developer:manage_oidc_trust":
+                return DEVELOPER_MANAGE_OIDC_TRUST;
             case "member:stats:export":
                 return MEMBER_STATS_EXPORT;
             case "livestream:moderate":
@@ -1303,14 +1509,18 @@ public final class PermissionAction {
                 return AUTHORIZED_USER_DELETE;
             case "company:authorized_user:email:read":
                 return COMPANY_AUTHORIZED_USER_EMAIL_READ;
-            case "social_account:delete":
-                return SOCIAL_ACCOUNT_DELETE;
             case "partner:create":
                 return PARTNER_CREATE;
+            case "social_account:delete":
+                return SOCIAL_ACCOUNT_DELETE;
             case "webhook_receive:refunds":
                 return WEBHOOK_RECEIVE_REFUNDS;
+            case "webhook_receive:ad_groups":
+                return WEBHOOK_RECEIVE_AD_GROUPS;
             case "oauth:token_exchange":
                 return OAUTH_TOKEN_EXCHANGE;
+            case "automation:read":
+                return AUTOMATION_READ;
             case "payment:resolution_center_case:manage":
                 return PAYMENT_RESOLUTION_CENTER_CASE_MANAGE;
             case "identity:write":
@@ -1323,6 +1533,8 @@ public final class PermissionAction {
                 return WEBHOOK_RECEIVE_VERIFICATIONS;
             case "webhook_receive:products":
                 return WEBHOOK_RECEIVE_PRODUCTS;
+            case "email:send":
+                return EMAIL_SEND;
             case "ad_campaign:update":
                 return AD_CAMPAIGN_UPDATE;
             case "notification:create":
@@ -1331,12 +1543,18 @@ public final class PermissionAction {
                 return BOUNTY_CREATE;
             case "invoice:basic:read":
                 return INVOICE_BASIC_READ;
+            case "partner:commission_advance:update":
+                return PARTNER_COMMISSION_ADVANCE_UPDATE;
             case "developer:manage_oauth":
                 return DEVELOPER_MANAGE_OAUTH;
             case "dms:channel:manage":
                 return DMS_CHANNEL_MANAGE;
             case "checkout_request:create":
                 return CHECKOUT_REQUEST_CREATE;
+            case "waitlist_entry:read":
+                return WAITLIST_ENTRY_READ;
+            case "partner:referral_request:cancel":
+                return PARTNER_REFERRAL_REQUEST_CANCEL;
             case "webhook_receive:accounts":
                 return WEBHOOK_RECEIVE_ACCOUNTS;
             case "dms:read":
@@ -1371,6 +1589,8 @@ public final class PermissionAction {
                 return PAYOUT_WITHDRAWAL_READ;
             case "company:balance:export":
                 return COMPANY_BALANCE_EXPORT;
+            case "webhook_receive:app_installations":
+                return WEBHOOK_RECEIVE_APP_INSTALLATIONS;
             case "webhook_receive:payments":
                 return WEBHOOK_RECEIVE_PAYMENTS;
             case "tracking_link:delete":
@@ -1381,30 +1601,38 @@ public final class PermissionAction {
                 return CHAT_READ;
             case "experience:delete":
                 return EXPERIENCE_DELETE;
+            case "user:abuse_report:create":
+                return USER_ABUSE_REPORT_CREATE;
+            case "checkout_configuration:create":
+                return CHECKOUT_CONFIGURATION_CREATE;
             case "payment:resolution_center_case:export":
                 return PAYMENT_RESOLUTION_CENTER_CASE_EXPORT;
             case "webhook_receive:ad_campaigns":
                 return WEBHOOK_RECEIVE_AD_CAMPAIGNS;
-            case "checkout_configuration:create":
-                return CHECKOUT_CONFIGURATION_CREATE;
-            case "developer:manage_api_key":
-                return DEVELOPER_MANAGE_API_KEY;
             case "ai_chat:delete":
                 return AI_CHAT_DELETE;
+            case "company:suspend_child":
+                return COMPANY_SUSPEND_CHILD;
+            case "developer:manage_api_key":
+                return DEVELOPER_MANAGE_API_KEY;
+            case "email:read":
+                return EMAIL_READ;
             case "webhook_receive:disputes":
                 return WEBHOOK_RECEIVE_DISPUTES;
-            case "iap:read":
-                return IAP_READ;
             case "crypto_wallet:manage":
                 return CRYPTO_WALLET_MANAGE;
+            case "iap:read":
+                return IAP_READ;
             case "support_chat:create":
                 return SUPPORT_CHAT_CREATE;
             case "dms:message:manage":
                 return DMS_MESSAGE_MANAGE;
-            case "authorized_user:update":
-                return AUTHORIZED_USER_UPDATE;
+            case "domain:read":
+                return DOMAIN_READ;
             case "app_authorization:delete":
                 return APP_AUTHORIZATION_DELETE;
+            case "authorized_user:update":
+                return AUTHORIZED_USER_UPDATE;
             case "media:read":
                 return MEDIA_READ;
             case "member:payment_methods:read":
@@ -1433,6 +1661,8 @@ public final class PermissionAction {
                 return PARTNER_BASIC_READ;
             case "member:phone:read":
                 return MEMBER_PHONE_READ;
+            case "domain:manage":
+                return DOMAIN_MANAGE;
             case "forum:post:create":
                 return FORUM_POST_CREATE;
             case "incorporation:write":
@@ -1445,6 +1675,8 @@ public final class PermissionAction {
                 return MEMBER_JOURNEY_READ;
             case "webhook_receive:withdrawals":
                 return WEBHOOK_RECEIVE_WITHDRAWALS;
+            case "user:payment:charge":
+                return USER_PAYMENT_CHARGE;
             case "webhook_receive:memberships":
                 return WEBHOOK_RECEIVE_MEMBERSHIPS;
             case "experience:hidden_experience:read":
@@ -1461,10 +1693,14 @@ public final class PermissionAction {
                 return ACCESS_PASS_BASIC_EXPORT;
             case "member:payment_methods:manage":
                 return MEMBER_PAYMENT_METHODS_MANAGE;
+            case "partner:email:read":
+                return PARTNER_EMAIL_READ;
             case "payout:delete_destination":
                 return PAYOUT_DELETE_DESTINATION;
             case "plan:create":
                 return PLAN_CREATE;
+            case "automation:manage":
+                return AUTOMATION_MANAGE;
             case "webhook_receive:card_transactions":
                 return WEBHOOK_RECEIVE_CARD_TRANSACTIONS;
             case "courses:read":
@@ -1475,30 +1711,42 @@ public final class PermissionAction {
                 return MEMBER_EMAIL_READ;
             case "lead:basic:read":
                 return LEAD_BASIC_READ;
+            case "partner:referral_request:create":
+                return PARTNER_REFERRAL_REQUEST_CREATE;
             case "payout:withdrawal:export":
                 return PAYOUT_WITHDRAWAL_EXPORT;
             case "plan:delete":
                 return PLAN_DELETE;
             case "payout:account:read":
                 return PAYOUT_ACCOUNT_READ;
+            case "developer:app_installation:update":
+                return DEVELOPER_APP_INSTALLATION_UPDATE;
+            case "member:reporting_line:update":
+                return MEMBER_REPORTING_LINE_UPDATE;
             case "profile":
                 return PROFILE;
             case "developer:basic:read":
                 return DEVELOPER_BASIC_READ;
             case "access_pass:create":
                 return ACCESS_PASS_CREATE;
+            case "automation:write":
+                return AUTOMATION_WRITE;
             case "webhook_receive:courses":
                 return WEBHOOK_RECEIVE_COURSES;
             case "shipment:create":
                 return SHIPMENT_CREATE;
             case "tracking_link:stats:export":
                 return TRACKING_LINK_STATS_EXPORT;
+            case "waitlist_entry:cancel":
+                return WAITLIST_ENTRY_CANCEL;
+            case "waitlist_entry:create":
+                return WAITLIST_ENTRY_CREATE;
             case "courses:update":
                 return COURSES_UPDATE;
-            case "plan:basic:export":
-                return PLAN_BASIC_EXPORT;
             case "ai_chat:create":
                 return AI_CHAT_CREATE;
+            case "plan:basic:export":
+                return PLAN_BASIC_EXPORT;
             case "webhook_receive:members":
                 return WEBHOOK_RECEIVE_MEMBERS;
             case "webhook_receive:payout_accounts":
@@ -1519,20 +1767,26 @@ public final class PermissionAction {
                 return CONTENT_REWARDS_BASIC_EXPORT;
             case "plan:update":
                 return PLAN_UPDATE;
+            case "developer:app_installation:read":
+                return DEVELOPER_APP_INSTALLATION_READ;
             case "member:basic:export":
                 return MEMBER_BASIC_EXPORT;
             case "company:create_child":
                 return COMPANY_CREATE_CHILD;
+            case "review:delete":
+                return REVIEW_DELETE;
             case "app_authorization:create":
                 return APP_AUTHORIZATION_CREATE;
             case "webhook_receive:entries":
                 return WEBHOOK_RECEIVE_ENTRIES;
-            case "webhook_receive:cards":
-                return WEBHOOK_RECEIVE_CARDS;
             case "checkout_configuration:delete":
                 return CHECKOUT_CONFIGURATION_DELETE;
             case "user:notifications:update":
                 return USER_NOTIFICATIONS_UPDATE;
+            case "webhook_receive:cards":
+                return WEBHOOK_RECEIVE_CARDS;
+            case "webhook_receive:events":
+                return WEBHOOK_RECEIVE_EVENTS;
             case "user:notifications:read":
                 return USER_NOTIFICATIONS_READ;
             case "payment:dispute_alert:read":
@@ -1545,6 +1799,8 @@ public final class PermissionAction {
                 return USER_BALANCE_READ;
             case "support_chat:message:create":
                 return SUPPORT_CHAT_MESSAGE_CREATE;
+            case "partner:referral_request:accept":
+                return PARTNER_REFERRAL_REQUEST_ACCEPT;
             case "social_link:update":
                 return SOCIAL_LINK_UPDATE;
             case "developer:update_app":
@@ -1571,6 +1827,8 @@ public final class PermissionAction {
                 return COMPANY_MANAGE_LEGAL;
             case "payout:transfer_funds":
                 return PAYOUT_TRANSFER_FUNDS;
+            case "webhook_receive:ads":
+                return WEBHOOK_RECEIVE_ADS;
             case "webhook_receive:app_memberships":
                 return WEBHOOK_RECEIVE_APP_MEMBERSHIPS;
             case "content_rewards:basic:read":
@@ -1583,10 +1841,16 @@ public final class PermissionAction {
                 return CRYPTO_WALLET_SWAP;
             case "email":
                 return EMAIL;
+            case "experiment:manage":
+                return EXPERIMENT_MANAGE;
             case "promo_code:delete":
                 return PROMO_CODE_DELETE;
+            case "partner:fees:update":
+                return PARTNER_FEES_UPDATE;
             case "payout:account:update":
                 return PAYOUT_ACCOUNT_UPDATE;
+            case "webhook_receive:domains":
+                return WEBHOOK_RECEIVE_DOMAINS;
             case "payout:transfer:export":
                 return PAYOUT_TRANSFER_EXPORT;
             case "user:email:read":
@@ -1595,20 +1859,22 @@ public final class PermissionAction {
                 return COMPANY_BASIC_READ;
             case "lead:basic:export":
                 return LEAD_BASIC_EXPORT;
-            case "stats:read":
-                return STATS_READ;
             case "ai_chat:update":
                 return AI_CHAT_UPDATE;
-            case "incorporation:read":
-                return INCORPORATION_READ;
+            case "stats:read":
+                return STATS_READ;
             case "ai_chat:read":
                 return AI_CHAT_READ;
+            case "incorporation:read":
+                return INCORPORATION_READ;
             case "app_authorization:update":
                 return APP_AUTHORIZATION_UPDATE;
             case "referral:partner:create":
                 return REFERRAL_PARTNER_CREATE;
             case "tracking_link:basic:export":
                 return TRACKING_LINK_BASIC_EXPORT;
+            case "user:abuse_report:read":
+                return USER_ABUSE_REPORT_READ;
             case "access_pass:control_center":
                 return ACCESS_PASS_CONTROL_CENTER;
             case "forum:moderate":
@@ -1627,6 +1893,8 @@ public final class PermissionAction {
                 return ACCESS_PASS_UPDATE;
             case "membership:update":
                 return MEMBERSHIP_UPDATE;
+            case "partner:commission_advance:accept":
+                return PARTNER_COMMISSION_ADVANCE_ACCEPT;
             case "livestream:manage_recording":
                 return LIVESTREAM_MANAGE_RECORDING;
             case "webhook_receive:payout_methods":
@@ -1641,12 +1909,16 @@ public final class PermissionAction {
                 return EXPERIENCE_UPDATE;
             case "affiliate:basic:read":
                 return AFFILIATE_BASIC_READ;
+            case "partner:referral_request:decline":
+                return PARTNER_REFERRAL_REQUEST_DECLINE;
             case "webhook_receive:setup_intents":
                 return WEBHOOK_RECEIVE_SETUP_INTENTS;
             case "payment:dispute:export":
                 return PAYMENT_DISPUTE_EXPORT;
             case "event:create":
                 return EVENT_CREATE;
+            case "partner:referral_request:read":
+                return PARTNER_REFERRAL_REQUEST_READ;
             case "payment:basic:read":
                 return PAYMENT_BASIC_READ;
             case "member:payment_methods:use":
@@ -1693,6 +1965,8 @@ public final class PermissionAction {
                 return DEVELOPER_UPDATE_APP_AUTHORIZATION;
             case "webhook_receive:card_applications":
                 return WEBHOOK_RECEIVE_CARD_APPLICATIONS;
+            case "crypto_wallet:trade":
+                return CRYPTO_WALLET_TRADE;
             case "media:generate":
                 return MEDIA_GENERATE;
             case "payment:dispute":
@@ -1703,6 +1977,8 @@ public final class PermissionAction {
                 return AD_CAMPAIGN_READ;
             case "child_company:basic:export":
                 return CHILD_COMPANY_BASIC_EXPORT;
+            case "email:manage":
+                return EMAIL_MANAGE;
             case "livestream:delete":
                 return LIVESTREAM_DELETE;
             case "experience:detach":
@@ -1725,34 +2001,38 @@ public final class PermissionAction {
                 return BOUNTY_CAPTURE_CLIP_CREATE;
             case "payout:withdraw_funds":
                 return PAYOUT_WITHDRAW_FUNDS;
-            case "social_account:read":
-                return SOCIAL_ACCOUNT_READ;
             case "experience:attach":
                 return EXPERIENCE_ATTACH;
+            case "social_account:read":
+                return SOCIAL_ACCOUNT_READ;
+            case "crypto_wallet:trade:read":
+                return CRYPTO_WALLET_TRADE_READ;
             case "content_rewards:create":
                 return CONTENT_REWARDS_CREATE;
             case "membership:resync_access":
                 return MEMBERSHIP_RESYNC_ACCESS;
             case "plan:waitlist:manage":
                 return PLAN_WAITLIST_MANAGE;
-            case "authorized_user:create":
-                return AUTHORIZED_USER_CREATE;
             case "authorized_role:update":
                 return AUTHORIZED_ROLE_UPDATE;
+            case "authorized_user:create":
+                return AUTHORIZED_USER_CREATE;
             case "checkout_request:basic:read":
                 return CHECKOUT_REQUEST_BASIC_READ;
+            case "airdrop_link:manage":
+                return AIRDROP_LINK_MANAGE;
             case "authorized_role:delete":
                 return AUTHORIZED_ROLE_DELETE;
             case "custom_emoji:update":
                 return CUSTOM_EMOJI_UPDATE;
-            case "airdrop_link:manage":
-                return AIRDROP_LINK_MANAGE;
             case "content_rewards:update":
                 return CONTENT_REWARDS_UPDATE;
             case "payment:dispute:read":
                 return PAYMENT_DISPUTE_READ;
             case "access_pass:stats:export":
                 return ACCESS_PASS_STATS_EXPORT;
+            case "experiment:read":
+                return EXPERIMENT_READ;
             case "member:moderate":
                 return MEMBER_MODERATE;
             case "plan:stats:export":
@@ -1761,18 +2041,26 @@ public final class PermissionAction {
                 return FORUM_READ;
             case "membership:transfer":
                 return MEMBERSHIP_TRANSFER;
+            case "ad_pixel:manage":
+                return AD_PIXEL_MANAGE;
+            case "user:mailing_addresses:read":
+                return USER_MAILING_ADDRESSES_READ;
             case "affiliate:update":
                 return AFFILIATE_UPDATE;
             case "tracking_link:create":
                 return TRACKING_LINK_CREATE;
             case "chat:message:create":
                 return CHAT_MESSAGE_CREATE;
+            case "partner:handoff":
+                return PARTNER_HANDOFF;
+            case "webhook_receive:financial_activity":
+                return WEBHOOK_RECEIVE_FINANCIAL_ACTIVITY;
             case "webhook_receive:plans":
                 return WEBHOOK_RECEIVE_PLANS;
-            case "plan:stats:read":
-                return PLAN_STATS_READ;
             case "course_analytics:read":
                 return COURSE_ANALYTICS_READ;
+            case "plan:stats:read":
+                return PLAN_STATS_READ;
             case "webhook_receive:resolutions":
                 return WEBHOOK_RECEIVE_RESOLUTIONS;
             case "course_lesson_interaction:read":
@@ -1803,8 +2091,6 @@ public final class PermissionAction {
     }
 
     public enum Value {
-        AI_PROMPT_CREATE,
-
         ACCESS_PASS_BASIC_EXPORT,
 
         ACCESS_PASS_BASIC_READ,
@@ -1839,9 +2125,7 @@ public final class PermissionAction {
 
         AD_CAMPAIGN_UPDATE,
 
-        AUDIENCE_BASIC_READ,
-
-        AUDIENCE_UPDATE,
+        AD_PIXEL_MANAGE,
 
         AD_PUBLISHER_READ,
 
@@ -1851,41 +2135,63 @@ public final class PermissionAction {
 
         AFFILIATE_UPDATE,
 
+        AI_CHAT_CREATE,
+
+        AI_CHAT_DELETE,
+
+        AI_CHAT_READ,
+
+        AI_CHAT_UPDATE,
+
+        AI_PROMPT_CREATE,
+
+        AIRDROP_LINK_BASIC_READ,
+
+        AIRDROP_LINK_MANAGE,
+
+        APP_AUTHORIZATION_CREATE,
+
+        APP_AUTHORIZATION_DELETE,
+
+        APP_AUTHORIZATION_READ,
+
+        APP_AUTHORIZATION_UPDATE,
+
+        AUDIENCE_BASIC_READ,
+
+        AUDIENCE_UPDATE,
+
+        AUTHORIZED_ROLE_ATTACH,
+
+        AUTHORIZED_ROLE_CREATE,
+
+        AUTHORIZED_ROLE_DELETE,
+
+        AUTHORIZED_ROLE_DETACH,
+
+        AUTHORIZED_ROLE_UPDATE,
+
         AUTHORIZED_USER_CREATE,
 
         AUTHORIZED_USER_DELETE,
 
         AUTHORIZED_USER_UPDATE,
 
-        AUTHORIZED_ROLE_CREATE,
+        AUTOMATION_MANAGE,
 
-        AUTHORIZED_ROLE_UPDATE,
+        AUTOMATION_READ,
 
-        AUTHORIZED_ROLE_DELETE,
-
-        AUTHORIZED_ROLE_ATTACH,
-
-        AUTHORIZED_ROLE_DETACH,
-
-        APP_AUTHORIZATION_CREATE,
-
-        APP_AUTHORIZATION_READ,
-
-        APP_AUTHORIZATION_UPDATE,
-
-        APP_AUTHORIZATION_DELETE,
+        AUTOMATION_WRITE,
 
         BOUNTY_BASIC_READ,
 
-        BOUNTY_CREATE,
+        BOUNTY_CAPTURE_CLIP_COMPLETE,
 
         BOUNTY_CAPTURE_CLIP_CREATE,
 
-        BOUNTY_CAPTURE_CLIP_COMPLETE,
-
         BOUNTY_CAPTURE_CLIP_DISCARD,
 
-        BOUNTY_UPDATE,
+        BOUNTY_CREATE,
 
         BOUNTY_SUBMISSION_CREATE,
 
@@ -1893,49 +2199,37 @@ public final class PermissionAction {
 
         BOUNTY_SUBMISSION_VOTE,
 
-        CHAT_MANAGE_WEBHOOK,
+        BOUNTY_UPDATE,
 
-        CHAT_MODERATE,
+        CHAT_MANAGE_WEBHOOK,
 
         CHAT_MESSAGE_CREATE,
 
+        CHAT_MODERATE,
+
         CHAT_READ,
 
-        DMS_READ,
+        CHECKOUT_CONFIGURATION_BASIC_READ,
 
-        DMS_MESSAGE_MANAGE,
+        CHECKOUT_CONFIGURATION_CREATE,
 
-        DMS_CHANNEL_MANAGE,
+        CHECKOUT_CONFIGURATION_DELETE,
 
-        FORUM_POST_CREATE,
+        CHECKOUT_REQUEST_BASIC_READ,
 
-        FORUM_READ,
+        CHECKOUT_REQUEST_CREATE,
 
-        FORUM_MODERATE,
-
-        COMPANY_AUTHORIZED_USER_READ,
+        CHILD_COMPANY_BASIC_EXPORT,
 
         COMPANY_AUTHORIZED_USER_EMAIL_READ,
 
-        COMPANY_BALANCE_READ,
+        COMPANY_AUTHORIZED_USER_READ,
 
         COMPANY_BALANCE_EXPORT,
 
-        COMPANY_TOKEN_TRANSACTION_READ,
-
-        COMPANY_TOKEN_TRANSACTION_CREATE,
-
-        COMPANY_LOG_READ,
-
-        COMPANY_MANAGE_CHECKOUT,
-
-        COMPANY_MANAGE_LEGAL,
+        COMPANY_BALANCE_READ,
 
         COMPANY_BASIC_READ,
-
-        COMPANY_UPDATE,
-
-        COMPANY_TRANSFER_OWNERSHIP,
 
         COMPANY_CREATE,
 
@@ -1945,19 +2239,23 @@ public final class PermissionAction {
 
         COMPANY_DELETE_CHILD,
 
+        COMPANY_LOG_READ,
+
+        COMPANY_MANAGE_CHECKOUT,
+
+        COMPANY_MANAGE_LEGAL,
+
+        COMPANY_SUSPEND_CHILD,
+
+        COMPANY_TRANSFER_OWNERSHIP,
+
+        COMPANY_UPDATE,
+
         COMPANY_UPDATE_CHILD_FEES,
 
-        CHILD_COMPANY_BASIC_EXPORT,
+        COMPANY_TOKEN_TRANSACTION_CREATE,
 
-        SOCIAL_ACCOUNT_CREATE,
-
-        SOCIAL_ACCOUNT_DELETE,
-
-        SOCIAL_ACCOUNT_READ,
-
-        SOCIAL_LINK_UPDATE,
-
-        CUSTOM_EMOJI_UPDATE,
+        COMPANY_TOKEN_TRANSACTION_READ,
 
         CONTENT_REWARDS_BASIC_EXPORT,
 
@@ -1971,23 +2269,65 @@ public final class PermissionAction {
 
         CONTENT_REWARDS_UPDATE,
 
+        COURSE_ANALYTICS_READ,
+
+        COURSE_LESSON_INTERACTION_READ,
+
+        COURSES_READ,
+
+        COURSES_UPDATE,
+
+        CRYPTO_WALLET_MANAGE,
+
+        CRYPTO_WALLET_SWAP,
+
+        CRYPTO_WALLET_TRADE,
+
+        CRYPTO_WALLET_TRADE_READ,
+
+        CUSTOM_EMOJI_UPDATE,
+
+        DEVELOPER_APP_INSTALLATION_READ,
+
+        DEVELOPER_APP_INSTALLATION_UPDATE,
+
         DEVELOPER_BASIC_READ,
 
         DEVELOPER_CREATE_APP,
 
+        DEVELOPER_LOGS_READ,
+
         DEVELOPER_MANAGE_API_KEY,
+
+        DEVELOPER_MANAGE_BUILDS,
 
         DEVELOPER_MANAGE_OAUTH,
 
+        DEVELOPER_MANAGE_OIDC_TRUST,
+
         DEVELOPER_MANAGE_WEBHOOK,
-
-        DEVELOPER_LOGS_READ,
-
-        DEVELOPER_MANAGE_BUILDS,
 
         DEVELOPER_UPDATE_APP,
 
         DEVELOPER_UPDATE_APP_AUTHORIZATION,
+
+        DMS_CHANNEL_MANAGE,
+
+        DMS_MESSAGE_MANAGE,
+
+        DMS_READ,
+
+        DOMAIN_MANAGE,
+
+        DOMAIN_READ,
+
+        EMAIL,
+
+        EMAIL_MANAGE,
+
+        EMAIL_READ,
+
+        EMAIL_SEND,
 
         EVENT_CREATE,
 
@@ -2003,6 +2343,16 @@ public final class PermissionAction {
 
         EXPERIENCE_UPDATE,
 
+        EXPERIMENT_MANAGE,
+
+        EXPERIMENT_READ,
+
+        FORUM_MODERATE,
+
+        FORUM_POST_CREATE,
+
+        FORUM_READ,
+
         IAP_READ,
 
         IDENTITY_READ,
@@ -2013,15 +2363,29 @@ public final class PermissionAction {
 
         INCORPORATION_WRITE,
 
+        INVOICE_BASIC_EXPORT,
+
+        INVOICE_BASIC_READ,
+
+        INVOICE_CREATE,
+
+        INVOICE_UPDATE,
+
+        LEAD_BASIC_EXPORT,
+
+        LEAD_BASIC_READ,
+
+        LEAD_MANAGE,
+
+        LIVESTREAM_CHAT_READ,
+
+        LIVESTREAM_CHAT_WRITE,
+
         LIVESTREAM_CREATE,
 
         LIVESTREAM_DELETE,
 
         LIVESTREAM_MANAGE_RECORDING,
-
-        LIVESTREAM_CHAT_READ,
-
-        LIVESTREAM_CHAT_WRITE,
 
         LIVESTREAM_MODERATE,
 
@@ -2035,33 +2399,67 @@ public final class PermissionAction {
 
         MEMBER_EMAIL_READ,
 
-        MEMBER_PHONE_READ,
+        MEMBER_JOURNEY_READ,
+
+        MEMBER_MANAGE,
+
+        MEMBER_MODERATE,
+
+        MEMBER_PAYMENT_METHODS_MANAGE,
 
         MEMBER_PAYMENT_METHODS_READ,
 
         MEMBER_PAYMENT_METHODS_USE,
 
-        MEMBER_PAYMENT_METHODS_MANAGE,
+        MEMBER_PHONE_READ,
 
-        MEMBER_MANAGE,
-
-        MEMBERSHIP_CANCEL,
-
-        MEMBERSHIP_RESYNC_ACCESS,
-
-        MEMBERSHIP_CREATE,
-
-        MEMBERSHIP_UPDATE,
-
-        MEMBERSHIP_TRANSFER,
-
-        MEMBER_MODERATE,
+        MEMBER_REPORTING_LINE_UPDATE,
 
         MEMBER_STATS_EXPORT,
 
         MEMBER_STATS_READ,
 
-        MEMBER_JOURNEY_READ,
+        MEMBERSHIP_CANCEL,
+
+        MEMBERSHIP_CREATE,
+
+        MEMBERSHIP_RESYNC_ACCESS,
+
+        MEMBERSHIP_TRANSFER,
+
+        MEMBERSHIP_UPDATE,
+
+        NOTIFICATION_CREATE,
+
+        OAUTH_TOKEN_EXCHANGE,
+
+        OPENID,
+
+        PARTNER_BASIC_READ,
+
+        PARTNER_COMMISSION_ADVANCE_ACCEPT,
+
+        PARTNER_COMMISSION_ADVANCE_UPDATE,
+
+        PARTNER_CREATE,
+
+        PARTNER_EMAIL_READ,
+
+        PARTNER_FEES_UPDATE,
+
+        PARTNER_HANDOFF,
+
+        PARTNER_INVITE_CREATE,
+
+        PARTNER_REFERRAL_REQUEST_ACCEPT,
+
+        PARTNER_REFERRAL_REQUEST_CANCEL,
+
+        PARTNER_REFERRAL_REQUEST_CREATE,
+
+        PARTNER_REFERRAL_REQUEST_DECLINE,
+
+        PARTNER_REFERRAL_REQUEST_READ,
 
         PAYMENT_BASIC_EXPORT,
 
@@ -2077,19 +2475,23 @@ public final class PermissionAction {
 
         PAYMENT_DISPUTE_ALERT_READ,
 
-        PAYMENT_SETUP_INTENT_READ,
-
-        PAYMENT_SETUP_INTENT_MANAGE,
-
         PAYMENT_MANAGE,
 
         PAYMENT_RESOLUTION_CENTER,
 
         PAYMENT_RESOLUTION_CENTER_CASE_EXPORT,
 
+        PAYMENT_RESOLUTION_CENTER_CASE_MANAGE,
+
         PAYMENT_RESOLUTION_CENTER_CASE_READ,
 
-        PAYMENT_RESOLUTION_CENTER_CASE_MANAGE,
+        PAYMENT_SETUP_INTENT_MANAGE,
+
+        PAYMENT_SETUP_INTENT_READ,
+
+        PAYOUT_ACCOUNT_READ,
+
+        PAYOUT_ACCOUNT_UPDATE,
 
         PAYOUT_CREATE_DESTINATION,
 
@@ -2097,23 +2499,19 @@ public final class PermissionAction {
 
         PAYOUT_DESTINATION_READ,
 
-        PAYOUT_TRANSFER_FUNDS,
+        PAYOUT_TRANSFER_EXPORT,
 
         PAYOUT_TRANSFER_READ,
 
-        PAYOUT_TRANSFER_EXPORT,
+        PAYOUT_TRANSFER_FUNDS,
 
         PAYOUT_UPDATE_DESTINATION,
 
         PAYOUT_WITHDRAW_FUNDS,
 
-        PAYOUT_WITHDRAWAL_READ,
-
         PAYOUT_WITHDRAWAL_EXPORT,
 
-        PAYOUT_ACCOUNT_READ,
-
-        PAYOUT_ACCOUNT_UPDATE,
+        PAYOUT_WITHDRAWAL_READ,
 
         PLAN_BASIC_EXPORT,
 
@@ -2129,11 +2527,13 @@ public final class PermissionAction {
 
         PLAN_UPDATE,
 
-        PLAN_WAITLIST_MANAGE,
-
         PLAN_WAITLIST_EXPORT,
 
+        PLAN_WAITLIST_MANAGE,
+
         PLAN_WAITLIST_READ,
+
+        PROFILE,
 
         PROMO_CODE_BASIC_EXPORT,
 
@@ -2149,19 +2549,27 @@ public final class PermissionAction {
 
         REFERRAL_PARTNER_CREATE,
 
-        PARTNER_BASIC_READ,
+        REVIEW_DELETE,
 
-        PARTNER_INVITE_CREATE,
+        SHIPMENT_BASIC_READ,
 
-        PARTNER_CREATE,
+        SHIPMENT_CREATE,
+
+        SOCIAL_ACCOUNT_CREATE,
+
+        SOCIAL_ACCOUNT_DELETE,
+
+        SOCIAL_ACCOUNT_READ,
+
+        SOCIAL_LINK_UPDATE,
 
         STATS_READ,
-
-        SUPPORT_CHAT_READ,
 
         SUPPORT_CHAT_CREATE,
 
         SUPPORT_CHAT_MESSAGE_CREATE,
+
+        SUPPORT_CHAT_READ,
 
         TRACKING_LINK_BASIC_EXPORT,
 
@@ -2177,148 +2585,110 @@ public final class PermissionAction {
 
         TRACKING_LINK_UPDATE,
 
-        COURSES_READ,
+        USER_ABUSE_REPORT_CREATE,
 
-        COURSES_UPDATE,
-
-        COURSE_LESSON_INTERACTION_READ,
-
-        COURSE_ANALYTICS_READ,
-
-        LEAD_BASIC_READ,
-
-        LEAD_BASIC_EXPORT,
-
-        INVOICE_CREATE,
-
-        INVOICE_BASIC_READ,
-
-        INVOICE_BASIC_EXPORT,
-
-        INVOICE_UPDATE,
-
-        WEBHOOK_RECEIVE_INVOICES,
-
-        WEBHOOK_RECEIVE_SETUP_INTENTS,
-
-        WEBHOOK_RECEIVE_WITHDRAWALS,
-
-        WEBHOOK_RECEIVE_SWAPS,
-
-        WEBHOOK_RECEIVE_LEDGER_ACCOUNTS,
-
-        WEBHOOK_RECEIVE_ACCOUNTS,
-
-        WEBHOOK_RECEIVE_DEPOSITS,
-
-        WEBHOOK_RECEIVE_TRANSFERS,
-
-        WEBHOOK_RECEIVE_CARD_TRANSACTIONS,
-
-        WEBHOOK_RECEIVE_CARDS,
-
-        WEBHOOK_RECEIVE_CARD_APPLICATIONS,
-
-        WEBHOOK_RECEIVE_PAYOUT_METHODS,
-
-        WEBHOOK_RECEIVE_VERIFICATIONS,
-
-        WEBHOOK_RECEIVE_IDENTITY_PROFILES,
-
-        WEBHOOK_RECEIVE_PAYOUT_ACCOUNTS,
-
-        WEBHOOK_RECEIVE_CHAT,
-
-        WEBHOOK_RECEIVE_ENTRIES,
-
-        WEBHOOK_RECEIVE_AD_CAMPAIGNS,
-
-        WEBHOOK_RECEIVE_PRODUCTS,
-
-        WEBHOOK_RECEIVE_PLANS,
-
-        WEBHOOK_RECEIVE_SHIPMENTS,
-
-        WEBHOOK_RECEIVE_MEMBERS,
-
-        WEBHOOK_RECEIVE_EXPORTS,
-
-        WEBHOOK_RECEIVE_COURSES,
-
-        WEBHOOK_RECEIVE_MEMBERSHIPS,
-
-        WEBHOOK_RECEIVE_PAYMENTS,
-
-        WEBHOOK_RECEIVE_REFUNDS,
-
-        WEBHOOK_RECEIVE_DISPUTES,
-
-        WEBHOOK_RECEIVE_RESOLUTIONS,
-
-        WEBHOOK_RECEIVE_APP_PAYMENTS,
-
-        WEBHOOK_RECEIVE_APP_MEMBERSHIPS,
-
-        SHIPMENT_CREATE,
-
-        SHIPMENT_BASIC_READ,
-
-        CHECKOUT_CONFIGURATION_BASIC_READ,
-
-        CHECKOUT_CONFIGURATION_CREATE,
-
-        CHECKOUT_CONFIGURATION_DELETE,
-
-        CHECKOUT_REQUEST_CREATE,
-
-        CHECKOUT_REQUEST_BASIC_READ,
-
-        CRYPTO_WALLET_MANAGE,
-
-        CRYPTO_WALLET_SWAP,
-
-        AIRDROP_LINK_BASIC_READ,
-
-        AIRDROP_LINK_MANAGE,
-
-        LEAD_MANAGE,
-
-        NOTIFICATION_CREATE,
+        USER_ABUSE_REPORT_READ,
 
         USER_BALANCE_READ,
 
         USER_EMAIL_READ,
 
-        USER_STAFF_READ,
-
-        OAUTH_TOKEN_EXCHANGE,
-
-        OPENID,
-
-        PROFILE,
-
-        EMAIL,
-
-        AI_CHAT_READ,
-
-        AI_CHAT_CREATE,
-
-        AI_CHAT_DELETE,
-
-        AI_CHAT_UPDATE,
+        USER_MAILING_ADDRESSES_READ,
 
         USER_NOTIFICATIONS_READ,
 
         USER_NOTIFICATIONS_UPDATE,
 
+        USER_PAYMENT_CHARGE,
+
         USER_PROFILE_UPDATE,
+
+        USER_STAFF_READ,
+
+        WAITLIST_ENTRY_CANCEL,
+
+        WAITLIST_ENTRY_CREATE,
+
+        WAITLIST_ENTRY_READ,
+
+        WEBHOOK_RECEIVE_ACCOUNTS,
+
+        WEBHOOK_RECEIVE_AD_CAMPAIGNS,
+
+        WEBHOOK_RECEIVE_AD_GROUPS,
+
+        WEBHOOK_RECEIVE_ADS,
+
+        WEBHOOK_RECEIVE_APP_INSTALLATIONS,
+
+        WEBHOOK_RECEIVE_APP_MEMBERSHIPS,
+
+        WEBHOOK_RECEIVE_APP_PAYMENTS,
+
+        WEBHOOK_RECEIVE_CARD_APPLICATIONS,
+
+        WEBHOOK_RECEIVE_CARD_TRANSACTIONS,
+
+        WEBHOOK_RECEIVE_CARDS,
+
+        WEBHOOK_RECEIVE_CHAT,
+
+        WEBHOOK_RECEIVE_COURSES,
+
+        WEBHOOK_RECEIVE_DEPOSITS,
+
+        WEBHOOK_RECEIVE_DISPUTES,
+
+        WEBHOOK_RECEIVE_DOMAINS,
+
+        WEBHOOK_RECEIVE_ENTRIES,
+
+        WEBHOOK_RECEIVE_EVENTS,
+
+        WEBHOOK_RECEIVE_EXPORTS,
+
+        WEBHOOK_RECEIVE_FINANCIAL_ACTIVITY,
+
+        WEBHOOK_RECEIVE_IDENTITY_PROFILES,
+
+        WEBHOOK_RECEIVE_INVOICES,
+
+        WEBHOOK_RECEIVE_LEDGER_ACCOUNTS,
+
+        WEBHOOK_RECEIVE_MEMBERS,
+
+        WEBHOOK_RECEIVE_MEMBERSHIPS,
+
+        WEBHOOK_RECEIVE_PAYMENTS,
+
+        WEBHOOK_RECEIVE_PAYOUT_ACCOUNTS,
+
+        WEBHOOK_RECEIVE_PAYOUT_METHODS,
+
+        WEBHOOK_RECEIVE_PLANS,
+
+        WEBHOOK_RECEIVE_PRODUCTS,
+
+        WEBHOOK_RECEIVE_REFUNDS,
+
+        WEBHOOK_RECEIVE_RESOLUTIONS,
+
+        WEBHOOK_RECEIVE_SETUP_INTENTS,
+
+        WEBHOOK_RECEIVE_SHIPMENTS,
+
+        WEBHOOK_RECEIVE_SWAPS,
+
+        WEBHOOK_RECEIVE_TRANSFERS,
+
+        WEBHOOK_RECEIVE_VERIFICATIONS,
+
+        WEBHOOK_RECEIVE_WITHDRAWALS,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
-        T visitAiPromptCreate();
-
         T visitAccessPassBasicExport();
 
         T visitAccessPassBasicRead();
@@ -2353,9 +2723,7 @@ public final class PermissionAction {
 
         T visitAdCampaignUpdate();
 
-        T visitAudienceBasicRead();
-
-        T visitAudienceUpdate();
+        T visitAdPixelManage();
 
         T visitAdPublisherRead();
 
@@ -2365,41 +2733,63 @@ public final class PermissionAction {
 
         T visitAffiliateUpdate();
 
+        T visitAiChatCreate();
+
+        T visitAiChatDelete();
+
+        T visitAiChatRead();
+
+        T visitAiChatUpdate();
+
+        T visitAiPromptCreate();
+
+        T visitAirdropLinkBasicRead();
+
+        T visitAirdropLinkManage();
+
+        T visitAppAuthorizationCreate();
+
+        T visitAppAuthorizationDelete();
+
+        T visitAppAuthorizationRead();
+
+        T visitAppAuthorizationUpdate();
+
+        T visitAudienceBasicRead();
+
+        T visitAudienceUpdate();
+
+        T visitAuthorizedRoleAttach();
+
+        T visitAuthorizedRoleCreate();
+
+        T visitAuthorizedRoleDelete();
+
+        T visitAuthorizedRoleDetach();
+
+        T visitAuthorizedRoleUpdate();
+
         T visitAuthorizedUserCreate();
 
         T visitAuthorizedUserDelete();
 
         T visitAuthorizedUserUpdate();
 
-        T visitAuthorizedRoleCreate();
+        T visitAutomationManage();
 
-        T visitAuthorizedRoleUpdate();
+        T visitAutomationRead();
 
-        T visitAuthorizedRoleDelete();
-
-        T visitAuthorizedRoleAttach();
-
-        T visitAuthorizedRoleDetach();
-
-        T visitAppAuthorizationCreate();
-
-        T visitAppAuthorizationRead();
-
-        T visitAppAuthorizationUpdate();
-
-        T visitAppAuthorizationDelete();
+        T visitAutomationWrite();
 
         T visitBountyBasicRead();
 
-        T visitBountyCreate();
+        T visitBountyCaptureClipComplete();
 
         T visitBountyCaptureClipCreate();
 
-        T visitBountyCaptureClipComplete();
-
         T visitBountyCaptureClipDiscard();
 
-        T visitBountyUpdate();
+        T visitBountyCreate();
 
         T visitBountySubmissionCreate();
 
@@ -2407,49 +2797,37 @@ public final class PermissionAction {
 
         T visitBountySubmissionVote();
 
-        T visitChatManageWebhook();
+        T visitBountyUpdate();
 
-        T visitChatModerate();
+        T visitChatManageWebhook();
 
         T visitChatMessageCreate();
 
+        T visitChatModerate();
+
         T visitChatRead();
 
-        T visitDmsRead();
+        T visitCheckoutConfigurationBasicRead();
 
-        T visitDmsMessageManage();
+        T visitCheckoutConfigurationCreate();
 
-        T visitDmsChannelManage();
+        T visitCheckoutConfigurationDelete();
 
-        T visitForumPostCreate();
+        T visitCheckoutRequestBasicRead();
 
-        T visitForumRead();
+        T visitCheckoutRequestCreate();
 
-        T visitForumModerate();
-
-        T visitCompanyAuthorizedUserRead();
+        T visitChildCompanyBasicExport();
 
         T visitCompanyAuthorizedUserEmailRead();
 
-        T visitCompanyBalanceRead();
+        T visitCompanyAuthorizedUserRead();
 
         T visitCompanyBalanceExport();
 
-        T visitCompanyTokenTransactionRead();
-
-        T visitCompanyTokenTransactionCreate();
-
-        T visitCompanyLogRead();
-
-        T visitCompanyManageCheckout();
-
-        T visitCompanyManageLegal();
+        T visitCompanyBalanceRead();
 
         T visitCompanyBasicRead();
-
-        T visitCompanyUpdate();
-
-        T visitCompanyTransferOwnership();
 
         T visitCompanyCreate();
 
@@ -2459,19 +2837,23 @@ public final class PermissionAction {
 
         T visitCompanyDeleteChild();
 
+        T visitCompanyLogRead();
+
+        T visitCompanyManageCheckout();
+
+        T visitCompanyManageLegal();
+
+        T visitCompanySuspendChild();
+
+        T visitCompanyTransferOwnership();
+
+        T visitCompanyUpdate();
+
         T visitCompanyUpdateChildFees();
 
-        T visitChildCompanyBasicExport();
+        T visitCompanyTokenTransactionCreate();
 
-        T visitSocialAccountCreate();
-
-        T visitSocialAccountDelete();
-
-        T visitSocialAccountRead();
-
-        T visitSocialLinkUpdate();
-
-        T visitCustomEmojiUpdate();
+        T visitCompanyTokenTransactionRead();
 
         T visitContentRewardsBasicExport();
 
@@ -2485,23 +2867,65 @@ public final class PermissionAction {
 
         T visitContentRewardsUpdate();
 
+        T visitCourseAnalyticsRead();
+
+        T visitCourseLessonInteractionRead();
+
+        T visitCoursesRead();
+
+        T visitCoursesUpdate();
+
+        T visitCryptoWalletManage();
+
+        T visitCryptoWalletSwap();
+
+        T visitCryptoWalletTrade();
+
+        T visitCryptoWalletTradeRead();
+
+        T visitCustomEmojiUpdate();
+
+        T visitDeveloperAppInstallationRead();
+
+        T visitDeveloperAppInstallationUpdate();
+
         T visitDeveloperBasicRead();
 
         T visitDeveloperCreateApp();
 
+        T visitDeveloperLogsRead();
+
         T visitDeveloperManageApiKey();
+
+        T visitDeveloperManageBuilds();
 
         T visitDeveloperManageOauth();
 
+        T visitDeveloperManageOidcTrust();
+
         T visitDeveloperManageWebhook();
-
-        T visitDeveloperLogsRead();
-
-        T visitDeveloperManageBuilds();
 
         T visitDeveloperUpdateApp();
 
         T visitDeveloperUpdateAppAuthorization();
+
+        T visitDmsChannelManage();
+
+        T visitDmsMessageManage();
+
+        T visitDmsRead();
+
+        T visitDomainManage();
+
+        T visitDomainRead();
+
+        T visitEmail();
+
+        T visitEmailManage();
+
+        T visitEmailRead();
+
+        T visitEmailSend();
 
         T visitEventCreate();
 
@@ -2517,6 +2941,16 @@ public final class PermissionAction {
 
         T visitExperienceUpdate();
 
+        T visitExperimentManage();
+
+        T visitExperimentRead();
+
+        T visitForumModerate();
+
+        T visitForumPostCreate();
+
+        T visitForumRead();
+
         T visitIapRead();
 
         T visitIdentityRead();
@@ -2527,15 +2961,29 @@ public final class PermissionAction {
 
         T visitIncorporationWrite();
 
+        T visitInvoiceBasicExport();
+
+        T visitInvoiceBasicRead();
+
+        T visitInvoiceCreate();
+
+        T visitInvoiceUpdate();
+
+        T visitLeadBasicExport();
+
+        T visitLeadBasicRead();
+
+        T visitLeadManage();
+
+        T visitLivestreamChatRead();
+
+        T visitLivestreamChatWrite();
+
         T visitLivestreamCreate();
 
         T visitLivestreamDelete();
 
         T visitLivestreamManageRecording();
-
-        T visitLivestreamChatRead();
-
-        T visitLivestreamChatWrite();
 
         T visitLivestreamModerate();
 
@@ -2549,33 +2997,67 @@ public final class PermissionAction {
 
         T visitMemberEmailRead();
 
-        T visitMemberPhoneRead();
+        T visitMemberJourneyRead();
+
+        T visitMemberManage();
+
+        T visitMemberModerate();
+
+        T visitMemberPaymentMethodsManage();
 
         T visitMemberPaymentMethodsRead();
 
         T visitMemberPaymentMethodsUse();
 
-        T visitMemberPaymentMethodsManage();
+        T visitMemberPhoneRead();
 
-        T visitMemberManage();
-
-        T visitMembershipCancel();
-
-        T visitMembershipResyncAccess();
-
-        T visitMembershipCreate();
-
-        T visitMembershipUpdate();
-
-        T visitMembershipTransfer();
-
-        T visitMemberModerate();
+        T visitMemberReportingLineUpdate();
 
         T visitMemberStatsExport();
 
         T visitMemberStatsRead();
 
-        T visitMemberJourneyRead();
+        T visitMembershipCancel();
+
+        T visitMembershipCreate();
+
+        T visitMembershipResyncAccess();
+
+        T visitMembershipTransfer();
+
+        T visitMembershipUpdate();
+
+        T visitNotificationCreate();
+
+        T visitOauthTokenExchange();
+
+        T visitOpenid();
+
+        T visitPartnerBasicRead();
+
+        T visitPartnerCommissionAdvanceAccept();
+
+        T visitPartnerCommissionAdvanceUpdate();
+
+        T visitPartnerCreate();
+
+        T visitPartnerEmailRead();
+
+        T visitPartnerFeesUpdate();
+
+        T visitPartnerHandoff();
+
+        T visitPartnerInviteCreate();
+
+        T visitPartnerReferralRequestAccept();
+
+        T visitPartnerReferralRequestCancel();
+
+        T visitPartnerReferralRequestCreate();
+
+        T visitPartnerReferralRequestDecline();
+
+        T visitPartnerReferralRequestRead();
 
         T visitPaymentBasicExport();
 
@@ -2591,19 +3073,23 @@ public final class PermissionAction {
 
         T visitPaymentDisputeAlertRead();
 
-        T visitPaymentSetupIntentRead();
-
-        T visitPaymentSetupIntentManage();
-
         T visitPaymentManage();
 
         T visitPaymentResolutionCenter();
 
         T visitPaymentResolutionCenterCaseExport();
 
+        T visitPaymentResolutionCenterCaseManage();
+
         T visitPaymentResolutionCenterCaseRead();
 
-        T visitPaymentResolutionCenterCaseManage();
+        T visitPaymentSetupIntentManage();
+
+        T visitPaymentSetupIntentRead();
+
+        T visitPayoutAccountRead();
+
+        T visitPayoutAccountUpdate();
 
         T visitPayoutCreateDestination();
 
@@ -2611,23 +3097,19 @@ public final class PermissionAction {
 
         T visitPayoutDestinationRead();
 
-        T visitPayoutTransferFunds();
+        T visitPayoutTransferExport();
 
         T visitPayoutTransferRead();
 
-        T visitPayoutTransferExport();
+        T visitPayoutTransferFunds();
 
         T visitPayoutUpdateDestination();
 
         T visitPayoutWithdrawFunds();
 
-        T visitPayoutWithdrawalRead();
-
         T visitPayoutWithdrawalExport();
 
-        T visitPayoutAccountRead();
-
-        T visitPayoutAccountUpdate();
+        T visitPayoutWithdrawalRead();
 
         T visitPlanBasicExport();
 
@@ -2643,11 +3125,13 @@ public final class PermissionAction {
 
         T visitPlanUpdate();
 
-        T visitPlanWaitlistManage();
-
         T visitPlanWaitlistExport();
 
+        T visitPlanWaitlistManage();
+
         T visitPlanWaitlistRead();
+
+        T visitProfile();
 
         T visitPromoCodeBasicExport();
 
@@ -2663,19 +3147,27 @@ public final class PermissionAction {
 
         T visitReferralPartnerCreate();
 
-        T visitPartnerBasicRead();
+        T visitReviewDelete();
 
-        T visitPartnerInviteCreate();
+        T visitShipmentBasicRead();
 
-        T visitPartnerCreate();
+        T visitShipmentCreate();
+
+        T visitSocialAccountCreate();
+
+        T visitSocialAccountDelete();
+
+        T visitSocialAccountRead();
+
+        T visitSocialLinkUpdate();
 
         T visitStatsRead();
-
-        T visitSupportChatRead();
 
         T visitSupportChatCreate();
 
         T visitSupportChatMessageCreate();
+
+        T visitSupportChatRead();
 
         T visitTrackingLinkBasicExport();
 
@@ -2691,141 +3183,105 @@ public final class PermissionAction {
 
         T visitTrackingLinkUpdate();
 
-        T visitCoursesRead();
+        T visitUserAbuseReportCreate();
 
-        T visitCoursesUpdate();
-
-        T visitCourseLessonInteractionRead();
-
-        T visitCourseAnalyticsRead();
-
-        T visitLeadBasicRead();
-
-        T visitLeadBasicExport();
-
-        T visitInvoiceCreate();
-
-        T visitInvoiceBasicRead();
-
-        T visitInvoiceBasicExport();
-
-        T visitInvoiceUpdate();
-
-        T visitWebhookReceiveInvoices();
-
-        T visitWebhookReceiveSetupIntents();
-
-        T visitWebhookReceiveWithdrawals();
-
-        T visitWebhookReceiveSwaps();
-
-        T visitWebhookReceiveLedgerAccounts();
-
-        T visitWebhookReceiveAccounts();
-
-        T visitWebhookReceiveDeposits();
-
-        T visitWebhookReceiveTransfers();
-
-        T visitWebhookReceiveCardTransactions();
-
-        T visitWebhookReceiveCards();
-
-        T visitWebhookReceiveCardApplications();
-
-        T visitWebhookReceivePayoutMethods();
-
-        T visitWebhookReceiveVerifications();
-
-        T visitWebhookReceiveIdentityProfiles();
-
-        T visitWebhookReceivePayoutAccounts();
-
-        T visitWebhookReceiveChat();
-
-        T visitWebhookReceiveEntries();
-
-        T visitWebhookReceiveAdCampaigns();
-
-        T visitWebhookReceiveProducts();
-
-        T visitWebhookReceivePlans();
-
-        T visitWebhookReceiveShipments();
-
-        T visitWebhookReceiveMembers();
-
-        T visitWebhookReceiveExports();
-
-        T visitWebhookReceiveCourses();
-
-        T visitWebhookReceiveMemberships();
-
-        T visitWebhookReceivePayments();
-
-        T visitWebhookReceiveRefunds();
-
-        T visitWebhookReceiveDisputes();
-
-        T visitWebhookReceiveResolutions();
-
-        T visitWebhookReceiveAppPayments();
-
-        T visitWebhookReceiveAppMemberships();
-
-        T visitShipmentCreate();
-
-        T visitShipmentBasicRead();
-
-        T visitCheckoutConfigurationBasicRead();
-
-        T visitCheckoutConfigurationCreate();
-
-        T visitCheckoutConfigurationDelete();
-
-        T visitCheckoutRequestCreate();
-
-        T visitCheckoutRequestBasicRead();
-
-        T visitCryptoWalletManage();
-
-        T visitCryptoWalletSwap();
-
-        T visitAirdropLinkBasicRead();
-
-        T visitAirdropLinkManage();
-
-        T visitLeadManage();
-
-        T visitNotificationCreate();
+        T visitUserAbuseReportRead();
 
         T visitUserBalanceRead();
 
         T visitUserEmailRead();
 
-        T visitUserStaffRead();
-
-        T visitOauthTokenExchange();
-
-        T visitOpenid();
-
-        T visitProfile();
-
-        T visitEmail();
-
-        T visitAiChatRead();
-
-        T visitAiChatCreate();
-
-        T visitAiChatDelete();
-
-        T visitAiChatUpdate();
+        T visitUserMailingAddressesRead();
 
         T visitUserNotificationsRead();
 
         T visitUserNotificationsUpdate();
 
+        T visitUserPaymentCharge();
+
         T visitUserProfileUpdate();
+
+        T visitUserStaffRead();
+
+        T visitWaitlistEntryCancel();
+
+        T visitWaitlistEntryCreate();
+
+        T visitWaitlistEntryRead();
+
+        T visitWebhookReceiveAccounts();
+
+        T visitWebhookReceiveAdCampaigns();
+
+        T visitWebhookReceiveAdGroups();
+
+        T visitWebhookReceiveAds();
+
+        T visitWebhookReceiveAppInstallations();
+
+        T visitWebhookReceiveAppMemberships();
+
+        T visitWebhookReceiveAppPayments();
+
+        T visitWebhookReceiveCardApplications();
+
+        T visitWebhookReceiveCardTransactions();
+
+        T visitWebhookReceiveCards();
+
+        T visitWebhookReceiveChat();
+
+        T visitWebhookReceiveCourses();
+
+        T visitWebhookReceiveDeposits();
+
+        T visitWebhookReceiveDisputes();
+
+        T visitWebhookReceiveDomains();
+
+        T visitWebhookReceiveEntries();
+
+        T visitWebhookReceiveEvents();
+
+        T visitWebhookReceiveExports();
+
+        T visitWebhookReceiveFinancialActivity();
+
+        T visitWebhookReceiveIdentityProfiles();
+
+        T visitWebhookReceiveInvoices();
+
+        T visitWebhookReceiveLedgerAccounts();
+
+        T visitWebhookReceiveMembers();
+
+        T visitWebhookReceiveMemberships();
+
+        T visitWebhookReceivePayments();
+
+        T visitWebhookReceivePayoutAccounts();
+
+        T visitWebhookReceivePayoutMethods();
+
+        T visitWebhookReceivePlans();
+
+        T visitWebhookReceiveProducts();
+
+        T visitWebhookReceiveRefunds();
+
+        T visitWebhookReceiveResolutions();
+
+        T visitWebhookReceiveSetupIntents();
+
+        T visitWebhookReceiveShipments();
+
+        T visitWebhookReceiveSwaps();
+
+        T visitWebhookReceiveTransfers();
+
+        T visitWebhookReceiveVerifications();
+
+        T visitWebhookReceiveWithdrawals();
 
         T visitUnknown(String unknownType);
     }

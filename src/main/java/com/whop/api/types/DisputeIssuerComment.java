@@ -122,7 +122,6 @@ public final class DisputeIssuerComment {
 
         private Optional<String> receivedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -135,7 +134,6 @@ public final class DisputeIssuerComment {
         }
 
         /**
-         * <p>What the issuer wrote, as received.</p>
          * <p>What the issuer wrote, as received.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,6 +183,14 @@ public final class DisputeIssuerComment {
         @java.lang.Override
         public DisputeIssuerComment build() {
             return new DisputeIssuerComment(receivedAt, text, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("received_at") || key.equalsIgnoreCase("text")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

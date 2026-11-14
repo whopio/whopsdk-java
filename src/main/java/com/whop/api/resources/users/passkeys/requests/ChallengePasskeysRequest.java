@@ -112,7 +112,6 @@ public final class ChallengePasskeysRequest {
 
         private Optional<String> passkeyId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -125,7 +124,6 @@ public final class ChallengePasskeysRequest {
         }
 
         /**
-         * <p>The ceremony this challenge is for.</p>
          * <p>The ceremony this challenge is for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -159,6 +157,14 @@ public final class ChallengePasskeysRequest {
         @java.lang.Override
         public ChallengePasskeysRequest build() {
             return new ChallengePasskeysRequest(challengeType, passkeyId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("challenge_type") || key.equalsIgnoreCase("passkey_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

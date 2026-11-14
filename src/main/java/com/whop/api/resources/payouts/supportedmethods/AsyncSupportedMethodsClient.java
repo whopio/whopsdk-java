@@ -5,6 +5,7 @@ package com.whop.api.resources.payouts.supportedmethods;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.payouts.supportedmethods.requests.ListSupportedMethodsRequest;
 import com.whop.api.resources.payouts.supportedmethods.types.ListSupportedMethodsResponseDataItem;
@@ -28,33 +29,69 @@ public class AsyncSupportedMethodsClient {
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             ListSupportedMethodsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the payout methods an account or user is eligible to add.
+     * Lists the payout methods an account or user is eligible to add. Pass a result's ID as <code>supported_payout_method_id</code> to <code>POST /payouts/methods</code> to save one.
      */
     public CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> list(
             ListSupportedMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListSupportedMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListSupportedMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

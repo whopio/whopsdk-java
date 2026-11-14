@@ -83,7 +83,6 @@ public final class CourseChaptersItemLessonsItemThumbnail {
     public static final class Builder {
         private Optional<String> url = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,6 +119,14 @@ public final class CourseChaptersItemLessonsItemThumbnail {
 
         public CourseChaptersItemLessonsItemThumbnail build() {
             return new CourseChaptersItemLessonsItemThumbnail(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

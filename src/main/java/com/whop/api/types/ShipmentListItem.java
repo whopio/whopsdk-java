@@ -324,7 +324,6 @@ public final class ShipmentListItem {
 
         private Optional<OffsetDateTime> deliveryEstimate = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -345,7 +344,6 @@ public final class ShipmentListItem {
 
         /**
          * <p>The datetime the shipment was created.</p>
-         * <p>The datetime the shipment was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -356,7 +354,6 @@ public final class ShipmentListItem {
         }
 
         /**
-         * <p>The unique identifier for the shipment.</p>
          * <p>The unique identifier for the shipment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -369,7 +366,6 @@ public final class ShipmentListItem {
 
         /**
          * <p>The current delivery status of this shipment.</p>
-         * <p>The current delivery status of this shipment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -381,7 +377,6 @@ public final class ShipmentListItem {
 
         /**
          * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
-         * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -392,7 +387,6 @@ public final class ShipmentListItem {
         }
 
         /**
-         * <p>The datetime the shipment was last updated.</p>
          * <p>The datetime the shipment was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -560,6 +554,22 @@ public final class ShipmentListItem {
                     trackingCode,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("delivery_estimate")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment")
+                    || key.equalsIgnoreCase("service")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("substatus")
+                    || key.equalsIgnoreCase("tracking_code")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -7,10 +7,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListMembersRequestOrder {
+    public static final ListMembersRequestOrder LAST_ACTIVITY_AT =
+            new ListMembersRequestOrder(Value.LAST_ACTIVITY_AT, "last_activity_at");
+
     public static final ListMembersRequestOrder JOINED_AT = new ListMembersRequestOrder(Value.JOINED_AT, "joined_at");
 
     public static final ListMembersRequestOrder USD_TOTAL_SPENT =
             new ListMembersRequestOrder(Value.USD_TOTAL_SPENT, "usd_total_spent");
+
+    public static final ListMembersRequestOrder MOST_RECENT_ACTION_AT =
+            new ListMembersRequestOrder(Value.MOST_RECENT_ACTION_AT, "most_recent_action_at");
 
     public static final ListMembersRequestOrder CREATED_AT =
             new ListMembersRequestOrder(Value.CREATED_AT, "created_at");
@@ -51,10 +57,14 @@ public final class ListMembersRequestOrder {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case LAST_ACTIVITY_AT:
+                return visitor.visitLastActivityAt();
             case JOINED_AT:
                 return visitor.visitJoinedAt();
             case USD_TOTAL_SPENT:
                 return visitor.visitUsdTotalSpent();
+            case MOST_RECENT_ACTION_AT:
+                return visitor.visitMostRecentActionAt();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
             case LAST_ACCESSED_AT:
@@ -68,10 +78,14 @@ public final class ListMembersRequestOrder {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListMembersRequestOrder valueOf(String value) {
         switch (value) {
+            case "last_activity_at":
+                return LAST_ACTIVITY_AT;
             case "joined_at":
                 return JOINED_AT;
             case "usd_total_spent":
                 return USD_TOTAL_SPENT;
+            case "most_recent_action_at":
+                return MOST_RECENT_ACTION_AT;
             case "created_at":
                 return CREATED_AT;
             case "last_accessed_at":
@@ -88,6 +102,10 @@ public final class ListMembersRequestOrder {
 
         LAST_ACCESSED_AT,
 
+        LAST_ACTIVITY_AT,
+
+        MOST_RECENT_ACTION_AT,
+
         USD_TOTAL_SPENT,
 
         UNKNOWN
@@ -99,6 +117,10 @@ public final class ListMembersRequestOrder {
         T visitJoinedAt();
 
         T visitLastAccessedAt();
+
+        T visitLastActivityAt();
+
+        T visitMostRecentActionAt();
 
         T visitUsdTotalSpent();
 

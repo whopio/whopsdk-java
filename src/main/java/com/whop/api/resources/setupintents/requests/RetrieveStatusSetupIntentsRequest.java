@@ -7,29 +7,54 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveStatusSetupIntentsRequest.Builder.class)
 public final class RetrieveStatusSetupIntentsRequest {
+    private final Optional<String> clientSecret;
+
     private final Map<String, Object> additionalProperties;
 
-    private RetrieveStatusSetupIntentsRequest(Map<String, Object> additionalProperties) {
+    private RetrieveStatusSetupIntentsRequest(Optional<String> clientSecret, Map<String, Object> additionalProperties) {
+        this.clientSecret = clientSecret;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The setup's own <code>client_secret</code>, for a caller without a secret key.
+     */
+    @JsonProperty("client_secret")
+    public Optional<String> getClientSecret() {
+        return clientSecret;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof RetrieveStatusSetupIntentsRequest;
+        return other instanceof RetrieveStatusSetupIntentsRequest && equalTo((RetrieveStatusSetupIntentsRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(RetrieveStatusSetupIntentsRequest other) {
+        return clientSecret.equals(other.clientSecret);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.clientSecret);
     }
 
     @java.lang.Override
@@ -43,17 +68,41 @@ public final class RetrieveStatusSetupIntentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        @JsonAnySetter
+        private Optional<String> clientSecret = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveStatusSetupIntentsRequest other) {
+            clientSecret(other.getClientSecret());
+            return this;
+        }
+
+        /**
+         * <p>The setup's own <code>client_secret</code>, for a caller without a secret key.</p>
+         */
+        @JsonSetter(value = "client_secret", nulls = Nulls.SKIP)
+        public Builder clientSecret(Optional<String> clientSecret) {
+            this.clientSecret = clientSecret;
+            return this;
+        }
+
+        public Builder clientSecret(String clientSecret) {
+            this.clientSecret = Optional.ofNullable(clientSecret);
             return this;
         }
 
         public RetrieveStatusSetupIntentsRequest build() {
-            return new RetrieveStatusSetupIntentsRequest(additionalProperties);
+            return new RetrieveStatusSetupIntentsRequest(clientSecret, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("client_secret")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

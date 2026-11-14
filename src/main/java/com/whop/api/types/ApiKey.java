@@ -387,7 +387,6 @@ public final class ApiKey {
 
         private Optional<String> expiresAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -411,7 +410,6 @@ public final class ApiKey {
 
         /**
          * <p>Dated API version used when requests authenticated with this key omit the <code>Api-Version-Date</code> header.</p>
-         * <p>Dated API version used when requests authenticated with this key omit the <code>Api-Version-Date</code> header.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -422,7 +420,6 @@ public final class ApiKey {
         }
 
         /**
-         * <p>When the API key was created, as an ISO 8601 timestamp.</p>
          * <p>When the API key was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -435,7 +432,6 @@ public final class ApiKey {
 
         /**
          * <p>API key ID, prefixed <code>apik_</code>.</p>
-         * <p>API key ID, prefixed <code>apik_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -446,7 +442,6 @@ public final class ApiKey {
         }
 
         /**
-         * <p>Whether this is the resource's default API key. Default keys cannot be updated or deleted, only rotated.</p>
          * <p>Whether this is the resource's default API key. Default keys cannot be updated or deleted, only rotated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -459,7 +454,6 @@ public final class ApiKey {
 
         /**
          * <p>Masked version of the secret key, so the key can be recognized without revealing the full secret.</p>
-         * <p>Masked version of the secret key, so the key can be recognized without revealing the full secret.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -471,7 +465,6 @@ public final class ApiKey {
         }
 
         /**
-         * <p>When the API key was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the API key was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -664,6 +657,25 @@ public final class ApiKey {
                     systemRole,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("grants")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("ip_allowlist")
+                    || key.equalsIgnoreCase("is_default_for_resource")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("obfuscated_secret_key")
+                    || key.equalsIgnoreCase("secret_key")
+                    || key.equalsIgnoreCase("system_role")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

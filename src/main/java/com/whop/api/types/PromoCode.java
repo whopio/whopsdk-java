@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 public final class PromoCode {
     private final AccountSummary account;
 
+    private final Optional<PromoCodeAffiliate> affiliate;
+
     private final double amountOff;
 
     private final boolean churnedUsersOnly;
@@ -71,6 +73,7 @@ public final class PromoCode {
 
     private PromoCode(
             AccountSummary account,
+            Optional<PromoCodeAffiliate> affiliate,
             double amountOff,
             boolean churnedUsersOnly,
             Optional<String> code,
@@ -93,6 +96,7 @@ public final class PromoCode {
             int uses,
             Map<String, Object> additionalProperties) {
         this.account = account;
+        this.affiliate = affiliate;
         this.amountOff = amountOff;
         this.churnedUsersOnly = churnedUsersOnly;
         this.code = code;
@@ -122,6 +126,17 @@ public final class PromoCode {
     @JsonProperty("account")
     public AccountSummary getAccount() {
         return account;
+    }
+
+    /**
+     * @return Affiliate credited with referrals that use the promo code, or <code>null</code> when no affiliate is attached.
+     */
+    @JsonIgnore
+    public Optional<PromoCodeAffiliate> getAffiliate() {
+        if (affiliate == null) {
+            return Optional.empty();
+        }
+        return affiliate;
     }
 
     /**
@@ -297,6 +312,12 @@ public final class PromoCode {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("affiliate")
+    private Optional<PromoCodeAffiliate> _getAffiliate() {
+        return affiliate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("code")
     private Optional<String> _getCode() {
         return code;
@@ -333,6 +354,7 @@ public final class PromoCode {
 
     private boolean equalTo(PromoCode other) {
         return account.equals(other.account)
+                && affiliate.equals(other.affiliate)
                 && amountOff == other.amountOff
                 && churnedUsersOnly == other.churnedUsersOnly
                 && code.equals(other.code)
@@ -359,6 +381,7 @@ public final class PromoCode {
     public int hashCode() {
         return Objects.hash(
                 this.account,
+                this.affiliate,
                 this.amountOff,
                 this.churnedUsersOnly,
                 this.code,
@@ -512,6 +535,15 @@ public final class PromoCode {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Affiliate credited with referrals that use the promo code, or <code>null</code> when no affiliate is attached.</p>
+         */
+        _FinalStage affiliate(Optional<PromoCodeAffiliate> affiliate);
+
+        _FinalStage affiliate(PromoCodeAffiliate affiliate);
+
+        _FinalStage affiliate(Nullable<PromoCodeAffiliate> affiliate);
+
+        /**
          * <p>Code entered at checkout.</p>
          */
         _FinalStage code(Optional<String> code);
@@ -618,7 +650,8 @@ public final class PromoCode {
 
         private Optional<String> code = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<PromoCodeAffiliate> affiliate = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -626,6 +659,7 @@ public final class PromoCode {
         @java.lang.Override
         public Builder from(PromoCode other) {
             account(other.getAccount());
+            affiliate(other.getAffiliate());
             amountOff(other.getAmountOff());
             churnedUsersOnly(other.getChurnedUsersOnly());
             code(other.getCode());
@@ -651,7 +685,6 @@ public final class PromoCode {
 
         /**
          * <p>Account that owns the promo code.</p>
-         * <p>Account that owns the promo code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -662,7 +695,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Discount amount. Percentage discounts are represented as a decimal fraction.</p>
          * <p>Discount amount. Percentage discounts are represented as a decimal fraction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -675,7 +707,6 @@ public final class PromoCode {
 
         /**
          * <p>Whether the promo code is restricted to churned customers.</p>
-         * <p>Whether the promo code is restricted to churned customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -686,7 +717,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>When the promo code was created, as an ISO 8601 timestamp.</p>
          * <p>When the promo code was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -699,7 +729,6 @@ public final class PromoCode {
 
         /**
          * <p>Currency used for a fixed-amount discount.</p>
-         * <p>Currency used for a fixed-amount discount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -710,7 +739,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>How long the discount applies.</p>
          * <p>How long the discount applies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -723,7 +751,6 @@ public final class PromoCode {
 
         /**
          * <p>Whether the promo code applies only to existing memberships.</p>
-         * <p>Whether the promo code applies only to existing memberships.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -734,7 +761,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Promo code ID, prefixed <code>promo_</code>.</p>
          * <p>Promo code ID, prefixed <code>promo_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -747,7 +773,6 @@ public final class PromoCode {
 
         /**
          * <p>Whether the promo code is restricted to new customers.</p>
-         * <p>Whether the promo code is restricted to new customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -758,7 +783,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Whether each customer may redeem the promo code only once.</p>
          * <p>Whether each customer may redeem the promo code only once.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -771,7 +795,6 @@ public final class PromoCode {
 
         /**
          * <p>Whether the discount is percentage-based or a fixed amount.</p>
-         * <p>Whether the discount is percentage-based or a fixed amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -782,7 +805,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Promo code lifecycle status.</p>
          * <p>Promo code lifecycle status.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -795,7 +817,6 @@ public final class PromoCode {
 
         /**
          * <p>Maximum uses when stock is limited.</p>
-         * <p>Maximum uses when stock is limited.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -806,7 +827,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Whether the promo code has no redemption limit.</p>
          * <p>Whether the promo code has no redemption limit.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -819,7 +839,6 @@ public final class PromoCode {
 
         /**
          * <p>When the promo code was updated, as an ISO 8601 timestamp.</p>
-         * <p>When the promo code was updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -830,7 +849,6 @@ public final class PromoCode {
         }
 
         /**
-         * <p>Memberships that used the promo code.</p>
          * <p>Memberships that used the promo code.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1020,10 +1038,47 @@ public final class PromoCode {
             return this;
         }
 
+        /**
+         * <p>Affiliate credited with referrals that use the promo code, or <code>null</code> when no affiliate is attached.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage affiliate(Nullable<PromoCodeAffiliate> affiliate) {
+            if (affiliate.isNull()) {
+                this.affiliate = null;
+            } else if (affiliate.isEmpty()) {
+                this.affiliate = Optional.empty();
+            } else {
+                this.affiliate = Optional.of(affiliate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Affiliate credited with referrals that use the promo code, or <code>null</code> when no affiliate is attached.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage affiliate(PromoCodeAffiliate affiliate) {
+            this.affiliate = Optional.ofNullable(affiliate);
+            return this;
+        }
+
+        /**
+         * <p>Affiliate credited with referrals that use the promo code, or <code>null</code> when no affiliate is attached.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "affiliate", nulls = Nulls.SKIP)
+        public _FinalStage affiliate(Optional<PromoCodeAffiliate> affiliate) {
+            this.affiliate = affiliate;
+            return this;
+        }
+
         @java.lang.Override
         public PromoCode build() {
             return new PromoCode(
                     account,
+                    affiliate,
                     amountOff,
                     churnedUsersOnly,
                     code,
@@ -1045,6 +1100,35 @@ public final class PromoCode {
                     updatedAt,
                     uses,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("affiliate")
+                    || key.equalsIgnoreCase("amount_off")
+                    || key.equalsIgnoreCase("churned_users_only")
+                    || key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("duration")
+                    || key.equalsIgnoreCase("existing_memberships_only")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("new_users_only")
+                    || key.equalsIgnoreCase("one_per_customer")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("promo_duration_months")
+                    || key.equalsIgnoreCase("promo_type")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("uses")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

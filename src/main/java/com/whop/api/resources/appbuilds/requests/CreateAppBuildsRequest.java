@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAppBuildsRequest.Builder.class)
 public final class CreateAppBuildsRequest {
-    private final Optional<String> aiPromptId;
-
     private final Optional<String> appId;
 
     private final CreateAppBuildsRequestAttachment attachment;
@@ -43,7 +41,6 @@ public final class CreateAppBuildsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAppBuildsRequest(
-            Optional<String> aiPromptId,
             Optional<String> appId,
             CreateAppBuildsRequestAttachment attachment,
             String checksum,
@@ -51,7 +48,6 @@ public final class CreateAppBuildsRequest {
             Optional<CreateAppBuildsRequestSourceAttachment> sourceAttachment,
             Optional<List<CreateAppBuildsRequestSupportedAppViewTypesItem>> supportedAppViewTypes,
             Map<String, Object> additionalProperties) {
-        this.aiPromptId = aiPromptId;
         this.appId = appId;
         this.attachment = attachment;
         this.checksum = checksum;
@@ -59,14 +55,6 @@ public final class CreateAppBuildsRequest {
         this.sourceAttachment = sourceAttachment;
         this.supportedAppViewTypes = supportedAppViewTypes;
         this.additionalProperties = additionalProperties;
-    }
-
-    /**
-     * @return The AI prompt that generated this build, if applicable.
-     */
-    @JsonProperty("ai_prompt_id")
-    public Optional<String> getAiPromptId() {
-        return aiPromptId;
     }
 
     /**
@@ -78,7 +66,7 @@ public final class CreateAppBuildsRequest {
     }
 
     /**
-     * @return The uploaded build file: <code>{ id }</code> for an existing file or <code>{ direct_upload_id }</code> for a completed direct upload.
+     * @return The uploaded build file: pass <code>id</code> for an existing file or <code>direct_upload_id</code> for a completed direct upload. iOS and Android builds take a .zip bundle; web builds take a JavaScript file or a .zip archive of the hosted site.
      */
     @JsonProperty("attachment")
     public CreateAppBuildsRequestAttachment getAttachment() {
@@ -129,8 +117,7 @@ public final class CreateAppBuildsRequest {
     }
 
     private boolean equalTo(CreateAppBuildsRequest other) {
-        return aiPromptId.equals(other.aiPromptId)
-                && appId.equals(other.appId)
+        return appId.equals(other.appId)
                 && attachment.equals(other.attachment)
                 && checksum.equals(other.checksum)
                 && platform.equals(other.platform)
@@ -141,7 +128,6 @@ public final class CreateAppBuildsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.aiPromptId,
                 this.appId,
                 this.attachment,
                 this.checksum,
@@ -161,7 +147,7 @@ public final class CreateAppBuildsRequest {
 
     public interface AttachmentStage {
         /**
-         * <p>The uploaded build file: <code>{ id }</code> for an existing file or <code>{ direct_upload_id }</code> for a completed direct upload.</p>
+         * <p>The uploaded build file: pass <code>id</code> for an existing file or <code>direct_upload_id</code> for a completed direct upload. iOS and Android builds take a .zip bundle; web builds take a JavaScript file or a .zip archive of the hosted site.</p>
          */
         ChecksumStage attachment(@NotNull CreateAppBuildsRequestAttachment attachment);
 
@@ -188,13 +174,6 @@ public final class CreateAppBuildsRequest {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>The AI prompt that generated this build, if applicable.</p>
-         */
-        _FinalStage aiPromptId(Optional<String> aiPromptId);
-
-        _FinalStage aiPromptId(String aiPromptId);
 
         /**
          * <p>The app to create the build for, prefixed <code>app_</code>. Defaults to the app behind the presented credential.</p>
@@ -234,16 +213,12 @@ public final class CreateAppBuildsRequest {
 
         private Optional<String> appId = Optional.empty();
 
-        private Optional<String> aiPromptId = Optional.empty();
-
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateAppBuildsRequest other) {
-            aiPromptId(other.getAiPromptId());
             appId(other.getAppId());
             attachment(other.getAttachment());
             checksum(other.getChecksum());
@@ -254,8 +229,7 @@ public final class CreateAppBuildsRequest {
         }
 
         /**
-         * <p>The uploaded build file: <code>{ id }</code> for an existing file or <code>{ direct_upload_id }</code> for a completed direct upload.</p>
-         * <p>The uploaded build file: <code>{ id }</code> for an existing file or <code>{ direct_upload_id }</code> for a completed direct upload.</p>
+         * <p>The uploaded build file: pass <code>id</code> for an existing file or <code>direct_upload_id</code> for a completed direct upload. iOS and Android builds take a .zip bundle; web builds take a JavaScript file or a .zip archive of the hosted site.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -267,7 +241,6 @@ public final class CreateAppBuildsRequest {
 
         /**
          * <p>A client-generated checksum of the build file, used to verify file integrity when unpacked.</p>
-         * <p>A client-generated checksum of the build file, used to verify file integrity when unpacked.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -278,7 +251,6 @@ public final class CreateAppBuildsRequest {
         }
 
         /**
-         * <p>The target platform for the build.</p>
          * <p>The target platform for the build.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -351,30 +323,9 @@ public final class CreateAppBuildsRequest {
             return this;
         }
 
-        /**
-         * <p>The AI prompt that generated this build, if applicable.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage aiPromptId(String aiPromptId) {
-            this.aiPromptId = Optional.ofNullable(aiPromptId);
-            return this;
-        }
-
-        /**
-         * <p>The AI prompt that generated this build, if applicable.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "ai_prompt_id", nulls = Nulls.SKIP)
-        public _FinalStage aiPromptId(Optional<String> aiPromptId) {
-            this.aiPromptId = aiPromptId;
-            return this;
-        }
-
         @java.lang.Override
         public CreateAppBuildsRequest build() {
             return new CreateAppBuildsRequest(
-                    aiPromptId,
                     appId,
                     attachment,
                     checksum,
@@ -382,6 +333,19 @@ public final class CreateAppBuildsRequest {
                     sourceAttachment,
                     supportedAppViewTypes,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("attachment")
+                    || key.equalsIgnoreCase("checksum")
+                    || key.equalsIgnoreCase("platform")
+                    || key.equalsIgnoreCase("source_attachment")
+                    || key.equalsIgnoreCase("supported_app_view_types")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

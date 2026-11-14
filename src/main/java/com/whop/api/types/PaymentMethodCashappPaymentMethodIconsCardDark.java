@@ -151,7 +151,6 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
 
         private String svg;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -167,7 +166,6 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
 
         /**
          * <p>Raster fallback at the shape's native size.</p>
-         * <p>Raster fallback at the shape's native size.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -178,7 +176,6 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
         }
 
         /**
-         * <p>Raster fallback at double density.</p>
          * <p>Raster fallback at double density.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -191,7 +188,6 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
 
         /**
          * <p>Raster fallback at quadruple density.</p>
-         * <p>Raster fallback at quadruple density.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -202,7 +198,6 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
         }
 
         /**
-         * <p>The vector file. Prefer this everywhere SVG renders.</p>
          * <p>The vector file. Prefer this everywhere SVG renders.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -216,6 +211,17 @@ public final class PaymentMethodCashappPaymentMethodIconsCardDark {
         @java.lang.Override
         public PaymentMethodCashappPaymentMethodIconsCardDark build() {
             return new PaymentMethodCashappPaymentMethodIconsCardDark(png1X, png2X, png4X, svg, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("png_1x")
+                    || key.equalsIgnoreCase("png_2x")
+                    || key.equalsIgnoreCase("png_4x")
+                    || key.equalsIgnoreCase("svg")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

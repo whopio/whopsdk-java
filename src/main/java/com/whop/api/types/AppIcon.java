@@ -86,7 +86,6 @@ public final class AppIcon {
     public static final class Builder implements UrlStage, _FinalStage {
         private String url;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class AppIcon {
         }
 
         /**
-         * <p>Icon image URL. Always present — the default app icon when none is uploaded.</p>
          * <p>Icon image URL. Always present — the default app icon when none is uploaded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class AppIcon {
         @java.lang.Override
         public AppIcon build() {
             return new AppIcon(url, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

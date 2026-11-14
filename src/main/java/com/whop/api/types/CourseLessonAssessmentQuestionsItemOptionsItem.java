@@ -171,7 +171,6 @@ public final class CourseLessonAssessmentQuestionsItemOptionsItem {
 
         private Optional<Boolean> isCorrect = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -187,7 +186,6 @@ public final class CourseLessonAssessmentQuestionsItemOptionsItem {
 
         /**
          * <p>The unique identifier for the assessment question option.</p>
-         * <p>The unique identifier for the assessment question option.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,7 +197,6 @@ public final class CourseLessonAssessmentQuestionsItemOptionsItem {
 
         /**
          * <p>The text of the answer option</p>
-         * <p>The text of the answer option</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +207,6 @@ public final class CourseLessonAssessmentQuestionsItemOptionsItem {
         }
 
         /**
-         * <p>The order of this option within the question</p>
          * <p>The order of this option within the question</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -261,6 +257,17 @@ public final class CourseLessonAssessmentQuestionsItemOptionsItem {
         public CourseLessonAssessmentQuestionsItemOptionsItem build() {
             return new CourseLessonAssessmentQuestionsItemOptionsItem(
                     id, isCorrect, optionText, order, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("is_correct")
+                    || key.equalsIgnoreCase("option_text")
+                    || key.equalsIgnoreCase("order")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

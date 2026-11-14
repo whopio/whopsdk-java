@@ -115,7 +115,6 @@ public final class ListEarningsResponseDataItemResourceAlternativePaymentMethodA
 
         private Optional<String> imageUrl = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -164,6 +163,14 @@ public final class ListEarningsResponseDataItemResourceAlternativePaymentMethodA
         public ListEarningsResponseDataItemResourceAlternativePaymentMethodAlternativePaymentMethod build() {
             return new ListEarningsResponseDataItemResourceAlternativePaymentMethodAlternativePaymentMethod(
                     imageUrl, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("image_url") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

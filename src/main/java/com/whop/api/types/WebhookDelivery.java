@@ -41,6 +41,8 @@ public final class WebhookDelivery {
 
     private final String sentAt;
 
+    private final WebhookDeliveryStatus status;
+
     private final boolean success;
 
     private final double totalTime;
@@ -56,6 +58,7 @@ public final class WebhookDelivery {
             Optional<Map<String, Object>> responseBody,
             double responseCode,
             String sentAt,
+            WebhookDeliveryStatus status,
             boolean success,
             double totalTime,
             Map<String, Object> additionalProperties) {
@@ -67,6 +70,7 @@ public final class WebhookDelivery {
         this.responseBody = responseBody;
         this.responseCode = responseCode;
         this.sentAt = sentAt;
+        this.status = status;
         this.success = success;
         this.totalTime = totalTime;
         this.additionalProperties = additionalProperties;
@@ -146,6 +150,14 @@ public final class WebhookDelivery {
     }
 
     /**
+     * @return Outcome of this delivery attempt: <code>success</code> when the endpoint returned a 2xx response, <code>error</code> otherwise.
+     */
+    @JsonProperty("status")
+    public WebhookDeliveryStatus getStatus() {
+        return status;
+    }
+
+    /**
      * @return Whether the endpoint acknowledged this attempt with a 2xx response.
      */
     @JsonProperty("success")
@@ -199,6 +211,7 @@ public final class WebhookDelivery {
                 && responseBody.equals(other.responseBody)
                 && responseCode == other.responseCode
                 && sentAt.equals(other.sentAt)
+                && status.equals(other.status)
                 && success == other.success
                 && totalTime == other.totalTime;
     }
@@ -214,6 +227,7 @@ public final class WebhookDelivery {
                 this.responseBody,
                 this.responseCode,
                 this.sentAt,
+                this.status,
                 this.success,
                 this.totalTime);
     }
@@ -254,7 +268,14 @@ public final class WebhookDelivery {
         /**
          * <p>When the webhook was sent, as an ISO 8601 timestamp.</p>
          */
-        SuccessStage sentAt(@NotNull String sentAt);
+        StatusStage sentAt(@NotNull String sentAt);
+    }
+
+    public interface StatusStage {
+        /**
+         * <p>Outcome of this delivery attempt: <code>success</code> when the endpoint returned a 2xx response, <code>error</code> otherwise.</p>
+         */
+        SuccessStage status(@NotNull WebhookDeliveryStatus status);
     }
 
     public interface SuccessStage {
@@ -321,6 +342,7 @@ public final class WebhookDelivery {
                     ResourceIdStage,
                     ResponseCodeStage,
                     SentAtStage,
+                    StatusStage,
                     SuccessStage,
                     TotalTimeStage,
                     _FinalStage {
@@ -331,6 +353,8 @@ public final class WebhookDelivery {
         private double responseCode;
 
         private String sentAt;
+
+        private WebhookDeliveryStatus status;
 
         private boolean success;
 
@@ -344,7 +368,6 @@ public final class WebhookDelivery {
 
         private Optional<String> event = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -359,13 +382,13 @@ public final class WebhookDelivery {
             responseBody(other.getResponseBody());
             responseCode(other.getResponseCode());
             sentAt(other.getSentAt());
+            status(other.getStatus());
             success(other.getSuccess());
             totalTime(other.getTotalTime());
             return this;
         }
 
         /**
-         * <p>Unique identifier for this delivery attempt. Pass it to the replay endpoint to re-send this exact payload.</p>
          * <p>Unique identifier for this delivery attempt. Pass it to the replay endpoint to re-send this exact payload.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -378,7 +401,6 @@ public final class WebhookDelivery {
 
         /**
          * <p>ID of the resource that triggered the webhook.</p>
-         * <p>ID of the resource that triggered the webhook.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -389,7 +411,6 @@ public final class WebhookDelivery {
         }
 
         /**
-         * <p>HTTP response code received from the webhook endpoint.</p>
          * <p>HTTP response code received from the webhook endpoint.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -402,18 +423,27 @@ public final class WebhookDelivery {
 
         /**
          * <p>When the webhook was sent, as an ISO 8601 timestamp.</p>
-         * <p>When the webhook was sent, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("sent_at")
-        public SuccessStage sentAt(@NotNull String sentAt) {
+        public StatusStage sentAt(@NotNull String sentAt) {
             this.sentAt = Objects.requireNonNull(sentAt, "sentAt must not be null");
             return this;
         }
 
         /**
-         * <p>Whether the endpoint acknowledged this attempt with a 2xx response.</p>
+         * <p>Outcome of this delivery attempt: <code>success</code> when the endpoint returned a 2xx response, <code>error</code> otherwise.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("status")
+        public SuccessStage status(@NotNull WebhookDeliveryStatus status) {
+            this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
          * <p>Whether the endpoint acknowledged this attempt with a 2xx response.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -425,7 +455,6 @@ public final class WebhookDelivery {
         }
 
         /**
-         * <p>Total time taken to send the webhook request, in seconds.</p>
          * <p>Total time taken to send the webhook request, in seconds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -590,9 +619,28 @@ public final class WebhookDelivery {
                     responseBody,
                     responseCode,
                     sentAt,
+                    status,
                     success,
                     totalTime,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("event")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("replayed_from")
+                    || key.equalsIgnoreCase("request_body")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("response_body")
+                    || key.equalsIgnoreCase("response_code")
+                    || key.equalsIgnoreCase("sent_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("success")
+                    || key.equalsIgnoreCase("total_time")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

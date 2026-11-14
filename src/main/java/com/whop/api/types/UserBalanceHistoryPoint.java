@@ -105,7 +105,6 @@ public final class UserBalanceHistoryPoint {
 
         private double v;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -119,7 +118,6 @@ public final class UserBalanceHistoryPoint {
 
         /**
          * <p>Point timestamp, in Unix seconds.</p>
-         * <p>Point timestamp, in Unix seconds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -130,7 +128,6 @@ public final class UserBalanceHistoryPoint {
         }
 
         /**
-         * <p>Cumulative wallet balance at this point, in USD.</p>
          * <p>Cumulative wallet balance at this point, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -144,6 +141,14 @@ public final class UserBalanceHistoryPoint {
         @java.lang.Override
         public UserBalanceHistoryPoint build() {
             return new UserBalanceHistoryPoint(t, v, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("t") || key.equalsIgnoreCase("v")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

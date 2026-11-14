@@ -133,7 +133,6 @@ public final class DeletePasskeysRequest {
 
         private String signature;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -148,7 +147,6 @@ public final class DeletePasskeysRequest {
 
         /**
          * <p>The <code>authenticatorData</code> from the WebAuthn assertion, base64url-encoded.</p>
-         * <p>The <code>authenticatorData</code> from the WebAuthn assertion, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -160,7 +158,6 @@ public final class DeletePasskeysRequest {
 
         /**
          * <p>The <code>clientDataJSON</code> from the WebAuthn assertion, base64url-encoded.</p>
-         * <p>The <code>clientDataJSON</code> from the WebAuthn assertion, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -171,7 +168,6 @@ public final class DeletePasskeysRequest {
         }
 
         /**
-         * <p>The <code>signature</code> from the WebAuthn assertion, base64url-encoded.</p>
          * <p>The <code>signature</code> from the WebAuthn assertion, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -185,6 +181,16 @@ public final class DeletePasskeysRequest {
         @java.lang.Override
         public DeletePasskeysRequest build() {
             return new DeletePasskeysRequest(authenticatorData, clientDataJson, signature, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("authenticator_data")
+                    || key.equalsIgnoreCase("client_data_json")
+                    || key.equalsIgnoreCase("signature")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

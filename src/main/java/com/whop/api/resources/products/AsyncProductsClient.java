@@ -5,6 +5,7 @@ package com.whop.api.resources.products;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.products.requests.CreateProductsRequest;
 import com.whop.api.resources.products.requests.DeleteProductsRequest;
@@ -36,82 +37,196 @@ public class AsyncProductsClient {
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
      */
-    public CompletableFuture<SyncPagingIterable<ProductListItem>> list(ListProductsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<ProductListItem>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ProductListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of products belonging to an account.
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
+     */
+    public CompletableFuture<SyncPagingIterable<ProductListItem>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ProductListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
+     */
+    public CompletableFuture<SyncPagingIterable<ProductListItem>> list(ListProductsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ProductListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists an account's products, or searches the public marketplace when you omit <code>account_id</code>. Without the <code>access_pass:basic:read</code> permission on the account, including when signed out, the list holds only the products its store page lists.
      */
     public CompletableFuture<SyncPagingIterable<ProductListItem>> list(
             ListProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ProductListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ProductListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a new product for an account.
      */
     public CompletableFuture<Product> create(CreateProductsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Creates a new product for an account.
      */
     public CompletableFuture<Product> create(CreateProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public CompletableFuture<Product> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public CompletableFuture<Product> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public CompletableFuture<Product> retrieve(String id, RetrieveProductsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing product. This endpoint is publicly accessible.
+     * Retrieves a product. Requires no authentication.
      */
     public CompletableFuture<Product> retrieve(
             String id, RetrieveProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a product. Only products with no memberships, entries, reviews, or invoices can be deleted.
      */
     public CompletableFuture<DeleteProductsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteProductsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteProductsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a product. Only products with no memberships, entries, reviews, or invoices can be deleted.
      */
     public CompletableFuture<DeleteProductsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteProductsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteProductsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a product. Only products with no memberships, entries, reviews, or invoices can be deleted.
      */
     public CompletableFuture<DeleteProductsResponse> delete(String id, DeleteProductsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteProductsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteProductsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -119,85 +234,170 @@ public class AsyncProductsClient {
      */
     public CompletableFuture<DeleteProductsResponse> delete(
             String id, DeleteProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteProductsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteProductsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an existing product.
      */
     public CompletableFuture<Product> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an existing product.
      */
     public CompletableFuture<Product> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an existing product.
      */
     public CompletableFuture<Product> update(String id, UpdateProductsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Updates an existing product.
      */
     public CompletableFuture<Product> update(String id, UpdateProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public CompletableFuture<Product> publish(String id) {
-        return this.rawClient.publish(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.publish(id);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public CompletableFuture<Product> publish(String id, RequestOptions requestOptions) {
-        return this.rawClient.publish(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.publish(id, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public CompletableFuture<Product> publish(String id, PublishProductsRequest request) {
-        return this.rawClient.publish(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.publish(id, request);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Submits a product to the whop.com marketplace for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live.
+     * Submits an App Store app's product for review. The product moves to <code>pending_review</code>; a Whop reviewer approves it before it goes live. Other products can no longer be listed on the whop.com marketplace, so the request fails with <code>discover_listing_discontinued</code>.
      */
     public CompletableFuture<Product> publish(
             String id, PublishProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.publish(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.publish(id, request, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a product from the whop.com marketplace. The product moves to <code>not_available</code>.
      */
     public CompletableFuture<Product> unpublish(String id) {
-        return this.rawClient.unpublish(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.unpublish(id);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a product from the whop.com marketplace. The product moves to <code>not_available</code>.
      */
     public CompletableFuture<Product> unpublish(String id, RequestOptions requestOptions) {
-        return this.rawClient.unpublish(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.unpublish(id, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Removes a product from the whop.com marketplace. The product moves to <code>not_available</code>.
      */
     public CompletableFuture<Product> unpublish(String id, UnpublishProductsRequest request) {
-        return this.rawClient.unpublish(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture = this.rawClient.unpublish(id, request);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -205,6 +405,14 @@ public class AsyncProductsClient {
      */
     public CompletableFuture<Product> unpublish(
             String id, UnpublishProductsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.unpublish(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Product>> rawFuture =
+                this.rawClient.unpublish(id, request, requestOptions);
+        CompletableFuture<Product> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

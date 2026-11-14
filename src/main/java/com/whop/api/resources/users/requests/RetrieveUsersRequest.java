@@ -21,7 +21,11 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveUsersRequest.Builder.class)
 public final class RetrieveUsersRequest {
+    private final Optional<Boolean> includeTrading;
+
     private final Optional<String> accountId;
+
+    private final Optional<Boolean> includeBalance;
 
     private final Optional<Boolean> includeBalanceHistory;
 
@@ -36,14 +40,18 @@ public final class RetrieveUsersRequest {
     private final Map<String, Object> additionalProperties;
 
     private RetrieveUsersRequest(
+            Optional<Boolean> includeTrading,
             Optional<String> accountId,
+            Optional<Boolean> includeBalance,
             Optional<Boolean> includeBalanceHistory,
             Optional<String> from,
             Optional<String> to,
             Optional<RetrieveUsersRequestInterval> interval,
             Optional<String> timeZone,
             Map<String, Object> additionalProperties) {
+        this.includeTrading = includeTrading;
         this.accountId = accountId;
+        this.includeBalance = includeBalance;
         this.includeBalanceHistory = includeBalanceHistory;
         this.from = from;
         this.to = to;
@@ -53,11 +61,27 @@ public final class RetrieveUsersRequest {
     }
 
     /**
+     * @return Also return the trading account under <code>trading</code>: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Only honored on the self view (me) with crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet.
+     */
+    @JsonProperty("include_trading")
+    public Optional<Boolean> getIncludeTrading() {
+        return includeTrading;
+    }
+
+    /**
      * @return When set, returns the user's account-specific profile overrides for this account.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return Compute live wallet and owned-account balances on the self view (default true). Set false for identity-only reads. Ignored when the id is not <code>me</code> or the caller lacks balance-read scope.
+     */
+    @JsonProperty("include_balance")
+    public Optional<Boolean> getIncludeBalance() {
+        return includeBalance;
     }
 
     /**
@@ -112,7 +136,9 @@ public final class RetrieveUsersRequest {
     }
 
     private boolean equalTo(RetrieveUsersRequest other) {
-        return accountId.equals(other.accountId)
+        return includeTrading.equals(other.includeTrading)
+                && accountId.equals(other.accountId)
+                && includeBalance.equals(other.includeBalance)
                 && includeBalanceHistory.equals(other.includeBalanceHistory)
                 && from.equals(other.from)
                 && to.equals(other.to)
@@ -123,7 +149,14 @@ public final class RetrieveUsersRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.accountId, this.includeBalanceHistory, this.from, this.to, this.interval, this.timeZone);
+                this.includeTrading,
+                this.accountId,
+                this.includeBalance,
+                this.includeBalanceHistory,
+                this.from,
+                this.to,
+                this.interval,
+                this.timeZone);
     }
 
     @java.lang.Override
@@ -137,7 +170,11 @@ public final class RetrieveUsersRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Boolean> includeTrading = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
+
+        private Optional<Boolean> includeBalance = Optional.empty();
 
         private Optional<Boolean> includeBalanceHistory = Optional.empty();
 
@@ -149,18 +186,33 @@ public final class RetrieveUsersRequest {
 
         private Optional<String> timeZone = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveUsersRequest other) {
+            includeTrading(other.getIncludeTrading());
             accountId(other.getAccountId());
+            includeBalance(other.getIncludeBalance());
             includeBalanceHistory(other.getIncludeBalanceHistory());
             from(other.getFrom());
             to(other.getTo());
             interval(other.getInterval());
             timeZone(other.getTimeZone());
+            return this;
+        }
+
+        /**
+         * <p>Also return the trading account under <code>trading</code>: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Only honored on the self view (me) with crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet.</p>
+         */
+        @JsonSetter(value = "include_trading", nulls = Nulls.SKIP)
+        public Builder includeTrading(Optional<Boolean> includeTrading) {
+            this.includeTrading = includeTrading;
+            return this;
+        }
+
+        public Builder includeTrading(Boolean includeTrading) {
+            this.includeTrading = Optional.ofNullable(includeTrading);
             return this;
         }
 
@@ -175,6 +227,20 @@ public final class RetrieveUsersRequest {
 
         public Builder accountId(String accountId) {
             this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>Compute live wallet and owned-account balances on the self view (default true). Set false for identity-only reads. Ignored when the id is not <code>me</code> or the caller lacks balance-read scope.</p>
+         */
+        @JsonSetter(value = "include_balance", nulls = Nulls.SKIP)
+        public Builder includeBalance(Optional<Boolean> includeBalance) {
+            this.includeBalance = includeBalance;
+            return this;
+        }
+
+        public Builder includeBalance(Boolean includeBalance) {
+            this.includeBalance = Optional.ofNullable(includeBalance);
             return this;
         }
 
@@ -250,7 +316,30 @@ public final class RetrieveUsersRequest {
 
         public RetrieveUsersRequest build() {
             return new RetrieveUsersRequest(
-                    accountId, includeBalanceHistory, from, to, interval, timeZone, additionalProperties);
+                    includeTrading,
+                    accountId,
+                    includeBalance,
+                    includeBalanceHistory,
+                    from,
+                    to,
+                    interval,
+                    timeZone,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("include_trading")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("include_balance")
+                    || key.equalsIgnoreCase("include_balance_history")
+                    || key.equalsIgnoreCase("from")
+                    || key.equalsIgnoreCase("to")
+                    || key.equalsIgnoreCase("interval")
+                    || key.equalsIgnoreCase("time_zone")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

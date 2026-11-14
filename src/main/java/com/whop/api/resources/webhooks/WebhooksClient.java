@@ -8,7 +8,6 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.webhooks.requests.CreateWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.DeleteWebhooksRequest;
-import com.whop.api.resources.webhooks.requests.DeliveriesWebhookRequest;
 import com.whop.api.resources.webhooks.requests.ListDeliveriesWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ListWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.ReplayDeliveryWebhooksRequest;
@@ -17,7 +16,6 @@ import com.whop.api.resources.webhooks.requests.RetrieveWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.TestWebhooksRequest;
 import com.whop.api.resources.webhooks.requests.UpdateWebhooksRequest;
 import com.whop.api.resources.webhooks.types.DeleteWebhooksResponse;
-import com.whop.api.resources.webhooks.types.DeliveriesWebhookResponseDataItem;
 import com.whop.api.resources.webhooks.types.ReplayDeliveryWebhooksResponse;
 import com.whop.api.resources.webhooks.types.ReplayWebhooksResponse;
 import com.whop.api.resources.webhooks.types.TestWebhooksResponse;
@@ -40,6 +38,20 @@ public class WebhooksClient {
      */
     public RawWebhooksClient withRawResponse() {
         return this.rawClient;
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
+    public SyncPagingIterable<WebhookListItem> list() {
+        return this.rawClient.list().body();
+    }
+
+    /**
+     * Returns a paginated list of webhook endpoints configured for an account, ordered by most recently created.
+     */
+    public SyncPagingIterable<WebhookListItem> list(RequestOptions requestOptions) {
+        return this.rawClient.list(requestOptions).body();
     }
 
     /**
@@ -99,28 +111,28 @@ public class WebhooksClient {
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public DeleteWebhooksResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public DeleteWebhooksResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public DeleteWebhooksResponse delete(String id, DeleteWebhooksRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Permanently deletes a webhook endpoint. Returns <code>true</code> on success, matching the legacy proxy response.
+     * Permanently deletes a webhook endpoint. To stop deliveries without deleting it, set <code>enabled</code> to <code>false</code> with <code>PATCH /webhooks/:id</code>.
      */
     public DeleteWebhooksResponse delete(String id, DeleteWebhooksRequest request, RequestOptions requestOptions) {
         return this.rawClient.delete(id, request, requestOptions).body();
@@ -155,28 +167,28 @@ public class WebhooksClient {
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public SyncPagingIterable<WebhookDelivery> listDeliveries(String id) {
         return this.rawClient.listDeliveries(id).body();
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public SyncPagingIterable<WebhookDelivery> listDeliveries(String id, RequestOptions requestOptions) {
         return this.rawClient.listDeliveries(id, requestOptions).body();
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public SyncPagingIterable<WebhookDelivery> listDeliveries(String id, ListDeliveriesWebhooksRequest request) {
         return this.rawClient.listDeliveries(id, request).body();
     }
 
     /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
+     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt. Filtered queries use a bounded read budget, so a page may be partial or empty. Continue with <code>page_info.end_cursor</code> while <code>page_info.has_next_page</code> is <code>true</code>.
      */
     public SyncPagingIterable<WebhookDelivery> listDeliveries(
             String id, ListDeliveriesWebhooksRequest request, RequestOptions requestOptions) {
@@ -184,21 +196,21 @@ public class WebhooksClient {
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayDeliveryWebhooksResponse replayDelivery(String id, String deliveryId) {
         return this.rawClient.replayDelivery(id, deliveryId).body();
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayDeliveryWebhooksResponse replayDelivery(String id, String deliveryId, RequestOptions requestOptions) {
         return this.rawClient.replayDelivery(id, deliveryId, requestOptions).body();
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayDeliveryWebhooksResponse replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request) {
@@ -206,7 +218,7 @@ public class WebhooksClient {
     }
 
     /**
-     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. By default the replay keeps the original <code>webhook-id</code>, so consumers that deduplicate on it can drop events they already processed. Pass <code>regenerate_id</code> to re-send under a freshly generated <code>webhook-id</code> instead, so a deduplicating consumer processes the replay as a new message. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the exact payload of a past delivery to the webhook's current URL and returns the delivery result. The replay keeps the original <code>webhook-id</code> unless you pass <code>regenerate_id</code>, so consumers that deduplicate on it can drop events they already processed. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayDeliveryWebhooksResponse replayDelivery(
             String id, String deliveryId, ReplayDeliveryWebhooksRequest request, RequestOptions requestOptions) {
@@ -216,14 +228,14 @@ public class WebhooksClient {
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayWebhooksResponse replay(String id, ReplayWebhooksRequest request) {
         return this.rawClient.replay(id, request).body();
     }
 
     /**
-     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to messages whose most recent delivery attempt failed. Fire and forget: nothing about the replay is stored, and each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, by default with its original <code>webhook-id</code>, so consumers that deduplicate are unaffected; pass <code>regenerate_ids</code> to re-send under freshly generated ids instead. Only available for enabled webhooks on API version v1; deliveries are retained for 30 days.
+     * Re-sends the webhook's past deliveries within a time window, optionally limited to specific events or to failed deliveries. Use it to recover events your endpoint missed. The replay runs asynchronously and nothing about it is stored: each re-send appears as a new entry in the webhook's delivery log. Each matching message is re-sent once, with its original <code>webhook-id</code> unless you pass <code>regenerate_ids</code>. Only available for enabled webhooks on API version <code>v1</code>; deliveries are retained for 30 days.
      */
     public ReplayWebhooksResponse replay(String id, ReplayWebhooksRequest request, RequestOptions requestOptions) {
         return this.rawClient.replay(id, request, requestOptions).body();
@@ -241,54 +253,5 @@ public class WebhooksClient {
      */
     public TestWebhooksResponse test(String id, TestWebhooksRequest request, RequestOptions requestOptions) {
         return this.rawClient.test(id, request, requestOptions).body();
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public SyncPagingIterable<DeliveriesWebhookResponseDataItem> deliveriesWebhook(String webhookId) {
-        return this.rawClient.deliveriesWebhook(webhookId).body();
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public SyncPagingIterable<DeliveriesWebhookResponseDataItem> deliveriesWebhook(
-            String webhookId, RequestOptions requestOptions) {
-        return this.rawClient.deliveriesWebhook(webhookId, requestOptions).body();
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public SyncPagingIterable<DeliveriesWebhookResponseDataItem> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request) {
-        return this.rawClient.deliveriesWebhook(webhookId, request).body();
-    }
-
-    /**
-     * Returns a paginated list of delivery attempts for a webhook, ordered by most recent first. Includes the request payload, response body, response code, and timing for each attempt.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>developer:manage_webhook</code></li>
-     * </ul>
-     */
-    public SyncPagingIterable<DeliveriesWebhookResponseDataItem> deliveriesWebhook(
-            String webhookId, DeliveriesWebhookRequest request, RequestOptions requestOptions) {
-        return this.rawClient
-                .deliveriesWebhook(webhookId, request, requestOptions)
-                .body();
     }
 }

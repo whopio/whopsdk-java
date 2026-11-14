@@ -121,7 +121,6 @@ public final class ListPeopleResponseDataItemDevice {
 
         private Optional<String> os = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -201,6 +200,14 @@ public final class ListPeopleResponseDataItemDevice {
 
         public ListPeopleResponseDataItemDevice build() {
             return new ListPeopleResponseDataItemDevice(browser, device, os, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("browser") || key.equalsIgnoreCase("device") || key.equalsIgnoreCase("os")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -148,7 +148,6 @@ public final class ListMethodsResponseLimits {
 
         private ListMethodsResponseLimitsStandard standard;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -164,7 +163,6 @@ public final class ListMethodsResponseLimits {
 
         /**
          * <p>The currency the caps are denominated in.</p>
-         * <p>The currency the caps are denominated in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -175,7 +173,6 @@ public final class ListMethodsResponseLimits {
         }
 
         /**
-         * <p>Caps for instant-speed payouts, which additionally draw on pending funds.</p>
          * <p>Caps for instant-speed payouts, which additionally draw on pending funds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -195,7 +192,6 @@ public final class ListMethodsResponseLimits {
 
         /**
          * <p>Caps for standard-speed payouts, which draw on settled funds only.</p>
-         * <p>Caps for standard-speed payouts, which draw on settled funds only.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,6 +204,17 @@ public final class ListMethodsResponseLimits {
         @java.lang.Override
         public ListMethodsResponseLimits build() {
             return new ListMethodsResponseLimits(currency, instant, object, standard, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("instant")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("standard")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

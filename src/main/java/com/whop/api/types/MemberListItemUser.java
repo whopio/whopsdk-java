@@ -181,7 +181,6 @@ public final class MemberListItemUser {
 
         private Optional<String> email = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -197,7 +196,6 @@ public final class MemberListItemUser {
 
         /**
          * <p>The unique identifier for the company member user.</p>
-         * <p>The unique identifier for the company member user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class MemberListItemUser {
         }
 
         /**
-         * <p>The whop username.</p>
          * <p>The whop username.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class MemberListItemUser {
         @java.lang.Override
         public MemberListItemUser build() {
             return new MemberListItemUser(email, id, name, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

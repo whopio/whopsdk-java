@@ -401,7 +401,6 @@ public final class MemberListItem {
 
         private Optional<MemberMostRecentActions> mostRecentAction = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -425,7 +424,6 @@ public final class MemberListItem {
 
         /**
          * <p>The member's content access level. <code>admin</code> means their team role grants administrative content access, <code>customer</code> means they hold a valid product membership, and <code>no_access</code> means they cannot access company content.</p>
-         * <p>The member's content access level. <code>admin</code> means their team role grants administrative content access, <code>customer</code> means they hold a valid product membership, and <code>no_access</code> means they cannot access company content.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -436,7 +434,6 @@ public final class MemberListItem {
         }
 
         /**
-         * <p>The member's token balance for this company. Computed live from the ledger, not from a cache.</p>
          * <p>The member's token balance for this company. Computed live from the ledger, not from a cache.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -449,7 +446,6 @@ public final class MemberListItem {
 
         /**
          * <p>The datetime the company member was created.</p>
-         * <p>The datetime the company member was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -460,7 +456,6 @@ public final class MemberListItem {
         }
 
         /**
-         * <p>The unique identifier for the company member.</p>
          * <p>The unique identifier for the company member.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -473,7 +468,6 @@ public final class MemberListItem {
 
         /**
          * <p>When the member joined the company</p>
-         * <p>When the member joined the company</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -484,7 +478,6 @@ public final class MemberListItem {
         }
 
         /**
-         * <p>The status of the member</p>
          * <p>The status of the member</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -497,7 +490,6 @@ public final class MemberListItem {
 
         /**
          * <p>The datetime the company member was last updated.</p>
-         * <p>The datetime the company member was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -508,7 +500,6 @@ public final class MemberListItem {
         }
 
         /**
-         * <p>How much money this customer has spent on the company's products and plans</p>
          * <p>How much money this customer has spent on the company's products and plans</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -679,6 +670,25 @@ public final class MemberListItem {
                     usdTotalSpent,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("access_level")
+                    || key.equalsIgnoreCase("company_token_balance")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("most_recent_action")
+                    || key.equalsIgnoreCase("most_recent_action_at")
+                    || key.equalsIgnoreCase("phone")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("usd_total_spent")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

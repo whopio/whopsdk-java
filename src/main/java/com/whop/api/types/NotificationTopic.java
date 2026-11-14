@@ -250,7 +250,6 @@ public final class NotificationTopic {
 
         private Optional<String> description = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -269,7 +268,6 @@ public final class NotificationTopic {
 
         /**
          * <p>Whether notifications for this topic are enabled by default when the user has not set a preference.</p>
-         * <p>Whether notifications for this topic are enabled by default when the user has not set a preference.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -280,7 +278,6 @@ public final class NotificationTopic {
         }
 
         /**
-         * <p>Notification topic ID, prefixed <code>topic_</code>. This is the value the notification preference endpoints take as <code>topic_id</code>.</p>
          * <p>Notification topic ID, prefixed <code>topic_</code>. This is the value the notification preference endpoints take as <code>topic_id</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -293,7 +290,6 @@ public final class NotificationTopic {
 
         /**
          * <p>Stable, human-readable name for the category, such as <code>new-follower</code>. Unlike <code>id</code>, it is the same in every environment, which makes it the value to match on in code and to read in logs. Treat it as an opaque string: the set is open and the casing is historical rather than normalized.</p>
-         * <p>Stable, human-readable name for the category, such as <code>new-follower</code>. Unlike <code>id</code>, it is the same in every environment, which makes it the value to match on in code and to read in logs. Treat it as an opaque string: the set is open and the casing is historical rather than normalized.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -304,7 +300,6 @@ public final class NotificationTopic {
         }
 
         /**
-         * <p>Whether this topic exclusively handles mention-based notifications.</p>
          * <p>Whether this topic exclusively handles mention-based notifications.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -317,7 +312,6 @@ public final class NotificationTopic {
 
         /**
          * <p>Display name shown in notification preference settings.</p>
-         * <p>Display name shown in notification preference settings.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -328,7 +322,6 @@ public final class NotificationTopic {
         }
 
         /**
-         * <p>Scope of the topic: whether it applies to an account, a user, or an account's team.</p>
          * <p>Scope of the topic: whether it applies to an account, a user, or an account's team.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -386,6 +379,20 @@ public final class NotificationTopic {
                     name,
                     topicType,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("default_preference_value")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("identifier")
+                    || key.equalsIgnoreCase("is_mention")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("topic_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

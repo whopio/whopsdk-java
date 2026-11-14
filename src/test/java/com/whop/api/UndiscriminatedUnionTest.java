@@ -6,91 +6,111 @@ package com.whop.api;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBody;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBodyEmail;
-import com.whop.api.resources.memberships.types.InviteMembershipsRequestBodyUserId;
-import com.whop.api.resources.payments.types.CreatePaymentsRequest;
-import com.whop.api.resources.payments.types.CreatePaymentsRequestOne;
-import com.whop.api.resources.payments.types.CreatePaymentsRequestThree;
-import com.whop.api.resources.payments.types.CreatePaymentsRequestTwo;
-import com.whop.api.resources.payments.types.CreatePaymentsRequestZero;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequest;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequestConfirmationToken;
-import com.whop.api.resources.setupintents.types.CreateSetupIntentsRequestPaymentMethodId;
+import com.whop.api.resources.experiments.types.ExposuresExperimentsResponse;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBody;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBodyAccountId;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBodyAccountUrl;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBodyTargetEmail;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBodyTargetUserId;
+import com.whop.api.resources.partnerreferralrequests.types.CreatePartnerReferralRequestsRequestBodyTargetUsername;
+import com.whop.api.resources.payments.types.PostShippingAddressChangedResponse;
+import com.whop.api.resources.payments.types.PostShippingAddressChangedResponseDecline;
+import com.whop.api.types.ExperimentExposure;
+import com.whop.api.types.ExperimentExposureBatch;
+import com.whop.api.types.ShippingAddressChangedWebhookReply;
 import org.junit.jupiter.api.Test;
 
 public final class UndiscriminatedUnionTest {
     @Test
-    public void testInviteMembershipsRequestBody_InviteMembershipsRequestBodyUserId() throws Exception {
-        String json = "{\"plan_id\":\"test\",\"user_id\":\"test\"}";
-        InviteMembershipsRequestBody union =
-                ObjectMappers.JSON_MAPPER.readValue(json, InviteMembershipsRequestBody.class);
-        assertTrue(
-                union.get() instanceof InviteMembershipsRequestBodyUserId,
-                "Expected InviteMembershipsRequestBodyUserId but got different variant");
+    public void testExposuresExperimentsResponse_ExperimentExposure() throws Exception {
+        String json = "{\"enabled\":true}";
+        ExposuresExperimentsResponse union =
+                ObjectMappers.JSON_MAPPER.readValue(json, ExposuresExperimentsResponse.class);
+        assertTrue(union.get() instanceof ExperimentExposure, "Expected ExperimentExposure but got different variant");
     }
 
     @Test
-    public void testInviteMembershipsRequestBody_InviteMembershipsRequestBodyEmail() throws Exception {
-        String json = "{\"email\":\"test\",\"plan_id\":\"test\"}";
-        InviteMembershipsRequestBody union =
-                ObjectMappers.JSON_MAPPER.readValue(json, InviteMembershipsRequestBody.class);
+    public void testExposuresExperimentsResponse_ExperimentExposureBatch() throws Exception {
+        String json = "{\"exposures\":{}}";
+        ExposuresExperimentsResponse union =
+                ObjectMappers.JSON_MAPPER.readValue(json, ExposuresExperimentsResponse.class);
         assertTrue(
-                union.get() instanceof InviteMembershipsRequestBodyEmail,
-                "Expected InviteMembershipsRequestBodyEmail but got different variant");
+                union.get() instanceof ExperimentExposureBatch,
+                "Expected ExperimentExposureBatch but got different variant");
     }
 
     @Test
-    public void testCreatePaymentsRequest_CreatePaymentsRequestZero() throws Exception {
-        String json = "{\"company_id\":\"test\",\"confirmation_token\":\"test\",\"plan\":{}}";
-        CreatePaymentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreatePaymentsRequest.class);
+    public void testCreatePartnerReferralRequestsRequestBody_CreatePartnerReferralRequestsRequestBodyAccountId()
+            throws Exception {
+        String json = "{\"account_id\":\"test\"}";
+        CreatePartnerReferralRequestsRequestBody union =
+                ObjectMappers.JSON_MAPPER.readValue(json, CreatePartnerReferralRequestsRequestBody.class);
         assertTrue(
-                union.get() instanceof CreatePaymentsRequestZero,
-                "Expected CreatePaymentsRequestZero but got different variant");
+                union.get() instanceof CreatePartnerReferralRequestsRequestBodyAccountId,
+                "Expected CreatePartnerReferralRequestsRequestBodyAccountId but got different variant");
     }
 
     @Test
-    public void testCreatePaymentsRequest_CreatePaymentsRequestOne() throws Exception {
-        String json = "{\"company_id\":\"test\",\"member_id\":\"test\",\"plan\":{}}";
-        CreatePaymentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreatePaymentsRequest.class);
+    public void testCreatePartnerReferralRequestsRequestBody_CreatePartnerReferralRequestsRequestBodyAccountUrl()
+            throws Exception {
+        String json = "{\"account_url\":\"test\"}";
+        CreatePartnerReferralRequestsRequestBody union =
+                ObjectMappers.JSON_MAPPER.readValue(json, CreatePartnerReferralRequestsRequestBody.class);
         assertTrue(
-                union.get() instanceof CreatePaymentsRequestOne,
-                "Expected CreatePaymentsRequestOne but got different variant");
+                union.get() instanceof CreatePartnerReferralRequestsRequestBodyAccountUrl,
+                "Expected CreatePartnerReferralRequestsRequestBodyAccountUrl but got different variant");
     }
 
     @Test
-    public void testCreatePaymentsRequest_CreatePaymentsRequestTwo() throws Exception {
-        String json = "{\"company_id\":\"test\",\"confirmation_token\":\"test\",\"plan_id\":\"test\"}";
-        CreatePaymentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreatePaymentsRequest.class);
+    public void testCreatePartnerReferralRequestsRequestBody_CreatePartnerReferralRequestsRequestBodyTargetUserId()
+            throws Exception {
+        String json = "{\"target_user_id\":\"test\"}";
+        CreatePartnerReferralRequestsRequestBody union =
+                ObjectMappers.JSON_MAPPER.readValue(json, CreatePartnerReferralRequestsRequestBody.class);
         assertTrue(
-                union.get() instanceof CreatePaymentsRequestTwo,
-                "Expected CreatePaymentsRequestTwo but got different variant");
+                union.get() instanceof CreatePartnerReferralRequestsRequestBodyTargetUserId,
+                "Expected CreatePartnerReferralRequestsRequestBodyTargetUserId but got different variant");
     }
 
     @Test
-    public void testCreatePaymentsRequest_CreatePaymentsRequestThree() throws Exception {
-        String json = "{\"company_id\":\"test\",\"member_id\":\"test\",\"plan_id\":\"test\"}";
-        CreatePaymentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreatePaymentsRequest.class);
+    public void testCreatePartnerReferralRequestsRequestBody_CreatePartnerReferralRequestsRequestBodyTargetUsername()
+            throws Exception {
+        String json = "{\"target_username\":\"test\"}";
+        CreatePartnerReferralRequestsRequestBody union =
+                ObjectMappers.JSON_MAPPER.readValue(json, CreatePartnerReferralRequestsRequestBody.class);
         assertTrue(
-                union.get() instanceof CreatePaymentsRequestThree,
-                "Expected CreatePaymentsRequestThree but got different variant");
+                union.get() instanceof CreatePartnerReferralRequestsRequestBodyTargetUsername,
+                "Expected CreatePartnerReferralRequestsRequestBodyTargetUsername but got different variant");
     }
 
     @Test
-    public void testCreateSetupIntentsRequest_CreateSetupIntentsRequestConfirmationToken() throws Exception {
-        String json = "{\"company_id\":\"test\",\"confirmation_token\":\"test\"}";
-        CreateSetupIntentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreateSetupIntentsRequest.class);
+    public void testCreatePartnerReferralRequestsRequestBody_CreatePartnerReferralRequestsRequestBodyTargetEmail()
+            throws Exception {
+        String json = "{\"target_email\":\"test\"}";
+        CreatePartnerReferralRequestsRequestBody union =
+                ObjectMappers.JSON_MAPPER.readValue(json, CreatePartnerReferralRequestsRequestBody.class);
         assertTrue(
-                union.get() instanceof CreateSetupIntentsRequestConfirmationToken,
-                "Expected CreateSetupIntentsRequestConfirmationToken but got different variant");
+                union.get() instanceof CreatePartnerReferralRequestsRequestBodyTargetEmail,
+                "Expected CreatePartnerReferralRequestsRequestBodyTargetEmail but got different variant");
     }
 
     @Test
-    public void testCreateSetupIntentsRequest_CreateSetupIntentsRequestPaymentMethodId() throws Exception {
-        String json = "{\"company_id\":\"test\",\"payment_method_id\":\"test\"}";
-        CreateSetupIntentsRequest union = ObjectMappers.JSON_MAPPER.readValue(json, CreateSetupIntentsRequest.class);
+    public void testPostShippingAddressChangedResponse_ShippingAddressChangedWebhookReply() throws Exception {
+        String json = "{\"line_items\":[]}";
+        PostShippingAddressChangedResponse union =
+                ObjectMappers.JSON_MAPPER.readValue(json, PostShippingAddressChangedResponse.class);
         assertTrue(
-                union.get() instanceof CreateSetupIntentsRequestPaymentMethodId,
-                "Expected CreateSetupIntentsRequestPaymentMethodId but got different variant");
+                union.get() instanceof ShippingAddressChangedWebhookReply,
+                "Expected ShippingAddressChangedWebhookReply but got different variant");
+    }
+
+    @Test
+    public void testPostShippingAddressChangedResponse_PostShippingAddressChangedResponseDecline() throws Exception {
+        String json = "{\"decline\":true}";
+        PostShippingAddressChangedResponse union =
+                ObjectMappers.JSON_MAPPER.readValue(json, PostShippingAddressChangedResponse.class);
+        assertTrue(
+                union.get() instanceof PostShippingAddressChangedResponseDecline,
+                "Expected PostShippingAddressChangedResponseDecline but got different variant");
     }
 }

@@ -30,20 +30,12 @@ public final class CreateTransfersResponse {
         return new CreateTransfersResponse(new TransferValue(value));
     }
 
-    public static CreateTransfersResponse send(CreateTransfersResponseSend value) {
-        return new CreateTransfersResponse(new SendValue(value));
-    }
-
     public static CreateTransfersResponse claimLink(CreateTransfersResponseClaimLink value) {
         return new CreateTransfersResponse(new ClaimLinkValue(value));
     }
 
     public boolean isTransfer() {
         return value instanceof TransferValue;
-    }
-
-    public boolean isSend() {
-        return value instanceof SendValue;
     }
 
     public boolean isClaimLink() {
@@ -57,13 +49,6 @@ public final class CreateTransfersResponse {
     public Optional<CreateTransfersResponseTransfer> getTransfer() {
         if (isTransfer()) {
             return Optional.of(((TransferValue) value).value);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<CreateTransfersResponseSend> getSend() {
-        if (isSend()) {
-            return Optional.of(((SendValue) value).value);
         }
         return Optional.empty();
     }
@@ -82,18 +67,18 @@ public final class CreateTransfersResponse {
         return Optional.empty();
     }
 
-    @Override
+    @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
         return other instanceof CreateTransfersResponse && value.equals(((CreateTransfersResponse) other).value);
     }
 
-    @Override
+    @java.lang.Override
     public int hashCode() {
         return Objects.hash(value);
     }
 
-    @Override
+    @java.lang.Override
     public String toString() {
         return value.toString();
     }
@@ -106,19 +91,13 @@ public final class CreateTransfersResponse {
     public interface Visitor<T> {
         T visitTransfer(CreateTransfersResponseTransfer transfer);
 
-        T visitSend(CreateTransfersResponseSend send);
-
         T visitClaimLink(CreateTransfersResponseClaimLink claimLink);
 
         T _visitUnknown(Object unknownType);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "object", visible = true, defaultImpl = _UnknownValue.class)
-    @JsonSubTypes({
-        @JsonSubTypes.Type(TransferValue.class),
-        @JsonSubTypes.Type(SendValue.class),
-        @JsonSubTypes.Type(ClaimLinkValue.class)
-    })
+    @JsonSubTypes({@JsonSubTypes.Type(TransferValue.class), @JsonSubTypes.Type(ClaimLinkValue.class)})
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Value {
         <T> T visit(Visitor<T> visitor);
@@ -150,46 +129,6 @@ public final class CreateTransfersResponse {
         }
 
         private boolean equalTo(TransferValue other) {
-            return value.equals(other.value);
-        }
-
-        @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "CreateTransfersResponse{" + "value: " + value + "}";
-        }
-    }
-
-    @JsonTypeName("send")
-    @JsonIgnoreProperties("object")
-    private static final class SendValue implements Value {
-        @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
-        private CreateTransfersResponseSend value;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private SendValue() {}
-
-        private SendValue(CreateTransfersResponseSend value) {
-            this.value = value;
-        }
-
-        @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitSend(value);
-        }
-
-        @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof SendValue && equalTo((SendValue) other);
-        }
-
-        private boolean equalTo(SendValue other) {
             return value.equals(other.value);
         }
 

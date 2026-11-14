@@ -108,7 +108,6 @@ public final class SummaryResolutionCenterCasesResponse {
 
         private int total;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class SummaryResolutionCenterCasesResponse {
 
         /**
          * <p>One entry per requested breakdown, keyed by the field it groups on. A field you did not ask for is absent.</p>
-         * <p>One entry per requested breakdown, keyed by the field it groups on. A field you did not ask for is absent.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -133,7 +131,6 @@ public final class SummaryResolutionCenterCasesResponse {
         }
 
         /**
-         * <p>How many cases match the filters.</p>
          * <p>How many cases match the filters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -147,6 +144,14 @@ public final class SummaryResolutionCenterCasesResponse {
         @java.lang.Override
         public SummaryResolutionCenterCasesResponse build() {
             return new SummaryResolutionCenterCasesResponse(groups, total, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("groups") || key.equalsIgnoreCase("total")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

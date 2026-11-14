@@ -42,8 +42,6 @@ public final class CheckoutConfiguration {
 
     private final Optional<Map<String, Object>> paymentMethodConfiguration;
 
-    private final Optional<CheckoutConfigurationPlan> plan;
-
     private final Optional<String> purchaseUrl;
 
     private final Optional<String> redirectUrl;
@@ -51,6 +49,8 @@ public final class CheckoutConfiguration {
     private final Optional<CheckoutConfigurationThreeDsLevel> threeDsLevel;
 
     private final String updatedAt;
+
+    private final Optional<CheckoutConfigurationVariant> variant;
 
     private final Map<String, Object> additionalProperties;
 
@@ -64,11 +64,11 @@ public final class CheckoutConfiguration {
             Optional<Map<String, Object>> metadata,
             CheckoutConfigurationMode mode,
             Optional<Map<String, Object>> paymentMethodConfiguration,
-            Optional<CheckoutConfigurationPlan> plan,
             Optional<String> purchaseUrl,
             Optional<String> redirectUrl,
             Optional<CheckoutConfigurationThreeDsLevel> threeDsLevel,
             String updatedAt,
+            Optional<CheckoutConfigurationVariant> variant,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.affiliateCode = affiliateCode;
@@ -79,11 +79,11 @@ public final class CheckoutConfiguration {
         this.metadata = metadata;
         this.mode = mode;
         this.paymentMethodConfiguration = paymentMethodConfiguration;
-        this.plan = plan;
         this.purchaseUrl = purchaseUrl;
         this.redirectUrl = redirectUrl;
         this.threeDsLevel = threeDsLevel;
         this.updatedAt = updatedAt;
+        this.variant = variant;
         this.additionalProperties = additionalProperties;
     }
 
@@ -126,7 +126,7 @@ public final class CheckoutConfiguration {
     }
 
     /**
-     * @return The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the plan's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.
+     * @return The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the variant's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.
      */
     @JsonIgnore
     public Optional<CheckoutSessionPaymentMethodConfiguration> getEffectivePaymentMethodConfiguration() {
@@ -161,7 +161,7 @@ public final class CheckoutConfiguration {
     }
 
     /**
-     * @return Payment method overrides for this checkout. <code>null</code> when it uses the plan or platform defaults.
+     * @return Payment method overrides for this checkout. <code>null</code> when it uses the variant or platform defaults.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getPaymentMethodConfiguration() {
@@ -169,17 +169,6 @@ public final class CheckoutConfiguration {
             return Optional.empty();
         }
         return paymentMethodConfiguration;
-    }
-
-    /**
-     * @return Plan used for payment checkout. <code>null</code> in setup mode.
-     */
-    @JsonIgnore
-    public Optional<CheckoutConfigurationPlan> getPlan() {
-        if (plan == null) {
-            return Optional.empty();
-        }
-        return plan;
     }
 
     /**
@@ -205,7 +194,7 @@ public final class CheckoutConfiguration {
     }
 
     /**
-     * @return 3D Secure behavior for this checkout, or <code>null</code> to use the account default.
+     * @return 3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.
      */
     @JsonIgnore
     public Optional<CheckoutConfigurationThreeDsLevel> getThreeDsLevel() {
@@ -221,6 +210,17 @@ public final class CheckoutConfiguration {
     @JsonProperty("updated_at")
     public String getUpdatedAt() {
         return updatedAt;
+    }
+
+    /**
+     * @return Variant used for payment checkout. <code>null</code> in setup mode.
+     */
+    @JsonIgnore
+    public Optional<CheckoutConfigurationVariant> getVariant() {
+        if (variant == null) {
+            return Optional.empty();
+        }
+        return variant;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -254,12 +254,6 @@ public final class CheckoutConfiguration {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("plan")
-    private Optional<CheckoutConfigurationPlan> _getPlan() {
-        return plan;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("purchase_url")
     private Optional<String> _getPurchaseUrl() {
         return purchaseUrl;
@@ -275,6 +269,12 @@ public final class CheckoutConfiguration {
     @JsonProperty("three_ds_level")
     private Optional<CheckoutConfigurationThreeDsLevel> _getThreeDsLevel() {
         return threeDsLevel;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant")
+    private Optional<CheckoutConfigurationVariant> _getVariant() {
+        return variant;
     }
 
     @java.lang.Override
@@ -298,11 +298,11 @@ public final class CheckoutConfiguration {
                 && metadata.equals(other.metadata)
                 && mode.equals(other.mode)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
-                && plan.equals(other.plan)
                 && purchaseUrl.equals(other.purchaseUrl)
                 && redirectUrl.equals(other.redirectUrl)
                 && threeDsLevel.equals(other.threeDsLevel)
-                && updatedAt.equals(other.updatedAt);
+                && updatedAt.equals(other.updatedAt)
+                && variant.equals(other.variant);
     }
 
     @java.lang.Override
@@ -317,11 +317,11 @@ public final class CheckoutConfiguration {
                 this.metadata,
                 this.mode,
                 this.paymentMethodConfiguration,
-                this.plan,
                 this.purchaseUrl,
                 this.redirectUrl,
                 this.threeDsLevel,
-                this.updatedAt);
+                this.updatedAt,
+                this.variant);
     }
 
     @java.lang.Override
@@ -393,7 +393,7 @@ public final class CheckoutConfiguration {
         _FinalStage currency(Nullable<CheckoutConfigurationCurrency> currency);
 
         /**
-         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the plan's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
+         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the variant's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
          */
         _FinalStage effectivePaymentMethodConfiguration(
                 Optional<CheckoutSessionPaymentMethodConfiguration> effectivePaymentMethodConfiguration);
@@ -414,22 +414,13 @@ public final class CheckoutConfiguration {
         _FinalStage metadata(Nullable<Map<String, Object>> metadata);
 
         /**
-         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the plan or platform defaults.</p>
+         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the variant or platform defaults.</p>
          */
         _FinalStage paymentMethodConfiguration(Optional<Map<String, Object>> paymentMethodConfiguration);
 
         _FinalStage paymentMethodConfiguration(Map<String, Object> paymentMethodConfiguration);
 
         _FinalStage paymentMethodConfiguration(Nullable<Map<String, Object>> paymentMethodConfiguration);
-
-        /**
-         * <p>Plan used for payment checkout. <code>null</code> in setup mode.</p>
-         */
-        _FinalStage plan(Optional<CheckoutConfigurationPlan> plan);
-
-        _FinalStage plan(CheckoutConfigurationPlan plan);
-
-        _FinalStage plan(Nullable<CheckoutConfigurationPlan> plan);
 
         /**
          * <p>Checkout URL you can send to customers.</p>
@@ -450,13 +441,22 @@ public final class CheckoutConfiguration {
         _FinalStage redirectUrl(Nullable<String> redirectUrl);
 
         /**
-         * <p>3D Secure behavior for this checkout, or <code>null</code> to use the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.</p>
          */
         _FinalStage threeDsLevel(Optional<CheckoutConfigurationThreeDsLevel> threeDsLevel);
 
         _FinalStage threeDsLevel(CheckoutConfigurationThreeDsLevel threeDsLevel);
 
         _FinalStage threeDsLevel(Nullable<CheckoutConfigurationThreeDsLevel> threeDsLevel);
+
+        /**
+         * <p>Variant used for payment checkout. <code>null</code> in setup mode.</p>
+         */
+        _FinalStage variant(Optional<CheckoutConfigurationVariant> variant);
+
+        _FinalStage variant(CheckoutConfigurationVariant variant);
+
+        _FinalStage variant(Nullable<CheckoutConfigurationVariant> variant);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -472,13 +472,13 @@ public final class CheckoutConfiguration {
 
         private String updatedAt;
 
+        private Optional<CheckoutConfigurationVariant> variant = Optional.empty();
+
         private Optional<CheckoutConfigurationThreeDsLevel> threeDsLevel = Optional.empty();
 
         private Optional<String> redirectUrl = Optional.empty();
 
         private Optional<String> purchaseUrl = Optional.empty();
-
-        private Optional<CheckoutConfigurationPlan> plan = Optional.empty();
 
         private Optional<Map<String, Object>> paymentMethodConfiguration = Optional.empty();
 
@@ -491,7 +491,6 @@ public final class CheckoutConfiguration {
 
         private Optional<String> affiliateCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -507,16 +506,15 @@ public final class CheckoutConfiguration {
             metadata(other.getMetadata());
             mode(other.getMode());
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
-            plan(other.getPlan());
             purchaseUrl(other.getPurchaseUrl());
             redirectUrl(other.getRedirectUrl());
             threeDsLevel(other.getThreeDsLevel());
             updatedAt(other.getUpdatedAt());
+            variant(other.getVariant());
             return this;
         }
 
         /**
-         * <p>Account ID, prefixed <code>biz_</code>.</p>
          * <p>Account ID, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -528,7 +526,6 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>When the checkout configuration was created, as an ISO 8601 timestamp.</p>
          * <p>When the checkout configuration was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -548,7 +545,6 @@ public final class CheckoutConfiguration {
 
         /**
          * <p>Controls whether checkout charges the buyer immediately or saves payment details for later.</p>
-         * <p>Controls whether checkout charges the buyer immediately or saves payment details for later.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -560,7 +556,6 @@ public final class CheckoutConfiguration {
 
         /**
          * <p>When the checkout configuration was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the checkout configuration was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -571,7 +566,43 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>3D Secure behavior for this checkout, or <code>null</code> to use the account default.</p>
+         * <p>Variant used for payment checkout. <code>null</code> in setup mode.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variant(Nullable<CheckoutConfigurationVariant> variant) {
+            if (variant.isNull()) {
+                this.variant = null;
+            } else if (variant.isEmpty()) {
+                this.variant = Optional.empty();
+            } else {
+                this.variant = Optional.of(variant.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Variant used for payment checkout. <code>null</code> in setup mode.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variant(CheckoutConfigurationVariant variant) {
+            this.variant = Optional.ofNullable(variant);
+            return this;
+        }
+
+        /**
+         * <p>Variant used for payment checkout. <code>null</code> in setup mode.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "variant", nulls = Nulls.SKIP)
+        public _FinalStage variant(Optional<CheckoutConfigurationVariant> variant) {
+            this.variant = variant;
+            return this;
+        }
+
+        /**
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -587,7 +618,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>3D Secure behavior for this checkout, or <code>null</code> to use the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -597,7 +628,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>3D Secure behavior for this checkout, or <code>null</code> to use the account default.</p>
+         * <p>3D Secure behavior for supported on-session card payments. <code>mandate_challenge</code> requires a 3DS challenge before payment processing; <code>mandate_if_required</code> mandates a challenge only when the payment processor requires it; <code>frictionless_if_required</code> uses the regular frictionless 3DS flow. Payments of $1,000 or more use <code>mandate_if_required</code> unless <code>mandate_challenge</code> is selected. Risk and authentication recovery requirements can override the preference. Applies in setup mode; <code>null</code> uses frictionless 3DS. Payment mode uses the variant policy.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "three_ds_level", nulls = Nulls.SKIP)
@@ -679,43 +710,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>Plan used for payment checkout. <code>null</code> in setup mode.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage plan(Nullable<CheckoutConfigurationPlan> plan) {
-            if (plan.isNull()) {
-                this.plan = null;
-            } else if (plan.isEmpty()) {
-                this.plan = Optional.empty();
-            } else {
-                this.plan = Optional.of(plan.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Plan used for payment checkout. <code>null</code> in setup mode.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage plan(CheckoutConfigurationPlan plan) {
-            this.plan = Optional.ofNullable(plan);
-            return this;
-        }
-
-        /**
-         * <p>Plan used for payment checkout. <code>null</code> in setup mode.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "plan", nulls = Nulls.SKIP)
-        public _FinalStage plan(Optional<CheckoutConfigurationPlan> plan) {
-            this.plan = plan;
-            return this;
-        }
-
-        /**
-         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the plan or platform defaults.</p>
+         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the variant or platform defaults.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -731,7 +726,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the plan or platform defaults.</p>
+         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the variant or platform defaults.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -741,7 +736,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the plan or platform defaults.</p>
+         * <p>Payment method overrides for this checkout. <code>null</code> when it uses the variant or platform defaults.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_method_configuration", nulls = Nulls.SKIP)
@@ -787,7 +782,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the plan's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
+         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the variant's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -804,7 +799,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the plan's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
+         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the variant's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -815,7 +810,7 @@ public final class CheckoutConfiguration {
         }
 
         /**
-         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the plan's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
+         * <p>The configuration governing a checkout mounted from this configuration, resolved through every layer (its own overrides, the variant's, and the account's) — the shape a session's <code>payment_method_configuration</code> carries. Apply it over the payment method types catalogue for the offerable set. <code>null</code> means platform defaults; <code>payment_method_configuration</code> stays this configuration's own editable override.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "effective_payment_method_configuration", nulls = Nulls.SKIP)
@@ -909,12 +904,33 @@ public final class CheckoutConfiguration {
                     metadata,
                     mode,
                     paymentMethodConfiguration,
-                    plan,
                     purchaseUrl,
                     redirectUrl,
                     threeDsLevel,
                     updatedAt,
+                    variant,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("effective_payment_method_configuration")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("mode")
+                    || key.equalsIgnoreCase("payment_method_configuration")
+                    || key.equalsIgnoreCase("purchase_url")
+                    || key.equalsIgnoreCase("redirect_url")
+                    || key.equalsIgnoreCase("three_ds_level")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("variant")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAccountLinksRequest.Builder.class)
 public final class CreateAccountLinksRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final String refreshUrl;
 
@@ -31,12 +31,12 @@ public final class CreateAccountLinksRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAccountLinksRequest(
-            String companyId,
+            String accountId,
             String refreshUrl,
             String returnUrl,
             AccountLinkUseCases useCase,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.refreshUrl = refreshUrl;
         this.returnUrl = returnUrl;
         this.useCase = useCase;
@@ -46,9 +46,9 @@ public final class CreateAccountLinksRequest {
     /**
      * @return The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -87,7 +87,7 @@ public final class CreateAccountLinksRequest {
     }
 
     private boolean equalTo(CreateAccountLinksRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && refreshUrl.equals(other.refreshUrl)
                 && returnUrl.equals(other.returnUrl)
                 && useCase.equals(other.useCase);
@@ -95,7 +95,7 @@ public final class CreateAccountLinksRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.refreshUrl, this.returnUrl, this.useCase);
+        return Objects.hash(this.accountId, this.refreshUrl, this.returnUrl, this.useCase);
     }
 
     @java.lang.Override
@@ -103,15 +103,15 @@ public final class CreateAccountLinksRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.</p>
          */
-        RefreshUrlStage companyId(@NotNull String companyId);
+        RefreshUrlStage accountId(@NotNull String accountId);
 
         Builder from(CreateAccountLinksRequest other);
     }
@@ -147,8 +147,8 @@ public final class CreateAccountLinksRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CompanyIdStage, RefreshUrlStage, ReturnUrlStage, UseCaseStage, _FinalStage {
-        private String companyId;
+            implements AccountIdStage, RefreshUrlStage, ReturnUrlStage, UseCaseStage, _FinalStage {
+        private String accountId;
 
         private String refreshUrl;
 
@@ -156,14 +156,13 @@ public final class CreateAccountLinksRequest {
 
         private AccountLinkUseCases useCase;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateAccountLinksRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             refreshUrl(other.getRefreshUrl());
             returnUrl(other.getReturnUrl());
             useCase(other.getUseCase());
@@ -172,18 +171,16 @@ public final class CreateAccountLinksRequest {
 
         /**
          * <p>The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.</p>
-         * <p>The unique identifier of the company to generate the link for, starting with 'biz_'. Must be a sub-merchant of the API key's company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public RefreshUrlStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public RefreshUrlStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
         /**
-         * <p>The URL to redirect the user to if the session expires and needs to be re-authenticated, such as 'https://example.com/refresh'.</p>
          * <p>The URL to redirect the user to if the session expires and needs to be re-authenticated, such as 'https://example.com/refresh'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -196,7 +193,6 @@ public final class CreateAccountLinksRequest {
 
         /**
          * <p>The URL to redirect the user to when they want to return to your site, such as 'https://example.com/return'.</p>
-         * <p>The URL to redirect the user to when they want to return to your site, such as 'https://example.com/return'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -207,7 +203,6 @@ public final class CreateAccountLinksRequest {
         }
 
         /**
-         * <p>The purpose of the account link, such as hosted payouts portal or hosted KYC onboarding.</p>
          * <p>The purpose of the account link, such as hosted payouts portal or hosted KYC onboarding.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -220,7 +215,18 @@ public final class CreateAccountLinksRequest {
 
         @java.lang.Override
         public CreateAccountLinksRequest build() {
-            return new CreateAccountLinksRequest(companyId, refreshUrl, returnUrl, useCase, additionalProperties);
+            return new CreateAccountLinksRequest(accountId, refreshUrl, returnUrl, useCase, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("refresh_url")
+                    || key.equalsIgnoreCase("return_url")
+                    || key.equalsIgnoreCase("use_case")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

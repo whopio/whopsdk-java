@@ -17,6 +17,7 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,58 +26,146 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Membership.Builder.class)
 public final class Membership {
-    private final MembershipAccount account;
+    private final StorefrontAccount account;
+
+    private final Optional<MembershipAffiliate> affiliate;
+
+    private final Optional<Integer> billingPeriodDays;
 
     private final boolean cancelAtPeriodEnd;
+
+    private final Optional<MembershipCancelOption> cancelOption;
+
+    private final Optional<String> canceledAt;
+
+    private final Optional<String> cancellationReason;
+
+    private final Optional<MembershipCollectionMethod> collectionMethod;
 
     private final String createdAt;
 
     private final Optional<String> currentPeriodEnd;
 
+    private final Optional<String> currentPeriodStart;
+
+    private final Optional<String> expiresAt;
+
+    private final Optional<List<MembershipExternalAccount>> externalAccounts;
+
+    private final Optional<MembershipFeedbackOption> feedbackOption;
+
     private final String id;
+
+    private final Money initialPrice;
 
     private final Optional<String> licenseKey;
 
+    private final Optional<String> manageUrl;
+
     private final Optional<MembershipMember> member;
+
+    private final Optional<String> memberId;
 
     private final Map<String, Object> metadata;
 
-    private final String planId;
+    private final Optional<MembershipMostRecentAction> mostRecentAction;
+
+    private final Optional<String> mostRecentActionAt;
+
+    private final Optional<String> phoneNumber;
+
+    private final MembershipProduct product;
 
     private final String productId;
 
+    private final Optional<String> promoCodeId;
+
+    private final Optional<Money> renewalPrice;
+
+    private final Optional<Integer> splitPayCurrentPayments;
+
+    private final Optional<Integer> splitPayRequiredPayments;
+
     private final MembershipStatus status;
 
+    private final String updatedAt;
+
     private final Optional<String> userId;
+
+    private final String variantId;
 
     private final Map<String, Object> additionalProperties;
 
     private Membership(
-            MembershipAccount account,
+            StorefrontAccount account,
+            Optional<MembershipAffiliate> affiliate,
+            Optional<Integer> billingPeriodDays,
             boolean cancelAtPeriodEnd,
+            Optional<MembershipCancelOption> cancelOption,
+            Optional<String> canceledAt,
+            Optional<String> cancellationReason,
+            Optional<MembershipCollectionMethod> collectionMethod,
             String createdAt,
             Optional<String> currentPeriodEnd,
+            Optional<String> currentPeriodStart,
+            Optional<String> expiresAt,
+            Optional<List<MembershipExternalAccount>> externalAccounts,
+            Optional<MembershipFeedbackOption> feedbackOption,
             String id,
+            Money initialPrice,
             Optional<String> licenseKey,
+            Optional<String> manageUrl,
             Optional<MembershipMember> member,
+            Optional<String> memberId,
             Map<String, Object> metadata,
-            String planId,
+            Optional<MembershipMostRecentAction> mostRecentAction,
+            Optional<String> mostRecentActionAt,
+            Optional<String> phoneNumber,
+            MembershipProduct product,
             String productId,
+            Optional<String> promoCodeId,
+            Optional<Money> renewalPrice,
+            Optional<Integer> splitPayCurrentPayments,
+            Optional<Integer> splitPayRequiredPayments,
             MembershipStatus status,
+            String updatedAt,
             Optional<String> userId,
+            String variantId,
             Map<String, Object> additionalProperties) {
         this.account = account;
+        this.affiliate = affiliate;
+        this.billingPeriodDays = billingPeriodDays;
         this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+        this.cancelOption = cancelOption;
+        this.canceledAt = canceledAt;
+        this.cancellationReason = cancellationReason;
+        this.collectionMethod = collectionMethod;
         this.createdAt = createdAt;
         this.currentPeriodEnd = currentPeriodEnd;
+        this.currentPeriodStart = currentPeriodStart;
+        this.expiresAt = expiresAt;
+        this.externalAccounts = externalAccounts;
+        this.feedbackOption = feedbackOption;
         this.id = id;
+        this.initialPrice = initialPrice;
         this.licenseKey = licenseKey;
+        this.manageUrl = manageUrl;
         this.member = member;
+        this.memberId = memberId;
         this.metadata = metadata;
-        this.planId = planId;
+        this.mostRecentAction = mostRecentAction;
+        this.mostRecentActionAt = mostRecentActionAt;
+        this.phoneNumber = phoneNumber;
+        this.product = product;
         this.productId = productId;
+        this.promoCodeId = promoCodeId;
+        this.renewalPrice = renewalPrice;
+        this.splitPayCurrentPayments = splitPayCurrentPayments;
+        this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.status = status;
+        this.updatedAt = updatedAt;
         this.userId = userId;
+        this.variantId = variantId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -84,16 +173,82 @@ public final class Membership {
      * @return The account (seller) this membership belongs to.
      */
     @JsonProperty("account")
-    public MembershipAccount getAccount() {
+    public StorefrontAccount getAccount() {
         return account;
     }
 
     /**
-     * @return Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring plans.
+     * @return The membership's affiliate commission. <code>null</code> without an affiliate, without <code>affiliate:basic:read</code> on the account, and always in webhooks.
+     */
+    @JsonIgnore
+    public Optional<MembershipAffiliate> getAffiliate() {
+        if (affiliate == null) {
+            return Optional.empty();
+        }
+        return affiliate;
+    }
+
+    /**
+     * @return Number of days between recurring charges. <code>null</code> for non-renewing memberships or memberships with multiple renewal schedules.
+     */
+    @JsonIgnore
+    public Optional<Integer> getBillingPeriodDays() {
+        if (billingPeriodDays == null) {
+            return Optional.empty();
+        }
+        return billingPeriodDays;
+    }
+
+    /**
+     * @return Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring variants.
      */
     @JsonProperty("cancel_at_period_end")
     public boolean getCancelAtPeriodEnd() {
         return cancelAtPeriodEnd;
+    }
+
+    /**
+     * @return The category the member picked for why they canceled. <code>null</code> when no category was picked.
+     */
+    @JsonIgnore
+    public Optional<MembershipCancelOption> getCancelOption() {
+        if (cancelOption == null) {
+            return Optional.empty();
+        }
+        return cancelOption;
+    }
+
+    /**
+     * @return When cancellation was requested, or when the membership was canceled if no request time is recorded, as an ISO 8601 timestamp. <code>null</code> when neither is recorded.
+     */
+    @JsonIgnore
+    public Optional<String> getCanceledAt() {
+        if (canceledAt == null) {
+            return Optional.empty();
+        }
+        return canceledAt;
+    }
+
+    /**
+     * @return Free-text explanation provided when canceling. <code>null</code> when no reason was provided.
+     */
+    @JsonIgnore
+    public Optional<String> getCancellationReason() {
+        if (cancellationReason == null) {
+            return Optional.empty();
+        }
+        return cancellationReason;
+    }
+
+    /**
+     * @return How renewals are collected. <code>charge_automatically</code> charges the saved payment method each period; <code>send_invoice</code> emails the buyer an invoice each period. <code>null</code> when not set.
+     */
+    @JsonIgnore
+    public Optional<MembershipCollectionMethod> getCollectionMethod() {
+        if (collectionMethod == null) {
+            return Optional.empty();
+        }
+        return collectionMethod;
     }
 
     /**
@@ -116,11 +271,60 @@ public final class Membership {
     }
 
     /**
+     * @return When the current billing period started, as an ISO 8601 timestamp. <code>null</code> when no billing period is recorded.
+     */
+    @JsonIgnore
+    public Optional<String> getCurrentPeriodStart() {
+        if (currentPeriodStart == null) {
+            return Optional.empty();
+        }
+        return currentPeriodStart;
+    }
+
+    /**
+     * @return When access ends for a membership with a fixed expiration, as an ISO 8601 timestamp. <code>null</code> when the membership has no expiration, such as a renewing membership.
+     */
+    @JsonIgnore
+    public Optional<String> getExpiresAt() {
+        if (expiresAt == null) {
+            return Optional.empty();
+        }
+        return expiresAt;
+    }
+
+    @JsonIgnore
+    public Optional<List<MembershipExternalAccount>> getExternalAccounts() {
+        if (externalAccounts == null) {
+            return Optional.empty();
+        }
+        return externalAccounts;
+    }
+
+    /**
+     * @return The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.
+     */
+    @JsonIgnore
+    public Optional<MembershipFeedbackOption> getFeedbackOption() {
+        if (feedbackOption == null) {
+            return Optional.empty();
+        }
+        return feedbackOption;
+    }
+
+    /**
      * @return Membership ID, prefixed <code>mem_</code>.
      */
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return The variant's current up-front price, in the variant's currency. A list price, not necessarily what the buyer paid. <code>amount</code> is <code>&quot;0.00&quot;</code> when the first charge is free.
+     */
+    @JsonProperty("initial_price")
+    public Money getInitialPrice() {
+        return initialPrice;
     }
 
     /**
@@ -135,6 +339,17 @@ public final class Membership {
     }
 
     /**
+     * @return URL where the buyer can sign in to manage billing. <code>null</code> without a member record or unless the caller is the buyer or has <code>member:manage</code> on the account.
+     */
+    @JsonIgnore
+    public Optional<String> getManageUrl() {
+        if (manageUrl == null) {
+            return Optional.empty();
+        }
+        return manageUrl;
+    }
+
+    /**
      * @return The caller's member row on the account. Present only when the membership belongs to the caller; <code>null</code> on seller-side reads.
      */
     @JsonIgnore
@@ -146,6 +361,17 @@ public final class Membership {
     }
 
     /**
+     * @return The buyer's member record on the account, prefixed <code>mber_</code>. <code>null</code> when the membership has no member record, such as an unclaimed membership.
+     */
+    @JsonIgnore
+    public Optional<String> getMemberId() {
+        if (memberId == null) {
+            return Optional.empty();
+        }
+        return memberId;
+    }
+
+    /**
      * @return Custom key-value pairs stored on the membership, commonly used for software licensing.
      */
     @JsonProperty("metadata")
@@ -154,11 +380,44 @@ public final class Membership {
     }
 
     /**
-     * @return The plan the buyer purchased, prefixed <code>plan_</code>.
+     * @return The membership's latest lifecycle event, such as <code>renewing_on</code> or <code>canceled_on</code>. Pair it with <code>most_recent_action_at</code>. <code>null</code> when none is recorded.
      */
-    @JsonProperty("plan_id")
-    public String getPlanId() {
-        return planId;
+    @JsonIgnore
+    public Optional<MembershipMostRecentAction> getMostRecentAction() {
+        if (mostRecentAction == null) {
+            return Optional.empty();
+        }
+        return mostRecentAction;
+    }
+
+    /**
+     * @return When <code>most_recent_action</code> happened or is scheduled to happen, as an ISO 8601 timestamp. A future time for upcoming events such as <code>renewing_on</code>. <code>null</code> when no action is recorded.
+     */
+    @JsonIgnore
+    public Optional<String> getMostRecentActionAt() {
+        if (mostRecentActionAt == null) {
+            return Optional.empty();
+        }
+        return mostRecentActionAt;
+    }
+
+    /**
+     * @return The buyer's phone number recorded for this membership, or <code>null</code>. The number collected (or verified) at checkout when the seller's phone collection is on; falls back to the buyer's account number when they have shared one with this seller.
+     */
+    @JsonIgnore
+    public Optional<String> getPhoneNumber() {
+        if (phoneNumber == null) {
+            return Optional.empty();
+        }
+        return phoneNumber;
+    }
+
+    /**
+     * @return The product this membership grants access to.
+     */
+    @JsonProperty("product")
+    public MembershipProduct getProduct() {
+        return product;
     }
 
     /**
@@ -170,11 +429,63 @@ public final class Membership {
     }
 
     /**
+     * @return The promo code discounting this membership, prefixed <code>promo_</code>. <code>null</code> when none is applied. Set at checkout or by Apply Promo Code to Membership.
+     */
+    @JsonIgnore
+    public Optional<String> getPromoCodeId() {
+        if (promoCodeId == null) {
+            return Optional.empty();
+        }
+        return promoCodeId;
+    }
+
+    /**
+     * @return The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.
+     */
+    @JsonIgnore
+    public Optional<Money> getRenewalPrice() {
+        if (renewalPrice == null) {
+            return Optional.empty();
+        }
+        return renewalPrice;
+    }
+
+    /**
+     * @return Paid installments counted so far on a split pay membership. <code>null</code> when the membership is not on split pay, or before its first installment is counted.
+     */
+    @JsonIgnore
+    public Optional<Integer> getSplitPayCurrentPayments() {
+        if (splitPayCurrentPayments == null) {
+            return Optional.empty();
+        }
+        return splitPayCurrentPayments;
+    }
+
+    /**
+     * @return Installment payments required before the membership stops billing. <code>null</code> when the membership is not on split pay.
+     */
+    @JsonIgnore
+    public Optional<Integer> getSplitPayRequiredPayments() {
+        if (splitPayRequiredPayments == null) {
+            return Optional.empty();
+        }
+        return splitPayRequiredPayments;
+    }
+
+    /**
      * @return Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.
      */
     @JsonProperty("status")
     public MembershipStatus getStatus() {
         return status;
+    }
+
+    /**
+     * @return When the membership was last changed, as an ISO 8601 timestamp. Reflects the most recent change to the membership itself, so you can reconcile against webhook retries, replays, and backfills.
+     */
+    @JsonProperty("updated_at")
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
     /**
@@ -188,10 +499,78 @@ public final class Membership {
         return userId;
     }
 
+    /**
+     * @return The variant the buyer purchased, prefixed <code>plan_</code>.
+     */
+    @JsonProperty("variant_id")
+    public String getVariantId() {
+        return variantId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("affiliate")
+    private Optional<MembershipAffiliate> _getAffiliate() {
+        return affiliate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("billing_period_days")
+    private Optional<Integer> _getBillingPeriodDays() {
+        return billingPeriodDays;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cancel_option")
+    private Optional<MembershipCancelOption> _getCancelOption() {
+        return cancelOption;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("canceled_at")
+    private Optional<String> _getCanceledAt() {
+        return canceledAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("cancellation_reason")
+    private Optional<String> _getCancellationReason() {
+        return cancellationReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("collection_method")
+    private Optional<MembershipCollectionMethod> _getCollectionMethod() {
+        return collectionMethod;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("current_period_end")
     private Optional<String> _getCurrentPeriodEnd() {
         return currentPeriodEnd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("current_period_start")
+    private Optional<String> _getCurrentPeriodStart() {
+        return currentPeriodStart;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("expires_at")
+    private Optional<String> _getExpiresAt() {
+        return expiresAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_accounts")
+    private Optional<List<MembershipExternalAccount>> _getExternalAccounts() {
+        return externalAccounts;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("feedback_option")
+    private Optional<MembershipFeedbackOption> _getFeedbackOption() {
+        return feedbackOption;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -201,9 +580,63 @@ public final class Membership {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("manage_url")
+    private Optional<String> _getManageUrl() {
+        return manageUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("member")
     private Optional<MembershipMember> _getMember() {
         return member;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("member_id")
+    private Optional<String> _getMemberId() {
+        return memberId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("most_recent_action")
+    private Optional<MembershipMostRecentAction> _getMostRecentAction() {
+        return mostRecentAction;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("most_recent_action_at")
+    private Optional<String> _getMostRecentActionAt() {
+        return mostRecentActionAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("phone_number")
+    private Optional<String> _getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("promo_code_id")
+    private Optional<String> _getPromoCodeId() {
+        return promoCodeId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("renewal_price")
+    private Optional<Money> _getRenewalPrice() {
+        return renewalPrice;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("split_pay_current_payments")
+    private Optional<Integer> _getSplitPayCurrentPayments() {
+        return splitPayCurrentPayments;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("split_pay_required_payments")
+    private Optional<Integer> _getSplitPayRequiredPayments() {
+        return splitPayRequiredPayments;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -225,34 +658,78 @@ public final class Membership {
 
     private boolean equalTo(Membership other) {
         return account.equals(other.account)
+                && affiliate.equals(other.affiliate)
+                && billingPeriodDays.equals(other.billingPeriodDays)
                 && cancelAtPeriodEnd == other.cancelAtPeriodEnd
+                && cancelOption.equals(other.cancelOption)
+                && canceledAt.equals(other.canceledAt)
+                && cancellationReason.equals(other.cancellationReason)
+                && collectionMethod.equals(other.collectionMethod)
                 && createdAt.equals(other.createdAt)
                 && currentPeriodEnd.equals(other.currentPeriodEnd)
+                && currentPeriodStart.equals(other.currentPeriodStart)
+                && expiresAt.equals(other.expiresAt)
+                && externalAccounts.equals(other.externalAccounts)
+                && feedbackOption.equals(other.feedbackOption)
                 && id.equals(other.id)
+                && initialPrice.equals(other.initialPrice)
                 && licenseKey.equals(other.licenseKey)
+                && manageUrl.equals(other.manageUrl)
                 && member.equals(other.member)
+                && memberId.equals(other.memberId)
                 && metadata.equals(other.metadata)
-                && planId.equals(other.planId)
+                && mostRecentAction.equals(other.mostRecentAction)
+                && mostRecentActionAt.equals(other.mostRecentActionAt)
+                && phoneNumber.equals(other.phoneNumber)
+                && product.equals(other.product)
                 && productId.equals(other.productId)
+                && promoCodeId.equals(other.promoCodeId)
+                && renewalPrice.equals(other.renewalPrice)
+                && splitPayCurrentPayments.equals(other.splitPayCurrentPayments)
+                && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && status.equals(other.status)
-                && userId.equals(other.userId);
+                && updatedAt.equals(other.updatedAt)
+                && userId.equals(other.userId)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
                 this.account,
+                this.affiliate,
+                this.billingPeriodDays,
                 this.cancelAtPeriodEnd,
+                this.cancelOption,
+                this.canceledAt,
+                this.cancellationReason,
+                this.collectionMethod,
                 this.createdAt,
                 this.currentPeriodEnd,
+                this.currentPeriodStart,
+                this.expiresAt,
+                this.externalAccounts,
+                this.feedbackOption,
                 this.id,
+                this.initialPrice,
                 this.licenseKey,
+                this.manageUrl,
                 this.member,
+                this.memberId,
                 this.metadata,
-                this.planId,
+                this.mostRecentAction,
+                this.mostRecentActionAt,
+                this.phoneNumber,
+                this.product,
                 this.productId,
+                this.promoCodeId,
+                this.renewalPrice,
+                this.splitPayCurrentPayments,
+                this.splitPayRequiredPayments,
                 this.status,
-                this.userId);
+                this.updatedAt,
+                this.userId,
+                this.variantId);
     }
 
     @java.lang.Override
@@ -268,14 +745,14 @@ public final class Membership {
         /**
          * <p>The account (seller) this membership belongs to.</p>
          */
-        CancelAtPeriodEndStage account(@NotNull MembershipAccount account);
+        CancelAtPeriodEndStage account(@NotNull StorefrontAccount account);
 
         Builder from(Membership other);
     }
 
     public interface CancelAtPeriodEndStage {
         /**
-         * <p>Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring plans.</p>
+         * <p>Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring variants.</p>
          */
         CreatedAtStage cancelAtPeriodEnd(boolean cancelAtPeriodEnd);
     }
@@ -291,14 +768,21 @@ public final class Membership {
         /**
          * <p>Membership ID, prefixed <code>mem_</code>.</p>
          */
-        PlanIdStage id(@NotNull String id);
+        InitialPriceStage id(@NotNull String id);
     }
 
-    public interface PlanIdStage {
+    public interface InitialPriceStage {
         /**
-         * <p>The plan the buyer purchased, prefixed <code>plan_</code>.</p>
+         * <p>The variant's current up-front price, in the variant's currency. A list price, not necessarily what the buyer paid. <code>amount</code> is <code>&quot;0.00&quot;</code> when the first charge is free.</p>
          */
-        ProductIdStage planId(@NotNull String planId);
+        ProductStage initialPrice(@NotNull Money initialPrice);
+    }
+
+    public interface ProductStage {
+        /**
+         * <p>The product this membership grants access to.</p>
+         */
+        ProductIdStage product(@NotNull MembershipProduct product);
     }
 
     public interface ProductIdStage {
@@ -312,7 +796,21 @@ public final class Membership {
         /**
          * <p>Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.</p>
          */
-        _FinalStage status(@NotNull MembershipStatus status);
+        UpdatedAtStage status(@NotNull MembershipStatus status);
+    }
+
+    public interface UpdatedAtStage {
+        /**
+         * <p>When the membership was last changed, as an ISO 8601 timestamp. Reflects the most recent change to the membership itself, so you can reconcile against webhook retries, replays, and backfills.</p>
+         */
+        VariantIdStage updatedAt(@NotNull String updatedAt);
+    }
+
+    public interface VariantIdStage {
+        /**
+         * <p>The variant the buyer purchased, prefixed <code>plan_</code>.</p>
+         */
+        _FinalStage variantId(@NotNull String variantId);
     }
 
     public interface _FinalStage {
@@ -321,6 +819,60 @@ public final class Membership {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The membership's affiliate commission. <code>null</code> without an affiliate, without <code>affiliate:basic:read</code> on the account, and always in webhooks.</p>
+         */
+        _FinalStage affiliate(Optional<MembershipAffiliate> affiliate);
+
+        _FinalStage affiliate(MembershipAffiliate affiliate);
+
+        _FinalStage affiliate(Nullable<MembershipAffiliate> affiliate);
+
+        /**
+         * <p>Number of days between recurring charges. <code>null</code> for non-renewing memberships or memberships with multiple renewal schedules.</p>
+         */
+        _FinalStage billingPeriodDays(Optional<Integer> billingPeriodDays);
+
+        _FinalStage billingPeriodDays(Integer billingPeriodDays);
+
+        _FinalStage billingPeriodDays(Nullable<Integer> billingPeriodDays);
+
+        /**
+         * <p>The category the member picked for why they canceled. <code>null</code> when no category was picked.</p>
+         */
+        _FinalStage cancelOption(Optional<MembershipCancelOption> cancelOption);
+
+        _FinalStage cancelOption(MembershipCancelOption cancelOption);
+
+        _FinalStage cancelOption(Nullable<MembershipCancelOption> cancelOption);
+
+        /**
+         * <p>When cancellation was requested, or when the membership was canceled if no request time is recorded, as an ISO 8601 timestamp. <code>null</code> when neither is recorded.</p>
+         */
+        _FinalStage canceledAt(Optional<String> canceledAt);
+
+        _FinalStage canceledAt(String canceledAt);
+
+        _FinalStage canceledAt(Nullable<String> canceledAt);
+
+        /**
+         * <p>Free-text explanation provided when canceling. <code>null</code> when no reason was provided.</p>
+         */
+        _FinalStage cancellationReason(Optional<String> cancellationReason);
+
+        _FinalStage cancellationReason(String cancellationReason);
+
+        _FinalStage cancellationReason(Nullable<String> cancellationReason);
+
+        /**
+         * <p>How renewals are collected. <code>charge_automatically</code> charges the saved payment method each period; <code>send_invoice</code> emails the buyer an invoice each period. <code>null</code> when not set.</p>
+         */
+        _FinalStage collectionMethod(Optional<MembershipCollectionMethod> collectionMethod);
+
+        _FinalStage collectionMethod(MembershipCollectionMethod collectionMethod);
+
+        _FinalStage collectionMethod(Nullable<MembershipCollectionMethod> collectionMethod);
 
         /**
          * <p>When the current billing period renews, or when a non-renewing membership expires, as an ISO 8601 timestamp. <code>null</code> for one-time purchases with no expiration.</p>
@@ -332,6 +884,39 @@ public final class Membership {
         _FinalStage currentPeriodEnd(Nullable<String> currentPeriodEnd);
 
         /**
+         * <p>When the current billing period started, as an ISO 8601 timestamp. <code>null</code> when no billing period is recorded.</p>
+         */
+        _FinalStage currentPeriodStart(Optional<String> currentPeriodStart);
+
+        _FinalStage currentPeriodStart(String currentPeriodStart);
+
+        _FinalStage currentPeriodStart(Nullable<String> currentPeriodStart);
+
+        /**
+         * <p>When access ends for a membership with a fixed expiration, as an ISO 8601 timestamp. <code>null</code> when the membership has no expiration, such as a renewing membership.</p>
+         */
+        _FinalStage expiresAt(Optional<String> expiresAt);
+
+        _FinalStage expiresAt(String expiresAt);
+
+        _FinalStage expiresAt(Nullable<String> expiresAt);
+
+        _FinalStage externalAccounts(Optional<List<MembershipExternalAccount>> externalAccounts);
+
+        _FinalStage externalAccounts(List<MembershipExternalAccount> externalAccounts);
+
+        _FinalStage externalAccounts(Nullable<List<MembershipExternalAccount>> externalAccounts);
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         */
+        _FinalStage feedbackOption(Optional<MembershipFeedbackOption> feedbackOption);
+
+        _FinalStage feedbackOption(MembershipFeedbackOption feedbackOption);
+
+        _FinalStage feedbackOption(Nullable<MembershipFeedbackOption> feedbackOption);
+
+        /**
          * <p>The software license key for this membership. Only present when the product includes a software licensing experience.</p>
          */
         _FinalStage licenseKey(Optional<String> licenseKey);
@@ -339,6 +924,15 @@ public final class Membership {
         _FinalStage licenseKey(String licenseKey);
 
         _FinalStage licenseKey(Nullable<String> licenseKey);
+
+        /**
+         * <p>URL where the buyer can sign in to manage billing. <code>null</code> without a member record or unless the caller is the buyer or has <code>member:manage</code> on the account.</p>
+         */
+        _FinalStage manageUrl(Optional<String> manageUrl);
+
+        _FinalStage manageUrl(String manageUrl);
+
+        _FinalStage manageUrl(Nullable<String> manageUrl);
 
         /**
          * <p>The caller's member row on the account. Present only when the membership belongs to the caller; <code>null</code> on seller-side reads.</p>
@@ -350,6 +944,15 @@ public final class Membership {
         _FinalStage member(Nullable<MembershipMember> member);
 
         /**
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. <code>null</code> when the membership has no member record, such as an unclaimed membership.</p>
+         */
+        _FinalStage memberId(Optional<String> memberId);
+
+        _FinalStage memberId(String memberId);
+
+        _FinalStage memberId(Nullable<String> memberId);
+
+        /**
          * <p>Custom key-value pairs stored on the membership, commonly used for software licensing.</p>
          */
         _FinalStage metadata(Map<String, Object> metadata);
@@ -357,6 +960,69 @@ public final class Membership {
         _FinalStage putAllMetadata(Map<String, Object> metadata);
 
         _FinalStage metadata(String key, Object value);
+
+        /**
+         * <p>The membership's latest lifecycle event, such as <code>renewing_on</code> or <code>canceled_on</code>. Pair it with <code>most_recent_action_at</code>. <code>null</code> when none is recorded.</p>
+         */
+        _FinalStage mostRecentAction(Optional<MembershipMostRecentAction> mostRecentAction);
+
+        _FinalStage mostRecentAction(MembershipMostRecentAction mostRecentAction);
+
+        _FinalStage mostRecentAction(Nullable<MembershipMostRecentAction> mostRecentAction);
+
+        /**
+         * <p>When <code>most_recent_action</code> happened or is scheduled to happen, as an ISO 8601 timestamp. A future time for upcoming events such as <code>renewing_on</code>. <code>null</code> when no action is recorded.</p>
+         */
+        _FinalStage mostRecentActionAt(Optional<String> mostRecentActionAt);
+
+        _FinalStage mostRecentActionAt(String mostRecentActionAt);
+
+        _FinalStage mostRecentActionAt(Nullable<String> mostRecentActionAt);
+
+        /**
+         * <p>The buyer's phone number recorded for this membership, or <code>null</code>. The number collected (or verified) at checkout when the seller's phone collection is on; falls back to the buyer's account number when they have shared one with this seller.</p>
+         */
+        _FinalStage phoneNumber(Optional<String> phoneNumber);
+
+        _FinalStage phoneNumber(String phoneNumber);
+
+        _FinalStage phoneNumber(Nullable<String> phoneNumber);
+
+        /**
+         * <p>The promo code discounting this membership, prefixed <code>promo_</code>. <code>null</code> when none is applied. Set at checkout or by Apply Promo Code to Membership.</p>
+         */
+        _FinalStage promoCodeId(Optional<String> promoCodeId);
+
+        _FinalStage promoCodeId(String promoCodeId);
+
+        _FinalStage promoCodeId(Nullable<String> promoCodeId);
+
+        /**
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
+         */
+        _FinalStage renewalPrice(Optional<Money> renewalPrice);
+
+        _FinalStage renewalPrice(Money renewalPrice);
+
+        _FinalStage renewalPrice(Nullable<Money> renewalPrice);
+
+        /**
+         * <p>Paid installments counted so far on a split pay membership. <code>null</code> when the membership is not on split pay, or before its first installment is counted.</p>
+         */
+        _FinalStage splitPayCurrentPayments(Optional<Integer> splitPayCurrentPayments);
+
+        _FinalStage splitPayCurrentPayments(Integer splitPayCurrentPayments);
+
+        _FinalStage splitPayCurrentPayments(Nullable<Integer> splitPayCurrentPayments);
+
+        /**
+         * <p>Installment payments required before the membership stops billing. <code>null</code> when the membership is not on split pay.</p>
+         */
+        _FinalStage splitPayRequiredPayments(Optional<Integer> splitPayRequiredPayments);
+
+        _FinalStage splitPayRequiredPayments(Integer splitPayRequiredPayments);
+
+        _FinalStage splitPayRequiredPayments(Nullable<Integer> splitPayRequiredPayments);
 
         /**
          * <p>The buyer, prefixed <code>user_</code>. <code>null</code> when the buyer is another business or the membership is unclaimed.</p>
@@ -374,11 +1040,14 @@ public final class Membership {
                     CancelAtPeriodEndStage,
                     CreatedAtStage,
                     IdStage,
-                    PlanIdStage,
+                    InitialPriceStage,
+                    ProductStage,
                     ProductIdStage,
                     StatusStage,
+                    UpdatedAtStage,
+                    VariantIdStage,
                     _FinalStage {
-        private MembershipAccount account;
+        private StorefrontAccount account;
 
         private boolean cancelAtPeriodEnd;
 
@@ -386,23 +1055,66 @@ public final class Membership {
 
         private String id;
 
-        private String planId;
+        private Money initialPrice;
+
+        private MembershipProduct product;
 
         private String productId;
 
         private MembershipStatus status;
 
+        private String updatedAt;
+
+        private String variantId;
+
         private Optional<String> userId = Optional.empty();
+
+        private Optional<Integer> splitPayRequiredPayments = Optional.empty();
+
+        private Optional<Integer> splitPayCurrentPayments = Optional.empty();
+
+        private Optional<Money> renewalPrice = Optional.empty();
+
+        private Optional<String> promoCodeId = Optional.empty();
+
+        private Optional<String> phoneNumber = Optional.empty();
+
+        private Optional<String> mostRecentActionAt = Optional.empty();
+
+        private Optional<MembershipMostRecentAction> mostRecentAction = Optional.empty();
 
         private Map<String, Object> metadata = new LinkedHashMap<>();
 
+        private Optional<String> memberId = Optional.empty();
+
         private Optional<MembershipMember> member = Optional.empty();
+
+        private Optional<String> manageUrl = Optional.empty();
 
         private Optional<String> licenseKey = Optional.empty();
 
+        private Optional<MembershipFeedbackOption> feedbackOption = Optional.empty();
+
+        private Optional<List<MembershipExternalAccount>> externalAccounts = Optional.empty();
+
+        private Optional<String> expiresAt = Optional.empty();
+
+        private Optional<String> currentPeriodStart = Optional.empty();
+
         private Optional<String> currentPeriodEnd = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<MembershipCollectionMethod> collectionMethod = Optional.empty();
+
+        private Optional<String> cancellationReason = Optional.empty();
+
+        private Optional<String> canceledAt = Optional.empty();
+
+        private Optional<MembershipCancelOption> cancelOption = Optional.empty();
+
+        private Optional<Integer> billingPeriodDays = Optional.empty();
+
+        private Optional<MembershipAffiliate> affiliate = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -410,35 +1122,55 @@ public final class Membership {
         @java.lang.Override
         public Builder from(Membership other) {
             account(other.getAccount());
+            affiliate(other.getAffiliate());
+            billingPeriodDays(other.getBillingPeriodDays());
             cancelAtPeriodEnd(other.getCancelAtPeriodEnd());
+            cancelOption(other.getCancelOption());
+            canceledAt(other.getCanceledAt());
+            cancellationReason(other.getCancellationReason());
+            collectionMethod(other.getCollectionMethod());
             createdAt(other.getCreatedAt());
             currentPeriodEnd(other.getCurrentPeriodEnd());
+            currentPeriodStart(other.getCurrentPeriodStart());
+            expiresAt(other.getExpiresAt());
+            externalAccounts(other.getExternalAccounts());
+            feedbackOption(other.getFeedbackOption());
             id(other.getId());
+            initialPrice(other.getInitialPrice());
             licenseKey(other.getLicenseKey());
+            manageUrl(other.getManageUrl());
             member(other.getMember());
+            memberId(other.getMemberId());
             metadata(other.getMetadata());
-            planId(other.getPlanId());
+            mostRecentAction(other.getMostRecentAction());
+            mostRecentActionAt(other.getMostRecentActionAt());
+            phoneNumber(other.getPhoneNumber());
+            product(other.getProduct());
             productId(other.getProductId());
+            promoCodeId(other.getPromoCodeId());
+            renewalPrice(other.getRenewalPrice());
+            splitPayCurrentPayments(other.getSplitPayCurrentPayments());
+            splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             status(other.getStatus());
+            updatedAt(other.getUpdatedAt());
             userId(other.getUserId());
+            variantId(other.getVariantId());
             return this;
         }
 
         /**
-         * <p>The account (seller) this membership belongs to.</p>
          * <p>The account (seller) this membership belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("account")
-        public CancelAtPeriodEndStage account(@NotNull MembershipAccount account) {
+        public CancelAtPeriodEndStage account(@NotNull StorefrontAccount account) {
             this.account = Objects.requireNonNull(account, "account must not be null");
             return this;
         }
 
         /**
-         * <p>Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring plans.</p>
-         * <p>Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring plans.</p>
+         * <p>Whether the membership is set to cancel when the current billing period ends. Only meaningful for recurring variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -449,7 +1181,6 @@ public final class Membership {
         }
 
         /**
-         * <p>When the membership was created, as an ISO 8601 timestamp.</p>
          * <p>When the membership was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -462,30 +1193,38 @@ public final class Membership {
 
         /**
          * <p>Membership ID, prefixed <code>mem_</code>.</p>
-         * <p>Membership ID, prefixed <code>mem_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("id")
-        public PlanIdStage id(@NotNull String id) {
+        public InitialPriceStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
 
         /**
-         * <p>The plan the buyer purchased, prefixed <code>plan_</code>.</p>
-         * <p>The plan the buyer purchased, prefixed <code>plan_</code>.</p>
+         * <p>The variant's current up-front price, in the variant's currency. A list price, not necessarily what the buyer paid. <code>amount</code> is <code>&quot;0.00&quot;</code> when the first charge is free.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("plan_id")
-        public ProductIdStage planId(@NotNull String planId) {
-            this.planId = Objects.requireNonNull(planId, "planId must not be null");
+        @JsonSetter("initial_price")
+        public ProductStage initialPrice(@NotNull Money initialPrice) {
+            this.initialPrice = Objects.requireNonNull(initialPrice, "initialPrice must not be null");
             return this;
         }
 
         /**
-         * <p>The product this membership grants access to, prefixed <code>prod_</code>.</p>
+         * <p>The product this membership grants access to.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("product")
+        public ProductIdStage product(@NotNull MembershipProduct product) {
+            this.product = Objects.requireNonNull(product, "product must not be null");
+            return this;
+        }
+
+        /**
          * <p>The product this membership grants access to, prefixed <code>prod_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -498,13 +1237,34 @@ public final class Membership {
 
         /**
          * <p>Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.</p>
-         * <p>Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull MembershipStatus status) {
+        public UpdatedAtStage status(@NotNull MembershipStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>When the membership was last changed, as an ISO 8601 timestamp. Reflects the most recent change to the membership itself, so you can reconcile against webhook retries, replays, and backfills.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("updated_at")
+        public VariantIdStage updatedAt(@NotNull String updatedAt) {
+            this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The variant the buyer purchased, prefixed <code>plan_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("variant_id")
+        public _FinalStage variantId(@NotNull String variantId) {
+            this.variantId = Objects.requireNonNull(variantId, "variantId must not be null");
             return this;
         }
 
@@ -545,6 +1305,258 @@ public final class Membership {
         }
 
         /**
+         * <p>Installment payments required before the membership stops billing. <code>null</code> when the membership is not on split pay.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage splitPayRequiredPayments(Nullable<Integer> splitPayRequiredPayments) {
+            if (splitPayRequiredPayments.isNull()) {
+                this.splitPayRequiredPayments = null;
+            } else if (splitPayRequiredPayments.isEmpty()) {
+                this.splitPayRequiredPayments = Optional.empty();
+            } else {
+                this.splitPayRequiredPayments = Optional.of(splitPayRequiredPayments.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Installment payments required before the membership stops billing. <code>null</code> when the membership is not on split pay.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage splitPayRequiredPayments(Integer splitPayRequiredPayments) {
+            this.splitPayRequiredPayments = Optional.ofNullable(splitPayRequiredPayments);
+            return this;
+        }
+
+        /**
+         * <p>Installment payments required before the membership stops billing. <code>null</code> when the membership is not on split pay.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "split_pay_required_payments", nulls = Nulls.SKIP)
+        public _FinalStage splitPayRequiredPayments(Optional<Integer> splitPayRequiredPayments) {
+            this.splitPayRequiredPayments = splitPayRequiredPayments;
+            return this;
+        }
+
+        /**
+         * <p>Paid installments counted so far on a split pay membership. <code>null</code> when the membership is not on split pay, or before its first installment is counted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage splitPayCurrentPayments(Nullable<Integer> splitPayCurrentPayments) {
+            if (splitPayCurrentPayments.isNull()) {
+                this.splitPayCurrentPayments = null;
+            } else if (splitPayCurrentPayments.isEmpty()) {
+                this.splitPayCurrentPayments = Optional.empty();
+            } else {
+                this.splitPayCurrentPayments = Optional.of(splitPayCurrentPayments.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Paid installments counted so far on a split pay membership. <code>null</code> when the membership is not on split pay, or before its first installment is counted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage splitPayCurrentPayments(Integer splitPayCurrentPayments) {
+            this.splitPayCurrentPayments = Optional.ofNullable(splitPayCurrentPayments);
+            return this;
+        }
+
+        /**
+         * <p>Paid installments counted so far on a split pay membership. <code>null</code> when the membership is not on split pay, or before its first installment is counted.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "split_pay_current_payments", nulls = Nulls.SKIP)
+        public _FinalStage splitPayCurrentPayments(Optional<Integer> splitPayCurrentPayments) {
+            this.splitPayCurrentPayments = splitPayCurrentPayments;
+            return this;
+        }
+
+        /**
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage renewalPrice(Nullable<Money> renewalPrice) {
+            if (renewalPrice.isNull()) {
+                this.renewalPrice = null;
+            } else if (renewalPrice.isEmpty()) {
+                this.renewalPrice = Optional.empty();
+            } else {
+                this.renewalPrice = Optional.of(renewalPrice.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage renewalPrice(Money renewalPrice) {
+            this.renewalPrice = Optional.ofNullable(renewalPrice);
+            return this;
+        }
+
+        /**
+         * <p>The variant's renewal price, in the variant's currency, after any promo code that still applies. A membership billed in the buyer's local currency is charged this price converted at the exchange rate on each billing date. <code>null</code> for non-renewing memberships.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)
+        public _FinalStage renewalPrice(Optional<Money> renewalPrice) {
+            this.renewalPrice = renewalPrice;
+            return this;
+        }
+
+        /**
+         * <p>The promo code discounting this membership, prefixed <code>promo_</code>. <code>null</code> when none is applied. Set at checkout or by Apply Promo Code to Membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage promoCodeId(Nullable<String> promoCodeId) {
+            if (promoCodeId.isNull()) {
+                this.promoCodeId = null;
+            } else if (promoCodeId.isEmpty()) {
+                this.promoCodeId = Optional.empty();
+            } else {
+                this.promoCodeId = Optional.of(promoCodeId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The promo code discounting this membership, prefixed <code>promo_</code>. <code>null</code> when none is applied. Set at checkout or by Apply Promo Code to Membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage promoCodeId(String promoCodeId) {
+            this.promoCodeId = Optional.ofNullable(promoCodeId);
+            return this;
+        }
+
+        /**
+         * <p>The promo code discounting this membership, prefixed <code>promo_</code>. <code>null</code> when none is applied. Set at checkout or by Apply Promo Code to Membership.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "promo_code_id", nulls = Nulls.SKIP)
+        public _FinalStage promoCodeId(Optional<String> promoCodeId) {
+            this.promoCodeId = promoCodeId;
+            return this;
+        }
+
+        /**
+         * <p>The buyer's phone number recorded for this membership, or <code>null</code>. The number collected (or verified) at checkout when the seller's phone collection is on; falls back to the buyer's account number when they have shared one with this seller.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage phoneNumber(Nullable<String> phoneNumber) {
+            if (phoneNumber.isNull()) {
+                this.phoneNumber = null;
+            } else if (phoneNumber.isEmpty()) {
+                this.phoneNumber = Optional.empty();
+            } else {
+                this.phoneNumber = Optional.of(phoneNumber.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The buyer's phone number recorded for this membership, or <code>null</code>. The number collected (or verified) at checkout when the seller's phone collection is on; falls back to the buyer's account number when they have shared one with this seller.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage phoneNumber(String phoneNumber) {
+            this.phoneNumber = Optional.ofNullable(phoneNumber);
+            return this;
+        }
+
+        /**
+         * <p>The buyer's phone number recorded for this membership, or <code>null</code>. The number collected (or verified) at checkout when the seller's phone collection is on; falls back to the buyer's account number when they have shared one with this seller.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "phone_number", nulls = Nulls.SKIP)
+        public _FinalStage phoneNumber(Optional<String> phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> happened or is scheduled to happen, as an ISO 8601 timestamp. A future time for upcoming events such as <code>renewing_on</code>. <code>null</code> when no action is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentActionAt(Nullable<String> mostRecentActionAt) {
+            if (mostRecentActionAt.isNull()) {
+                this.mostRecentActionAt = null;
+            } else if (mostRecentActionAt.isEmpty()) {
+                this.mostRecentActionAt = Optional.empty();
+            } else {
+                this.mostRecentActionAt = Optional.of(mostRecentActionAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> happened or is scheduled to happen, as an ISO 8601 timestamp. A future time for upcoming events such as <code>renewing_on</code>. <code>null</code> when no action is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentActionAt(String mostRecentActionAt) {
+            this.mostRecentActionAt = Optional.ofNullable(mostRecentActionAt);
+            return this;
+        }
+
+        /**
+         * <p>When <code>most_recent_action</code> happened or is scheduled to happen, as an ISO 8601 timestamp. A future time for upcoming events such as <code>renewing_on</code>. <code>null</code> when no action is recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "most_recent_action_at", nulls = Nulls.SKIP)
+        public _FinalStage mostRecentActionAt(Optional<String> mostRecentActionAt) {
+            this.mostRecentActionAt = mostRecentActionAt;
+            return this;
+        }
+
+        /**
+         * <p>The membership's latest lifecycle event, such as <code>renewing_on</code> or <code>canceled_on</code>. Pair it with <code>most_recent_action_at</code>. <code>null</code> when none is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentAction(Nullable<MembershipMostRecentAction> mostRecentAction) {
+            if (mostRecentAction.isNull()) {
+                this.mostRecentAction = null;
+            } else if (mostRecentAction.isEmpty()) {
+                this.mostRecentAction = Optional.empty();
+            } else {
+                this.mostRecentAction = Optional.of(mostRecentAction.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The membership's latest lifecycle event, such as <code>renewing_on</code> or <code>canceled_on</code>. Pair it with <code>most_recent_action_at</code>. <code>null</code> when none is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mostRecentAction(MembershipMostRecentAction mostRecentAction) {
+            this.mostRecentAction = Optional.ofNullable(mostRecentAction);
+            return this;
+        }
+
+        /**
+         * <p>The membership's latest lifecycle event, such as <code>renewing_on</code> or <code>canceled_on</code>. Pair it with <code>most_recent_action_at</code>. <code>null</code> when none is recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "most_recent_action", nulls = Nulls.SKIP)
+        public _FinalStage mostRecentAction(Optional<MembershipMostRecentAction> mostRecentAction) {
+            this.mostRecentAction = mostRecentAction;
+            return this;
+        }
+
+        /**
          * <p>Custom key-value pairs stored on the membership, commonly used for software licensing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -576,6 +1588,42 @@ public final class Membership {
             if (metadata != null) {
                 this.metadata.putAll(metadata);
             }
+            return this;
+        }
+
+        /**
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. <code>null</code> when the membership has no member record, such as an unclaimed membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage memberId(Nullable<String> memberId) {
+            if (memberId.isNull()) {
+                this.memberId = null;
+            } else if (memberId.isEmpty()) {
+                this.memberId = Optional.empty();
+            } else {
+                this.memberId = Optional.of(memberId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. <code>null</code> when the membership has no member record, such as an unclaimed membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
+            return this;
+        }
+
+        /**
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. <code>null</code> when the membership has no member record, such as an unclaimed membership.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public _FinalStage memberId(Optional<String> memberId) {
+            this.memberId = memberId;
             return this;
         }
 
@@ -616,6 +1664,42 @@ public final class Membership {
         }
 
         /**
+         * <p>URL where the buyer can sign in to manage billing. <code>null</code> without a member record or unless the caller is the buyer or has <code>member:manage</code> on the account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage manageUrl(Nullable<String> manageUrl) {
+            if (manageUrl.isNull()) {
+                this.manageUrl = null;
+            } else if (manageUrl.isEmpty()) {
+                this.manageUrl = Optional.empty();
+            } else {
+                this.manageUrl = Optional.of(manageUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>URL where the buyer can sign in to manage billing. <code>null</code> without a member record or unless the caller is the buyer or has <code>member:manage</code> on the account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage manageUrl(String manageUrl) {
+            this.manageUrl = Optional.ofNullable(manageUrl);
+            return this;
+        }
+
+        /**
+         * <p>URL where the buyer can sign in to manage billing. <code>null</code> without a member record or unless the caller is the buyer or has <code>member:manage</code> on the account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "manage_url", nulls = Nulls.SKIP)
+        public _FinalStage manageUrl(Optional<String> manageUrl) {
+            this.manageUrl = manageUrl;
+            return this;
+        }
+
+        /**
          * <p>The software license key for this membership. Only present when the product includes a software licensing experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -648,6 +1732,139 @@ public final class Membership {
         @JsonSetter(value = "license_key", nulls = Nulls.SKIP)
         public _FinalStage licenseKey(Optional<String> licenseKey) {
             this.licenseKey = licenseKey;
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feedbackOption(Nullable<MembershipFeedbackOption> feedbackOption) {
+            if (feedbackOption.isNull()) {
+                this.feedbackOption = null;
+            } else if (feedbackOption.isEmpty()) {
+                this.feedbackOption = Optional.empty();
+            } else {
+                this.feedbackOption = Optional.of(feedbackOption.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage feedbackOption(MembershipFeedbackOption feedbackOption) {
+            this.feedbackOption = Optional.ofNullable(feedbackOption);
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reason the member picked, as they saw it. <code>null</code> when the member picked a default category or gave no reason.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "feedback_option", nulls = Nulls.SKIP)
+        public _FinalStage feedbackOption(Optional<MembershipFeedbackOption> feedbackOption) {
+            this.feedbackOption = feedbackOption;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage externalAccounts(Nullable<List<MembershipExternalAccount>> externalAccounts) {
+            if (externalAccounts.isNull()) {
+                this.externalAccounts = null;
+            } else if (externalAccounts.isEmpty()) {
+                this.externalAccounts = Optional.empty();
+            } else {
+                this.externalAccounts = Optional.of(externalAccounts.get());
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage externalAccounts(List<MembershipExternalAccount> externalAccounts) {
+            this.externalAccounts = Optional.ofNullable(externalAccounts);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "external_accounts", nulls = Nulls.SKIP)
+        public _FinalStage externalAccounts(Optional<List<MembershipExternalAccount>> externalAccounts) {
+            this.externalAccounts = externalAccounts;
+            return this;
+        }
+
+        /**
+         * <p>When access ends for a membership with a fixed expiration, as an ISO 8601 timestamp. <code>null</code> when the membership has no expiration, such as a renewing membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage expiresAt(Nullable<String> expiresAt) {
+            if (expiresAt.isNull()) {
+                this.expiresAt = null;
+            } else if (expiresAt.isEmpty()) {
+                this.expiresAt = Optional.empty();
+            } else {
+                this.expiresAt = Optional.of(expiresAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When access ends for a membership with a fixed expiration, as an ISO 8601 timestamp. <code>null</code> when the membership has no expiration, such as a renewing membership.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage expiresAt(String expiresAt) {
+            this.expiresAt = Optional.ofNullable(expiresAt);
+            return this;
+        }
+
+        /**
+         * <p>When access ends for a membership with a fixed expiration, as an ISO 8601 timestamp. <code>null</code> when the membership has no expiration, such as a renewing membership.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "expires_at", nulls = Nulls.SKIP)
+        public _FinalStage expiresAt(Optional<String> expiresAt) {
+            this.expiresAt = expiresAt;
+            return this;
+        }
+
+        /**
+         * <p>When the current billing period started, as an ISO 8601 timestamp. <code>null</code> when no billing period is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage currentPeriodStart(Nullable<String> currentPeriodStart) {
+            if (currentPeriodStart.isNull()) {
+                this.currentPeriodStart = null;
+            } else if (currentPeriodStart.isEmpty()) {
+                this.currentPeriodStart = Optional.empty();
+            } else {
+                this.currentPeriodStart = Optional.of(currentPeriodStart.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the current billing period started, as an ISO 8601 timestamp. <code>null</code> when no billing period is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage currentPeriodStart(String currentPeriodStart) {
+            this.currentPeriodStart = Optional.ofNullable(currentPeriodStart);
+            return this;
+        }
+
+        /**
+         * <p>When the current billing period started, as an ISO 8601 timestamp. <code>null</code> when no billing period is recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "current_period_start", nulls = Nulls.SKIP)
+        public _FinalStage currentPeriodStart(Optional<String> currentPeriodStart) {
+            this.currentPeriodStart = currentPeriodStart;
             return this;
         }
 
@@ -687,22 +1904,301 @@ public final class Membership {
             return this;
         }
 
+        /**
+         * <p>How renewals are collected. <code>charge_automatically</code> charges the saved payment method each period; <code>send_invoice</code> emails the buyer an invoice each period. <code>null</code> when not set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage collectionMethod(Nullable<MembershipCollectionMethod> collectionMethod) {
+            if (collectionMethod.isNull()) {
+                this.collectionMethod = null;
+            } else if (collectionMethod.isEmpty()) {
+                this.collectionMethod = Optional.empty();
+            } else {
+                this.collectionMethod = Optional.of(collectionMethod.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How renewals are collected. <code>charge_automatically</code> charges the saved payment method each period; <code>send_invoice</code> emails the buyer an invoice each period. <code>null</code> when not set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage collectionMethod(MembershipCollectionMethod collectionMethod) {
+            this.collectionMethod = Optional.ofNullable(collectionMethod);
+            return this;
+        }
+
+        /**
+         * <p>How renewals are collected. <code>charge_automatically</code> charges the saved payment method each period; <code>send_invoice</code> emails the buyer an invoice each period. <code>null</code> when not set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "collection_method", nulls = Nulls.SKIP)
+        public _FinalStage collectionMethod(Optional<MembershipCollectionMethod> collectionMethod) {
+            this.collectionMethod = collectionMethod;
+            return this;
+        }
+
+        /**
+         * <p>Free-text explanation provided when canceling. <code>null</code> when no reason was provided.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancellationReason(Nullable<String> cancellationReason) {
+            if (cancellationReason.isNull()) {
+                this.cancellationReason = null;
+            } else if (cancellationReason.isEmpty()) {
+                this.cancellationReason = Optional.empty();
+            } else {
+                this.cancellationReason = Optional.of(cancellationReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Free-text explanation provided when canceling. <code>null</code> when no reason was provided.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancellationReason(String cancellationReason) {
+            this.cancellationReason = Optional.ofNullable(cancellationReason);
+            return this;
+        }
+
+        /**
+         * <p>Free-text explanation provided when canceling. <code>null</code> when no reason was provided.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "cancellation_reason", nulls = Nulls.SKIP)
+        public _FinalStage cancellationReason(Optional<String> cancellationReason) {
+            this.cancellationReason = cancellationReason;
+            return this;
+        }
+
+        /**
+         * <p>When cancellation was requested, or when the membership was canceled if no request time is recorded, as an ISO 8601 timestamp. <code>null</code> when neither is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage canceledAt(Nullable<String> canceledAt) {
+            if (canceledAt.isNull()) {
+                this.canceledAt = null;
+            } else if (canceledAt.isEmpty()) {
+                this.canceledAt = Optional.empty();
+            } else {
+                this.canceledAt = Optional.of(canceledAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When cancellation was requested, or when the membership was canceled if no request time is recorded, as an ISO 8601 timestamp. <code>null</code> when neither is recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage canceledAt(String canceledAt) {
+            this.canceledAt = Optional.ofNullable(canceledAt);
+            return this;
+        }
+
+        /**
+         * <p>When cancellation was requested, or when the membership was canceled if no request time is recorded, as an ISO 8601 timestamp. <code>null</code> when neither is recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "canceled_at", nulls = Nulls.SKIP)
+        public _FinalStage canceledAt(Optional<String> canceledAt) {
+            this.canceledAt = canceledAt;
+            return this;
+        }
+
+        /**
+         * <p>The category the member picked for why they canceled. <code>null</code> when no category was picked.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancelOption(Nullable<MembershipCancelOption> cancelOption) {
+            if (cancelOption.isNull()) {
+                this.cancelOption = null;
+            } else if (cancelOption.isEmpty()) {
+                this.cancelOption = Optional.empty();
+            } else {
+                this.cancelOption = Optional.of(cancelOption.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The category the member picked for why they canceled. <code>null</code> when no category was picked.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cancelOption(MembershipCancelOption cancelOption) {
+            this.cancelOption = Optional.ofNullable(cancelOption);
+            return this;
+        }
+
+        /**
+         * <p>The category the member picked for why they canceled. <code>null</code> when no category was picked.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "cancel_option", nulls = Nulls.SKIP)
+        public _FinalStage cancelOption(Optional<MembershipCancelOption> cancelOption) {
+            this.cancelOption = cancelOption;
+            return this;
+        }
+
+        /**
+         * <p>Number of days between recurring charges. <code>null</code> for non-renewing memberships or memberships with multiple renewal schedules.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage billingPeriodDays(Nullable<Integer> billingPeriodDays) {
+            if (billingPeriodDays.isNull()) {
+                this.billingPeriodDays = null;
+            } else if (billingPeriodDays.isEmpty()) {
+                this.billingPeriodDays = Optional.empty();
+            } else {
+                this.billingPeriodDays = Optional.of(billingPeriodDays.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Number of days between recurring charges. <code>null</code> for non-renewing memberships or memberships with multiple renewal schedules.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage billingPeriodDays(Integer billingPeriodDays) {
+            this.billingPeriodDays = Optional.ofNullable(billingPeriodDays);
+            return this;
+        }
+
+        /**
+         * <p>Number of days between recurring charges. <code>null</code> for non-renewing memberships or memberships with multiple renewal schedules.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "billing_period_days", nulls = Nulls.SKIP)
+        public _FinalStage billingPeriodDays(Optional<Integer> billingPeriodDays) {
+            this.billingPeriodDays = billingPeriodDays;
+            return this;
+        }
+
+        /**
+         * <p>The membership's affiliate commission. <code>null</code> without an affiliate, without <code>affiliate:basic:read</code> on the account, and always in webhooks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage affiliate(Nullable<MembershipAffiliate> affiliate) {
+            if (affiliate.isNull()) {
+                this.affiliate = null;
+            } else if (affiliate.isEmpty()) {
+                this.affiliate = Optional.empty();
+            } else {
+                this.affiliate = Optional.of(affiliate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The membership's affiliate commission. <code>null</code> without an affiliate, without <code>affiliate:basic:read</code> on the account, and always in webhooks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage affiliate(MembershipAffiliate affiliate) {
+            this.affiliate = Optional.ofNullable(affiliate);
+            return this;
+        }
+
+        /**
+         * <p>The membership's affiliate commission. <code>null</code> without an affiliate, without <code>affiliate:basic:read</code> on the account, and always in webhooks.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "affiliate", nulls = Nulls.SKIP)
+        public _FinalStage affiliate(Optional<MembershipAffiliate> affiliate) {
+            this.affiliate = affiliate;
+            return this;
+        }
+
         @java.lang.Override
         public Membership build() {
             return new Membership(
                     account,
+                    affiliate,
+                    billingPeriodDays,
                     cancelAtPeriodEnd,
+                    cancelOption,
+                    canceledAt,
+                    cancellationReason,
+                    collectionMethod,
                     createdAt,
                     currentPeriodEnd,
+                    currentPeriodStart,
+                    expiresAt,
+                    externalAccounts,
+                    feedbackOption,
                     id,
+                    initialPrice,
                     licenseKey,
+                    manageUrl,
                     member,
+                    memberId,
                     metadata,
-                    planId,
+                    mostRecentAction,
+                    mostRecentActionAt,
+                    phoneNumber,
+                    product,
                     productId,
+                    promoCodeId,
+                    renewalPrice,
+                    splitPayCurrentPayments,
+                    splitPayRequiredPayments,
                     status,
+                    updatedAt,
                     userId,
+                    variantId,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("affiliate")
+                    || key.equalsIgnoreCase("billing_period_days")
+                    || key.equalsIgnoreCase("cancel_at_period_end")
+                    || key.equalsIgnoreCase("cancel_option")
+                    || key.equalsIgnoreCase("canceled_at")
+                    || key.equalsIgnoreCase("cancellation_reason")
+                    || key.equalsIgnoreCase("collection_method")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("current_period_end")
+                    || key.equalsIgnoreCase("current_period_start")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("external_accounts")
+                    || key.equalsIgnoreCase("feedback_option")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("initial_price")
+                    || key.equalsIgnoreCase("license_key")
+                    || key.equalsIgnoreCase("manage_url")
+                    || key.equalsIgnoreCase("member")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("most_recent_action")
+                    || key.equalsIgnoreCase("most_recent_action_at")
+                    || key.equalsIgnoreCase("phone_number")
+                    || key.equalsIgnoreCase("product")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("promo_code_id")
+                    || key.equalsIgnoreCase("renewal_price")
+                    || key.equalsIgnoreCase("split_pay_current_payments")
+                    || key.equalsIgnoreCase("split_pay_required_payments")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("variant_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

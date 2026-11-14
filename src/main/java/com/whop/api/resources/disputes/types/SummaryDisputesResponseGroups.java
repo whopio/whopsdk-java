@@ -86,7 +86,6 @@ public final class SummaryDisputesResponseGroups {
 
         private Optional<SummaryDisputesResponseGroupsStatus> status = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -127,6 +126,14 @@ public final class SummaryDisputesResponseGroups {
 
         public SummaryDisputesResponseGroups build() {
             return new SummaryDisputesResponseGroups(currency, status, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("currency") || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

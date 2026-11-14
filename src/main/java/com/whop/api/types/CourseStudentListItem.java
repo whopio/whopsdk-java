@@ -236,7 +236,6 @@ public final class CourseStudentListItem {
 
         private CourseStudentListItemUser user;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -255,7 +254,6 @@ public final class CourseStudentListItem {
 
         /**
          * <p>The total number of lessons this student has marked as completed in the course.</p>
-         * <p>The total number of lessons this student has marked as completed in the course.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -266,7 +264,6 @@ public final class CourseStudentListItem {
         }
 
         /**
-         * <p>The percentage of available lessons the student has completed, as a value from 0 to 100 rounded to two decimal places.</p>
          * <p>The percentage of available lessons the student has completed, as a value from 0 to 100 rounded to two decimal places.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -279,7 +276,6 @@ public final class CourseStudentListItem {
 
         /**
          * <p>The timestamp when the student first interacted with this course, as a Unix timestamp.</p>
-         * <p>The timestamp when the student first interacted with this course, as a Unix timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -290,7 +286,6 @@ public final class CourseStudentListItem {
         }
 
         /**
-         * <p>The unique identifier for the course student type.</p>
          * <p>The unique identifier for the course student type.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -303,7 +298,6 @@ public final class CourseStudentListItem {
 
         /**
          * <p>The timestamp when the student most recently interacted with this course, as a Unix timestamp.</p>
-         * <p>The timestamp when the student most recently interacted with this course, as a Unix timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -315,7 +309,6 @@ public final class CourseStudentListItem {
 
         /**
          * <p>The total number of visible lessons available to this student in the course.</p>
-         * <p>The total number of visible lessons available to this student in the course.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -326,7 +319,6 @@ public final class CourseStudentListItem {
         }
 
         /**
-         * <p>The user profile of the enrolled student.</p>
          * <p>The user profile of the enrolled student.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -348,6 +340,20 @@ public final class CourseStudentListItem {
                     totalLessonsCount,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("completed_lessons_count")
+                    || key.equalsIgnoreCase("completion_rate")
+                    || key.equalsIgnoreCase("first_interaction_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_interaction_at")
+                    || key.equalsIgnoreCase("total_lessons_count")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

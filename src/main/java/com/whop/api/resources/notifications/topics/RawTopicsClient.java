@@ -8,6 +8,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -35,32 +36,32 @@ public class RawTopicsClient {
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>> list() {
         return list(ListTopicsRequest.builder().build());
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>> list(RequestOptions requestOptions) {
         return list(ListTopicsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>> list(ListTopicsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are internal and not returned.
+     * Lists the platform's visible notification topics — the categories users can set notification preferences on. App-created topics are not returned.
      */
     public WhopApiHttpResponse<SyncPagingIterable<NotificationTopic>> list(
             ListTopicsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications/topics");
         if (request.getTopicType().isPresent()) {
@@ -90,6 +91,15 @@ public class RawTopicsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -104,8 +114,11 @@ public class RawTopicsClient {
                 List<NotificationTopic> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<NotificationTopic>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -123,6 +136,8 @@ public class RawTopicsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

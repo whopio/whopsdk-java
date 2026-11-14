@@ -5,14 +5,21 @@ package com.whop.api.resources.messages;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.messages.requests.CreateMessagesRequest;
 import com.whop.api.resources.messages.requests.DeleteMessagesRequest;
 import com.whop.api.resources.messages.requests.ListMessagesRequest;
+import com.whop.api.resources.messages.requests.ListReactionsMessagesRequest;
+import com.whop.api.resources.messages.requests.PinMessagesRequest;
+import com.whop.api.resources.messages.requests.ReactMessagesRequest;
 import com.whop.api.resources.messages.requests.RetrieveMessagesRequest;
+import com.whop.api.resources.messages.requests.UnpinMessagesRequest;
+import com.whop.api.resources.messages.requests.UnreactMessagesRequest;
 import com.whop.api.resources.messages.requests.UpdateMessagesRequest;
-import com.whop.api.types.Message;
-import com.whop.api.types.MessageListItem;
+import com.whop.api.resources.messages.requests.VoteMessagesRequest;
+import com.whop.api.types.ChatMessage;
+import com.whop.api.types.ChatReaction;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncMessagesClient {
@@ -33,226 +40,498 @@ public class AsyncMessagesClient {
     }
 
     /**
-     * Returns a paginated list of messages within a specific experience chat, DM, or group chat channel, sorted by creation time.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Lists messages in a channel. Existing public message and channel IDs are preserved. For reconnect synchronization, use inclusive updated_after with include_deleted=true; results use ascending change order. Follow the returned cursors and replace cached messages by ID, including when updated_at is unchanged. The returned updated_at is the stored message update time; reaction changes only affect synchronization ordering. Deleted entries contain identity and timestamps with their content redacted. To jump into history, specify channel_id and one around anchor; results use ascending creation-time order. For older messages in chronological order, use before_message_id with last and direction=asc; for newer messages, use after_message_id with first and direction=asc. Do not supply order or direction with updated_after or an around anchor. Keep message-ID filters when continuing with cursors. For around queries, omit the around anchor and continue with direction=asc.
      */
-    public CompletableFuture<SyncPagingIterable<MessageListItem>> list(ListMessagesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<ChatMessage>> list(ListMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatMessage>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ChatMessage>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of messages within a specific experience chat, DM, or group chat channel, sorted by creation time.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Lists messages in a channel. Existing public message and channel IDs are preserved. For reconnect synchronization, use inclusive updated_after with include_deleted=true; results use ascending change order. Follow the returned cursors and replace cached messages by ID, including when updated_at is unchanged. The returned updated_at is the stored message update time; reaction changes only affect synchronization ordering. Deleted entries contain identity and timestamps with their content redacted. To jump into history, specify channel_id and one around anchor; results use ascending creation-time order. For older messages in chronological order, use before_message_id with last and direction=asc; for newer messages, use after_message_id with first and direction=asc. Do not supply order or direction with updated_after or an around anchor. Keep message-ID filters when continuing with cursors. For around queries, omit the around anchor and continue with direction=asc.
      */
-    public CompletableFuture<SyncPagingIterable<MessageListItem>> list(
+    public CompletableFuture<SyncPagingIterable<ChatMessage>> list(
             ListMessagesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatMessage>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ChatMessage>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Send a new message in an experience chat, DM, or group chat channel. Supports text content, attachments, polls, and replies.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Sends a Markdown message as the authenticated user or app agent. Channel access, posting restrictions, moderation, and delivery follow the existing chat services. Use Idempotency-Key to safely retry a send. The response and realtime message use the same message ID. Custom author presentation and embeds are read-only. With email_address, the message's text is also emailed to the customer of a support chat with that address's account, if they're a member with an email address. The email answers the email behind replying_to_message_id, or else continues the chat's latest email. The message is posted even when it isn't emailed. Files, GIFs and polls stay in the chat and are left out of the email, and a message with no text isn't emailed. Sending needs member:email:read, and the address's owner or, for a shared address, email:read and email:send.
      */
-    public CompletableFuture<Message> create(CreateMessagesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> create(CreateMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Send a new message in an experience chat, DM, or group chat channel. Supports text content, attachments, polls, and replies.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Sends a Markdown message as the authenticated user or app agent. Channel access, posting restrictions, moderation, and delivery follow the existing chat services. Use Idempotency-Key to safely retry a send. The response and realtime message use the same message ID. Custom author presentation and embeds are read-only. With email_address, the message's text is also emailed to the customer of a support chat with that address's account, if they're a member with an email address. The email answers the email behind replying_to_message_id, or else continues the chat's latest email. The message is posted even when it isn't emailed. Files, GIFs and polls stay in the chat and are left out of the email, and a message with no text isn't emailed. Sending needs member:email:read, and the address's owner or, for a shared address, email:read and email:send.
      */
-    public CompletableFuture<Message> create(CreateMessagesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> create(CreateMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<Message> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> retrieve(String id) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<Message> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> retrieve(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<Message> retrieve(String id, RetrieveMessagesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> retrieve(String id, RetrieveMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:read</code></li>
-     * <li><code>dms:read</code></li>
-     * <li><code>livestream:chat:read</code></li>
-     * <li><code>support_chat:read</code></li>
-     * </ul>
+     * Retrieves a live message from an accessible channel. Use list synchronization to retrieve deletion entries.
      */
-    public CompletableFuture<Message> retrieve(
+    public CompletableFuture<ChatMessage> retrieve(
             String id, RetrieveMessagesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+    public CompletableFuture<Void> delete(String id) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Void> delete(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<Boolean> delete(String id, DeleteMessagesRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+    public CompletableFuture<Void> delete(String id, DeleteMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a message from an experience chat, DM, or group chat channel. Only the message author or a channel admin can delete a message.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code> and <code>chat:read</code></li>
-     * <li><code>dms:message:manage</code> and <code>dms:read</code></li>
-     * <li><code>livestream:chat:write</code> and <code>livestream:chat:read</code></li>
-     * <li><code>support_chat:message:create</code> and <code>support_chat:read</code></li>
-     * </ul>
+     * Deletes a message as its author or a permitted moderator. Deleted messages remain available as redacted entries through list synchronization.
      */
-    public CompletableFuture<Boolean> delete(String id, DeleteMessagesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<Void> delete(String id, DeleteMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Void>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Void> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<Message> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> update(String id) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<Message> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> update(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<Message> update(String id, UpdateMessagesRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> update(String id, UpdateMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Edit the content, attachments, or pinned status of an existing message in an experience chat, DM, or group chat channel.
-     * <p>Required permissions (one of):</p>
-     * <ul>
-     * <li><code>chat:message:create</code></li>
-     * <li><code>dms:message:manage</code></li>
-     * <li><code>livestream:chat:write</code></li>
-     * <li><code>support_chat:message:create</code></li>
-     * </ul>
+     * Updates the author's message. Use the pin and unpin actions to change its pin state. Omitted fields are preserved; attachment and preview collections replace their previous values.
      */
-    public CompletableFuture<Message> update(String id, UpdateMessagesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+    public CompletableFuture<ChatMessage> update(
+            String id, UpdateMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> pin(String id) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.pin(id);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> pin(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.pin(id, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> pin(String id, PinMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.pin(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> pin(String id, PinMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.pin(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Add your emoji reaction to a message. Reacting again with the same emoji changes nothing.
+     */
+    public CompletableFuture<ChatMessage> react(String id, ReactMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.react(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Add your emoji reaction to a message. Reacting again with the same emoji changes nothing.
+     */
+    public CompletableFuture<ChatMessage> react(
+            String id, ReactMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.react(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<SyncPagingIterable<ChatReaction>> listReactions(String id) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> rawFuture =
+                this.rawClient.listReactions(id);
+        CompletableFuture<SyncPagingIterable<ChatReaction>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<SyncPagingIterable<ChatReaction>> listReactions(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> rawFuture =
+                this.rawClient.listReactions(id, requestOptions);
+        CompletableFuture<SyncPagingIterable<ChatReaction>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<SyncPagingIterable<ChatReaction>> listReactions(
+            String id, ListReactionsMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> rawFuture =
+                this.rawClient.listReactions(id, request);
+        CompletableFuture<SyncPagingIterable<ChatReaction>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * List who reacted to a message, newest first. Optionally filter by emoji.
+     */
+    public CompletableFuture<SyncPagingIterable<ChatReaction>> listReactions(
+            String id, ListReactionsMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChatReaction>>> rawFuture =
+                this.rawClient.listReactions(id, request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ChatReaction>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> unpin(String id) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.unpin(id);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> unpin(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.unpin(id, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> unpin(String id, UnpinMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.unpin(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Unpins a message in its channel. Requires the channel's pin permission.
+     */
+    public CompletableFuture<ChatMessage> unpin(
+            String id, UnpinMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.unpin(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Remove your emoji reaction from a message. Removing a reaction you have not added changes nothing.
+     */
+    public CompletableFuture<ChatMessage> unreact(String id, UnreactMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.unreact(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Remove your emoji reaction from a message. Removing a reaction you have not added changes nothing.
+     */
+    public CompletableFuture<ChatMessage> unreact(
+            String id, UnreactMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.unreact(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Vote for one option on a message poll. Each user can vote once per poll.
+     */
+    public CompletableFuture<ChatMessage> vote(String id, VoteMessagesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture = this.rawClient.vote(id, request);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Vote for one option on a message poll. Each user can vote once per poll.
+     */
+    public CompletableFuture<ChatMessage> vote(String id, VoteMessagesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ChatMessage>> rawFuture =
+                this.rawClient.vote(id, request, requestOptions);
+        CompletableFuture<ChatMessage> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

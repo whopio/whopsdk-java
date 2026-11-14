@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public final class ListSwapsResponseDataItem {
     private final String accountId;
 
+    private final Optional<String> amount;
+
     private final Optional<String> error;
 
     private final String id;
@@ -38,31 +40,48 @@ public final class ListSwapsResponseDataItem {
 
     private final List<String> txHashes;
 
+    private final Optional<String> userId;
+
     private final Map<String, Object> additionalProperties;
 
     private ListSwapsResponseDataItem(
             String accountId,
+            Optional<String> amount,
             Optional<String> error,
             String id,
             ListSwapsResponseDataItemObject object,
             ListSwapsResponseDataItemStatus status,
             List<String> txHashes,
+            Optional<String> userId,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.amount = amount;
         this.error = error;
         this.id = id;
         this.object = object;
         this.status = status;
         this.txHashes = txHashes;
+        this.userId = userId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Account ID that owns the wallet used for the swap.
+     * @return Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.
      */
     @JsonProperty("account_id")
     public String getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The from_token amount the swap was created to spend, as a decimal string. A swap created with <code>all</code> reports the wallet balance it read. Null for a fiat pair.
+     */
+    @JsonIgnore
+    public Optional<String> getAmount() {
+        if (amount == null) {
+            return Optional.empty();
+        }
+        return amount;
     }
 
     /**
@@ -105,10 +124,33 @@ public final class ListSwapsResponseDataItem {
         return txHashes;
     }
 
+    /**
+     * @return User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.
+     */
+    @JsonIgnore
+    public Optional<String> getUserId() {
+        if (userId == null) {
+            return Optional.empty();
+        }
+        return userId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("amount")
+    private Optional<String> _getAmount() {
+        return amount;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("error")
     private Optional<String> _getError() {
         return error;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("user_id")
+    private Optional<String> _getUserId() {
+        return userId;
     }
 
     @java.lang.Override
@@ -124,16 +166,19 @@ public final class ListSwapsResponseDataItem {
 
     private boolean equalTo(ListSwapsResponseDataItem other) {
         return accountId.equals(other.accountId)
+                && amount.equals(other.amount)
                 && error.equals(other.error)
                 && id.equals(other.id)
                 && object.equals(other.object)
                 && status.equals(other.status)
-                && txHashes.equals(other.txHashes);
+                && txHashes.equals(other.txHashes)
+                && userId.equals(other.userId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.error, this.id, this.object, this.status, this.txHashes);
+        return Objects.hash(
+                this.accountId, this.amount, this.error, this.id, this.object, this.status, this.txHashes, this.userId);
     }
 
     @java.lang.Override
@@ -147,7 +192,7 @@ public final class ListSwapsResponseDataItem {
 
     public interface AccountIdStage {
         /**
-         * <p>Account ID that owns the wallet used for the swap.</p>
+         * <p>Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.</p>
          */
         IdStage accountId(@NotNull String accountId);
 
@@ -180,6 +225,15 @@ public final class ListSwapsResponseDataItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The from_token amount the swap was created to spend, as a decimal string. A swap created with <code>all</code> reports the wallet balance it read. Null for a fiat pair.</p>
+         */
+        _FinalStage amount(Optional<String> amount);
+
+        _FinalStage amount(String amount);
+
+        _FinalStage amount(Nullable<String> amount);
+
+        /**
          * <p>Latest error returned for a failed swap.</p>
          */
         _FinalStage error(Optional<String> error);
@@ -196,6 +250,15 @@ public final class ListSwapsResponseDataItem {
         _FinalStage addTxHashes(String txHashes);
 
         _FinalStage addAllTxHashes(List<String> txHashes);
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         */
+        _FinalStage userId(Optional<String> userId);
+
+        _FinalStage userId(String userId);
+
+        _FinalStage userId(Nullable<String> userId);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -208,11 +271,14 @@ public final class ListSwapsResponseDataItem {
 
         private ListSwapsResponseDataItemStatus status;
 
+        private Optional<String> userId = Optional.empty();
+
         private List<String> txHashes = new ArrayList<>();
 
         private Optional<String> error = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> amount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -220,17 +286,18 @@ public final class ListSwapsResponseDataItem {
         @java.lang.Override
         public Builder from(ListSwapsResponseDataItem other) {
             accountId(other.getAccountId());
+            amount(other.getAmount());
             error(other.getError());
             id(other.getId());
             object(other.getObject());
             status(other.getStatus());
             txHashes(other.getTxHashes());
+            userId(other.getUserId());
             return this;
         }
 
         /**
-         * <p>Account ID that owns the wallet used for the swap.</p>
-         * <p>Account ID that owns the wallet used for the swap.</p>
+         * <p>Account that owns the swap: a business ID prefixed <code>biz_</code>, or the user ID for a personal account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -241,7 +308,6 @@ public final class ListSwapsResponseDataItem {
         }
 
         /**
-         * <p>Swap ID.</p>
          * <p>Swap ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -261,13 +327,48 @@ public final class ListSwapsResponseDataItem {
 
         /**
          * <p>Current swap status. <code>complete</code> and <code>failed</code> are terminal.</p>
-         * <p>Current swap status. <code>complete</code> and <code>failed</code> are terminal.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
         public _FinalStage status(@NotNull ListSwapsResponseDataItemStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(Nullable<String> userId) {
+            if (userId.isNull()) {
+                this.userId = null;
+            } else if (userId.isEmpty()) {
+                this.userId = Optional.empty();
+            } else {
+                this.userId = Optional.of(userId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
+            return this;
+        }
+
+        /**
+         * <p>User whose personal account owns the swap, prefixed <code>user_</code>. Null for a business account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public _FinalStage userId(Optional<String> userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -342,9 +443,61 @@ public final class ListSwapsResponseDataItem {
             return this;
         }
 
+        /**
+         * <p>The from_token amount the swap was created to spend, as a decimal string. A swap created with <code>all</code> reports the wallet balance it read. Null for a fiat pair.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(Nullable<String> amount) {
+            if (amount.isNull()) {
+                this.amount = null;
+            } else if (amount.isEmpty()) {
+                this.amount = Optional.empty();
+            } else {
+                this.amount = Optional.of(amount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The from_token amount the swap was created to spend, as a decimal string. A swap created with <code>all</code> reports the wallet balance it read. Null for a fiat pair.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amount(String amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        /**
+         * <p>The from_token amount the swap was created to spend, as a decimal string. A swap created with <code>all</code> reports the wallet balance it read. Null for a fiat pair.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public _FinalStage amount(Optional<String> amount) {
+            this.amount = amount;
+            return this;
+        }
+
         @java.lang.Override
         public ListSwapsResponseDataItem build() {
-            return new ListSwapsResponseDataItem(accountId, error, id, object, status, txHashes, additionalProperties);
+            return new ListSwapsResponseDataItem(
+                    accountId, amount, error, id, object, status, txHashes, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("error")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("tx_hashes")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

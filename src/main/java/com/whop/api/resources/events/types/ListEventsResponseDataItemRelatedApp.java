@@ -136,7 +136,6 @@ public final class ListEventsResponseDataItemRelatedApp {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -228,6 +227,17 @@ public final class ListEventsResponseDataItemRelatedApp {
 
         public ListEventsResponseDataItemRelatedApp build() {
             return new ListEventsResponseDataItemRelatedApp(domainId, iconUrl, id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("domain_id")
+                    || key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -60,84 +60,84 @@ public class CardsClient {
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CreateCardsResponse create() {
         return this.rawClient.create().body();
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CreateCardsResponse create(RequestOptions requestOptions) {
         return this.rawClient.create(requestOptions).body();
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CreateCardsResponse create(CreateCardsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Issue a virtual card, or apply for card issuing.
+     * Issues a virtual card, or applies for card issuing. An account with no application files one here and gets back a <code>202</code>; call again to issue the card once it is approved. An account whose application was denied or canceled applies again the same way, replacing that application.
      */
     public CreateCardsResponse create(CreateCardsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public RetrieveCardsResponse retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public RetrieveCardsResponse retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public RetrieveCardsResponse retrieve(String id, RetrieveCardsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieve a single card.
+     * Retrieves a single card, including its <code>secrets</code> (card number, CVC, and PIN), which List Cards does not return.
      */
     public RetrieveCardsResponse retrieve(String id, RetrieveCardsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public UpdateCardsResponse update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public UpdateCardsResponse update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public UpdateCardsResponse update(String id, UpdateCardsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Update, freeze, or cancel a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
+     * Updates, freezes, or cancels a card. Updating the card's name, billing address, or limits requires both <code>payout:account:update</code> and <code>company:balance:read</code>; a card's assigned holder may update their own card's pin and frozen state with any user token.
      */
     public UpdateCardsResponse update(String id, UpdateCardsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();

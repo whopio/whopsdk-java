@@ -170,7 +170,6 @@ public final class AccountSocialLink {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -186,7 +185,6 @@ public final class AccountSocialLink {
 
         /**
          * <p>The ID of the social link</p>
-         * <p>The ID of the social link</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -198,7 +196,6 @@ public final class AccountSocialLink {
 
         /**
          * <p>The social link URL</p>
-         * <p>The social link URL</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -209,7 +206,6 @@ public final class AccountSocialLink {
         }
 
         /**
-         * <p>The social platform for this link</p>
          * <p>The social platform for this link</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +255,17 @@ public final class AccountSocialLink {
         @java.lang.Override
         public AccountSocialLink build() {
             return new AccountSocialLink(id, title, url, website, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("url")
+                    || key.equalsIgnoreCase("website")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

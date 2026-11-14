@@ -206,7 +206,6 @@ public final class CreateOverridesRequestBodyStandard {
 
         private Optional<AffiliateAppliesToPayments> appliesToPayments = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -223,7 +222,6 @@ public final class CreateOverridesRequestBodyStandard {
 
         /**
          * <p>The commission value (percentage 1-100 or flat fee).</p>
-         * <p>The commission value (percentage 1-100 or flat fee).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -235,7 +233,6 @@ public final class CreateOverridesRequestBodyStandard {
 
         /**
          * <p>The affiliate ID.</p>
-         * <p>The affiliate ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -246,7 +243,6 @@ public final class CreateOverridesRequestBodyStandard {
         }
 
         /**
-         * <p>The plan ID (required for standard overrides).</p>
          * <p>The plan ID (required for standard overrides).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -333,6 +329,18 @@ public final class CreateOverridesRequestBodyStandard {
         public CreateOverridesRequestBodyStandard build() {
             return new CreateOverridesRequestBodyStandard(
                     appliesToPayments, commissionType, commissionValue, id, planId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("applies_to_payments")
+                    || key.equalsIgnoreCase("commission_type")
+                    || key.equalsIgnoreCase("commission_value")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("plan_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

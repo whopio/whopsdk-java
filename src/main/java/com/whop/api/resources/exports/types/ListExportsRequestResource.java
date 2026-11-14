@@ -31,8 +31,8 @@ public final class ListExportsRequestResource {
     public static final ListExportsRequestResource FINANCIAL_ACTIVITY =
             new ListExportsRequestResource(Value.FINANCIAL_ACTIVITY, "financial-activity");
 
-    public static final ListExportsRequestResource CONTENT_REWARDS_SUBMISSIONS =
-            new ListExportsRequestResource(Value.CONTENT_REWARDS_SUBMISSIONS, "content_rewards_submissions");
+    public static final ListExportsRequestResource EXTERNAL_ACCOUNTS =
+            new ListExportsRequestResource(Value.EXTERNAL_ACCOUNTS, "external_accounts");
 
     public static final ListExportsRequestResource LEADS = new ListExportsRequestResource(Value.LEADS, "leads");
 
@@ -51,13 +51,16 @@ public final class ListExportsRequestResource {
     public static final ListExportsRequestResource SHIPMENTS =
             new ListExportsRequestResource(Value.SHIPMENTS, "shipments");
 
-    public static final ListExportsRequestResource ENTRIES = new ListExportsRequestResource(Value.ENTRIES, "entries");
+    public static final ListExportsRequestResource RECEIPT_INVOICES =
+            new ListExportsRequestResource(Value.RECEIPT_INVOICES, "receipt_invoices");
 
-    public static final ListExportsRequestResource MEMBERSHIPS =
-            new ListExportsRequestResource(Value.MEMBERSHIPS, "memberships");
+    public static final ListExportsRequestResource ENTRIES = new ListExportsRequestResource(Value.ENTRIES, "entries");
 
     public static final ListExportsRequestResource TRANSFERS =
             new ListExportsRequestResource(Value.TRANSFERS, "transfers");
+
+    public static final ListExportsRequestResource MEMBERSHIPS =
+            new ListExportsRequestResource(Value.MEMBERSHIPS, "memberships");
 
     public static final ListExportsRequestResource CHILD_COMPANIES =
             new ListExportsRequestResource(Value.CHILD_COMPANIES, "child_companies");
@@ -163,8 +166,8 @@ public final class ListExportsRequestResource {
                 return visitor.visitPayouts();
             case FINANCIAL_ACTIVITY:
                 return visitor.visitFinancialActivity();
-            case CONTENT_REWARDS_SUBMISSIONS:
-                return visitor.visitContentRewardsSubmissions();
+            case EXTERNAL_ACCOUNTS:
+                return visitor.visitExternalAccounts();
             case LEADS:
                 return visitor.visitLeads();
             case TRACKING_LINKS:
@@ -177,12 +180,14 @@ public final class ListExportsRequestResource {
                 return visitor.visitBountySubmissions();
             case SHIPMENTS:
                 return visitor.visitShipments();
+            case RECEIPT_INVOICES:
+                return visitor.visitReceiptInvoices();
             case ENTRIES:
                 return visitor.visitEntries();
-            case MEMBERSHIPS:
-                return visitor.visitMemberships();
             case TRANSFERS:
                 return visitor.visitTransfers();
+            case MEMBERSHIPS:
+                return visitor.visitMemberships();
             case CHILD_COMPANIES:
                 return visitor.visitChildCompanies();
             case WITHDRAWAL_LINES:
@@ -248,8 +253,8 @@ public final class ListExportsRequestResource {
                 return PAYOUTS;
             case "financial-activity":
                 return FINANCIAL_ACTIVITY;
-            case "content_rewards_submissions":
-                return CONTENT_REWARDS_SUBMISSIONS;
+            case "external_accounts":
+                return EXTERNAL_ACCOUNTS;
             case "leads":
                 return LEADS;
             case "tracking_links":
@@ -262,12 +267,14 @@ public final class ListExportsRequestResource {
                 return BOUNTY_SUBMISSIONS;
             case "shipments":
                 return SHIPMENTS;
+            case "receipt_invoices":
+                return RECEIPT_INVOICES;
             case "entries":
                 return ENTRIES;
-            case "memberships":
-                return MEMBERSHIPS;
             case "transfers":
                 return TRANSFERS;
+            case "memberships":
+                return MEMBERSHIPS;
             case "child_companies":
                 return CHILD_COMPANIES;
             case "withdrawal_lines":
@@ -334,11 +341,9 @@ public final class ListExportsRequestResource {
 
         EVENTS,
 
+        EXTERNAL_ACCOUNTS,
+
         FINANCIAL_ACTIVITY,
-
-        MEMBERS,
-
-        MEMBERSHIPS,
 
         PAYOUT_METHODS,
 
@@ -349,6 +354,8 @@ public final class ListExportsRequestResource {
         PLANS,
 
         PRODUCTS,
+
+        RECEIPT_INVOICES,
 
         RESOLUTION_CENTER_CASES,
 
@@ -362,9 +369,13 @@ public final class ListExportsRequestResource {
 
         WEBHOOKS,
 
+        MEMBERS,
+
         RECEIPTS,
 
         UNCLAIMED_MEMBERSHIPS,
+
+        MEMBERSHIPS,
 
         TRACKING_LINKS,
 
@@ -375,8 +386,6 @@ public final class ListExportsRequestResource {
         ENTRIES,
 
         LEADS,
-
-        CONTENT_REWARDS_SUBMISSIONS,
 
         INVOICES,
 
@@ -414,11 +423,9 @@ public final class ListExportsRequestResource {
 
         T visitEvents();
 
+        T visitExternalAccounts();
+
         T visitFinancialActivity();
-
-        T visitMembers();
-
-        T visitMemberships();
 
         T visitPayoutMethods();
 
@@ -429,6 +436,8 @@ public final class ListExportsRequestResource {
         T visitPlans();
 
         T visitProducts();
+
+        T visitReceiptInvoices();
 
         T visitResolutionCenterCases();
 
@@ -442,9 +451,13 @@ public final class ListExportsRequestResource {
 
         T visitWebhooks();
 
+        T visitMembers();
+
         T visitReceipts();
 
         T visitUnclaimedMemberships();
+
+        T visitMemberships();
 
         T visitTrackingLinks();
 
@@ -455,8 +468,6 @@ public final class ListExportsRequestResource {
         T visitEntries();
 
         T visitLeads();
-
-        T visitContentRewardsSubmissions();
 
         T visitInvoices();
 

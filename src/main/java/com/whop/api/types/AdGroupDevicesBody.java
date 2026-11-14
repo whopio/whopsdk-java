@@ -87,7 +87,6 @@ public final class AdGroupDevicesBody {
 
         private Optional<List<AdGroupDevicesBodyPlatformsItem>> platforms = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -128,6 +127,14 @@ public final class AdGroupDevicesBody {
 
         public AdGroupDevicesBody build() {
             return new AdGroupDevicesBody(operatingSystems, platforms, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("operating_systems") || key.equalsIgnoreCase("platforms")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

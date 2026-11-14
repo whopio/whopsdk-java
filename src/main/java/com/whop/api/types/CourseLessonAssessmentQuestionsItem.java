@@ -284,7 +284,6 @@ public final class CourseLessonAssessmentQuestionsItem {
 
         private Optional<String> correctAnswer = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -304,7 +303,6 @@ public final class CourseLessonAssessmentQuestionsItem {
 
         /**
          * <p>The datetime the assessment question was created.</p>
-         * <p>The datetime the assessment question was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -315,7 +313,6 @@ public final class CourseLessonAssessmentQuestionsItem {
         }
 
         /**
-         * <p>The unique identifier for the assessment question.</p>
          * <p>The unique identifier for the assessment question.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -328,7 +325,6 @@ public final class CourseLessonAssessmentQuestionsItem {
 
         /**
          * <p>The order of the question within its lesson</p>
-         * <p>The order of the question within its lesson</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -340,7 +336,6 @@ public final class CourseLessonAssessmentQuestionsItem {
 
         /**
          * <p>The text of the question</p>
-         * <p>The text of the question</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,7 +346,6 @@ public final class CourseLessonAssessmentQuestionsItem {
         }
 
         /**
-         * <p>The type of the question</p>
          * <p>The type of the question</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -481,6 +475,21 @@ public final class CourseLessonAssessmentQuestionsItem {
                     questionText,
                     questionType,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("correct_answer")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("question_text")
+                    || key.equalsIgnoreCase("question_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

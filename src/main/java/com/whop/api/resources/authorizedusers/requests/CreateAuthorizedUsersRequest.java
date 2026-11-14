@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAuthorizedUsersRequest.Builder.class)
 public final class CreateAuthorizedUsersRequest {
-    private final String companyId;
+    private final String accountId;
 
     private final Optional<CreateAuthorizedUsersRequestElevation> elevation;
 
@@ -39,13 +39,13 @@ public final class CreateAuthorizedUsersRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAuthorizedUsersRequest(
-            String companyId,
+            String accountId,
             Optional<CreateAuthorizedUsersRequestElevation> elevation,
             GrantableAuthorizedUserRoles role,
             Optional<Boolean> sendEmails,
             String userId,
             Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+        this.accountId = accountId;
         this.elevation = elevation;
         this.role = role;
         this.sendEmails = sendEmails;
@@ -56,9 +56,9 @@ public final class CreateAuthorizedUsersRequest {
     /**
      * @return The ID of the company to add the authorized user to.
      */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
     }
 
     /**
@@ -123,7 +123,7 @@ public final class CreateAuthorizedUsersRequest {
     }
 
     private boolean equalTo(CreateAuthorizedUsersRequest other) {
-        return companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
                 && elevation.equals(other.elevation)
                 && role.equals(other.role)
                 && sendEmails.equals(other.sendEmails)
@@ -132,7 +132,7 @@ public final class CreateAuthorizedUsersRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId, this.elevation, this.role, this.sendEmails, this.userId);
+        return Objects.hash(this.accountId, this.elevation, this.role, this.sendEmails, this.userId);
     }
 
     @java.lang.Override
@@ -140,15 +140,15 @@ public final class CreateAuthorizedUsersRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
+    public interface AccountIdStage {
         /**
          * <p>The ID of the company to add the authorized user to.</p>
          */
-        RoleStage companyId(@NotNull String companyId);
+        RoleStage accountId(@NotNull String accountId);
 
         Builder from(CreateAuthorizedUsersRequest other);
     }
@@ -194,8 +194,8 @@ public final class CreateAuthorizedUsersRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, RoleStage, UserIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder implements AccountIdStage, RoleStage, UserIdStage, _FinalStage {
+        private String accountId;
 
         private GrantableAuthorizedUserRoles role;
 
@@ -205,14 +205,13 @@ public final class CreateAuthorizedUsersRequest {
 
         private Optional<CreateAuthorizedUsersRequestElevation> elevation = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateAuthorizedUsersRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             elevation(other.getElevation());
             role(other.getRole());
             sendEmails(other.getSendEmails());
@@ -222,18 +221,16 @@ public final class CreateAuthorizedUsersRequest {
 
         /**
          * <p>The ID of the company to add the authorized user to.</p>
-         * <p>The ID of the company to add the authorized user to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("company_id")
-        public RoleStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter("account_id")
+        public RoleStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
             return this;
         }
 
         /**
-         * <p>The role to assign to the authorized user within the company. Supported roles: 'moderator', 'sales_manager'.</p>
          * <p>The role to assign to the authorized user within the company. Supported roles: 'moderator', 'sales_manager'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -245,7 +242,6 @@ public final class CreateAuthorizedUsersRequest {
         }
 
         /**
-         * <p>The ID of the user to add as an authorized user.</p>
          * <p>The ID of the user to add as an authorized user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -331,7 +327,19 @@ public final class CreateAuthorizedUsersRequest {
         @java.lang.Override
         public CreateAuthorizedUsersRequest build() {
             return new CreateAuthorizedUsersRequest(
-                    companyId, elevation, role, sendEmails, userId, additionalProperties);
+                    accountId, elevation, role, sendEmails, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("elevation")
+                    || key.equalsIgnoreCase("role")
+                    || key.equalsIgnoreCase("send_emails")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

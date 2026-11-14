@@ -24,7 +24,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateAiChatsRequest.Builder.class)
 public final class UpdateAiChatsRequest {
-    private final Optional<String> currentCompanyId;
+    private final Optional<String> currentAccountId;
 
     private final Optional<AiChatNotificationPreferences> notificationPreference;
 
@@ -33,25 +33,25 @@ public final class UpdateAiChatsRequest {
     private final Map<String, Object> additionalProperties;
 
     private UpdateAiChatsRequest(
-            Optional<String> currentCompanyId,
+            Optional<String> currentAccountId,
             Optional<AiChatNotificationPreferences> notificationPreference,
             Optional<String> title,
             Map<String, Object> additionalProperties) {
-        this.currentCompanyId = currentCompanyId;
+        this.currentAccountId = currentAccountId;
         this.notificationPreference = notificationPreference;
         this.title = title;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).
+     * @return The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).
      */
     @JsonIgnore
-    public Optional<String> getCurrentCompanyId() {
-        if (currentCompanyId == null) {
+    public Optional<String> getCurrentAccountId() {
+        if (currentAccountId == null) {
             return Optional.empty();
         }
-        return currentCompanyId;
+        return currentAccountId;
     }
 
     /**
@@ -77,9 +77,9 @@ public final class UpdateAiChatsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("current_company_id")
-    private Optional<String> _getCurrentCompanyId() {
-        return currentCompanyId;
+    @JsonProperty("current_account_id")
+    private Optional<String> _getCurrentAccountId() {
+        return currentAccountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -106,14 +106,14 @@ public final class UpdateAiChatsRequest {
     }
 
     private boolean equalTo(UpdateAiChatsRequest other) {
-        return currentCompanyId.equals(other.currentCompanyId)
+        return currentAccountId.equals(other.currentAccountId)
                 && notificationPreference.equals(other.notificationPreference)
                 && title.equals(other.title);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.currentCompanyId, this.notificationPreference, this.title);
+        return Objects.hash(this.currentAccountId, this.notificationPreference, this.title);
     }
 
     @java.lang.Override
@@ -127,45 +127,44 @@ public final class UpdateAiChatsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> currentCompanyId = Optional.empty();
+        private Optional<String> currentAccountId = Optional.empty();
 
         private Optional<AiChatNotificationPreferences> notificationPreference = Optional.empty();
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdateAiChatsRequest other) {
-            currentCompanyId(other.getCurrentCompanyId());
+            currentAccountId(other.getCurrentAccountId());
             notificationPreference(other.getNotificationPreference());
             title(other.getTitle());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
+         * <p>The unique identifier of the account to set as context for the AI chat (e.g., &quot;biz_XXXXX&quot;).</p>
          */
-        @JsonSetter(value = "current_company_id", nulls = Nulls.SKIP)
-        public Builder currentCompanyId(Optional<String> currentCompanyId) {
-            this.currentCompanyId = currentCompanyId;
+        @JsonSetter(value = "current_account_id", nulls = Nulls.SKIP)
+        public Builder currentAccountId(Optional<String> currentAccountId) {
+            this.currentAccountId = currentAccountId;
             return this;
         }
 
-        public Builder currentCompanyId(String currentCompanyId) {
-            this.currentCompanyId = Optional.ofNullable(currentCompanyId);
+        public Builder currentAccountId(String currentAccountId) {
+            this.currentAccountId = Optional.ofNullable(currentAccountId);
             return this;
         }
 
-        public Builder currentCompanyId(Nullable<String> currentCompanyId) {
-            if (currentCompanyId.isNull()) {
-                this.currentCompanyId = null;
-            } else if (currentCompanyId.isEmpty()) {
-                this.currentCompanyId = Optional.empty();
+        public Builder currentAccountId(Nullable<String> currentAccountId) {
+            if (currentAccountId.isNull()) {
+                this.currentAccountId = null;
+            } else if (currentAccountId.isEmpty()) {
+                this.currentAccountId = Optional.empty();
             } else {
-                this.currentCompanyId = Optional.of(currentCompanyId.get());
+                this.currentAccountId = Optional.of(currentAccountId.get());
             }
             return this;
         }
@@ -221,7 +220,17 @@ public final class UpdateAiChatsRequest {
         }
 
         public UpdateAiChatsRequest build() {
-            return new UpdateAiChatsRequest(currentCompanyId, notificationPreference, title, additionalProperties);
+            return new UpdateAiChatsRequest(currentAccountId, notificationPreference, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("current_account_id")
+                    || key.equalsIgnoreCase("notification_preference")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -4,11 +4,14 @@
 package com.whop.api.resources.users.passkeys;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -22,11 +25,10 @@ import com.whop.api.resources.users.passkeys.requests.ChallengePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.CreatePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.DeletePasskeysRequest;
 import com.whop.api.resources.users.passkeys.requests.ListPasskeysRequest;
-import com.whop.api.resources.users.passkeys.types.ChallengePasskeysResponse;
 import com.whop.api.resources.users.passkeys.types.DeletePasskeysResponse;
 import com.whop.api.resources.users.passkeys.types.ListPasskeysResponse;
 import com.whop.api.types.Passkey;
-import com.whop.api.types.V1ErrorResponse;
+import com.whop.api.types.PasskeyChallenge;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -51,32 +53,32 @@ public class AsyncRawPasskeysClient {
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> list() {
         return list(ListPasskeysRequest.builder().build());
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> list(RequestOptions requestOptions) {
         return list(ListPasskeysRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> list(ListPasskeysRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the authenticated user's own passkeys, newest first. The list is always the caller's own; there is no parameter for reading another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
+     * Lists the authenticated user's own passkeys, newest first. You cannot read another user's passkeys. Requires a user session: an API key or an OAuth token is refused, because a passkey confirms the account holder before a sensitive action and no app may enumerate one.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> list(
             ListPasskeysRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/passkeys");
         if (request.getFirst().isPresent()) {
@@ -118,8 +120,18 @@ public class AsyncRawPasskeysClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<Passkey>>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -135,15 +147,20 @@ public class AsyncRawPasskeysClient {
                                 .build();
                         List<Passkey> result = parsedResponse.getData();
                         future.complete(new WhopApiHttpResponse<>(
-                                new SyncPagingIterable<Passkey>(startingAfter != null, result, parsedResponse, () -> {
-                                    try {
-                                        return list(nextRequest, requestOptions)
-                                                .get()
-                                                .body();
-                                    } catch (InterruptedException | ExecutionException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }),
+                                new SyncPagingIterable<Passkey>(
+                                        startingAfter.isPresent()
+                                                && !startingAfter.get().isEmpty(),
+                                        result,
+                                        parsedResponse,
+                                        () -> {
+                                            try {
+                                                return list(nextRequest, requestOptions)
+                                                        .get()
+                                                        .body();
+                                            } catch (InterruptedException | ExecutionException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }),
                                 response));
                         return;
                     }
@@ -172,6 +189,9 @@ public class AsyncRawPasskeysClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -182,22 +202,27 @@ public class AsyncRawPasskeysClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code>; it is single-use and expires 5 minutes after it is issued. Requires a user session.
+     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code> and run the ceremony with its <code>creation_options</code>; it is single-use and expires 5 minutes after it is issued. Send back the <code>user_handle</code> the options carried; a registration without it is refused. Registering replaces the account's passkeys made before Whop issued options, which can only be deleted. Requires a user session that has completed step-up verification.
      */
     public CompletableFuture<WhopApiHttpResponse<Passkey>> create(CreatePasskeysRequest request) {
         return create(request, null);
     }
 
     /**
-     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code>; it is single-use and expires 5 minutes after it is issued. Requires a user session.
+     * Registers a passkey for the authenticated user from the attestation a browser produced for a <code>registration</code> challenge. Mint that challenge first with <code>POST /users/me/passkeys/challenge</code> and run the ceremony with its <code>creation_options</code>; it is single-use and expires 5 minutes after it is issued. Send back the <code>user_handle</code> the options carried; a registration without it is refused. Registering replaces the account's passkeys made before Whop issued options, which can only be deleted. Requires a user session that has completed step-up verification.
      */
     public CompletableFuture<WhopApiHttpResponse<Passkey>> create(
             CreatePasskeysRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/passkeys");
         if (requestOptions != null) {
@@ -208,7 +233,9 @@ public class AsyncRawPasskeysClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -223,8 +250,18 @@ public class AsyncRawPasskeysClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<Passkey>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -253,7 +290,7 @@ public class AsyncRawPasskeysClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -264,6 +301,9 @@ public class AsyncRawPasskeysClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -274,23 +314,27 @@ public class AsyncRawPasskeysClient {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
             }
         });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
         return future;
     }
 
     /**
-     * Mints the challenge a browser needs to run a WebAuthn ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session.
+     * Mints the challenge and WebAuthn options a browser needs to run a ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. The options are in wire snake_case: convert the keys to camelCase before passing them to the browser. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session. A <code>registration</code> challenge also requires step-up verification, so the user completes it before the browser ceremony.
      */
-    public CompletableFuture<WhopApiHttpResponse<ChallengePasskeysResponse>> challenge(
-            ChallengePasskeysRequest request) {
+    public CompletableFuture<WhopApiHttpResponse<PasskeyChallenge>> challenge(ChallengePasskeysRequest request) {
         return challenge(request, null);
     }
 
     /**
-     * Mints the challenge a browser needs to run a WebAuthn ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session.
+     * Mints the challenge and WebAuthn options a browser needs to run a ceremony against the authenticated user's own passkeys. A <code>registration</code> challenge enrolls a new passkey; a <code>deletion</code> challenge is bound to the one passkey named by <code>passkey_id</code> and proves the user still holds it. The options are in wire snake_case: convert the keys to camelCase before passing them to the browser. Challenges are single-use and expire 5 minutes after they are issued, so send a fresh <code>Idempotency-Key</code> per ceremony — a replayed key returns the original challenge, which may already have expired. Requires a user session. A <code>registration</code> challenge also requires step-up verification, so the user completes it before the browser ceremony.
      */
-    public CompletableFuture<WhopApiHttpResponse<ChallengePasskeysResponse>> challenge(
+    public CompletableFuture<WhopApiHttpResponse<PasskeyChallenge>> challenge(
             ChallengePasskeysRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/passkeys/challenge");
         if (requestOptions != null) {
@@ -301,7 +345,9 @@ public class AsyncRawPasskeysClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -316,16 +362,25 @@ public class AsyncRawPasskeysClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
-        CompletableFuture<WhopApiHttpResponse<ChallengePasskeysResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<PasskeyChallenge>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
                     String responseBodyString = responseBody != null ? responseBody.string() : "{}";
                     if (response.isSuccessful()) {
                         future.complete(new WhopApiHttpResponse<>(
-                                ObjectMappers.JSON_MAPPER.readValue(
-                                        responseBodyString, ChallengePasskeysResponse.class),
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, PasskeyChallenge.class),
                                 response));
                         return;
                     }
@@ -353,7 +408,7 @@ public class AsyncRawPasskeysClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
                         }
@@ -364,6 +419,9 @@ public class AsyncRawPasskeysClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -372,6 +430,11 @@ public class AsyncRawPasskeysClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;
@@ -390,10 +453,10 @@ public class AsyncRawPasskeysClient {
      */
     public CompletableFuture<WhopApiHttpResponse<DeletePasskeysResponse>> delete(
             String id, DeletePasskeysRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("users/me/passkeys")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -402,7 +465,9 @@ public class AsyncRawPasskeysClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -417,8 +482,18 @@ public class AsyncRawPasskeysClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         CompletableFuture<WhopApiHttpResponse<DeletePasskeysResponse>> future = new CompletableFuture<>();
-        client.newCall(okhttpRequest).enqueue(new Callback() {
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try (ResponseBody responseBody = response.body()) {
@@ -459,6 +534,9 @@ public class AsyncRawPasskeysClient {
                     future.completeExceptionally(new WhopApiApiException(
                             "Error with status code " + response.code(), response.code(), errorBody, response));
                     return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
                     future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
                 }
@@ -467,6 +545,11 @@ public class AsyncRawPasskeysClient {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
             }
         });
         return future;

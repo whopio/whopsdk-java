@@ -323,7 +323,6 @@ public final class CreateCoursesRequest {
 
         private Optional<Boolean> certificateAfterCompletionEnabled = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -343,7 +342,6 @@ public final class CreateCoursesRequest {
 
         /**
          * <p>The unique identifier of the experience to create the course in (e.g., &quot;exp_XXXXX&quot;).</p>
-         * <p>The unique identifier of the experience to create the course in (e.g., &quot;exp_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -354,7 +352,6 @@ public final class CreateCoursesRequest {
         }
 
         /**
-         * <p>The display title of the course (e.g., &quot;Introduction to Web Development&quot;).</p>
          * <p>The display title of the course (e.g., &quot;Introduction to Web Development&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -593,6 +590,21 @@ public final class CreateCoursesRequest {
                     title,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("certificate_after_completion_enabled")
+                    || key.equalsIgnoreCase("experience_id")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("require_completing_lessons_in_order")
+                    || key.equalsIgnoreCase("tagline")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

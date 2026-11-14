@@ -7,29 +7,54 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveAccountsRequest.Builder.class)
 public final class RetrieveAccountsRequest {
+    private final Optional<Boolean> includeTrading;
+
     private final Map<String, Object> additionalProperties;
 
-    private RetrieveAccountsRequest(Map<String, Object> additionalProperties) {
+    private RetrieveAccountsRequest(Optional<Boolean> includeTrading, Map<String, Object> additionalProperties) {
+        this.includeTrading = includeTrading;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Also return the trading account under <code>trading</code>: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Requires crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet. Otherwise <code>trading</code> is <code>null</code>.
+     */
+    @JsonProperty("include_trading")
+    public Optional<Boolean> getIncludeTrading() {
+        return includeTrading;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof RetrieveAccountsRequest;
+        return other instanceof RetrieveAccountsRequest && equalTo((RetrieveAccountsRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(RetrieveAccountsRequest other) {
+        return includeTrading.equals(other.includeTrading);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.includeTrading);
     }
 
     @java.lang.Override
@@ -43,17 +68,41 @@ public final class RetrieveAccountsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        @JsonAnySetter
+        private Optional<Boolean> includeTrading = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveAccountsRequest other) {
+            includeTrading(other.getIncludeTrading());
+            return this;
+        }
+
+        /**
+         * <p>Also return the trading account under <code>trading</code>: its address, a snapshot of its margin and open positions, and its Hyperliquid WebSocket subscriptions. Requires crypto_wallet:trade:read, crypto_wallet:trade, or crypto_wallet:manage permission and an Ethereum wallet. Otherwise <code>trading</code> is <code>null</code>.</p>
+         */
+        @JsonSetter(value = "include_trading", nulls = Nulls.SKIP)
+        public Builder includeTrading(Optional<Boolean> includeTrading) {
+            this.includeTrading = includeTrading;
+            return this;
+        }
+
+        public Builder includeTrading(Boolean includeTrading) {
+            this.includeTrading = Optional.ofNullable(includeTrading);
             return this;
         }
 
         public RetrieveAccountsRequest build() {
-            return new RetrieveAccountsRequest(additionalProperties);
+            return new RetrieveAccountsRequest(includeTrading, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("include_trading")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

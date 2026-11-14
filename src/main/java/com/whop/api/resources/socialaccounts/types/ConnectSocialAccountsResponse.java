@@ -28,9 +28,6 @@ public final class ConnectSocialAccountsResponse {
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return The OAuth authorization URL to redirect the user to.
-     */
     @JsonProperty("authorize_url")
     public String getAuthorizeUrl() {
         return authorizeUrl;
@@ -66,9 +63,6 @@ public final class ConnectSocialAccountsResponse {
     }
 
     public interface AuthorizeUrlStage {
-        /**
-         * <p>The OAuth authorization URL to redirect the user to.</p>
-         */
         _FinalStage authorizeUrl(@NotNull String authorizeUrl);
 
         Builder from(ConnectSocialAccountsResponse other);
@@ -86,7 +80,6 @@ public final class ConnectSocialAccountsResponse {
     public static final class Builder implements AuthorizeUrlStage, _FinalStage {
         private String authorizeUrl;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -97,11 +90,6 @@ public final class ConnectSocialAccountsResponse {
             return this;
         }
 
-        /**
-         * <p>The OAuth authorization URL to redirect the user to.</p>
-         * <p>The OAuth authorization URL to redirect the user to.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("authorize_url")
         public _FinalStage authorizeUrl(@NotNull String authorizeUrl) {
@@ -112,6 +100,14 @@ public final class ConnectSocialAccountsResponse {
         @java.lang.Override
         public ConnectSocialAccountsResponse build() {
             return new ConnectSocialAccountsResponse(authorizeUrl, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("authorize_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

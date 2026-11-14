@@ -271,7 +271,6 @@ public final class ResolutionEvent {
 
         private List<ResolutionAttachment> attachments = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -291,7 +290,6 @@ public final class ResolutionEvent {
 
         /**
          * <p>The action recorded in this event.</p>
-         * <p>The action recorded in this event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -302,7 +300,6 @@ public final class ResolutionEvent {
         }
 
         /**
-         * <p>When the event occurred, as an ISO 8601 timestamp.</p>
          * <p>When the event occurred, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -315,7 +312,6 @@ public final class ResolutionEvent {
 
         /**
          * <p>Unique identifier for the event, prefixed <code>revt_</code>.</p>
-         * <p>Unique identifier for the event, prefixed <code>revt_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -326,7 +322,6 @@ public final class ResolutionEvent {
         }
 
         /**
-         * <p>The party that performed the action.</p>
          * <p>The party that performed the action.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -339,7 +334,6 @@ public final class ResolutionEvent {
 
         /**
          * <p>Whether the customer can see this event in the timeline.</p>
-         * <p>Whether the customer can see this event in the timeline.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -350,7 +344,6 @@ public final class ResolutionEvent {
         }
 
         /**
-         * <p>Whether the merchant can see this event in the timeline.</p>
          * <p>Whether the merchant can see this event in the timeline.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -433,6 +426,21 @@ public final class ResolutionEvent {
                     viewableByCustomer,
                     viewableByMerchant,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("action")
+                    || key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("details")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("reporter_type")
+                    || key.equalsIgnoreCase("viewable_by_customer")
+                    || key.equalsIgnoreCase("viewable_by_merchant")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

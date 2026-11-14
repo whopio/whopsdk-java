@@ -5,6 +5,7 @@ package com.whop.api.resources.forums;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.forums.requests.ListForumsRequest;
 import com.whop.api.resources.forums.requests.RetrieveForumsRequest;
@@ -31,18 +32,26 @@ public class AsyncForumsClient {
     }
 
     /**
-     * Returns a paginated list of forums within a specific company, with optional filtering by product.
+     * Returns a paginated list of forums for an account, with optional filtering by product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<ForumListItem>> list(ListForumsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ForumListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ForumListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of forums within a specific company, with optional filtering by product.
+     * Returns a paginated list of forums for an account, with optional filtering by product.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>forum:read</code></li>
@@ -50,7 +59,15 @@ public class AsyncForumsClient {
      */
     public CompletableFuture<SyncPagingIterable<ForumListItem>> list(
             ListForumsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ForumListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ForumListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -61,7 +78,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -72,7 +96,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -83,7 +114,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> retrieve(String id, RetrieveForumsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -94,7 +132,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> retrieve(String id, RetrieveForumsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -105,7 +150,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -116,7 +168,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -127,7 +186,14 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> update(String id, UpdateForumsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -138,6 +204,13 @@ public class AsyncForumsClient {
      * </ul>
      */
     public CompletableFuture<Forum> update(String id, UpdateForumsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Forum>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Forum> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

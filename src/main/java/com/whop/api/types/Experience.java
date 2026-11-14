@@ -306,7 +306,6 @@ public final class Experience {
 
         private Optional<ExperienceImage> image = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -327,7 +326,6 @@ public final class Experience {
 
         /**
          * <p>The app that powers this experience, defining its interface and behavior.</p>
-         * <p>The app that powers this experience, defining its interface and behavior.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -338,7 +336,6 @@ public final class Experience {
         }
 
         /**
-         * <p>The company that owns this experience.</p>
          * <p>The company that owns this experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -351,7 +348,6 @@ public final class Experience {
 
         /**
          * <p>The datetime the experience was created.</p>
-         * <p>The datetime the experience was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -362,7 +358,6 @@ public final class Experience {
         }
 
         /**
-         * <p>The unique identifier for the experience.</p>
          * <p>The unique identifier for the experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -375,7 +370,6 @@ public final class Experience {
 
         /**
          * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
-         * <p>Whether this experience is publicly visible to all users, including those without a membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -386,7 +380,6 @@ public final class Experience {
         }
 
         /**
-         * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * <p>The display name of this experience shown to users in the product navigation. Maximum 255 characters.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -508,6 +501,22 @@ public final class Experience {
         public Experience build() {
             return new Experience(
                     app, company, createdAt, id, image, isPublic, name, order, products, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("app")
+                    || key.equalsIgnoreCase("company")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("image")
+                    || key.equalsIgnoreCase("is_public")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("products")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

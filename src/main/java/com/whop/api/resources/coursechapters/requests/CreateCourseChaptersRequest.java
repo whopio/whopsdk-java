@@ -123,7 +123,6 @@ public final class CreateCourseChaptersRequest {
 
         private Optional<String> title = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -136,7 +135,6 @@ public final class CreateCourseChaptersRequest {
         }
 
         /**
-         * <p>The unique identifier of the course to create the chapter in (e.g., &quot;course_XXXXX&quot;).</p>
          * <p>The unique identifier of the course to create the chapter in (e.g., &quot;course_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -186,6 +184,14 @@ public final class CreateCourseChaptersRequest {
         @java.lang.Override
         public CreateCourseChaptersRequest build() {
             return new CreateCourseChaptersRequest(courseId, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("course_id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

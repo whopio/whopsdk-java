@@ -9,11 +9,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -27,6 +30,10 @@ public final class CreatePasskeysRequest {
 
     private final String nickname;
 
+    private final Optional<List<String>> transports;
+
+    private final String userHandle;
+
     private final Map<String, Object> additionalProperties;
 
     private CreatePasskeysRequest(
@@ -34,11 +41,15 @@ public final class CreatePasskeysRequest {
             String clientDataJson,
             String credentialId,
             String nickname,
+            Optional<List<String>> transports,
+            String userHandle,
             Map<String, Object> additionalProperties) {
         this.attestationObject = attestationObject;
         this.clientDataJson = clientDataJson;
         this.credentialId = credentialId;
         this.nickname = nickname;
+        this.transports = transports;
+        this.userHandle = userHandle;
         this.additionalProperties = additionalProperties;
     }
 
@@ -74,6 +85,22 @@ public final class CreatePasskeysRequest {
         return nickname;
     }
 
+    /**
+     * @return The <code>getTransports()</code> result from the registration response. Values Whop does not recognize are dropped.
+     */
+    @JsonProperty("transports")
+    public Optional<List<String>> getTransports() {
+        return transports;
+    }
+
+    /**
+     * @return The <code>creation_options.user.id</code> the passkey was created with. Must match the challenge's options.
+     */
+    @JsonProperty("user_handle")
+    public String getUserHandle() {
+        return userHandle;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -89,12 +116,20 @@ public final class CreatePasskeysRequest {
         return attestationObject.equals(other.attestationObject)
                 && clientDataJson.equals(other.clientDataJson)
                 && credentialId.equals(other.credentialId)
-                && nickname.equals(other.nickname);
+                && nickname.equals(other.nickname)
+                && transports.equals(other.transports)
+                && userHandle.equals(other.userHandle);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.attestationObject, this.clientDataJson, this.credentialId, this.nickname);
+        return Objects.hash(
+                this.attestationObject,
+                this.clientDataJson,
+                this.credentialId,
+                this.nickname,
+                this.transports,
+                this.userHandle);
     }
 
     @java.lang.Override
@@ -133,7 +168,14 @@ public final class CreatePasskeysRequest {
         /**
          * <p>A name for this passkey, usually the device it lives on. 255 characters or fewer.</p>
          */
-        _FinalStage nickname(@NotNull String nickname);
+        UserHandleStage nickname(@NotNull String nickname);
+    }
+
+    public interface UserHandleStage {
+        /**
+         * <p>The <code>creation_options.user.id</code> the passkey was created with. Must match the challenge's options.</p>
+         */
+        _FinalStage userHandle(@NotNull String userHandle);
     }
 
     public interface _FinalStage {
@@ -142,11 +184,23 @@ public final class CreatePasskeysRequest {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The <code>getTransports()</code> result from the registration response. Values Whop does not recognize are dropped.</p>
+         */
+        _FinalStage transports(Optional<List<String>> transports);
+
+        _FinalStage transports(List<String> transports);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AttestationObjectStage, ClientDataJsonStage, CredentialIdStage, NicknameStage, _FinalStage {
+            implements AttestationObjectStage,
+                    ClientDataJsonStage,
+                    CredentialIdStage,
+                    NicknameStage,
+                    UserHandleStage,
+                    _FinalStage {
         private String attestationObject;
 
         private String clientDataJson;
@@ -155,7 +209,10 @@ public final class CreatePasskeysRequest {
 
         private String nickname;
 
-        @JsonAnySetter
+        private String userHandle;
+
+        private Optional<List<String>> transports = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -166,11 +223,12 @@ public final class CreatePasskeysRequest {
             clientDataJson(other.getClientDataJson());
             credentialId(other.getCredentialId());
             nickname(other.getNickname());
+            transports(other.getTransports());
+            userHandle(other.getUserHandle());
             return this;
         }
 
         /**
-         * <p>The <code>attestationObject</code> from the WebAuthn attestation response, base64url-encoded.</p>
          * <p>The <code>attestationObject</code> from the WebAuthn attestation response, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -183,7 +241,6 @@ public final class CreatePasskeysRequest {
 
         /**
          * <p>The <code>clientDataJSON</code> from the WebAuthn attestation response, base64url-encoded.</p>
-         * <p>The <code>clientDataJSON</code> from the WebAuthn attestation response, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -194,7 +251,6 @@ public final class CreatePasskeysRequest {
         }
 
         /**
-         * <p>The WebAuthn credential ID the authenticator returned, base64url-encoded.</p>
          * <p>The WebAuthn credential ID the authenticator returned, base64url-encoded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -207,20 +263,69 @@ public final class CreatePasskeysRequest {
 
         /**
          * <p>A name for this passkey, usually the device it lives on. 255 characters or fewer.</p>
-         * <p>A name for this passkey, usually the device it lives on. 255 characters or fewer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("nickname")
-        public _FinalStage nickname(@NotNull String nickname) {
+        public UserHandleStage nickname(@NotNull String nickname) {
             this.nickname = Objects.requireNonNull(nickname, "nickname must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The <code>creation_options.user.id</code> the passkey was created with. Must match the challenge's options.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("user_handle")
+        public _FinalStage userHandle(@NotNull String userHandle) {
+            this.userHandle = Objects.requireNonNull(userHandle, "userHandle must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The <code>getTransports()</code> result from the registration response. Values Whop does not recognize are dropped.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage transports(List<String> transports) {
+            this.transports = Optional.ofNullable(transports);
+            return this;
+        }
+
+        /**
+         * <p>The <code>getTransports()</code> result from the registration response. Values Whop does not recognize are dropped.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "transports", nulls = Nulls.SKIP)
+        public _FinalStage transports(Optional<List<String>> transports) {
+            this.transports = transports;
             return this;
         }
 
         @java.lang.Override
         public CreatePasskeysRequest build() {
             return new CreatePasskeysRequest(
-                    attestationObject, clientDataJson, credentialId, nickname, additionalProperties);
+                    attestationObject,
+                    clientDataJson,
+                    credentialId,
+                    nickname,
+                    transports,
+                    userHandle,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attestation_object")
+                    || key.equalsIgnoreCase("client_data_json")
+                    || key.equalsIgnoreCase("credential_id")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("transports")
+                    || key.equalsIgnoreCase("user_handle")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

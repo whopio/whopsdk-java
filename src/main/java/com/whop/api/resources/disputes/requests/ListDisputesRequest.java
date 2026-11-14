@@ -47,6 +47,10 @@ public final class ListDisputesRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<String> query;
+
+    private final Optional<Boolean> includeSubaccounts;
+
     private final Map<String, Object> additionalProperties;
 
     private ListDisputesRequest(
@@ -61,6 +65,8 @@ public final class ListDisputesRequest {
             Optional<String> currency,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<String> query,
+            Optional<Boolean> includeSubaccounts,
             Map<String, Object> additionalProperties) {
         this.status = status;
         this.accountId = accountId;
@@ -73,11 +79,13 @@ public final class ListDisputesRequest {
         this.currency = currency;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.query = query;
+        this.includeSubaccounts = includeSubaccounts;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Covers both chargebacks and inquiries at each stage. A <code>needs_response</code> dispute whose evidence deadline has passed reports and filters as <code>under_review</code> instead.
+     * @return Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Inquiries match only the <code>warning_</code> statuses. A <code>needs_response</code> dispute whose evidence deadline has passed reports and filters as <code>under_review</code> instead.
      */
     @JsonProperty("status")
     public Optional<List<ListDisputesRequestStatusItem>> getStatus() {
@@ -93,7 +101,7 @@ public final class ListDisputesRequest {
     }
 
     /**
-     * @return The number of disputes to return (default 20, max 100).
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -101,7 +109,7 @@ public final class ListDisputesRequest {
     }
 
     /**
-     * @return A cursor; returns disputes after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -109,7 +117,7 @@ public final class ListDisputesRequest {
     }
 
     /**
-     * @return The number of disputes to return from the end of the range.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -117,7 +125,7 @@ public final class ListDisputesRequest {
     }
 
     /**
-     * @return A cursor; returns disputes before this position.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -164,6 +172,22 @@ public final class ListDisputesRequest {
         return createdAfter;
     }
 
+    /**
+     * @return Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
+    /**
+     * @return Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a <code>query</code> to narrow it. With <code>query</code>, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.
+     */
+    @JsonProperty("include_subaccounts")
+    public Optional<Boolean> getIncludeSubaccounts() {
+        return includeSubaccounts;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -186,7 +210,9 @@ public final class ListDisputesRequest {
                 && direction.equals(other.direction)
                 && currency.equals(other.currency)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && query.equals(other.query)
+                && includeSubaccounts.equals(other.includeSubaccounts);
     }
 
     @java.lang.Override
@@ -202,7 +228,9 @@ public final class ListDisputesRequest {
                 this.direction,
                 this.currency,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.query,
+                this.includeSubaccounts);
     }
 
     @java.lang.Override
@@ -238,7 +266,10 @@ public final class ListDisputesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> query = Optional.empty();
+
+        private Optional<Boolean> includeSubaccounts = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -255,11 +286,13 @@ public final class ListDisputesRequest {
             currency(other.getCurrency());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            query(other.getQuery());
+            includeSubaccounts(other.getIncludeSubaccounts());
             return this;
         }
 
         /**
-         * <p>Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Covers both chargebacks and inquiries at each stage. A <code>needs_response</code> dispute whose evidence deadline has passed reports and filters as <code>under_review</code> instead.</p>
+         * <p>Only disputes in these statuses. Repeat the parameter to pass several — one paginated list covers all of them. Inquiries match only the <code>warning_</code> statuses. A <code>needs_response</code> dispute whose evidence deadline has passed reports and filters as <code>under_review</code> instead.</p>
          */
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
         public Builder status(Optional<List<ListDisputesRequestStatusItem>> status) {
@@ -292,7 +325,7 @@ public final class ListDisputesRequest {
         }
 
         /**
-         * <p>The number of disputes to return (default 20, max 100).</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -306,7 +339,7 @@ public final class ListDisputesRequest {
         }
 
         /**
-         * <p>A cursor; returns disputes after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -320,7 +353,7 @@ public final class ListDisputesRequest {
         }
 
         /**
-         * <p>The number of disputes to return from the end of the range.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -334,7 +367,7 @@ public final class ListDisputesRequest {
         }
 
         /**
-         * <p>A cursor; returns disputes before this position.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -417,6 +450,34 @@ public final class ListDisputesRequest {
             return this;
         }
 
+        /**
+         * <p>Search disputes by dispute ID, payment ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
+        /**
+         * <p>Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, covers the disputes of the account and every subaccount, in any order. The listing is cut off after 10 seconds; add a <code>query</code> to narrow it. With <code>query</code>, matches on dispute, payment, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' disputes are returned only for subaccounts you can read disputes on.</p>
+         */
+        @JsonSetter(value = "include_subaccounts", nulls = Nulls.SKIP)
+        public Builder includeSubaccounts(Optional<Boolean> includeSubaccounts) {
+            this.includeSubaccounts = includeSubaccounts;
+            return this;
+        }
+
+        public Builder includeSubaccounts(Boolean includeSubaccounts) {
+            this.includeSubaccounts = Optional.ofNullable(includeSubaccounts);
+            return this;
+        }
+
         public ListDisputesRequest build() {
             return new ListDisputesRequest(
                     status,
@@ -430,7 +491,29 @@ public final class ListDisputesRequest {
                     currency,
                     createdBefore,
                     createdAfter,
+                    query,
+                    includeSubaccounts,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("include_subaccounts")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

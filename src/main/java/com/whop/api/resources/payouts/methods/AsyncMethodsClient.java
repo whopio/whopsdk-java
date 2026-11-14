@@ -5,6 +5,7 @@ package com.whop.api.resources.payouts.methods;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.payouts.methods.requests.CreateMethodsRequest;
 import com.whop.api.resources.payouts.methods.requests.DeleteMethodsRequest;
@@ -34,68 +35,141 @@ public class AsyncMethodsClient {
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> list(ListMethodsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists the bank accounts, wallets, and crypto addresses an account or user can withdraw to, newest first.
+     * Lists the bank accounts, wallets, and crypto addresses an account or user can pay out to, newest first.
      */
     public CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> list(
             ListMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListMethodsResponseDataItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListMethodsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CompletableFuture<CreateMethodsResponse> create(CreateMethodsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateMethodsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Saves a new place an account or user can withdraw to. Sensitive details are vaulted in transit and never stored raw.
+     * Saves a bank account, wallet, or crypto address an account or user can pay out to, from a method listed by <code>GET /payouts/supported_methods</code>. Sensitive details are vaulted in transit and never stored raw.
      */
     public CompletableFuture<CreateMethodsResponse> create(
             CreateMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateMethodsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a saved payout method so it can no longer receive payouts.
      */
     public CompletableFuture<DeleteMethodsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a saved payout method so it can no longer receive payouts.
      */
     public CompletableFuture<DeleteMethodsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a saved payout method so it can no longer receive payouts.
      */
     public CompletableFuture<DeleteMethodsResponse> delete(String id, DeleteMethodsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -103,21 +177,73 @@ public class AsyncMethodsClient {
      */
     public CompletableFuture<DeleteMethodsResponse> delete(
             String id, DeleteMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteMethodsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public CompletableFuture<UpdateMethodsResponse> update(String id) {
+        CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<UpdateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
+     */
+    public CompletableFuture<UpdateMethodsResponse> update(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> rawFuture =
+                this.rawClient.update(id, requestOptions);
+        CompletableFuture<UpdateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public CompletableFuture<UpdateMethodsResponse> update(String id, UpdateMethodsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<UpdateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Changes the label used to identify a saved payout method.
+     * Changes the label used to identify a saved payout method, makes it the account's default payout method, or updates the payout address on file for it. Send <code>address</code> on its own: it cannot be combined with <code>nickname</code> or <code>is_default</code>. Address updates require the <code>payout:account:update</code> scope as well, on the same account, and are supported only for bank and wallet payout methods, not recipient payout methods.
      */
     public CompletableFuture<UpdateMethodsResponse> update(
             String id, UpdateMethodsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<UpdateMethodsResponse>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<UpdateMethodsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

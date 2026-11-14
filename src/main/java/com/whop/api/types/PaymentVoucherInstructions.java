@@ -86,7 +86,6 @@ public final class PaymentVoucherInstructions {
     public static final class Builder implements VoucherStage, _FinalStage {
         private PaymentVoucher voucher;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -98,7 +97,6 @@ public final class PaymentVoucherInstructions {
         }
 
         /**
-         * <p>The voucher to show.</p>
          * <p>The voucher to show.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -112,6 +110,14 @@ public final class PaymentVoucherInstructions {
         @java.lang.Override
         public PaymentVoucherInstructions build() {
             return new PaymentVoucherInstructions(voucher, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("voucher")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -21,6 +21,9 @@ public final class PaymentStatusStatus {
     public static final PaymentStatusStatus REQUIRES_ACTION =
             new PaymentStatusStatus(Value.REQUIRES_ACTION, "requires_action");
 
+    public static final PaymentStatusStatus REQUIRES_CAPTURE =
+            new PaymentStatusStatus(Value.REQUIRES_CAPTURE, "requires_capture");
+
     private final Value value;
 
     private final String string;
@@ -65,6 +68,8 @@ public final class PaymentStatusStatus {
                 return visitor.visitRequiresConfirmation();
             case REQUIRES_ACTION:
                 return visitor.visitRequiresAction();
+            case REQUIRES_CAPTURE:
+                return visitor.visitRequiresCapture();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -86,6 +91,8 @@ public final class PaymentStatusStatus {
                 return REQUIRES_CONFIRMATION;
             case "requires_action":
                 return REQUIRES_ACTION;
+            case "requires_capture":
+                return REQUIRES_CAPTURE;
             default:
                 return new PaymentStatusStatus(Value.UNKNOWN, value);
         }
@@ -95,6 +102,8 @@ public final class PaymentStatusStatus {
         REQUIRES_CONFIRMATION,
 
         REQUIRES_ACTION,
+
+        REQUIRES_CAPTURE,
 
         CONFIRMING,
 
@@ -111,6 +120,8 @@ public final class PaymentStatusStatus {
         T visitRequiresConfirmation();
 
         T visitRequiresAction();
+
+        T visitRequiresCapture();
 
         T visitConfirming();
 

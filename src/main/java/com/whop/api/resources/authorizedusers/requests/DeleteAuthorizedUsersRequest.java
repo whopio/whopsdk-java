@@ -20,21 +20,21 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = DeleteAuthorizedUsersRequest.Builder.class)
 public final class DeleteAuthorizedUsersRequest {
-    private final Optional<String> companyId;
+    private final Optional<String> accountId;
 
     private final Map<String, Object> additionalProperties;
 
-    private DeleteAuthorizedUsersRequest(Optional<String> companyId, Map<String, Object> additionalProperties) {
-        this.companyId = companyId;
+    private DeleteAuthorizedUsersRequest(Optional<String> accountId, Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.additionalProperties = additionalProperties;
     }
 
     /**
      * @return The ID of the company the authorized user belongs to. Optional if the authorized user ID is provided.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     @java.lang.Override
@@ -49,12 +49,12 @@ public final class DeleteAuthorizedUsersRequest {
     }
 
     private boolean equalTo(DeleteAuthorizedUsersRequest other) {
-        return companyId.equals(other.companyId);
+        return accountId.equals(other.accountId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.companyId);
+        return Objects.hash(this.accountId);
     }
 
     @java.lang.Override
@@ -68,34 +68,41 @@ public final class DeleteAuthorizedUsersRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private Optional<String> companyId = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(DeleteAuthorizedUsersRequest other) {
-            companyId(other.getCompanyId());
+            accountId(other.getAccountId());
             return this;
         }
 
         /**
          * <p>The ID of the company the authorized user belongs to. Optional if the authorized user ID is provided.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         public DeleteAuthorizedUsersRequest build() {
-            return new DeleteAuthorizedUsersRequest(companyId, additionalProperties);
+            return new DeleteAuthorizedUsersRequest(accountId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -25,9 +25,9 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateExperiencesRequest.Builder.class)
 public final class CreateExperiencesRequest {
-    private final String appId;
+    private final String accountId;
 
-    private final String companyId;
+    private final String appId;
 
     private final Optional<Boolean> isPublic;
 
@@ -42,16 +42,16 @@ public final class CreateExperiencesRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateExperiencesRequest(
+            String accountId,
             String appId,
-            String companyId,
             Optional<Boolean> isPublic,
             Optional<CreateExperiencesRequestLogo> logo,
             Optional<String> name,
             Optional<Boolean> notificationsEnabled,
             Optional<String> sectionId,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.appId = appId;
-        this.companyId = companyId;
         this.isPublic = isPublic;
         this.logo = logo;
         this.name = name;
@@ -61,19 +61,19 @@ public final class CreateExperiencesRequest {
     }
 
     /**
+     * @return The unique identifier of the company to create this experience for.
+     */
+    @JsonProperty("account_id")
+    public String getAccountId() {
+        return accountId;
+    }
+
+    /**
      * @return The unique identifier of the app that powers this experience.
      */
     @JsonProperty("app_id")
     public String getAppId() {
         return appId;
-    }
-
-    /**
-     * @return The unique identifier of the company to create this experience for.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
     }
 
     /**
@@ -173,8 +173,8 @@ public final class CreateExperiencesRequest {
     }
 
     private boolean equalTo(CreateExperiencesRequest other) {
-        return appId.equals(other.appId)
-                && companyId.equals(other.companyId)
+        return accountId.equals(other.accountId)
+                && appId.equals(other.appId)
                 && isPublic.equals(other.isPublic)
                 && logo.equals(other.logo)
                 && name.equals(other.name)
@@ -185,8 +185,8 @@ public final class CreateExperiencesRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.appId,
-                this.companyId,
                 this.isPublic,
                 this.logo,
                 this.name,
@@ -199,24 +199,24 @@ public final class CreateExperiencesRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static AppIdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
+    }
+
+    public interface AccountIdStage {
+        /**
+         * <p>The unique identifier of the company to create this experience for.</p>
+         */
+        AppIdStage accountId(@NotNull String accountId);
+
+        Builder from(CreateExperiencesRequest other);
     }
 
     public interface AppIdStage {
         /**
          * <p>The unique identifier of the app that powers this experience.</p>
          */
-        CompanyIdStage appId(@NotNull String appId);
-
-        Builder from(CreateExperiencesRequest other);
-    }
-
-    public interface CompanyIdStage {
-        /**
-         * <p>The unique identifier of the company to create this experience for.</p>
-         */
-        _FinalStage companyId(@NotNull String companyId);
+        _FinalStage appId(@NotNull String appId);
     }
 
     public interface _FinalStage {
@@ -273,10 +273,10 @@ public final class CreateExperiencesRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AppIdStage, CompanyIdStage, _FinalStage {
-        private String appId;
+    public static final class Builder implements AccountIdStage, AppIdStage, _FinalStage {
+        private String accountId;
 
-        private String companyId;
+        private String appId;
 
         private Optional<String> sectionId = Optional.empty();
 
@@ -288,15 +288,14 @@ public final class CreateExperiencesRequest {
 
         private Optional<Boolean> isPublic = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateExperiencesRequest other) {
+            accountId(other.getAccountId());
             appId(other.getAppId());
-            companyId(other.getCompanyId());
             isPublic(other.getIsPublic());
             logo(other.getLogo());
             name(other.getName());
@@ -306,26 +305,24 @@ public final class CreateExperiencesRequest {
         }
 
         /**
-         * <p>The unique identifier of the app that powers this experience.</p>
+         * <p>The unique identifier of the company to create this experience for.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account_id")
+        public AppIdStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
          * <p>The unique identifier of the app that powers this experience.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("app_id")
-        public CompanyIdStage appId(@NotNull String appId) {
+        public _FinalStage appId(@NotNull String appId) {
             this.appId = Objects.requireNonNull(appId, "appId must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The unique identifier of the company to create this experience for.</p>
-         * <p>The unique identifier of the company to create this experience for.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
             return this;
         }
 
@@ -512,7 +509,21 @@ public final class CreateExperiencesRequest {
         @java.lang.Override
         public CreateExperiencesRequest build() {
             return new CreateExperiencesRequest(
-                    appId, companyId, isPublic, logo, name, notificationsEnabled, sectionId, additionalProperties);
+                    accountId, appId, isPublic, logo, name, notificationsEnabled, sectionId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("is_public")
+                    || key.equalsIgnoreCase("logo")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("notifications_enabled")
+                    || key.equalsIgnoreCase("section_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

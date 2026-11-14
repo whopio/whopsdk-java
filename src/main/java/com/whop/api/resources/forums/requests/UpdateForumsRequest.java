@@ -190,7 +190,6 @@ public final class UpdateForumsRequest {
 
         private Optional<ForumWhoCanPostTypes> whoCanPost = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -339,6 +338,18 @@ public final class UpdateForumsRequest {
                     whoCanComment,
                     whoCanPost,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("banned_words")
+                    || key.equalsIgnoreCase("banner_image")
+                    || key.equalsIgnoreCase("email_notification_preference")
+                    || key.equalsIgnoreCase("who_can_comment")
+                    || key.equalsIgnoreCase("who_can_post")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

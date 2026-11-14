@@ -109,7 +109,6 @@ public final class PaymentNextActionDisplayInstructions {
 
         private List<PaymentNextActionDisplayInstructionsRenderItem> render = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class PaymentNextActionDisplayInstructions {
         }
 
         /**
-         * <p>The instructions. <code>kind</code> picks the shape, and the details sit under the key named for it: <code>voucher</code>, <code>qr</code>, or <code>bank_transfer</code>.</p>
          * <p>The instructions. <code>kind</code> picks the shape, and the details sit under the key named for it: <code>voucher</code>, <code>qr</code>, or <code>bank_transfer</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -160,6 +158,14 @@ public final class PaymentNextActionDisplayInstructions {
         @java.lang.Override
         public PaymentNextActionDisplayInstructions build() {
             return new PaymentNextActionDisplayInstructions(data, render, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("render")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

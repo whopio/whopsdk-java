@@ -45,8 +45,6 @@ public final class CreatePromoCodesRequest {
 
     private final Optional<Boolean> onePerCustomer;
 
-    private final Optional<List<String>> planIds;
-
     private final Optional<String> productId;
 
     private final int promoDurationMonths;
@@ -56,6 +54,8 @@ public final class CreatePromoCodesRequest {
     private final Optional<Integer> stock;
 
     private final Optional<Boolean> unlimitedStock;
+
+    private final Optional<List<String>> variantIds;
 
     private final Map<String, Object> additionalProperties;
 
@@ -69,12 +69,12 @@ public final class CreatePromoCodesRequest {
             Optional<String> expiresAt,
             boolean newUsersOnly,
             Optional<Boolean> onePerCustomer,
-            Optional<List<String>> planIds,
             Optional<String> productId,
             int promoDurationMonths,
             CreatePromoCodesRequestPromoType promoType,
             Optional<Integer> stock,
             Optional<Boolean> unlimitedStock,
+            Optional<List<String>> variantIds,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.amountOff = amountOff;
@@ -85,12 +85,12 @@ public final class CreatePromoCodesRequest {
         this.expiresAt = expiresAt;
         this.newUsersOnly = newUsersOnly;
         this.onePerCustomer = onePerCustomer;
-        this.planIds = planIds;
         this.productId = productId;
         this.promoDurationMonths = promoDurationMonths;
         this.promoType = promoType;
         this.stock = stock;
         this.unlimitedStock = unlimitedStock;
+        this.variantIds = variantIds;
         this.additionalProperties = additionalProperties;
     }
 
@@ -142,11 +142,6 @@ public final class CreatePromoCodesRequest {
         return onePerCustomer;
     }
 
-    @JsonProperty("plan_ids")
-    public Optional<List<String>> getPlanIds() {
-        return planIds;
-    }
-
     @JsonIgnore
     public Optional<String> getProductId() {
         if (productId == null) {
@@ -176,6 +171,11 @@ public final class CreatePromoCodesRequest {
     @JsonProperty("unlimited_stock")
     public Optional<Boolean> getUnlimitedStock() {
         return unlimitedStock;
+    }
+
+    @JsonProperty("variant_ids")
+    public Optional<List<String>> getVariantIds() {
+        return variantIds;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -217,12 +217,12 @@ public final class CreatePromoCodesRequest {
                 && expiresAt.equals(other.expiresAt)
                 && newUsersOnly == other.newUsersOnly
                 && onePerCustomer.equals(other.onePerCustomer)
-                && planIds.equals(other.planIds)
                 && productId.equals(other.productId)
                 && promoDurationMonths == other.promoDurationMonths
                 && promoType.equals(other.promoType)
                 && stock.equals(other.stock)
-                && unlimitedStock.equals(other.unlimitedStock);
+                && unlimitedStock.equals(other.unlimitedStock)
+                && variantIds.equals(other.variantIds);
     }
 
     @java.lang.Override
@@ -237,12 +237,12 @@ public final class CreatePromoCodesRequest {
                 this.expiresAt,
                 this.newUsersOnly,
                 this.onePerCustomer,
-                this.planIds,
                 this.productId,
                 this.promoDurationMonths,
                 this.promoType,
                 this.stock,
-                this.unlimitedStock);
+                this.unlimitedStock,
+                this.variantIds);
     }
 
     @java.lang.Override
@@ -309,10 +309,6 @@ public final class CreatePromoCodesRequest {
 
         _FinalStage onePerCustomer(Boolean onePerCustomer);
 
-        _FinalStage planIds(Optional<List<String>> planIds);
-
-        _FinalStage planIds(List<String> planIds);
-
         _FinalStage productId(Optional<String> productId);
 
         _FinalStage productId(String productId);
@@ -328,6 +324,10 @@ public final class CreatePromoCodesRequest {
         _FinalStage unlimitedStock(Optional<Boolean> unlimitedStock);
 
         _FinalStage unlimitedStock(Boolean unlimitedStock);
+
+        _FinalStage variantIds(Optional<List<String>> variantIds);
+
+        _FinalStage variantIds(List<String> variantIds);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -354,13 +354,13 @@ public final class CreatePromoCodesRequest {
 
         private CreatePromoCodesRequestPromoType promoType;
 
+        private Optional<List<String>> variantIds = Optional.empty();
+
         private Optional<Boolean> unlimitedStock = Optional.empty();
 
         private Optional<Integer> stock = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
-
-        private Optional<List<String>> planIds = Optional.empty();
 
         private Optional<Boolean> onePerCustomer = Optional.empty();
 
@@ -370,7 +370,6 @@ public final class CreatePromoCodesRequest {
 
         private Optional<Boolean> churnedUsersOnly = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -386,12 +385,12 @@ public final class CreatePromoCodesRequest {
             expiresAt(other.getExpiresAt());
             newUsersOnly(other.getNewUsersOnly());
             onePerCustomer(other.getOnePerCustomer());
-            planIds(other.getPlanIds());
             productId(other.getProductId());
             promoDurationMonths(other.getPromoDurationMonths());
             promoType(other.getPromoType());
             stock(other.getStock());
             unlimitedStock(other.getUnlimitedStock());
+            variantIds(other.getVariantIds());
             return this;
         }
 
@@ -441,6 +440,19 @@ public final class CreatePromoCodesRequest {
         @JsonSetter("promo_type")
         public _FinalStage promoType(@NotNull CreatePromoCodesRequestPromoType promoType) {
             this.promoType = Objects.requireNonNull(promoType, "promoType must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage variantIds(List<String> variantIds) {
+            this.variantIds = Optional.ofNullable(variantIds);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "variant_ids", nulls = Nulls.SKIP)
+        public _FinalStage variantIds(Optional<List<String>> variantIds) {
+            this.variantIds = variantIds;
             return this;
         }
 
@@ -504,19 +516,6 @@ public final class CreatePromoCodesRequest {
         @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
         public _FinalStage productId(Optional<String> productId) {
             this.productId = productId;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage planIds(List<String> planIds) {
-            this.planIds = Optional.ofNullable(planIds);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "plan_ids", nulls = Nulls.SKIP)
-        public _FinalStage planIds(Optional<List<String>> planIds) {
-            this.planIds = planIds;
             return this;
         }
 
@@ -596,13 +595,35 @@ public final class CreatePromoCodesRequest {
                     expiresAt,
                     newUsersOnly,
                     onePerCustomer,
-                    planIds,
                     productId,
                     promoDurationMonths,
                     promoType,
                     stock,
                     unlimitedStock,
+                    variantIds,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount_off")
+                    || key.equalsIgnoreCase("base_currency")
+                    || key.equalsIgnoreCase("churned_users_only")
+                    || key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("existing_memberships_only")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("new_users_only")
+                    || key.equalsIgnoreCase("one_per_customer")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("promo_duration_months")
+                    || key.equalsIgnoreCase("promo_type")
+                    || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("variant_ids")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

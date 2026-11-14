@@ -107,7 +107,6 @@ public final class IdentityProfileLinkedCompaniesItem {
 
         private String title;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class IdentityProfileLinkedCompaniesItem {
 
         /**
          * <p>The unique identifier for the company.</p>
-         * <p>The unique identifier for the company.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -132,7 +130,6 @@ public final class IdentityProfileLinkedCompaniesItem {
         }
 
         /**
-         * <p>The display name of the company shown to customers.</p>
          * <p>The display name of the company shown to customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -146,6 +143,14 @@ public final class IdentityProfileLinkedCompaniesItem {
         @java.lang.Override
         public IdentityProfileLinkedCompaniesItem build() {
             return new IdentityProfileLinkedCompaniesItem(id, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

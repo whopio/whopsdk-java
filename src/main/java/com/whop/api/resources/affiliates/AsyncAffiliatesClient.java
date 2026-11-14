@@ -6,6 +6,7 @@ package com.whop.api.resources.affiliates;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.affiliates.overrides.AsyncOverridesClient;
 import com.whop.api.resources.affiliates.requests.ArchiveAffiliatesRequest;
@@ -39,18 +40,27 @@ public class AsyncAffiliatesClient {
     }
 
     /**
-     * Returns a paginated list of affiliates for the actor in context, with optional filtering by status, search, and sorting.
+     * Lists the affiliates of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:basic:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AffiliateListItem>> list(ListAffiliatesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AffiliateListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AffiliateListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of affiliates for the actor in context, with optional filtering by status, search, and sorting.
+     * Lists the affiliates of an account.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:basic:read</code></li>
@@ -58,29 +68,52 @@ public class AsyncAffiliatesClient {
      */
     public CompletableFuture<SyncPagingIterable<AffiliateListItem>> list(
             ListAffiliatesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AffiliateListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AffiliateListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates or finds an affiliate for a company and user.
+     * Creates an affiliate for a user on an account. If the user is already an affiliate of the account, returns that affiliate, reactivating it if it was archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:create</code></li>
      * </ul>
      */
     public CompletableFuture<Affiliate> create(CreateAffiliatesRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates or finds an affiliate for a company and user.
+     * Creates an affiliate for a user on an account. If the user is already an affiliate of the account, returns that affiliate, reactivating it if it was archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:create</code></li>
      * </ul>
      */
     public CompletableFuture<Affiliate> create(CreateAffiliatesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -91,7 +124,14 @@ public class AsyncAffiliatesClient {
      * </ul>
      */
     public CompletableFuture<Affiliate> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -102,7 +142,14 @@ public class AsyncAffiliatesClient {
      * </ul>
      */
     public CompletableFuture<Affiliate> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -113,7 +160,14 @@ public class AsyncAffiliatesClient {
      * </ul>
      */
     public CompletableFuture<Affiliate> retrieve(String id, RetrieveAffiliatesRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -125,44 +179,73 @@ public class AsyncAffiliatesClient {
      */
     public CompletableFuture<Affiliate> retrieve(
             String id, RetrieveAffiliatesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Affiliate>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Affiliate> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> archive(String id) {
-        return this.rawClient.archive(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.archive(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> archive(String id, RequestOptions requestOptions) {
-        return this.rawClient.archive(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.archive(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> archive(String id, ArchiveAffiliatesRequest request) {
-        return this.rawClient.archive(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.archive(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Archives an existing Affiliate
+     * Archives an affiliate. The affiliate that handles Whop marketplace referrals cannot be archived.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -170,44 +253,72 @@ public class AsyncAffiliatesClient {
      */
     public CompletableFuture<Boolean> archive(
             String id, ArchiveAffiliatesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.archive(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.archive(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> unarchive(String id) {
-        return this.rawClient.unarchive(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.unarchive(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> unarchive(String id, RequestOptions requestOptions) {
-        return this.rawClient.unarchive(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.unarchive(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
      * </ul>
      */
     public CompletableFuture<Boolean> unarchive(String id, UnarchiveAffiliatesRequest request) {
-        return this.rawClient.unarchive(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.unarchive(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Unarchives an existing Affiliate
+     * Unarchives an archived affiliate.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>affiliate:update</code></li>
@@ -215,7 +326,15 @@ public class AsyncAffiliatesClient {
      */
     public CompletableFuture<Boolean> unarchive(
             String id, UnarchiveAffiliatesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.unarchive(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture =
+                this.rawClient.unarchive(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     public AsyncOverridesClient overrides() {

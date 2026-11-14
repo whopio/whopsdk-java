@@ -6,26 +6,15 @@ package com.whop.api.resources.stats;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
-import com.whop.api.errors.BadRequestError;
-import com.whop.api.errors.ForbiddenError;
-import com.whop.api.errors.InternalServerError;
-import com.whop.api.errors.NotFoundError;
-import com.whop.api.errors.TooManyRequestsError;
-import com.whop.api.errors.UnauthorizedError;
-import com.whop.api.errors.UnprocessableEntityError;
-import com.whop.api.resources.stats.requests.DescribeStatsRequest;
-import com.whop.api.resources.stats.requests.MetricStatsRequest;
-import com.whop.api.resources.stats.requests.RawStatsRequest;
 import com.whop.api.resources.stats.requests.RetrieveStatsRequest;
-import com.whop.api.resources.stats.types.DescribeStatsResponse;
 import com.whop.api.resources.stats.types.ListStatsResponse;
-import com.whop.api.resources.stats.types.MetricStatsResponse;
-import com.whop.api.resources.stats.types.RawStatsResponse;
 import com.whop.api.resources.stats.types.RetrieveStatsResponse;
 import java.io.IOException;
 import okhttp3.Headers;
@@ -43,17 +32,17 @@ public class RawStatsClient {
     }
 
     /**
-     * Lists every metric you can query, with its unit and the properties you can filter or break it down by.
+     * Deprecated. Lists every metric without saying which ones you can chart. List chartable metrics with <code>GET /stats/time_series</code>, and aggregates that are not bucketed over time with <code>GET /stats/reports</code>.
      */
     public WhopApiHttpResponse<ListStatsResponse> list() {
         return list(null);
     }
 
     /**
-     * Lists every metric you can query, with its unit and the properties you can filter or break it down by.
+     * Deprecated. Lists every metric without saying which ones you can chart. List chartable metrics with <code>GET /stats/time_series</code>, and aggregates that are not bucketed over time with <code>GET /stats/reports</code>.
      */
     public WhopApiHttpResponse<ListStatsResponse> list(RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("stats");
         if (requestOptions != null) {
@@ -71,6 +60,15 @@ public class RawStatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -78,375 +76,32 @@ public class RawStatsClient {
                 return new WhopApiHttpResponse<>(
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ListStatsResponse.class), response);
             }
-            try {
-                if (response.code() == 401) {
-                    throw new UnauthorizedError(
-                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<DescribeStatsResponse> describeStats() {
-        return describeStats(DescribeStatsRequest.builder().build());
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<DescribeStatsResponse> describeStats(RequestOptions requestOptions) {
-        return describeStats(DescribeStatsRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<DescribeStatsResponse> describeStats(DescribeStatsRequest request) {
-        return describeStats(request, null);
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<DescribeStatsResponse> describeStats(
-            DescribeStatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("stats/describe");
-        if (request.getResource().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "resource", request.getResource().get(), false);
-        }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
-        if (request.getUserId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "user_id", request.getUserId().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DescribeStatsResponse.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Query an aggregated metric. Returns data grouped by period with optional breakdowns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<MetricStatsResponse> metricStats(MetricStatsRequest request) {
-        return metricStats(request, null);
-    }
-
-    /**
-     * Query an aggregated metric. Returns data grouped by period with optional breakdowns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<MetricStatsResponse> metricStats(
-            MetricStatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("stats/metric");
-        QueryStringMapper.addQueryParameter(httpUrl, "resource", request.getResource(), false);
-        if (request.getGranularity().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "granularity", request.getGranularity().get(), false);
-        }
-        if (request.getFilters().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "filters", request.getFilters().get(), false);
-        }
-        if (request.getTimeZone().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "time_zone", request.getTimeZone().get(), false);
-        }
-        if (request.getFrom().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "from", request.getFrom().get(), false);
-        }
-        if (request.getTo().isPresent()) {
-            QueryStringMapper.addQueryParameter(httpUrl, "to", request.getTo().get(), false);
-        }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
-        if (request.getUserId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "user_id", request.getUserId().get(), false);
-        }
-        if (request.getBreakdowns().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "breakdowns", request.getBreakdowns().get(), true);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, MetricStatsResponse.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Query raw data from a resource. Returns paginated rows with all columns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<RawStatsResponse> rawStats(RawStatsRequest request) {
-        return rawStats(request, null);
-    }
-
-    /**
-     * Query raw data from a resource. Returns paginated rows with all columns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public WhopApiHttpResponse<RawStatsResponse> rawStats(RawStatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
-                .newBuilder()
-                .addPathSegments("stats/raw");
-        QueryStringMapper.addQueryParameter(httpUrl, "resource", request.getResource(), false);
-        if (request.getFrom().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "from", request.getFrom().get(), false);
-        }
-        if (request.getTo().isPresent()) {
-            QueryStringMapper.addQueryParameter(httpUrl, "to", request.getTo().get(), false);
-        }
-        if (request.getLimit().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "limit", request.getLimit().get(), false);
-        }
-        if (request.getCursor().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "cursor", request.getCursor().get(), false);
-        }
-        if (request.getSort().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "sort", request.getSort().get(), false);
-        }
-        if (request.getSortDirection().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "sort_direction", request.getSortDirection().get(), false);
-        }
-        if (request.getCompanyId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "company_id", request.getCompanyId().get(), false);
-        }
-        if (request.getUserId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "user_id", request.getUserId().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                return new WhopApiHttpResponse<>(
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, RawStatsResponse.class), response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 422:
-                        throw new UnprocessableEntityError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 500:
-                        throw new InternalServerError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Retrieves a metric as a time series of points for an account or user over a time range. The <code>market_prices</code> metric is public and requires no authentication.
+     * Deprecated compatibility endpoint. Retrieve a metric's time series with <code>GET /stats/time_series/{metric}</code> instead.
      */
     public WhopApiHttpResponse<RetrieveStatsResponse> retrieve(String metric, RetrieveStatsRequest request) {
         return retrieve(metric, request, null);
     }
 
     /**
-     * Retrieves a metric as a time series of points for an account or user over a time range. The <code>market_prices</code> metric is public and requires no authentication.
+     * Deprecated compatibility endpoint. Retrieve a metric's time series with <code>GET /stats/time_series/{metric}</code> instead.
      */
     public WhopApiHttpResponse<RetrieveStatsResponse> retrieve(
             String metric, RetrieveStatsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("stats")
-                .addPathSegment(metric);
+                .addPathSegment(PathSegments.validate(metric));
         if (request.getAccountId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "account_id", request.getAccountId().get(), false);
@@ -565,6 +220,183 @@ public class RawStatsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "event", request.getEvent().get(), false);
         }
+        if (request.getBusinessType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "business_type", request.getBusinessType().get(), false);
+        }
+        if (request.getIndustryType().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "industry_type", request.getIndustryType().get(), false);
+        }
+        if (request.getProductCategory().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_category", request.getProductCategory().get(), false);
+        }
+        if (request.getAccountCountry().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_country", request.getAccountCountry().get(), false);
+        }
+        if (request.getIssuer().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "issuer", request.getIssuer().get(), false);
+        }
+        if (request.getWebhookId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "webhook_id", request.getWebhookId().get(), false);
+        }
+        if (request.getConversionWindow().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "conversion_window", request.getConversionWindow().get(), false);
+        }
+        if (request.getMatureOnly().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "mature_only", request.getMatureOnly().get(), false);
+        }
+        if (request.getSteps().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "steps", request.getSteps().get(), false);
+        }
+        if (request.getCompareTo().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "compare_to", request.getCompareTo().get(), false);
+        }
+        if (request.getConfidenceLevel().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "confidence_level", request.getConfidenceLevel().get(), false);
+        }
+        if (request.getContactable().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "contactable", request.getContactable().get(), false);
+        }
+        if (request.getHasPurchased().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "has_purchased", request.getHasPurchased().get(), false);
+        }
+        if (request.getFirstSeenAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first_seen_after", request.getFirstSeenAfter().get(), false);
+        }
+        if (request.getFirstSeenBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first_seen_before", request.getFirstSeenBefore().get(), false);
+        }
+        if (request.getLastSeenAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last_seen_after", request.getLastSeenAfter().get(), false);
+        }
+        if (request.getLastSeenBefore().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "last_seen_before", request.getLastSeenBefore().get(), false);
+        }
+        if (request.getFirstSeenWithinDays().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "first_seen_within_days",
+                    request.getFirstSeenWithinDays().get(),
+                    false);
+        }
+        if (request.getLastSeenWithinDays().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "last_seen_within_days",
+                    request.getLastSeenWithinDays().get(),
+                    false);
+        }
+        if (request.getKnown().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "known", request.getKnown().get(), false);
+        }
+        if (request.getHasEmail().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "has_email", request.getHasEmail().get(), false);
+        }
+        if (request.getHasPhone().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "has_phone", request.getHasPhone().get(), false);
+        }
+        if (request.getLtvGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_gt", request.getLtvGt().get(), false);
+        }
+        if (request.getLtvGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_gte", request.getLtvGte().get(), false);
+        }
+        if (request.getLtvLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_lt", request.getLtvLt().get(), false);
+        }
+        if (request.getLtvLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "ltv_lte", request.getLtvLte().get(), false);
+        }
+        if (request.getAovGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_gt", request.getAovGt().get(), false);
+        }
+        if (request.getAovGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_gte", request.getAovGte().get(), false);
+        }
+        if (request.getAovLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_lt", request.getAovLt().get(), false);
+        }
+        if (request.getAovLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "aov_lte", request.getAovLte().get(), false);
+        }
+        if (request.getPurchaseCountGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_gt", request.getPurchaseCountGt().get(), false);
+        }
+        if (request.getPurchaseCountGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_gte", request.getPurchaseCountGte().get(), false);
+        }
+        if (request.getPurchaseCountLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_lt", request.getPurchaseCountLt().get(), false);
+        }
+        if (request.getPurchaseCountLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "purchase_count_lte", request.getPurchaseCountLte().get(), false);
+        }
+        if (request.getEventCountGt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_gt", request.getEventCountGt().get(), false);
+        }
+        if (request.getEventCountGte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_gte", request.getEventCountGte().get(), false);
+        }
+        if (request.getEventCountLt().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_lt", request.getEventCountLt().get(), false);
+        }
+        if (request.getEventCountLte().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "event_count_lte", request.getEventCountLte().get(), false);
+        }
+        if (request.getReferringAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "referring_account_id",
+                    request.getReferringAccountId().get(),
+                    false);
+        }
+        if (request.getTeamLeadId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "team_lead_id", request.getTeamLeadId().get(), false);
+        }
+        if (request.getActivity().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "activity", request.getActivity().get(), false);
+        }
+        if (request.getBreakdownLimit().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "breakdown_limit", request.getBreakdownLimit().get(), false);
+        }
         if (request.getAdCampaignIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "ad_campaign_ids", request.getAdCampaignIds().get(), true);
@@ -592,6 +424,15 @@ public class RawStatsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -599,27 +440,11 @@ public class RawStatsClient {
                 return new WhopApiHttpResponse<>(
                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, RetrieveStatsResponse.class), response);
             }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

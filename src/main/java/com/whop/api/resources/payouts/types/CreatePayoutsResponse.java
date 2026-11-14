@@ -28,6 +28,10 @@ import org.jetbrains.annotations.NotNull;
 public final class CreatePayoutsResponse {
     private final String amount;
 
+    private final boolean cancelable;
+
+    private final Optional<CreatePayoutsResponseConversion> conversion;
+
     private final OffsetDateTime createdAt;
 
     private final String currency;
@@ -68,6 +72,8 @@ public final class CreatePayoutsResponse {
 
     private final CreatePayoutsResponseSpeed speed;
 
+    private final Optional<String> statementDescriptor;
+
     private final CreatePayoutsResponseStatus status;
 
     private final String statusDetail;
@@ -78,6 +84,8 @@ public final class CreatePayoutsResponse {
 
     private CreatePayoutsResponse(
             String amount,
+            boolean cancelable,
+            Optional<CreatePayoutsResponseConversion> conversion,
             OffsetDateTime createdAt,
             String currency,
             Optional<String> destinationAmount,
@@ -98,11 +106,14 @@ public final class CreatePayoutsResponse {
             Optional<String> payoutRequestId,
             Optional<CreatePayoutsResponseSource> source,
             CreatePayoutsResponseSpeed speed,
+            Optional<String> statementDescriptor,
             CreatePayoutsResponseStatus status,
             String statusDetail,
             Optional<String> traceCode,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
+        this.cancelable = cancelable;
+        this.conversion = conversion;
         this.createdAt = createdAt;
         this.currency = currency;
         this.destinationAmount = destinationAmount;
@@ -123,6 +134,7 @@ public final class CreatePayoutsResponse {
         this.payoutRequestId = payoutRequestId;
         this.source = source;
         this.speed = speed;
+        this.statementDescriptor = statementDescriptor;
         this.status = status;
         this.statusDetail = statusDetail;
         this.traceCode = traceCode;
@@ -135,6 +147,25 @@ public final class CreatePayoutsResponse {
     @JsonProperty("amount")
     public String getAmount() {
         return amount;
+    }
+
+    /**
+     * @return Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended.
+     */
+    @JsonProperty("cancelable")
+    public boolean getCancelable() {
+        return cancelable;
+    }
+
+    /**
+     * @return How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.
+     */
+    @JsonIgnore
+    public Optional<CreatePayoutsResponseConversion> getConversion() {
+        if (conversion == null) {
+            return Optional.empty();
+        }
+        return conversion;
     }
 
     /**
@@ -165,7 +196,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return Currency the funds are delivered in, taken from the payout method. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.
+     * @return Currency the funds are delivered in, taken from the payout method. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.
      */
     @JsonIgnore
     public Optional<String> getDestinationCurrency() {
@@ -225,7 +256,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id.
+     * @return Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id. A payout paid from a card with <code>payment_method_id</code> answers under its card payment's <code>pay_</code> id until it is submitted.
      */
     @JsonProperty("id")
     public String getId() {
@@ -249,7 +280,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.
+     * @return The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.
      */
     @JsonProperty("net_amount")
     public String getNetAmount() {
@@ -295,7 +326,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return For a stablecoin payout, the id of the conversion request that funds it, prefixed <code>cofr_</code>; <code>null</code> on fiat payouts.
+     * @return The id of the conversion request that funds this payout, prefixed <code>cofr_</code>; <code>null</code> when the payout has none.
      */
     @JsonIgnore
     public Optional<String> getPayoutRequestId() {
@@ -306,7 +337,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.
+     * @return How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source.
      */
     @JsonIgnore
     public Optional<CreatePayoutsResponseSource> getSource() {
@@ -325,6 +356,17 @@ public final class CreatePayoutsResponse {
     }
 
     /**
+     * @return The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters.
+     */
+    @JsonIgnore
+    public Optional<String> getStatementDescriptor() {
+        if (statementDescriptor == null) {
+            return Optional.empty();
+        }
+        return statementDescriptor;
+    }
+
+    /**
      * @return Current payout status, in the same vocabulary as GET /payouts.
      */
     @JsonProperty("status")
@@ -333,7 +375,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.
+     * @return The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.
      */
     @JsonProperty("status_detail")
     public String getStatusDetail() {
@@ -341,7 +383,7 @@ public final class CreatePayoutsResponse {
     }
 
     /**
-     * @return ACH trace number the recipient's bank can use to locate this payout. Always <code>null</code> here — it is assigned when the payout is submitted to the bank, and appears on the payout in GET /payouts once it has been sent; payouts not sent over ACH never get one.
+     * @return Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. Always <code>null</code> here. It appears on the payout in GET /payouts once the reference is available, and stays <code>null</code> on payouts that have none.
      */
     @JsonIgnore
     public Optional<String> getTraceCode() {
@@ -349,6 +391,12 @@ public final class CreatePayoutsResponse {
             return Optional.empty();
         }
         return traceCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("conversion")
+    private Optional<CreatePayoutsResponseConversion> _getConversion() {
+        return conversion;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -412,6 +460,12 @@ public final class CreatePayoutsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("statement_descriptor")
+    private Optional<String> _getStatementDescriptor() {
+        return statementDescriptor;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("trace_code")
     private Optional<String> _getTraceCode() {
         return traceCode;
@@ -430,6 +484,8 @@ public final class CreatePayoutsResponse {
 
     private boolean equalTo(CreatePayoutsResponse other) {
         return amount.equals(other.amount)
+                && cancelable == other.cancelable
+                && conversion.equals(other.conversion)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && destinationAmount.equals(other.destinationAmount)
@@ -450,6 +506,7 @@ public final class CreatePayoutsResponse {
                 && payoutRequestId.equals(other.payoutRequestId)
                 && source.equals(other.source)
                 && speed.equals(other.speed)
+                && statementDescriptor.equals(other.statementDescriptor)
                 && status.equals(other.status)
                 && statusDetail.equals(other.statusDetail)
                 && traceCode.equals(other.traceCode);
@@ -459,6 +516,8 @@ public final class CreatePayoutsResponse {
     public int hashCode() {
         return Objects.hash(
                 this.amount,
+                this.cancelable,
+                this.conversion,
                 this.createdAt,
                 this.currency,
                 this.destinationAmount,
@@ -479,6 +538,7 @@ public final class CreatePayoutsResponse {
                 this.payoutRequestId,
                 this.source,
                 this.speed,
+                this.statementDescriptor,
                 this.status,
                 this.statusDetail,
                 this.traceCode);
@@ -497,9 +557,16 @@ public final class CreatePayoutsResponse {
         /**
          * <p>The payout amount in whole currency units, as a decimal string.</p>
          */
-        CreatedAtStage amount(@NotNull String amount);
+        CancelableStage amount(@NotNull String amount);
 
         Builder from(CreatePayoutsResponse other);
+    }
+
+    public interface CancelableStage {
+        /**
+         * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended.</p>
+         */
+        CreatedAtStage cancelable(boolean cancelable);
     }
 
     public interface CreatedAtStage {
@@ -532,7 +599,7 @@ public final class CreatePayoutsResponse {
 
     public interface IdStage {
         /**
-         * <p>Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id.</p>
+         * <p>Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id. A payout paid from a card with <code>payment_method_id</code> answers under its card payment's <code>pay_</code> id until it is submitted.</p>
          */
         MarkupFeeStage id(@NotNull String id);
     }
@@ -546,7 +613,7 @@ public final class CreatePayoutsResponse {
 
     public interface NetAmountStage {
         /**
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
+         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
          */
         ObjectStage netAmount(@NotNull String netAmount);
     }
@@ -571,7 +638,7 @@ public final class CreatePayoutsResponse {
 
     public interface StatusDetailStage {
         /**
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
+         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
          */
         _FinalStage statusDetail(@NotNull String statusDetail);
     }
@@ -584,6 +651,15 @@ public final class CreatePayoutsResponse {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         */
+        _FinalStage conversion(Optional<CreatePayoutsResponseConversion> conversion);
+
+        _FinalStage conversion(CreatePayoutsResponseConversion conversion);
+
+        _FinalStage conversion(Nullable<CreatePayoutsResponseConversion> conversion);
+
+        /**
          * <p>The amount delivered in the destination currency, as a decimal string. Null until the payout settles; appears on the payout in GET /payouts once assigned.</p>
          */
         _FinalStage destinationAmount(Optional<String> destinationAmount);
@@ -593,7 +669,7 @@ public final class CreatePayoutsResponse {
         _FinalStage destinationAmount(Nullable<String> destinationAmount);
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          */
         _FinalStage destinationCurrency(Optional<String> destinationCurrency);
 
@@ -665,7 +741,7 @@ public final class CreatePayoutsResponse {
         _FinalStage payoutMethod(Nullable<CreatePayoutsResponsePayoutMethod> payoutMethod);
 
         /**
-         * <p>For a stablecoin payout, the id of the conversion request that funds it, prefixed <code>cofr_</code>; <code>null</code> on fiat payouts.</p>
+         * <p>The id of the conversion request that funds this payout, prefixed <code>cofr_</code>; <code>null</code> when the payout has none.</p>
          */
         _FinalStage payoutRequestId(Optional<String> payoutRequestId);
 
@@ -674,7 +750,7 @@ public final class CreatePayoutsResponse {
         _FinalStage payoutRequestId(Nullable<String> payoutRequestId);
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source.</p>
          */
         _FinalStage source(Optional<CreatePayoutsResponseSource> source);
 
@@ -683,7 +759,16 @@ public final class CreatePayoutsResponse {
         _FinalStage source(Nullable<CreatePayoutsResponseSource> source);
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Always <code>null</code> here — it is assigned when the payout is submitted to the bank, and appears on the payout in GET /payouts once it has been sent; payouts not sent over ACH never get one.</p>
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters.</p>
+         */
+        _FinalStage statementDescriptor(Optional<String> statementDescriptor);
+
+        _FinalStage statementDescriptor(String statementDescriptor);
+
+        _FinalStage statementDescriptor(Nullable<String> statementDescriptor);
+
+        /**
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. Always <code>null</code> here. It appears on the payout in GET /payouts once the reference is available, and stays <code>null</code> on payouts that have none.</p>
          */
         _FinalStage traceCode(Optional<String> traceCode);
 
@@ -695,6 +780,7 @@ public final class CreatePayoutsResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements AmountStage,
+                    CancelableStage,
                     CreatedAtStage,
                     CurrencyStage,
                     FeeAmountStage,
@@ -708,6 +794,8 @@ public final class CreatePayoutsResponse {
                     StatusDetailStage,
                     _FinalStage {
         private String amount;
+
+        private boolean cancelable;
 
         private OffsetDateTime createdAt;
 
@@ -733,6 +821,8 @@ public final class CreatePayoutsResponse {
 
         private Optional<String> traceCode = Optional.empty();
 
+        private Optional<String> statementDescriptor = Optional.empty();
+
         private Optional<CreatePayoutsResponseSource> source = Optional.empty();
 
         private Optional<String> payoutRequestId = Optional.empty();
@@ -755,7 +845,8 @@ public final class CreatePayoutsResponse {
 
         private Optional<String> destinationAmount = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<CreatePayoutsResponseConversion> conversion = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -763,6 +854,8 @@ public final class CreatePayoutsResponse {
         @java.lang.Override
         public Builder from(CreatePayoutsResponse other) {
             amount(other.getAmount());
+            cancelable(other.getCancelable());
+            conversion(other.getConversion());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             destinationAmount(other.getDestinationAmount());
@@ -783,6 +876,7 @@ public final class CreatePayoutsResponse {
             payoutRequestId(other.getPayoutRequestId());
             source(other.getSource());
             speed(other.getSpeed());
+            statementDescriptor(other.getStatementDescriptor());
             status(other.getStatus());
             statusDetail(other.getStatusDetail());
             traceCode(other.getTraceCode());
@@ -791,18 +885,27 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>The payout amount in whole currency units, as a decimal string.</p>
-         * <p>The payout amount in whole currency units, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("amount")
-        public CreatedAtStage amount(@NotNull String amount) {
+        public CancelableStage amount(@NotNull String amount) {
             this.amount = Objects.requireNonNull(amount, "amount must not be null");
             return this;
         }
 
         /**
-         * <p>When the payout was created.</p>
+         * <p>Whether <code>POST /payouts/{id}/cancel</code> would act on this payout right now: <code>true</code> while it is <code>in_review</code>, while it is <code>processing</code> with nothing yet submitted to the payout provider, or while a submitted payout can still be asked to cancel at the provider. <code>false</code> once the money has arrived or the payout has already ended.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("cancelable")
+        public CreatedAtStage cancelable(boolean cancelable) {
+            this.cancelable = cancelable;
+            return this;
+        }
+
+        /**
          * <p>When the payout was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -815,7 +918,6 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>Payout currency.</p>
-         * <p>Payout currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -826,7 +928,6 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>The fee charged for the payout, in the payout currency, as a decimal string.</p>
          * <p>The fee charged for the payout, in the payout currency, as a decimal string.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -839,7 +940,6 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>Who bore the payout fee: the account itself, or its parent platform.</p>
-         * <p>Who bore the payout fee: the account itself, or its parent platform.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -850,8 +950,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id.</p>
-         * <p>Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id.</p>
+         * <p>Payout ID, prefixed <code>wdrl_</code> — the id POST returns is the id GET /payouts lists. Conversion requests created before this version keep answering under their <code>cofr_</code> id. A payout paid from a card with <code>payment_method_id</code> answers under its card payment's <code>pay_</code> id until it is submitted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -863,7 +962,6 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.</p>
-         * <p>Whop's markup on the provider fee, in the payout currency, as a decimal string. <code>&quot;0.0&quot;</code> when none applies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -874,8 +972,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
-         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled stablecoin payout can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
+         * <p>The planned net for the destination, in the payout currency: amount minus fee_amount minus markup_fee when fee_paid_by is <code>self</code>; equal to amount when the platform covers the fees. A payout that ends denied, canceled, or failed delivered nothing — most keep the planned figure and <code>failure</code> says where the funds are, but a canceled payout funded by a conversion request can report the settled outcome instead: <code>amount</code> carries what stayed in the balance, fees are zero because none were charged, and <code>net_amount</code> is 0 because nothing was delivered.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -894,7 +991,6 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>Payout delivery speed.</p>
-         * <p>Payout delivery speed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -906,7 +1002,6 @@ public final class CreatePayoutsResponse {
 
         /**
          * <p>Current payout status, in the same vocabulary as GET /payouts.</p>
-         * <p>Current payout status, in the same vocabulary as GET /payouts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -917,8 +1012,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
-         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the stablecoin conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
+         * <p>The finest machine phase under <code>status</code> — for example <code>awaiting_provider_acceptance</code> vs <code>in_transit</code> under <code>processing</code>, or the conversion phase under <code>requested</code>. Informational vocabulary: values can be added without a version bump; <code>status</code> is the versioned contract.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -929,7 +1023,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Always <code>null</code> here — it is assigned when the payout is submitted to the bank, and appears on the payout in GET /payouts once it has been sent; payouts not sent over ACH never get one.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. Always <code>null</code> here. It appears on the payout in GET /payouts once the reference is available, and stays <code>null</code> on payouts that have none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -945,7 +1039,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Always <code>null</code> here — it is assigned when the payout is submitted to the bank, and appears on the payout in GET /payouts once it has been sent; payouts not sent over ACH never get one.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. Always <code>null</code> here. It appears on the payout in GET /payouts once the reference is available, and stays <code>null</code> on payouts that have none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -955,7 +1049,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>ACH trace number the recipient's bank can use to locate this payout. Always <code>null</code> here — it is assigned when the payout is submitted to the bank, and appears on the payout in GET /payouts once it has been sent; payouts not sent over ACH never get one.</p>
+         * <p>Payment network reference for this payout, such as an ACH trace number, an RTP or FedNow end-to-end ID, a wire IMAD, or a SWIFT UETR. Always <code>null</code> here. It appears on the payout in GET /payouts once the reference is available, and stays <code>null</code> on payouts that have none.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "trace_code", nulls = Nulls.SKIP)
@@ -965,7 +1059,43 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(Nullable<String> statementDescriptor) {
+            if (statementDescriptor.isNull()) {
+                this.statementDescriptor = null;
+            } else if (statementDescriptor.isEmpty()) {
+                this.statementDescriptor = Optional.empty();
+            } else {
+                this.statementDescriptor = Optional.of(statementDescriptor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(String statementDescriptor) {
+            this.statementDescriptor = Optional.ofNullable(statementDescriptor);
+            return this;
+        }
+
+        /**
+         * <p>The payment description sent with the payout, or <code>null</code> if no descriptor was set. When set, 5-80 printable ASCII characters.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
+        public _FinalStage statementDescriptor(Optional<String> statementDescriptor) {
+            this.statementDescriptor = statementDescriptor;
+            return this;
+        }
+
+        /**
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -981,7 +1111,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -991,7 +1121,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout; <code>null</code> on payouts created before source tracking or through internal tooling.</p>
+         * <p>How the payout was created. <code>automatic</code> means a scheduled auto-payout. <code>null</code> when the payout has no recorded source.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source", nulls = Nulls.SKIP)
@@ -1001,7 +1131,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>For a stablecoin payout, the id of the conversion request that funds it, prefixed <code>cofr_</code>; <code>null</code> on fiat payouts.</p>
+         * <p>The id of the conversion request that funds this payout, prefixed <code>cofr_</code>; <code>null</code> when the payout has none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1017,7 +1147,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>For a stablecoin payout, the id of the conversion request that funds it, prefixed <code>cofr_</code>; <code>null</code> on fiat payouts.</p>
+         * <p>The id of the conversion request that funds this payout, prefixed <code>cofr_</code>; <code>null</code> when the payout has none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1027,7 +1157,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>For a stablecoin payout, the id of the conversion request that funds it, prefixed <code>cofr_</code>; <code>null</code> on fiat payouts.</p>
+         * <p>The id of the conversion request that funds this payout, prefixed <code>cofr_</code>; <code>null</code> when the payout has none.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payout_request_id", nulls = Nulls.SKIP)
@@ -1288,7 +1418,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1304,7 +1434,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1314,7 +1444,7 @@ public final class CreatePayoutsResponse {
         }
 
         /**
-         * <p>Currency the funds are delivered in, taken from the payout method. On a stablecoin payout it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
+         * <p>Currency the funds are delivered in, taken from the payout method. On a payout funded by a conversion request it follows the settlement payout minted alongside it — the <code>GET /payouts</code> row carrying this payout's id as <code>payout_request_id</code> — and is <code>null</code> only when no settlement payout exists.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "destination_currency", nulls = Nulls.SKIP)
@@ -1359,10 +1489,48 @@ public final class CreatePayoutsResponse {
             return this;
         }
 
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(Nullable<CreatePayoutsResponseConversion> conversion) {
+            if (conversion.isNull()) {
+                this.conversion = null;
+            } else if (conversion.isEmpty()) {
+                this.conversion = Optional.empty();
+            } else {
+                this.conversion = Optional.of(conversion.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage conversion(CreatePayoutsResponseConversion conversion) {
+            this.conversion = Optional.ofNullable(conversion);
+            return this;
+        }
+
+        /**
+         * <p>How the balance was converted into the payout currency before the payout was sent. <code>null</code> when the payout was sent from a balance in its own currency.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "conversion", nulls = Nulls.SKIP)
+        public _FinalStage conversion(Optional<CreatePayoutsResponseConversion> conversion) {
+            this.conversion = conversion;
+            return this;
+        }
+
         @java.lang.Override
         public CreatePayoutsResponse build() {
             return new CreatePayoutsResponse(
                     amount,
+                    cancelable,
+                    conversion,
                     createdAt,
                     currency,
                     destinationAmount,
@@ -1383,10 +1551,45 @@ public final class CreatePayoutsResponse {
                     payoutRequestId,
                     source,
                     speed,
+                    statementDescriptor,
                     status,
                     statusDetail,
                     traceCode,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("cancelable")
+                    || key.equalsIgnoreCase("conversion")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("destination_amount")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("exchange_rate")
+                    || key.equalsIgnoreCase("failure")
+                    || key.equalsIgnoreCase("fee_amount")
+                    || key.equalsIgnoreCase("fee_paid_by")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("markup_fee")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("net_amount")
+                    || key.equalsIgnoreCase("notes")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("payout_method")
+                    || key.equalsIgnoreCase("payout_request_id")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("speed")
+                    || key.equalsIgnoreCase("statement_descriptor")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_detail")
+                    || key.equalsIgnoreCase("trace_code")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -180,7 +180,6 @@ public final class DisputeBuyer {
 
         private Optional<String> username = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -321,6 +320,18 @@ public final class DisputeBuyer {
 
         public DisputeBuyer build() {
             return new DisputeBuyer(email, memberId, name, userId, username, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("username")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

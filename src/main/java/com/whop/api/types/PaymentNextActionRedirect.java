@@ -108,7 +108,6 @@ public final class PaymentNextActionRedirect {
 
         private List<PaymentNextActionRedirectRenderItem> render = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -121,7 +120,6 @@ public final class PaymentNextActionRedirect {
         }
 
         /**
-         * <p>Where to send the buyer.</p>
          * <p>Where to send the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -159,6 +157,14 @@ public final class PaymentNextActionRedirect {
         @java.lang.Override
         public PaymentNextActionRedirect build() {
             return new PaymentNextActionRedirect(data, render, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("render")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

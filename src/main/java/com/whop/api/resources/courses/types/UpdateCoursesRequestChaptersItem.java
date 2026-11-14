@@ -171,7 +171,6 @@ public final class UpdateCoursesRequestChaptersItem {
 
         private Optional<List<UpdateCoursesRequestChaptersItemLessonsItem>> lessons = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -187,7 +186,6 @@ public final class UpdateCoursesRequestChaptersItem {
 
         /**
          * <p>The ID of the chapter to update</p>
-         * <p>The ID of the chapter to update</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,7 +197,6 @@ public final class UpdateCoursesRequestChaptersItem {
 
         /**
          * <p>The order of the chapter within its course</p>
-         * <p>The order of the chapter within its course</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +207,6 @@ public final class UpdateCoursesRequestChaptersItem {
         }
 
         /**
-         * <p>The title of the chapter</p>
          * <p>The title of the chapter</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -260,6 +256,17 @@ public final class UpdateCoursesRequestChaptersItem {
         @java.lang.Override
         public UpdateCoursesRequestChaptersItem build() {
             return new UpdateCoursesRequestChaptersItem(id, lessons, order, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lessons")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

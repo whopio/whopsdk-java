@@ -286,7 +286,6 @@ public final class OauthGrant {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -306,7 +305,6 @@ public final class OauthGrant {
 
         /**
          * <p>The app this grant authorizes, prefixed <code>app_</code>.</p>
-         * <p>The app this grant authorizes, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -318,7 +316,6 @@ public final class OauthGrant {
 
         /**
          * <p>When the user first authorized the app, as an ISO 8601 timestamp.</p>
-         * <p>When the user first authorized the app, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -329,7 +326,6 @@ public final class OauthGrant {
         }
 
         /**
-         * <p>Grant ID, prefixed <code>oag_</code>.</p>
          * <p>Grant ID, prefixed <code>oag_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -504,6 +500,21 @@ public final class OauthGrant {
                     revokedAt,
                     scopes,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("app_id")
+                    || key.equalsIgnoreCase("authorized_at")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("redirect_url")
+                    || key.equalsIgnoreCase("revoked_at")
+                    || key.equalsIgnoreCase("scopes")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

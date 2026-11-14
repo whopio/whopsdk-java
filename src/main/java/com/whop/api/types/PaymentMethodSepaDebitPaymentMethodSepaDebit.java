@@ -157,7 +157,6 @@ public final class PaymentMethodSepaDebitPaymentMethodSepaDebit {
 
         private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -273,6 +272,17 @@ public final class PaymentMethodSepaDebitPaymentMethodSepaDebit {
         public PaymentMethodSepaDebitPaymentMethodSepaDebit build() {
             return new PaymentMethodSepaDebitPaymentMethodSepaDebit(
                     bankCode, branchCode, country, last4, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bank_code")
+                    || key.equalsIgnoreCase("branch_code")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("last4")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

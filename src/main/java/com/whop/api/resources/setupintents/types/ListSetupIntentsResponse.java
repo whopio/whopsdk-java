@@ -12,8 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.PageInfo;
-import com.whop.api.types.SetupIntentListItem;
+import com.whop.api.types.SetupIntent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,32 +23,28 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListSetupIntentsResponse.Builder.class)
 public final class ListSetupIntentsResponse {
-    private final List<SetupIntentListItem> data;
+    private final List<SetupIntent> data;
 
-    private final PageInfo pageInfo;
+    private final ListSetupIntentsResponsePageInfo pageInfo;
 
     private final Map<String, Object> additionalProperties;
 
     private ListSetupIntentsResponse(
-            List<SetupIntentListItem> data, PageInfo pageInfo, Map<String, Object> additionalProperties) {
+            List<SetupIntent> data,
+            ListSetupIntentsResponsePageInfo pageInfo,
+            Map<String, Object> additionalProperties) {
         this.data = data;
         this.pageInfo = pageInfo;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return A list of nodes.
-     */
     @JsonProperty("data")
-    public List<SetupIntentListItem> getData() {
+    public List<SetupIntent> getData() {
         return data;
     }
 
-    /**
-     * @return Information to aid in pagination.
-     */
     @JsonProperty("page_info")
-    public PageInfo getPageInfo() {
+    public ListSetupIntentsResponsePageInfo getPageInfo() {
         return pageInfo;
     }
 
@@ -83,10 +78,7 @@ public final class ListSetupIntentsResponse {
     }
 
     public interface PageInfoStage {
-        /**
-         * <p>Information to aid in pagination.</p>
-         */
-        _FinalStage pageInfo(@NotNull PageInfo pageInfo);
+        _FinalStage pageInfo(@NotNull ListSetupIntentsResponsePageInfo pageInfo);
 
         Builder from(ListSetupIntentsResponse other);
     }
@@ -98,23 +90,19 @@ public final class ListSetupIntentsResponse {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>A list of nodes.</p>
-         */
-        _FinalStage data(List<SetupIntentListItem> data);
+        _FinalStage data(List<SetupIntent> data);
 
-        _FinalStage addData(SetupIntentListItem data);
+        _FinalStage addData(SetupIntent data);
 
-        _FinalStage addAllData(List<SetupIntentListItem> data);
+        _FinalStage addAllData(List<SetupIntent> data);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements PageInfoStage, _FinalStage {
-        private PageInfo pageInfo;
+        private ListSetupIntentsResponsePageInfo pageInfo;
 
-        private List<SetupIntentListItem> data = new ArrayList<>();
+        private List<SetupIntent> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,46 +114,30 @@ public final class ListSetupIntentsResponse {
             return this;
         }
 
-        /**
-         * <p>Information to aid in pagination.</p>
-         * <p>Information to aid in pagination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("page_info")
-        public _FinalStage pageInfo(@NotNull PageInfo pageInfo) {
+        public _FinalStage pageInfo(@NotNull ListSetupIntentsResponsePageInfo pageInfo) {
             this.pageInfo = Objects.requireNonNull(pageInfo, "pageInfo must not be null");
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addAllData(List<SetupIntentListItem> data) {
+        public _FinalStage addAllData(List<SetupIntent> data) {
             if (data != null) {
                 this.data.addAll(data);
             }
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
-        public _FinalStage addData(SetupIntentListItem data) {
+        public _FinalStage addData(SetupIntent data) {
             this.data.add(data);
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
-        public _FinalStage data(List<SetupIntentListItem> data) {
+        public _FinalStage data(List<SetupIntent> data) {
             this.data.clear();
             if (data != null) {
                 this.data.addAll(data);
@@ -176,6 +148,14 @@ public final class ListSetupIntentsResponse {
         @java.lang.Override
         public ListSetupIntentsResponse build() {
             return new ListSetupIntentsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

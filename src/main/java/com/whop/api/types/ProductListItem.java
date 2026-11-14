@@ -26,7 +26,17 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ProductListItem.Builder.class)
 public final class ProductListItem {
+    private final Optional<Map<String, Object>> account;
+
+    private final double averageReviewRating;
+
     private final String createdAt;
+
+    private final Optional<ProductPublicVariant> defaultVariant;
+
+    private final Optional<String> description;
+
+    private final List<ProductExperience> experiences;
 
     private final Optional<String> externalIdentifier;
 
@@ -37,6 +47,8 @@ public final class ProductListItem {
     private final String id;
 
     private final List<String> labels;
+
+    private final Optional<String> logoUrl;
 
     private final double memberCount;
 
@@ -50,6 +62,8 @@ public final class ProductListItem {
 
     private final String updatedAt;
 
+    private final Optional<Map<String, Object>> variantAttributes;
+
     private final boolean verified;
 
     private final Optional<String> visibility;
@@ -57,36 +71,69 @@ public final class ProductListItem {
     private final Map<String, Object> additionalProperties;
 
     private ProductListItem(
+            Optional<Map<String, Object>> account,
+            double averageReviewRating,
             String createdAt,
+            Optional<ProductPublicVariant> defaultVariant,
+            Optional<String> description,
+            List<ProductExperience> experiences,
             Optional<String> externalIdentifier,
             List<ProductGalleryImage> galleryImages,
             Optional<String> headline,
             String id,
             List<String> labels,
+            Optional<String> logoUrl,
             double memberCount,
             Optional<Map<String, Object>> metadata,
             double publishedReviewsCount,
             String route,
             String title,
             String updatedAt,
+            Optional<Map<String, Object>> variantAttributes,
             boolean verified,
             Optional<String> visibility,
             Map<String, Object> additionalProperties) {
+        this.account = account;
+        this.averageReviewRating = averageReviewRating;
         this.createdAt = createdAt;
+        this.defaultVariant = defaultVariant;
+        this.description = description;
+        this.experiences = experiences;
         this.externalIdentifier = externalIdentifier;
         this.galleryImages = galleryImages;
         this.headline = headline;
         this.id = id;
         this.labels = labels;
+        this.logoUrl = logoUrl;
         this.memberCount = memberCount;
         this.metadata = metadata;
         this.publishedReviewsCount = publishedReviewsCount;
         this.route = route;
         this.title = title;
         this.updatedAt = updatedAt;
+        this.variantAttributes = variantAttributes;
         this.verified = verified;
         this.visibility = visibility;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Account that sells this product.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Object>> getAccount() {
+        if (account == null) {
+            return Optional.empty();
+        }
+        return account;
+    }
+
+    /**
+     * @return Average star rating across published reviews for this product, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.
+     */
+    @JsonProperty("average_review_rating")
+    public double getAverageReviewRating() {
+        return averageReviewRating;
     }
 
     /**
@@ -95,6 +142,33 @@ public final class ProductListItem {
     @JsonProperty("created_at")
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    /**
+     * @return Buyable variant to show and check out with. The configured default when that variant is buyable, otherwise the first buyable variant in product-page order. <code>null</code> when none is buyable.
+     */
+    @JsonIgnore
+    public Optional<ProductPublicVariant> getDefaultVariant() {
+        if (defaultVariant == null) {
+            return Optional.empty();
+        }
+        return defaultVariant;
+    }
+
+    /**
+     * @return Written description displayed on the product page. <code>null</code> if none is set.
+     */
+    @JsonIgnore
+    public Optional<String> getDescription() {
+        if (description == null) {
+            return Optional.empty();
+        }
+        return description;
+    }
+
+    @JsonProperty("experiences")
+    public List<ProductExperience> getExperiences() {
+        return experiences;
     }
 
     /**
@@ -135,6 +209,17 @@ public final class ProductListItem {
     @JsonProperty("labels")
     public List<String> getLabels() {
         return labels;
+    }
+
+    /**
+     * @return Logo image URL shown on product pages and in search results. <code>null</code> when the product has no logo.
+     */
+    @JsonIgnore
+    public Optional<String> getLogoUrl() {
+        if (logoUrl == null) {
+            return Optional.empty();
+        }
+        return logoUrl;
     }
 
     /**
@@ -189,6 +274,17 @@ public final class ProductListItem {
     }
 
     /**
+     * @return The option set the product's variants span, as a map of attribute name to the values in use, e.g. <code>{&quot;color&quot;: [&quot;Blue&quot;, &quot;Red&quot;], &quot;size&quot;: [&quot;S&quot;, &quot;M&quot;, &quot;L&quot;]}</code>. Derived from the visible, non-invoice variants that carry <code>attributes</code>: keys alphabetical, values in the order the variants were created. Read-only. <code>null</code> when the product has no variants.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Object>> getVariantAttributes() {
+        if (variantAttributes == null) {
+            return Optional.empty();
+        }
+        return variantAttributes;
+    }
+
+    /**
      * @return Whether the product has been verified by Whop.
      */
     @JsonProperty("verified")
@@ -208,6 +304,24 @@ public final class ProductListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account")
+    private Optional<Map<String, Object>> _getAccount() {
+        return account;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("default_variant")
+    private Optional<ProductPublicVariant> _getDefaultVariant() {
+        return defaultVariant;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("description")
+    private Optional<String> _getDescription() {
+        return description;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("external_identifier")
     private Optional<String> _getExternalIdentifier() {
         return externalIdentifier;
@@ -220,9 +334,21 @@ public final class ProductListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("logo_url")
+    private Optional<String> _getLogoUrl() {
+        return logoUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("metadata")
     private Optional<Map<String, Object>> _getMetadata() {
         return metadata;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("variant_attributes")
+    private Optional<Map<String, Object>> _getVariantAttributes() {
+        return variantAttributes;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -243,18 +369,25 @@ public final class ProductListItem {
     }
 
     private boolean equalTo(ProductListItem other) {
-        return createdAt.equals(other.createdAt)
+        return account.equals(other.account)
+                && averageReviewRating == other.averageReviewRating
+                && createdAt.equals(other.createdAt)
+                && defaultVariant.equals(other.defaultVariant)
+                && description.equals(other.description)
+                && experiences.equals(other.experiences)
                 && externalIdentifier.equals(other.externalIdentifier)
                 && galleryImages.equals(other.galleryImages)
                 && headline.equals(other.headline)
                 && id.equals(other.id)
                 && labels.equals(other.labels)
+                && logoUrl.equals(other.logoUrl)
                 && memberCount == other.memberCount
                 && metadata.equals(other.metadata)
                 && publishedReviewsCount == other.publishedReviewsCount
                 && route.equals(other.route)
                 && title.equals(other.title)
                 && updatedAt.equals(other.updatedAt)
+                && variantAttributes.equals(other.variantAttributes)
                 && verified == other.verified
                 && visibility.equals(other.visibility);
     }
@@ -262,18 +395,25 @@ public final class ProductListItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
+                this.averageReviewRating,
                 this.createdAt,
+                this.defaultVariant,
+                this.description,
+                this.experiences,
                 this.externalIdentifier,
                 this.galleryImages,
                 this.headline,
                 this.id,
                 this.labels,
+                this.logoUrl,
                 this.memberCount,
                 this.metadata,
                 this.publishedReviewsCount,
                 this.route,
                 this.title,
                 this.updatedAt,
+                this.variantAttributes,
                 this.verified,
                 this.visibility);
     }
@@ -283,8 +423,17 @@ public final class ProductListItem {
         return ObjectMappers.stringify(this);
     }
 
-    public static CreatedAtStage builder() {
+    public static AverageReviewRatingStage builder() {
         return new Builder();
+    }
+
+    public interface AverageReviewRatingStage {
+        /**
+         * <p>Average star rating across published reviews for this product, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         */
+        CreatedAtStage averageReviewRating(double averageReviewRating);
+
+        Builder from(ProductListItem other);
     }
 
     public interface CreatedAtStage {
@@ -292,8 +441,6 @@ public final class ProductListItem {
          * <p>When the product was created, as an ISO 8601 timestamp.</p>
          */
         IdStage createdAt(@NotNull String createdAt);
-
-        Builder from(ProductListItem other);
     }
 
     public interface IdStage {
@@ -353,6 +500,39 @@ public final class ProductListItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Account that sells this product.</p>
+         */
+        _FinalStage account(Optional<Map<String, Object>> account);
+
+        _FinalStage account(Map<String, Object> account);
+
+        _FinalStage account(Nullable<Map<String, Object>> account);
+
+        /**
+         * <p>Buyable variant to show and check out with. The configured default when that variant is buyable, otherwise the first buyable variant in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        _FinalStage defaultVariant(Optional<ProductPublicVariant> defaultVariant);
+
+        _FinalStage defaultVariant(ProductPublicVariant defaultVariant);
+
+        _FinalStage defaultVariant(Nullable<ProductPublicVariant> defaultVariant);
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         */
+        _FinalStage description(Optional<String> description);
+
+        _FinalStage description(String description);
+
+        _FinalStage description(Nullable<String> description);
+
+        _FinalStage experiences(List<ProductExperience> experiences);
+
+        _FinalStage addExperiences(ProductExperience experiences);
+
+        _FinalStage addAllExperiences(List<ProductExperience> experiences);
+
+        /**
          * <p>External identifier stored on the product for your own reference.</p>
          */
         _FinalStage externalIdentifier(Optional<String> externalIdentifier);
@@ -383,6 +563,15 @@ public final class ProductListItem {
         _FinalStage addAllLabels(List<String> labels);
 
         /**
+         * <p>Logo image URL shown on product pages and in search results. <code>null</code> when the product has no logo.</p>
+         */
+        _FinalStage logoUrl(Optional<String> logoUrl);
+
+        _FinalStage logoUrl(String logoUrl);
+
+        _FinalStage logoUrl(Nullable<String> logoUrl);
+
+        /**
          * <p>Custom key-value pairs stored on the product.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
@@ -390,6 +579,15 @@ public final class ProductListItem {
         _FinalStage metadata(Map<String, Object> metadata);
 
         _FinalStage metadata(Nullable<Map<String, Object>> metadata);
+
+        /**
+         * <p>The option set the product's variants span, as a map of attribute name to the values in use, e.g. <code>{&quot;color&quot;: [&quot;Blue&quot;, &quot;Red&quot;], &quot;size&quot;: [&quot;S&quot;, &quot;M&quot;, &quot;L&quot;]}</code>. Derived from the visible, non-invoice variants that carry <code>attributes</code>: keys alphabetical, values in the order the variants were created. Read-only. <code>null</code> when the product has no variants.</p>
+         */
+        _FinalStage variantAttributes(Optional<Map<String, Object>> variantAttributes);
+
+        _FinalStage variantAttributes(Map<String, Object> variantAttributes);
+
+        _FinalStage variantAttributes(Nullable<Map<String, Object>> variantAttributes);
 
         /**
          * <p>Whether the product is publicly visible, hidden, or archived.</p>
@@ -403,7 +601,8 @@ public final class ProductListItem {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage,
+            implements AverageReviewRatingStage,
+                    CreatedAtStage,
                     IdStage,
                     MemberCountStage,
                     PublishedReviewsCountStage,
@@ -412,6 +611,8 @@ public final class ProductListItem {
                     UpdatedAtStage,
                     VerifiedStage,
                     _FinalStage {
+        private double averageReviewRating;
+
         private String createdAt;
 
         private String id;
@@ -430,7 +631,11 @@ public final class ProductListItem {
 
         private Optional<String> visibility = Optional.empty();
 
+        private Optional<Map<String, Object>> variantAttributes = Optional.empty();
+
         private Optional<Map<String, Object>> metadata = Optional.empty();
+
+        private Optional<String> logoUrl = Optional.empty();
 
         private List<String> labels = new ArrayList<>();
 
@@ -440,32 +645,56 @@ public final class ProductListItem {
 
         private Optional<String> externalIdentifier = Optional.empty();
 
-        @JsonAnySetter
+        private List<ProductExperience> experiences = new ArrayList<>();
+
+        private Optional<String> description = Optional.empty();
+
+        private Optional<ProductPublicVariant> defaultVariant = Optional.empty();
+
+        private Optional<Map<String, Object>> account = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ProductListItem other) {
+            account(other.getAccount());
+            averageReviewRating(other.getAverageReviewRating());
             createdAt(other.getCreatedAt());
+            defaultVariant(other.getDefaultVariant());
+            description(other.getDescription());
+            experiences(other.getExperiences());
             externalIdentifier(other.getExternalIdentifier());
             galleryImages(other.getGalleryImages());
             headline(other.getHeadline());
             id(other.getId());
             labels(other.getLabels());
+            logoUrl(other.getLogoUrl());
             memberCount(other.getMemberCount());
             metadata(other.getMetadata());
             publishedReviewsCount(other.getPublishedReviewsCount());
             route(other.getRoute());
             title(other.getTitle());
             updatedAt(other.getUpdatedAt());
+            variantAttributes(other.getVariantAttributes());
             verified(other.getVerified());
             visibility(other.getVisibility());
             return this;
         }
 
         /**
-         * <p>When the product was created, as an ISO 8601 timestamp.</p>
+         * <p>Average star rating across published reviews for this product, from <code>1.0</code> to <code>5.0</code>. Returns <code>0.0</code> when no published-review rating is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("average_review_rating")
+        public CreatedAtStage averageReviewRating(double averageReviewRating) {
+            this.averageReviewRating = averageReviewRating;
+            return this;
+        }
+
+        /**
          * <p>When the product was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -478,7 +707,6 @@ public final class ProductListItem {
 
         /**
          * <p>Product ID, prefixed <code>prod_</code>.</p>
-         * <p>Product ID, prefixed <code>prod_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -489,7 +717,6 @@ public final class ProductListItem {
         }
 
         /**
-         * <p>Active memberships for this product; 0 if public member counts are disabled.</p>
          * <p>Active memberships for this product; 0 if public member counts are disabled.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -502,7 +729,6 @@ public final class ProductListItem {
 
         /**
          * <p>Published customer reviews for this product.</p>
-         * <p>Published customer reviews for this product.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -513,7 +739,6 @@ public final class ProductListItem {
         }
 
         /**
-         * <p>URL slug for the product's public link.</p>
          * <p>URL slug for the product's public link.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -526,7 +751,6 @@ public final class ProductListItem {
 
         /**
          * <p>Product display name shown to customers.</p>
-         * <p>Product display name shown to customers.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -538,7 +762,6 @@ public final class ProductListItem {
 
         /**
          * <p>When the product was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the product was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -549,7 +772,6 @@ public final class ProductListItem {
         }
 
         /**
-         * <p>Whether the product has been verified by Whop.</p>
          * <p>Whether the product has been verified by Whop.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -597,6 +819,42 @@ public final class ProductListItem {
         }
 
         /**
+         * <p>The option set the product's variants span, as a map of attribute name to the values in use, e.g. <code>{&quot;color&quot;: [&quot;Blue&quot;, &quot;Red&quot;], &quot;size&quot;: [&quot;S&quot;, &quot;M&quot;, &quot;L&quot;]}</code>. Derived from the visible, non-invoice variants that carry <code>attributes</code>: keys alphabetical, values in the order the variants were created. Read-only. <code>null</code> when the product has no variants.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantAttributes(Nullable<Map<String, Object>> variantAttributes) {
+            if (variantAttributes.isNull()) {
+                this.variantAttributes = null;
+            } else if (variantAttributes.isEmpty()) {
+                this.variantAttributes = Optional.empty();
+            } else {
+                this.variantAttributes = Optional.of(variantAttributes.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The option set the product's variants span, as a map of attribute name to the values in use, e.g. <code>{&quot;color&quot;: [&quot;Blue&quot;, &quot;Red&quot;], &quot;size&quot;: [&quot;S&quot;, &quot;M&quot;, &quot;L&quot;]}</code>. Derived from the visible, non-invoice variants that carry <code>attributes</code>: keys alphabetical, values in the order the variants were created. Read-only. <code>null</code> when the product has no variants.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage variantAttributes(Map<String, Object> variantAttributes) {
+            this.variantAttributes = Optional.ofNullable(variantAttributes);
+            return this;
+        }
+
+        /**
+         * <p>The option set the product's variants span, as a map of attribute name to the values in use, e.g. <code>{&quot;color&quot;: [&quot;Blue&quot;, &quot;Red&quot;], &quot;size&quot;: [&quot;S&quot;, &quot;M&quot;, &quot;L&quot;]}</code>. Derived from the visible, non-invoice variants that carry <code>attributes</code>: keys alphabetical, values in the order the variants were created. Read-only. <code>null</code> when the product has no variants.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "variant_attributes", nulls = Nulls.SKIP)
+        public _FinalStage variantAttributes(Optional<Map<String, Object>> variantAttributes) {
+            this.variantAttributes = variantAttributes;
+            return this;
+        }
+
+        /**
          * <p>Custom key-value pairs stored on the product.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -629,6 +887,42 @@ public final class ProductListItem {
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public _FinalStage metadata(Optional<Map<String, Object>> metadata) {
             this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * <p>Logo image URL shown on product pages and in search results. <code>null</code> when the product has no logo.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(Nullable<String> logoUrl) {
+            if (logoUrl.isNull()) {
+                this.logoUrl = null;
+            } else if (logoUrl.isEmpty()) {
+                this.logoUrl = Optional.empty();
+            } else {
+                this.logoUrl = Optional.of(logoUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Logo image URL shown on product pages and in search results. <code>null</code> when the product has no logo.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage logoUrl(String logoUrl) {
+            this.logoUrl = Optional.ofNullable(logoUrl);
+            return this;
+        }
+
+        /**
+         * <p>Logo image URL shown on product pages and in search results. <code>null</code> when the product has no logo.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "logo_url", nulls = Nulls.SKIP)
+        public _FinalStage logoUrl(Optional<String> logoUrl) {
+            this.logoUrl = logoUrl;
             return this;
         }
 
@@ -753,23 +1047,190 @@ public final class ProductListItem {
         }
 
         @java.lang.Override
+        public _FinalStage addAllExperiences(List<ProductExperience> experiences) {
+            if (experiences != null) {
+                this.experiences.addAll(experiences);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addExperiences(ProductExperience experiences) {
+            this.experiences.add(experiences);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "experiences", nulls = Nulls.SKIP)
+        public _FinalStage experiences(List<ProductExperience> experiences) {
+            this.experiences.clear();
+            if (experiences != null) {
+                this.experiences.addAll(experiences);
+            }
+            return this;
+        }
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage description(Nullable<String> description) {
+            if (description.isNull()) {
+                this.description = null;
+            } else if (description.isEmpty()) {
+                this.description = Optional.empty();
+            } else {
+                this.description = Optional.of(description.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage description(String description) {
+            this.description = Optional.ofNullable(description);
+            return this;
+        }
+
+        /**
+         * <p>Written description displayed on the product page. <code>null</code> if none is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "description", nulls = Nulls.SKIP)
+        public _FinalStage description(Optional<String> description) {
+            this.description = description;
+            return this;
+        }
+
+        /**
+         * <p>Buyable variant to show and check out with. The configured default when that variant is buyable, otherwise the first buyable variant in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultVariant(Nullable<ProductPublicVariant> defaultVariant) {
+            if (defaultVariant.isNull()) {
+                this.defaultVariant = null;
+            } else if (defaultVariant.isEmpty()) {
+                this.defaultVariant = Optional.empty();
+            } else {
+                this.defaultVariant = Optional.of(defaultVariant.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Buyable variant to show and check out with. The configured default when that variant is buyable, otherwise the first buyable variant in product-page order. <code>null</code> when none is buyable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage defaultVariant(ProductPublicVariant defaultVariant) {
+            this.defaultVariant = Optional.ofNullable(defaultVariant);
+            return this;
+        }
+
+        /**
+         * <p>Buyable variant to show and check out with. The configured default when that variant is buyable, otherwise the first buyable variant in product-page order. <code>null</code> when none is buyable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "default_variant", nulls = Nulls.SKIP)
+        public _FinalStage defaultVariant(Optional<ProductPublicVariant> defaultVariant) {
+            this.defaultVariant = defaultVariant;
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(Nullable<Map<String, Object>> account) {
+            if (account.isNull()) {
+                this.account = null;
+            } else if (account.isEmpty()) {
+                this.account = Optional.empty();
+            } else {
+                this.account = Optional.of(account.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage account(Map<String, Object> account) {
+            this.account = Optional.ofNullable(account);
+            return this;
+        }
+
+        /**
+         * <p>Account that sells this product.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account", nulls = Nulls.SKIP)
+        public _FinalStage account(Optional<Map<String, Object>> account) {
+            this.account = account;
+            return this;
+        }
+
+        @java.lang.Override
         public ProductListItem build() {
             return new ProductListItem(
+                    account,
+                    averageReviewRating,
                     createdAt,
+                    defaultVariant,
+                    description,
+                    experiences,
                     externalIdentifier,
                     galleryImages,
                     headline,
                     id,
                     labels,
+                    logoUrl,
                     memberCount,
                     metadata,
                     publishedReviewsCount,
                     route,
                     title,
                     updatedAt,
+                    variantAttributes,
                     verified,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("average_review_rating")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("default_variant")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("experiences")
+                    || key.equalsIgnoreCase("external_identifier")
+                    || key.equalsIgnoreCase("gallery_images")
+                    || key.equalsIgnoreCase("headline")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("labels")
+                    || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("member_count")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("published_reviews_count")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("variant_attributes")
+                    || key.equalsIgnoreCase("verified")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

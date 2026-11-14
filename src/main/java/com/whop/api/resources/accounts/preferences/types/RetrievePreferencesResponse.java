@@ -15,7 +15,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.CustomerTrackingPreferences;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,9 +37,50 @@ public final class RetrievePreferencesResponse {
 
     private final RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration;
 
+    private final boolean cancellationEmails;
+
     private final boolean cardsAutoTopUp;
 
+    private final boolean cardsNotifications;
+
+    private final Optional<Boolean> coversSubaccountNegativeBalances;
+
+    private final Optional<CustomerTrackingPreferences> customerTracking;
+
     private final boolean disputeFighterEnabled;
+
+    private final boolean economicIntelligence;
+
+    private final boolean economicIntelligenceAutoRenew;
+
+    private final Optional<String> economicIntelligenceEndsAt;
+
+    private final Optional<Double> economicIntelligenceFeePercentage;
+
+    private final Optional<String> economicIntelligenceFirstRenewalAt;
+
+    private final List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers;
+
+    private final Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+            economicIntelligencePreviousPeriod;
+
+    private final boolean failedPaymentEmails;
+
+    private final List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions;
+
+    private final Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency;
+
+    private final Optional<String> preferredSettlementCurrencyChangeableAt;
+
+    private final boolean renewalReminderEmails;
+
+    private final boolean reviewRequestEmails;
+
+    private final Optional<Boolean> subaccountNotifications;
+
+    private final Optional<Boolean> subaccountTeamViewOnly;
+
+    private final RetrievePreferencesResponseSubscriptionFailureBehavior subscriptionFailureBehavior;
 
     private final Map<String, Object> additionalProperties;
 
@@ -46,16 +90,56 @@ public final class RetrievePreferencesResponse {
             String adsReportingCurrency,
             String adsSchedulingTimezone,
             RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration,
+            boolean cancellationEmails,
             boolean cardsAutoTopUp,
+            boolean cardsNotifications,
+            Optional<Boolean> coversSubaccountNegativeBalances,
+            Optional<CustomerTrackingPreferences> customerTracking,
             boolean disputeFighterEnabled,
+            boolean economicIntelligence,
+            boolean economicIntelligenceAutoRenew,
+            Optional<String> economicIntelligenceEndsAt,
+            Optional<Double> economicIntelligenceFeePercentage,
+            Optional<String> economicIntelligenceFirstRenewalAt,
+            List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers,
+            Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod> economicIntelligencePreviousPeriod,
+            boolean failedPaymentEmails,
+            List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions,
+            Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency,
+            Optional<String> preferredSettlementCurrencyChangeableAt,
+            boolean renewalReminderEmails,
+            boolean reviewRequestEmails,
+            Optional<Boolean> subaccountNotifications,
+            Optional<Boolean> subaccountTeamViewOnly,
+            RetrievePreferencesResponseSubscriptionFailureBehavior subscriptionFailureBehavior,
             Map<String, Object> additionalProperties) {
         this.adsAgreement = adsAgreement;
         this.adsPaymentMethods = adsPaymentMethods;
         this.adsReportingCurrency = adsReportingCurrency;
         this.adsSchedulingTimezone = adsSchedulingTimezone;
         this.adsTripleWhaleIntegration = adsTripleWhaleIntegration;
+        this.cancellationEmails = cancellationEmails;
         this.cardsAutoTopUp = cardsAutoTopUp;
+        this.cardsNotifications = cardsNotifications;
+        this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
+        this.customerTracking = customerTracking;
         this.disputeFighterEnabled = disputeFighterEnabled;
+        this.economicIntelligence = economicIntelligence;
+        this.economicIntelligenceAutoRenew = economicIntelligenceAutoRenew;
+        this.economicIntelligenceEndsAt = economicIntelligenceEndsAt;
+        this.economicIntelligenceFeePercentage = economicIntelligenceFeePercentage;
+        this.economicIntelligenceFirstRenewalAt = economicIntelligenceFirstRenewalAt;
+        this.economicIntelligenceOffers = economicIntelligenceOffers;
+        this.economicIntelligencePreviousPeriod = economicIntelligencePreviousPeriod;
+        this.failedPaymentEmails = failedPaymentEmails;
+        this.feedbackOptions = feedbackOptions;
+        this.preferredSettlementCurrency = preferredSettlementCurrency;
+        this.preferredSettlementCurrencyChangeableAt = preferredSettlementCurrencyChangeableAt;
+        this.renewalReminderEmails = renewalReminderEmails;
+        this.reviewRequestEmails = reviewRequestEmails;
+        this.subaccountNotifications = subaccountNotifications;
+        this.subaccountTeamViewOnly = subaccountTeamViewOnly;
+        this.subscriptionFailureBehavior = subscriptionFailureBehavior;
         this.additionalProperties = additionalProperties;
     }
 
@@ -95,11 +179,19 @@ public final class RetrievePreferencesResponse {
     }
 
     /**
-     * @return The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel.
+     * @return The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel. Available to any Triple Whale customer — Shopify, WooCommerce, or a custom checkout — by setting <code>shop_domain</code>. Requires the <code>ad_campaign:create</code> scope. Once connected, ad click-through URLs Whop serves carry <code>tw_source=whop</code> and <code>tw_adid=&lt;ad id&gt;</code> query parameters so Triple Whale's pixel attributes conversions back to the originating ad — no destination URL changes are needed.
      */
     @JsonProperty("ads_triple_whale_integration")
     public RetrievePreferencesResponseAdsTripleWhaleIntegration getAdsTripleWhaleIntegration() {
         return adsTripleWhaleIntegration;
+    }
+
+    /**
+     * @return Whether Whop emails members when their membership is canceled or terminated. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.
+     */
+    @JsonProperty("cancellation_emails")
+    public boolean getCancellationEmails() {
+        return cancellationEmails;
     }
 
     /**
@@ -111,6 +203,36 @@ public final class RetrievePreferencesResponse {
     }
 
     /**
+     * @return Whether Whop Card notifications reach this account's team. <code>true</code> by default, including when the account has no cards balance. Set it to <code>false</code> to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected.
+     */
+    @JsonProperty("cards_notifications")
+    public boolean getCardsNotifications() {
+        return cardsNotifications;
+    }
+
+    /**
+     * @return Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Refunds on its subaccounts may also take them negative by up to this account's available balance. <code>null</code> when the account has no subaccounts.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getCoversSubaccountNegativeBalances() {
+        if (coversSubaccountNegativeBalances == null) {
+            return Optional.empty();
+        }
+        return coversSubaccountNegativeBalances;
+    }
+
+    /**
+     * @return The saved customer tracking settings for the hosted tracking page and Element, with defaults applied. <code>null</code> until set; tracking is off unless <code>enabled</code> is <code>true</code>.
+     */
+    @JsonIgnore
+    public Optional<CustomerTrackingPreferences> getCustomerTracking() {
+        if (customerTracking == null) {
+            return Optional.empty();
+        }
+        return customerTracking;
+    }
+
+    /**
      * @return Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.
      */
     @JsonProperty("dispute_fighter_enabled")
@@ -118,10 +240,224 @@ public final class RetrievePreferencesResponse {
         return disputeFighterEnabled;
     }
 
+    /**
+     * @return Whether Economic Intelligence is on for the account. It turns off automatically at <code>economic_intelligence_ends_at</code>.
+     */
+    @JsonProperty("economic_intelligence")
+    public boolean getEconomicIntelligence() {
+        return economicIntelligence;
+    }
+
+    /**
+     * @return Whether Economic Intelligence renews itself every period, with no end date. Turn it on by setting this to <code>true</code>, or by passing the <code>3_days</code> offer's key as <code>economic_intelligence_duration_key</code>. Set it to <code>false</code> to stop renewing: Economic Intelligence stays on until the end of the current period, shown in <code>economic_intelligence_ends_at</code>, and the fee is charged until then. Set it back to <code>true</code> before then to keep renewing.
+     */
+    @JsonProperty("economic_intelligence_auto_renew")
+    public boolean getEconomicIntelligenceAutoRenew() {
+        return economicIntelligenceAutoRenew;
+    }
+
+    /**
+     * @return When Economic Intelligence turns off, as an ISO 8601 timestamp: the end of the current period once auto-renew is turned off. <code>null</code> when Economic Intelligence is off or renews automatically.
+     */
+    @JsonIgnore
+    public Optional<String> getEconomicIntelligenceEndsAt() {
+        if (economicIntelligenceEndsAt == null) {
+            return Optional.empty();
+        }
+        return economicIntelligenceEndsAt;
+    }
+
+    /**
+     * @return Percentage of payment volume charged while Economic Intelligence is on, such as <code>3</code> for 3%. <code>null</code> when Economic Intelligence is off.
+     */
+    @JsonIgnore
+    public Optional<Double> getEconomicIntelligenceFeePercentage() {
+        if (economicIntelligenceFeePercentage == null) {
+            return Optional.empty();
+        }
+        return economicIntelligenceFeePercentage;
+    }
+
+    /**
+     * @return When auto-renew first renews, as an ISO 8601 timestamp: one period after it was turned on. <code>null</code> when auto-renew is off.
+     */
+    @JsonIgnore
+    public Optional<String> getEconomicIntelligenceFirstRenewalAt() {
+        if (economicIntelligenceFirstRenewalAt == null) {
+            return Optional.empty();
+        }
+        return economicIntelligenceFirstRenewalAt;
+    }
+
+    /**
+     * @return What the account can choose now to turn on Economic Intelligence. Auto-renew is the only plan: one offer, with its fee and the length of each period, while auto-renew is off, and empty while Economic Intelligence renews automatically.
+     */
+    @JsonProperty("economic_intelligence_offers")
+    public List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> getEconomicIntelligenceOffers() {
+        return economicIntelligenceOffers;
+    }
+
+    /**
+     * @return The account's last Economic Intelligence period, once it has ended. <code>null</code> while Economic Intelligence is on, or when it has never been on.
+     */
+    @JsonIgnore
+    public Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+            getEconomicIntelligencePreviousPeriod() {
+        if (economicIntelligencePreviousPeriod == null) {
+            return Optional.empty();
+        }
+        return economicIntelligencePreviousPeriod;
+    }
+
+    /**
+     * @return Whether Whop emails members when a renewal payment fails or needs them to verify it. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get the invoice and its past-due reminders, since that is how the member pays. These emails also stop while the account's <code>send_customer_emails</code> is <code>false</code>.
+     */
+    @JsonProperty("failed_payment_emails")
+    public boolean getFailedPaymentEmails() {
+        return failedPaymentEmails;
+    }
+
+    /**
+     * @return The account's own cancel reasons, in the order members see them when they cancel. Each is filed under a standard category, saved as the membership's <code>cancel_option</code>, so reports keep grouping cancellations. Empty when the account uses Whop's default reasons.
+     */
+    @JsonProperty("feedback_options")
+    public List<RetrievePreferencesResponseFeedbackOptionsItem> getFeedbackOptions() {
+        return feedbackOptions;
+    }
+
+    /**
+     * @return Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.
+     */
+    @JsonIgnore
+    public Optional<RetrievePreferencesResponsePreferredSettlementCurrency> getPreferredSettlementCurrency() {
+        if (preferredSettlementCurrency == null) {
+            return Optional.empty();
+        }
+        return preferredSettlementCurrency;
+    }
+
+    /**
+     * @return When <code>preferred_settlement_currency</code> may next be changed or turned off, as an ISO 8601 timestamp. It can change at most once a day. <code>null</code> when it may change now.
+     */
+    @JsonIgnore
+    public Optional<String> getPreferredSettlementCurrencyChangeableAt() {
+        if (preferredSettlementCurrencyChangeableAt == null) {
+            return Optional.empty();
+        }
+        return preferredSettlementCurrencyChangeableAt;
+    }
+
+    /**
+     * @return Whether Whop emails members the day before their membership renews or their free trial converts. <code>true</code> by default. Set it to <code>false</code> to stop that reminder. Members still get the reminders card networks require. They go out 7 days before a trial over 7 days converts, and 30 days before a 6-month or longer plan renews. All stop while <code>send_customer_emails</code> is <code>false</code>.
+     */
+    @JsonProperty("renewal_reminder_emails")
+    public boolean getRenewalReminderEmails() {
+        return renewalReminderEmails;
+    }
+
+    /**
+     * @return Whether Whop emails customers after a purchase asking them to leave a review. <code>true</code> by default. Set it to <code>false</code> to stop these emails, including ones already scheduled. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.
+     */
+    @JsonProperty("review_request_emails")
+    public boolean getReviewRequestEmails() {
+        return reviewRequestEmails;
+    }
+
+    /**
+     * @return Whether Whop emails and notifies the teams of this account's subaccounts. <code>true</code> by default. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. <code>null</code> when the account has no subaccounts.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getSubaccountNotifications() {
+        if (subaccountNotifications == null) {
+            return Optional.empty();
+        }
+        return subaccountNotifications;
+    }
+
+    /**
+     * @return Whether this account's subaccounts are view-only for their own team members. When <code>true</code>, a subaccount's team can still see everything their role allows but every change is refused with a view-only error. <code>false</code> by default. <code>null</code> when the account has no subaccounts.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getSubaccountTeamViewOnly() {
+        if (subaccountTeamViewOnly == null) {
+            return Optional.empty();
+        }
+        return subaccountTeamViewOnly;
+    }
+
+    /**
+     * @return What happens to a subscription once every retry of a renewal payment has failed. <code>cancel</code> (the default) cancels it. <code>none</code> leaves it past due and keeps billing it each period; access follows the account's past-due access setting.
+     */
+    @JsonProperty("subscription_failure_behavior")
+    public RetrievePreferencesResponseSubscriptionFailureBehavior getSubscriptionFailureBehavior() {
+        return subscriptionFailureBehavior;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("ads_payment_methods")
     private Optional<RetrievePreferencesResponseAdsPaymentMethods> _getAdsPaymentMethods() {
         return adsPaymentMethods;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("covers_subaccount_negative_balances")
+    private Optional<Boolean> _getCoversSubaccountNegativeBalances() {
+        return coversSubaccountNegativeBalances;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("customer_tracking")
+    private Optional<CustomerTrackingPreferences> _getCustomerTracking() {
+        return customerTracking;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("economic_intelligence_ends_at")
+    private Optional<String> _getEconomicIntelligenceEndsAt() {
+        return economicIntelligenceEndsAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("economic_intelligence_fee_percentage")
+    private Optional<Double> _getEconomicIntelligenceFeePercentage() {
+        return economicIntelligenceFeePercentage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("economic_intelligence_first_renewal_at")
+    private Optional<String> _getEconomicIntelligenceFirstRenewalAt() {
+        return economicIntelligenceFirstRenewalAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("economic_intelligence_previous_period")
+    private Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+            _getEconomicIntelligencePreviousPeriod() {
+        return economicIntelligencePreviousPeriod;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("preferred_settlement_currency")
+    private Optional<RetrievePreferencesResponsePreferredSettlementCurrency> _getPreferredSettlementCurrency() {
+        return preferredSettlementCurrency;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("preferred_settlement_currency_changeable_at")
+    private Optional<String> _getPreferredSettlementCurrencyChangeableAt() {
+        return preferredSettlementCurrencyChangeableAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("subaccount_notifications")
+    private Optional<Boolean> _getSubaccountNotifications() {
+        return subaccountNotifications;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("subaccount_team_view_only")
+    private Optional<Boolean> _getSubaccountTeamViewOnly() {
+        return subaccountTeamViewOnly;
     }
 
     @java.lang.Override
@@ -141,8 +477,28 @@ public final class RetrievePreferencesResponse {
                 && adsReportingCurrency.equals(other.adsReportingCurrency)
                 && adsSchedulingTimezone.equals(other.adsSchedulingTimezone)
                 && adsTripleWhaleIntegration.equals(other.adsTripleWhaleIntegration)
+                && cancellationEmails == other.cancellationEmails
                 && cardsAutoTopUp == other.cardsAutoTopUp
-                && disputeFighterEnabled == other.disputeFighterEnabled;
+                && cardsNotifications == other.cardsNotifications
+                && coversSubaccountNegativeBalances.equals(other.coversSubaccountNegativeBalances)
+                && customerTracking.equals(other.customerTracking)
+                && disputeFighterEnabled == other.disputeFighterEnabled
+                && economicIntelligence == other.economicIntelligence
+                && economicIntelligenceAutoRenew == other.economicIntelligenceAutoRenew
+                && economicIntelligenceEndsAt.equals(other.economicIntelligenceEndsAt)
+                && economicIntelligenceFeePercentage.equals(other.economicIntelligenceFeePercentage)
+                && economicIntelligenceFirstRenewalAt.equals(other.economicIntelligenceFirstRenewalAt)
+                && economicIntelligenceOffers.equals(other.economicIntelligenceOffers)
+                && economicIntelligencePreviousPeriod.equals(other.economicIntelligencePreviousPeriod)
+                && failedPaymentEmails == other.failedPaymentEmails
+                && feedbackOptions.equals(other.feedbackOptions)
+                && preferredSettlementCurrency.equals(other.preferredSettlementCurrency)
+                && preferredSettlementCurrencyChangeableAt.equals(other.preferredSettlementCurrencyChangeableAt)
+                && renewalReminderEmails == other.renewalReminderEmails
+                && reviewRequestEmails == other.reviewRequestEmails
+                && subaccountNotifications.equals(other.subaccountNotifications)
+                && subaccountTeamViewOnly.equals(other.subaccountTeamViewOnly)
+                && subscriptionFailureBehavior.equals(other.subscriptionFailureBehavior);
     }
 
     @java.lang.Override
@@ -153,8 +509,28 @@ public final class RetrievePreferencesResponse {
                 this.adsReportingCurrency,
                 this.adsSchedulingTimezone,
                 this.adsTripleWhaleIntegration,
+                this.cancellationEmails,
                 this.cardsAutoTopUp,
-                this.disputeFighterEnabled);
+                this.cardsNotifications,
+                this.coversSubaccountNegativeBalances,
+                this.customerTracking,
+                this.disputeFighterEnabled,
+                this.economicIntelligence,
+                this.economicIntelligenceAutoRenew,
+                this.economicIntelligenceEndsAt,
+                this.economicIntelligenceFeePercentage,
+                this.economicIntelligenceFirstRenewalAt,
+                this.economicIntelligenceOffers,
+                this.economicIntelligencePreviousPeriod,
+                this.failedPaymentEmails,
+                this.feedbackOptions,
+                this.preferredSettlementCurrency,
+                this.preferredSettlementCurrencyChangeableAt,
+                this.renewalReminderEmails,
+                this.reviewRequestEmails,
+                this.subaccountNotifications,
+                this.subaccountTeamViewOnly,
+                this.subscriptionFailureBehavior);
     }
 
     @java.lang.Override
@@ -191,24 +567,81 @@ public final class RetrievePreferencesResponse {
 
     public interface AdsTripleWhaleIntegrationStage {
         /**
-         * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel.</p>
+         * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel. Available to any Triple Whale customer — Shopify, WooCommerce, or a custom checkout — by setting <code>shop_domain</code>. Requires the <code>ad_campaign:create</code> scope. Once connected, ad click-through URLs Whop serves carry <code>tw_source=whop</code> and <code>tw_adid=&lt;ad id&gt;</code> query parameters so Triple Whale's pixel attributes conversions back to the originating ad — no destination URL changes are needed.</p>
          */
-        CardsAutoTopUpStage adsTripleWhaleIntegration(
+        CancellationEmailsStage adsTripleWhaleIntegration(
                 @NotNull RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration);
+    }
+
+    public interface CancellationEmailsStage {
+        /**
+         * <p>Whether Whop emails members when their membership is canceled or terminated. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         */
+        CardsAutoTopUpStage cancellationEmails(boolean cancellationEmails);
     }
 
     public interface CardsAutoTopUpStage {
         /**
          * <p>Whether incoming funds are automatically moved to the account's cards balance. <code>false</code> when the account has no cards balance.</p>
          */
-        DisputeFighterEnabledStage cardsAutoTopUp(boolean cardsAutoTopUp);
+        CardsNotificationsStage cardsAutoTopUp(boolean cardsAutoTopUp);
+    }
+
+    public interface CardsNotificationsStage {
+        /**
+         * <p>Whether Whop Card notifications reach this account's team. <code>true</code> by default, including when the account has no cards balance. Set it to <code>false</code> to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected.</p>
+         */
+        DisputeFighterEnabledStage cardsNotifications(boolean cardsNotifications);
     }
 
     public interface DisputeFighterEnabledStage {
         /**
          * <p>Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.</p>
          */
-        _FinalStage disputeFighterEnabled(boolean disputeFighterEnabled);
+        EconomicIntelligenceStage disputeFighterEnabled(boolean disputeFighterEnabled);
+    }
+
+    public interface EconomicIntelligenceStage {
+        /**
+         * <p>Whether Economic Intelligence is on for the account. It turns off automatically at <code>economic_intelligence_ends_at</code>.</p>
+         */
+        EconomicIntelligenceAutoRenewStage economicIntelligence(boolean economicIntelligence);
+    }
+
+    public interface EconomicIntelligenceAutoRenewStage {
+        /**
+         * <p>Whether Economic Intelligence renews itself every period, with no end date. Turn it on by setting this to <code>true</code>, or by passing the <code>3_days</code> offer's key as <code>economic_intelligence_duration_key</code>. Set it to <code>false</code> to stop renewing: Economic Intelligence stays on until the end of the current period, shown in <code>economic_intelligence_ends_at</code>, and the fee is charged until then. Set it back to <code>true</code> before then to keep renewing.</p>
+         */
+        FailedPaymentEmailsStage economicIntelligenceAutoRenew(boolean economicIntelligenceAutoRenew);
+    }
+
+    public interface FailedPaymentEmailsStage {
+        /**
+         * <p>Whether Whop emails members when a renewal payment fails or needs them to verify it. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get the invoice and its past-due reminders, since that is how the member pays. These emails also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         */
+        RenewalReminderEmailsStage failedPaymentEmails(boolean failedPaymentEmails);
+    }
+
+    public interface RenewalReminderEmailsStage {
+        /**
+         * <p>Whether Whop emails members the day before their membership renews or their free trial converts. <code>true</code> by default. Set it to <code>false</code> to stop that reminder. Members still get the reminders card networks require. They go out 7 days before a trial over 7 days converts, and 30 days before a 6-month or longer plan renews. All stop while <code>send_customer_emails</code> is <code>false</code>.</p>
+         */
+        ReviewRequestEmailsStage renewalReminderEmails(boolean renewalReminderEmails);
+    }
+
+    public interface ReviewRequestEmailsStage {
+        /**
+         * <p>Whether Whop emails customers after a purchase asking them to leave a review. <code>true</code> by default. Set it to <code>false</code> to stop these emails, including ones already scheduled. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         */
+        SubscriptionFailureBehaviorStage reviewRequestEmails(boolean reviewRequestEmails);
+    }
+
+    public interface SubscriptionFailureBehaviorStage {
+        /**
+         * <p>What happens to a subscription once every retry of a renewal payment has failed. <code>cancel</code> (the default) cancels it. <code>none</code> leaves it past due and keeps billing it each period; access follows the account's past-due access setting.</p>
+         */
+        _FinalStage subscriptionFailureBehavior(
+                @NotNull RetrievePreferencesResponseSubscriptionFailureBehavior subscriptionFailureBehavior);
     }
 
     public interface _FinalStage {
@@ -226,6 +659,125 @@ public final class RetrievePreferencesResponse {
         _FinalStage adsPaymentMethods(RetrievePreferencesResponseAdsPaymentMethods adsPaymentMethods);
 
         _FinalStage adsPaymentMethods(Nullable<RetrievePreferencesResponseAdsPaymentMethods> adsPaymentMethods);
+
+        /**
+         * <p>Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Refunds on its subaccounts may also take them negative by up to this account's available balance. <code>null</code> when the account has no subaccounts.</p>
+         */
+        _FinalStage coversSubaccountNegativeBalances(Optional<Boolean> coversSubaccountNegativeBalances);
+
+        _FinalStage coversSubaccountNegativeBalances(Boolean coversSubaccountNegativeBalances);
+
+        _FinalStage coversSubaccountNegativeBalances(Nullable<Boolean> coversSubaccountNegativeBalances);
+
+        /**
+         * <p>The saved customer tracking settings for the hosted tracking page and Element, with defaults applied. <code>null</code> until set; tracking is off unless <code>enabled</code> is <code>true</code>.</p>
+         */
+        _FinalStage customerTracking(Optional<CustomerTrackingPreferences> customerTracking);
+
+        _FinalStage customerTracking(CustomerTrackingPreferences customerTracking);
+
+        _FinalStage customerTracking(Nullable<CustomerTrackingPreferences> customerTracking);
+
+        /**
+         * <p>When Economic Intelligence turns off, as an ISO 8601 timestamp: the end of the current period once auto-renew is turned off. <code>null</code> when Economic Intelligence is off or renews automatically.</p>
+         */
+        _FinalStage economicIntelligenceEndsAt(Optional<String> economicIntelligenceEndsAt);
+
+        _FinalStage economicIntelligenceEndsAt(String economicIntelligenceEndsAt);
+
+        _FinalStage economicIntelligenceEndsAt(Nullable<String> economicIntelligenceEndsAt);
+
+        /**
+         * <p>Percentage of payment volume charged while Economic Intelligence is on, such as <code>3</code> for 3%. <code>null</code> when Economic Intelligence is off.</p>
+         */
+        _FinalStage economicIntelligenceFeePercentage(Optional<Double> economicIntelligenceFeePercentage);
+
+        _FinalStage economicIntelligenceFeePercentage(Double economicIntelligenceFeePercentage);
+
+        _FinalStage economicIntelligenceFeePercentage(Nullable<Double> economicIntelligenceFeePercentage);
+
+        /**
+         * <p>When auto-renew first renews, as an ISO 8601 timestamp: one period after it was turned on. <code>null</code> when auto-renew is off.</p>
+         */
+        _FinalStage economicIntelligenceFirstRenewalAt(Optional<String> economicIntelligenceFirstRenewalAt);
+
+        _FinalStage economicIntelligenceFirstRenewalAt(String economicIntelligenceFirstRenewalAt);
+
+        _FinalStage economicIntelligenceFirstRenewalAt(Nullable<String> economicIntelligenceFirstRenewalAt);
+
+        /**
+         * <p>What the account can choose now to turn on Economic Intelligence. Auto-renew is the only plan: one offer, with its fee and the length of each period, while auto-renew is off, and empty while Economic Intelligence renews automatically.</p>
+         */
+        _FinalStage economicIntelligenceOffers(
+                List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers);
+
+        _FinalStage addEconomicIntelligenceOffers(
+                RetrievePreferencesResponseEconomicIntelligenceOffersItem economicIntelligenceOffers);
+
+        _FinalStage addAllEconomicIntelligenceOffers(
+                List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers);
+
+        /**
+         * <p>The account's last Economic Intelligence period, once it has ended. <code>null</code> while Economic Intelligence is on, or when it has never been on.</p>
+         */
+        _FinalStage economicIntelligencePreviousPeriod(
+                Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+                        economicIntelligencePreviousPeriod);
+
+        _FinalStage economicIntelligencePreviousPeriod(
+                RetrievePreferencesResponseEconomicIntelligencePreviousPeriod economicIntelligencePreviousPeriod);
+
+        _FinalStage economicIntelligencePreviousPeriod(
+                Nullable<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+                        economicIntelligencePreviousPeriod);
+
+        /**
+         * <p>The account's own cancel reasons, in the order members see them when they cancel. Each is filed under a standard category, saved as the membership's <code>cancel_option</code>, so reports keep grouping cancellations. Empty when the account uses Whop's default reasons.</p>
+         */
+        _FinalStage feedbackOptions(List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions);
+
+        _FinalStage addFeedbackOptions(RetrievePreferencesResponseFeedbackOptionsItem feedbackOptions);
+
+        _FinalStage addAllFeedbackOptions(List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions);
+
+        /**
+         * <p>Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.</p>
+         */
+        _FinalStage preferredSettlementCurrency(
+                Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency);
+
+        _FinalStage preferredSettlementCurrency(
+                RetrievePreferencesResponsePreferredSettlementCurrency preferredSettlementCurrency);
+
+        _FinalStage preferredSettlementCurrency(
+                Nullable<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency);
+
+        /**
+         * <p>When <code>preferred_settlement_currency</code> may next be changed or turned off, as an ISO 8601 timestamp. It can change at most once a day. <code>null</code> when it may change now.</p>
+         */
+        _FinalStage preferredSettlementCurrencyChangeableAt(Optional<String> preferredSettlementCurrencyChangeableAt);
+
+        _FinalStage preferredSettlementCurrencyChangeableAt(String preferredSettlementCurrencyChangeableAt);
+
+        _FinalStage preferredSettlementCurrencyChangeableAt(Nullable<String> preferredSettlementCurrencyChangeableAt);
+
+        /**
+         * <p>Whether Whop emails and notifies the teams of this account's subaccounts. <code>true</code> by default. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. <code>null</code> when the account has no subaccounts.</p>
+         */
+        _FinalStage subaccountNotifications(Optional<Boolean> subaccountNotifications);
+
+        _FinalStage subaccountNotifications(Boolean subaccountNotifications);
+
+        _FinalStage subaccountNotifications(Nullable<Boolean> subaccountNotifications);
+
+        /**
+         * <p>Whether this account's subaccounts are view-only for their own team members. When <code>true</code>, a subaccount's team can still see everything their role allows but every change is refused with a view-only error. <code>false</code> by default. <code>null</code> when the account has no subaccounts.</p>
+         */
+        _FinalStage subaccountTeamViewOnly(Optional<Boolean> subaccountTeamViewOnly);
+
+        _FinalStage subaccountTeamViewOnly(Boolean subaccountTeamViewOnly);
+
+        _FinalStage subaccountTeamViewOnly(Nullable<Boolean> subaccountTeamViewOnly);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -234,8 +786,16 @@ public final class RetrievePreferencesResponse {
                     AdsReportingCurrencyStage,
                     AdsSchedulingTimezoneStage,
                     AdsTripleWhaleIntegrationStage,
+                    CancellationEmailsStage,
                     CardsAutoTopUpStage,
+                    CardsNotificationsStage,
                     DisputeFighterEnabledStage,
+                    EconomicIntelligenceStage,
+                    EconomicIntelligenceAutoRenewStage,
+                    FailedPaymentEmailsStage,
+                    RenewalReminderEmailsStage,
+                    ReviewRequestEmailsStage,
+                    SubscriptionFailureBehaviorStage,
                     _FinalStage {
         private RetrievePreferencesResponseAdsAgreement adsAgreement;
 
@@ -245,13 +805,55 @@ public final class RetrievePreferencesResponse {
 
         private RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration;
 
+        private boolean cancellationEmails;
+
         private boolean cardsAutoTopUp;
+
+        private boolean cardsNotifications;
 
         private boolean disputeFighterEnabled;
 
+        private boolean economicIntelligence;
+
+        private boolean economicIntelligenceAutoRenew;
+
+        private boolean failedPaymentEmails;
+
+        private boolean renewalReminderEmails;
+
+        private boolean reviewRequestEmails;
+
+        private RetrievePreferencesResponseSubscriptionFailureBehavior subscriptionFailureBehavior;
+
+        private Optional<Boolean> subaccountTeamViewOnly = Optional.empty();
+
+        private Optional<Boolean> subaccountNotifications = Optional.empty();
+
+        private Optional<String> preferredSettlementCurrencyChangeableAt = Optional.empty();
+
+        private Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency =
+                Optional.empty();
+
+        private List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions = new ArrayList<>();
+
+        private Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+                economicIntelligencePreviousPeriod = Optional.empty();
+
+        private List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers =
+                new ArrayList<>();
+
+        private Optional<String> economicIntelligenceFirstRenewalAt = Optional.empty();
+
+        private Optional<Double> economicIntelligenceFeePercentage = Optional.empty();
+
+        private Optional<String> economicIntelligenceEndsAt = Optional.empty();
+
+        private Optional<CustomerTrackingPreferences> customerTracking = Optional.empty();
+
+        private Optional<Boolean> coversSubaccountNegativeBalances = Optional.empty();
+
         private Optional<RetrievePreferencesResponseAdsPaymentMethods> adsPaymentMethods = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -263,13 +865,32 @@ public final class RetrievePreferencesResponse {
             adsReportingCurrency(other.getAdsReportingCurrency());
             adsSchedulingTimezone(other.getAdsSchedulingTimezone());
             adsTripleWhaleIntegration(other.getAdsTripleWhaleIntegration());
+            cancellationEmails(other.getCancellationEmails());
             cardsAutoTopUp(other.getCardsAutoTopUp());
+            cardsNotifications(other.getCardsNotifications());
+            coversSubaccountNegativeBalances(other.getCoversSubaccountNegativeBalances());
+            customerTracking(other.getCustomerTracking());
             disputeFighterEnabled(other.getDisputeFighterEnabled());
+            economicIntelligence(other.getEconomicIntelligence());
+            economicIntelligenceAutoRenew(other.getEconomicIntelligenceAutoRenew());
+            economicIntelligenceEndsAt(other.getEconomicIntelligenceEndsAt());
+            economicIntelligenceFeePercentage(other.getEconomicIntelligenceFeePercentage());
+            economicIntelligenceFirstRenewalAt(other.getEconomicIntelligenceFirstRenewalAt());
+            economicIntelligenceOffers(other.getEconomicIntelligenceOffers());
+            economicIntelligencePreviousPeriod(other.getEconomicIntelligencePreviousPeriod());
+            failedPaymentEmails(other.getFailedPaymentEmails());
+            feedbackOptions(other.getFeedbackOptions());
+            preferredSettlementCurrency(other.getPreferredSettlementCurrency());
+            preferredSettlementCurrencyChangeableAt(other.getPreferredSettlementCurrencyChangeableAt());
+            renewalReminderEmails(other.getRenewalReminderEmails());
+            reviewRequestEmails(other.getReviewRequestEmails());
+            subaccountNotifications(other.getSubaccountNotifications());
+            subaccountTeamViewOnly(other.getSubaccountTeamViewOnly());
+            subscriptionFailureBehavior(other.getSubscriptionFailureBehavior());
             return this;
         }
 
         /**
-         * <p>The account's Whop Ads services and payment authorization agreement. While <code>pending_signature</code>, campaign launch is blocked; sign by answering <code>requested_information</code> via <code>PATCH /verifications/{id}</code>.</p>
          * <p>The account's Whop Ads services and payment authorization agreement. While <code>pending_signature</code>, campaign launch is blocked; sign by answering <code>requested_information</code> via <code>PATCH /verifications/{id}</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -281,7 +902,6 @@ public final class RetrievePreferencesResponse {
         }
 
         /**
-         * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>.</p>
          * <p>Lowercase ISO currency code, such as <code>usd</code> or <code>eur</code>, used to display ad spend and stats. Defaults to <code>usd</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -295,7 +915,6 @@ public final class RetrievePreferencesResponse {
 
         /**
          * <p>IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Defaults to <code>America/New_York</code> until explicitly overridden.</p>
-         * <p>IANA timezone (e.g. <code>America/New_York</code>) used to interpret campaign start/end times and to bucket reports. Defaults to <code>America/New_York</code> until explicitly overridden.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,13 +926,12 @@ public final class RetrievePreferencesResponse {
         }
 
         /**
-         * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel.</p>
-         * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel.</p>
+         * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel. Available to any Triple Whale customer — Shopify, WooCommerce, or a custom checkout — by setting <code>shop_domain</code>. Requires the <code>ad_campaign:create</code> scope. Once connected, ad click-through URLs Whop serves carry <code>tw_source=whop</code> and <code>tw_adid=&lt;ad id&gt;</code> query parameters so Triple Whale's pixel attributes conversions back to the originating ad — no destination URL changes are needed.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("ads_triple_whale_integration")
-        public CardsAutoTopUpStage adsTripleWhaleIntegration(
+        public CancellationEmailsStage adsTripleWhaleIntegration(
                 @NotNull RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration) {
             this.adsTripleWhaleIntegration =
                     Objects.requireNonNull(adsTripleWhaleIntegration, "adsTripleWhaleIntegration must not be null");
@@ -321,26 +939,558 @@ public final class RetrievePreferencesResponse {
         }
 
         /**
-         * <p>Whether incoming funds are automatically moved to the account's cards balance. <code>false</code> when the account has no cards balance.</p>
+         * <p>Whether Whop emails members when their membership is canceled or terminated. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("cancellation_emails")
+        public CardsAutoTopUpStage cancellationEmails(boolean cancellationEmails) {
+            this.cancellationEmails = cancellationEmails;
+            return this;
+        }
+
+        /**
          * <p>Whether incoming funds are automatically moved to the account's cards balance. <code>false</code> when the account has no cards balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("cards_auto_top_up")
-        public DisputeFighterEnabledStage cardsAutoTopUp(boolean cardsAutoTopUp) {
+        public CardsNotificationsStage cardsAutoTopUp(boolean cardsAutoTopUp) {
             this.cardsAutoTopUp = cardsAutoTopUp;
             return this;
         }
 
         /**
-         * <p>Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.</p>
+         * <p>Whether Whop Card notifications reach this account's team. <code>true</code> by default, including when the account has no cards balance. Set it to <code>false</code> to stop every card email and push notification for the account — application status, verification and action-required alerts, card-ready alerts, declines, large charges, and cashback summaries. Cardholder onboarding invitations still send, because they carry the only link an invited cardholder can onboard with. Requesting a card is rejected while notifications are off, since the request reaches nobody. Cards on personal accounts are unaffected.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("cards_notifications")
+        public DisputeFighterEnabledStage cardsNotifications(boolean cardsNotifications) {
+            this.cardsNotifications = cardsNotifications;
+            return this;
+        }
+
+        /**
          * <p>Whether Whop assembles and files the evidence response when this account's payments are disputed. Off by default; enabling it also opts the account into the success fee charged only on disputes it wins.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("dispute_fighter_enabled")
-        public _FinalStage disputeFighterEnabled(boolean disputeFighterEnabled) {
+        public EconomicIntelligenceStage disputeFighterEnabled(boolean disputeFighterEnabled) {
             this.disputeFighterEnabled = disputeFighterEnabled;
+            return this;
+        }
+
+        /**
+         * <p>Whether Economic Intelligence is on for the account. It turns off automatically at <code>economic_intelligence_ends_at</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("economic_intelligence")
+        public EconomicIntelligenceAutoRenewStage economicIntelligence(boolean economicIntelligence) {
+            this.economicIntelligence = economicIntelligence;
+            return this;
+        }
+
+        /**
+         * <p>Whether Economic Intelligence renews itself every period, with no end date. Turn it on by setting this to <code>true</code>, or by passing the <code>3_days</code> offer's key as <code>economic_intelligence_duration_key</code>. Set it to <code>false</code> to stop renewing: Economic Intelligence stays on until the end of the current period, shown in <code>economic_intelligence_ends_at</code>, and the fee is charged until then. Set it back to <code>true</code> before then to keep renewing.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("economic_intelligence_auto_renew")
+        public FailedPaymentEmailsStage economicIntelligenceAutoRenew(boolean economicIntelligenceAutoRenew) {
+            this.economicIntelligenceAutoRenew = economicIntelligenceAutoRenew;
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails members when a renewal payment fails or needs them to verify it. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get the invoice and its past-due reminders, since that is how the member pays. These emails also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("failed_payment_emails")
+        public RenewalReminderEmailsStage failedPaymentEmails(boolean failedPaymentEmails) {
+            this.failedPaymentEmails = failedPaymentEmails;
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails members the day before their membership renews or their free trial converts. <code>true</code> by default. Set it to <code>false</code> to stop that reminder. Members still get the reminders card networks require. They go out 7 days before a trial over 7 days converts, and 30 days before a 6-month or longer plan renews. All stop while <code>send_customer_emails</code> is <code>false</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("renewal_reminder_emails")
+        public ReviewRequestEmailsStage renewalReminderEmails(boolean renewalReminderEmails) {
+            this.renewalReminderEmails = renewalReminderEmails;
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails customers after a purchase asking them to leave a review. <code>true</code> by default. Set it to <code>false</code> to stop these emails, including ones already scheduled. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("review_request_emails")
+        public SubscriptionFailureBehaviorStage reviewRequestEmails(boolean reviewRequestEmails) {
+            this.reviewRequestEmails = reviewRequestEmails;
+            return this;
+        }
+
+        /**
+         * <p>What happens to a subscription once every retry of a renewal payment has failed. <code>cancel</code> (the default) cancels it. <code>none</code> leaves it past due and keeps billing it each period; access follows the account's past-due access setting.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("subscription_failure_behavior")
+        public _FinalStage subscriptionFailureBehavior(
+                @NotNull RetrievePreferencesResponseSubscriptionFailureBehavior subscriptionFailureBehavior) {
+            this.subscriptionFailureBehavior =
+                    Objects.requireNonNull(subscriptionFailureBehavior, "subscriptionFailureBehavior must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether this account's subaccounts are view-only for their own team members. When <code>true</code>, a subaccount's team can still see everything their role allows but every change is refused with a view-only error. <code>false</code> by default. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountTeamViewOnly(Nullable<Boolean> subaccountTeamViewOnly) {
+            if (subaccountTeamViewOnly.isNull()) {
+                this.subaccountTeamViewOnly = null;
+            } else if (subaccountTeamViewOnly.isEmpty()) {
+                this.subaccountTeamViewOnly = Optional.empty();
+            } else {
+                this.subaccountTeamViewOnly = Optional.of(subaccountTeamViewOnly.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether this account's subaccounts are view-only for their own team members. When <code>true</code>, a subaccount's team can still see everything their role allows but every change is refused with a view-only error. <code>false</code> by default. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountTeamViewOnly(Boolean subaccountTeamViewOnly) {
+            this.subaccountTeamViewOnly = Optional.ofNullable(subaccountTeamViewOnly);
+            return this;
+        }
+
+        /**
+         * <p>Whether this account's subaccounts are view-only for their own team members. When <code>true</code>, a subaccount's team can still see everything their role allows but every change is refused with a view-only error. <code>false</code> by default. <code>null</code> when the account has no subaccounts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "subaccount_team_view_only", nulls = Nulls.SKIP)
+        public _FinalStage subaccountTeamViewOnly(Optional<Boolean> subaccountTeamViewOnly) {
+            this.subaccountTeamViewOnly = subaccountTeamViewOnly;
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails and notifies the teams of this account's subaccounts. <code>true</code> by default. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountNotifications(Nullable<Boolean> subaccountNotifications) {
+            if (subaccountNotifications.isNull()) {
+                this.subaccountNotifications = null;
+            } else if (subaccountNotifications.isEmpty()) {
+                this.subaccountNotifications = Optional.empty();
+            } else {
+                this.subaccountNotifications = Optional.of(subaccountNotifications.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails and notifies the teams of this account's subaccounts. <code>true</code> by default. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountNotifications(Boolean subaccountNotifications) {
+            this.subaccountNotifications = Optional.ofNullable(subaccountNotifications);
+            return this;
+        }
+
+        /**
+         * <p>Whether Whop emails and notifies the teams of this account's subaccounts. <code>true</code> by default. Set it to <code>false</code> to stop Whop's emails, push, and in-app notifications to them. These include payout, verification, dispute, and card alerts about their accounts. <code>null</code> when the account has no subaccounts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "subaccount_notifications", nulls = Nulls.SKIP)
+        public _FinalStage subaccountNotifications(Optional<Boolean> subaccountNotifications) {
+            this.subaccountNotifications = subaccountNotifications;
+            return this;
+        }
+
+        /**
+         * <p>When <code>preferred_settlement_currency</code> may next be changed or turned off, as an ISO 8601 timestamp. It can change at most once a day. <code>null</code> when it may change now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage preferredSettlementCurrencyChangeableAt(
+                Nullable<String> preferredSettlementCurrencyChangeableAt) {
+            if (preferredSettlementCurrencyChangeableAt.isNull()) {
+                this.preferredSettlementCurrencyChangeableAt = null;
+            } else if (preferredSettlementCurrencyChangeableAt.isEmpty()) {
+                this.preferredSettlementCurrencyChangeableAt = Optional.empty();
+            } else {
+                this.preferredSettlementCurrencyChangeableAt =
+                        Optional.of(preferredSettlementCurrencyChangeableAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When <code>preferred_settlement_currency</code> may next be changed or turned off, as an ISO 8601 timestamp. It can change at most once a day. <code>null</code> when it may change now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage preferredSettlementCurrencyChangeableAt(String preferredSettlementCurrencyChangeableAt) {
+            this.preferredSettlementCurrencyChangeableAt = Optional.ofNullable(preferredSettlementCurrencyChangeableAt);
+            return this;
+        }
+
+        /**
+         * <p>When <code>preferred_settlement_currency</code> may next be changed or turned off, as an ISO 8601 timestamp. It can change at most once a day. <code>null</code> when it may change now.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "preferred_settlement_currency_changeable_at", nulls = Nulls.SKIP)
+        public _FinalStage preferredSettlementCurrencyChangeableAt(
+                Optional<String> preferredSettlementCurrencyChangeableAt) {
+            this.preferredSettlementCurrencyChangeableAt = preferredSettlementCurrencyChangeableAt;
+            return this;
+        }
+
+        /**
+         * <p>Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage preferredSettlementCurrency(
+                Nullable<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency) {
+            if (preferredSettlementCurrency.isNull()) {
+                this.preferredSettlementCurrency = null;
+            } else if (preferredSettlementCurrency.isEmpty()) {
+                this.preferredSettlementCurrency = Optional.empty();
+            } else {
+                this.preferredSettlementCurrency = Optional.of(preferredSettlementCurrency.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage preferredSettlementCurrency(
+                RetrievePreferencesResponsePreferredSettlementCurrency preferredSettlementCurrency) {
+            this.preferredSettlementCurrency = Optional.ofNullable(preferredSettlementCurrency);
+            return this;
+        }
+
+        /**
+         * <p>Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "preferred_settlement_currency", nulls = Nulls.SKIP)
+        public _FinalStage preferredSettlementCurrency(
+                Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency) {
+            this.preferredSettlementCurrency = preferredSettlementCurrency;
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reasons, in the order members see them when they cancel. Each is filed under a standard category, saved as the membership's <code>cancel_option</code>, so reports keep grouping cancellations. Empty when the account uses Whop's default reasons.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addAllFeedbackOptions(List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions) {
+            if (feedbackOptions != null) {
+                this.feedbackOptions.addAll(feedbackOptions);
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reasons, in the order members see them when they cancel. Each is filed under a standard category, saved as the membership's <code>cancel_option</code>, so reports keep grouping cancellations. Empty when the account uses Whop's default reasons.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addFeedbackOptions(RetrievePreferencesResponseFeedbackOptionsItem feedbackOptions) {
+            this.feedbackOptions.add(feedbackOptions);
+            return this;
+        }
+
+        /**
+         * <p>The account's own cancel reasons, in the order members see them when they cancel. Each is filed under a standard category, saved as the membership's <code>cancel_option</code>, so reports keep grouping cancellations. Empty when the account uses Whop's default reasons.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "feedback_options", nulls = Nulls.SKIP)
+        public _FinalStage feedbackOptions(List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions) {
+            this.feedbackOptions.clear();
+            if (feedbackOptions != null) {
+                this.feedbackOptions.addAll(feedbackOptions);
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's last Economic Intelligence period, once it has ended. <code>null</code> while Economic Intelligence is on, or when it has never been on.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligencePreviousPeriod(
+                Nullable<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+                        economicIntelligencePreviousPeriod) {
+            if (economicIntelligencePreviousPeriod.isNull()) {
+                this.economicIntelligencePreviousPeriod = null;
+            } else if (economicIntelligencePreviousPeriod.isEmpty()) {
+                this.economicIntelligencePreviousPeriod = Optional.empty();
+            } else {
+                this.economicIntelligencePreviousPeriod = Optional.of(economicIntelligencePreviousPeriod.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The account's last Economic Intelligence period, once it has ended. <code>null</code> while Economic Intelligence is on, or when it has never been on.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligencePreviousPeriod(
+                RetrievePreferencesResponseEconomicIntelligencePreviousPeriod economicIntelligencePreviousPeriod) {
+            this.economicIntelligencePreviousPeriod = Optional.ofNullable(economicIntelligencePreviousPeriod);
+            return this;
+        }
+
+        /**
+         * <p>The account's last Economic Intelligence period, once it has ended. <code>null</code> while Economic Intelligence is on, or when it has never been on.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "economic_intelligence_previous_period", nulls = Nulls.SKIP)
+        public _FinalStage economicIntelligencePreviousPeriod(
+                Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod>
+                        economicIntelligencePreviousPeriod) {
+            this.economicIntelligencePreviousPeriod = economicIntelligencePreviousPeriod;
+            return this;
+        }
+
+        /**
+         * <p>What the account can choose now to turn on Economic Intelligence. Auto-renew is the only plan: one offer, with its fee and the length of each period, while auto-renew is off, and empty while Economic Intelligence renews automatically.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addAllEconomicIntelligenceOffers(
+                List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers) {
+            if (economicIntelligenceOffers != null) {
+                this.economicIntelligenceOffers.addAll(economicIntelligenceOffers);
+            }
+            return this;
+        }
+
+        /**
+         * <p>What the account can choose now to turn on Economic Intelligence. Auto-renew is the only plan: one offer, with its fee and the length of each period, while auto-renew is off, and empty while Economic Intelligence renews automatically.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage addEconomicIntelligenceOffers(
+                RetrievePreferencesResponseEconomicIntelligenceOffersItem economicIntelligenceOffers) {
+            this.economicIntelligenceOffers.add(economicIntelligenceOffers);
+            return this;
+        }
+
+        /**
+         * <p>What the account can choose now to turn on Economic Intelligence. Auto-renew is the only plan: one offer, with its fee and the length of each period, while auto-renew is off, and empty while Economic Intelligence renews automatically.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "economic_intelligence_offers", nulls = Nulls.SKIP)
+        public _FinalStage economicIntelligenceOffers(
+                List<RetrievePreferencesResponseEconomicIntelligenceOffersItem> economicIntelligenceOffers) {
+            this.economicIntelligenceOffers.clear();
+            if (economicIntelligenceOffers != null) {
+                this.economicIntelligenceOffers.addAll(economicIntelligenceOffers);
+            }
+            return this;
+        }
+
+        /**
+         * <p>When auto-renew first renews, as an ISO 8601 timestamp: one period after it was turned on. <code>null</code> when auto-renew is off.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceFirstRenewalAt(Nullable<String> economicIntelligenceFirstRenewalAt) {
+            if (economicIntelligenceFirstRenewalAt.isNull()) {
+                this.economicIntelligenceFirstRenewalAt = null;
+            } else if (economicIntelligenceFirstRenewalAt.isEmpty()) {
+                this.economicIntelligenceFirstRenewalAt = Optional.empty();
+            } else {
+                this.economicIntelligenceFirstRenewalAt = Optional.of(economicIntelligenceFirstRenewalAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When auto-renew first renews, as an ISO 8601 timestamp: one period after it was turned on. <code>null</code> when auto-renew is off.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceFirstRenewalAt(String economicIntelligenceFirstRenewalAt) {
+            this.economicIntelligenceFirstRenewalAt = Optional.ofNullable(economicIntelligenceFirstRenewalAt);
+            return this;
+        }
+
+        /**
+         * <p>When auto-renew first renews, as an ISO 8601 timestamp: one period after it was turned on. <code>null</code> when auto-renew is off.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "economic_intelligence_first_renewal_at", nulls = Nulls.SKIP)
+        public _FinalStage economicIntelligenceFirstRenewalAt(Optional<String> economicIntelligenceFirstRenewalAt) {
+            this.economicIntelligenceFirstRenewalAt = economicIntelligenceFirstRenewalAt;
+            return this;
+        }
+
+        /**
+         * <p>Percentage of payment volume charged while Economic Intelligence is on, such as <code>3</code> for 3%. <code>null</code> when Economic Intelligence is off.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceFeePercentage(Nullable<Double> economicIntelligenceFeePercentage) {
+            if (economicIntelligenceFeePercentage.isNull()) {
+                this.economicIntelligenceFeePercentage = null;
+            } else if (economicIntelligenceFeePercentage.isEmpty()) {
+                this.economicIntelligenceFeePercentage = Optional.empty();
+            } else {
+                this.economicIntelligenceFeePercentage = Optional.of(economicIntelligenceFeePercentage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Percentage of payment volume charged while Economic Intelligence is on, such as <code>3</code> for 3%. <code>null</code> when Economic Intelligence is off.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceFeePercentage(Double economicIntelligenceFeePercentage) {
+            this.economicIntelligenceFeePercentage = Optional.ofNullable(economicIntelligenceFeePercentage);
+            return this;
+        }
+
+        /**
+         * <p>Percentage of payment volume charged while Economic Intelligence is on, such as <code>3</code> for 3%. <code>null</code> when Economic Intelligence is off.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "economic_intelligence_fee_percentage", nulls = Nulls.SKIP)
+        public _FinalStage economicIntelligenceFeePercentage(Optional<Double> economicIntelligenceFeePercentage) {
+            this.economicIntelligenceFeePercentage = economicIntelligenceFeePercentage;
+            return this;
+        }
+
+        /**
+         * <p>When Economic Intelligence turns off, as an ISO 8601 timestamp: the end of the current period once auto-renew is turned off. <code>null</code> when Economic Intelligence is off or renews automatically.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceEndsAt(Nullable<String> economicIntelligenceEndsAt) {
+            if (economicIntelligenceEndsAt.isNull()) {
+                this.economicIntelligenceEndsAt = null;
+            } else if (economicIntelligenceEndsAt.isEmpty()) {
+                this.economicIntelligenceEndsAt = Optional.empty();
+            } else {
+                this.economicIntelligenceEndsAt = Optional.of(economicIntelligenceEndsAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When Economic Intelligence turns off, as an ISO 8601 timestamp: the end of the current period once auto-renew is turned off. <code>null</code> when Economic Intelligence is off or renews automatically.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage economicIntelligenceEndsAt(String economicIntelligenceEndsAt) {
+            this.economicIntelligenceEndsAt = Optional.ofNullable(economicIntelligenceEndsAt);
+            return this;
+        }
+
+        /**
+         * <p>When Economic Intelligence turns off, as an ISO 8601 timestamp: the end of the current period once auto-renew is turned off. <code>null</code> when Economic Intelligence is off or renews automatically.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "economic_intelligence_ends_at", nulls = Nulls.SKIP)
+        public _FinalStage economicIntelligenceEndsAt(Optional<String> economicIntelligenceEndsAt) {
+            this.economicIntelligenceEndsAt = economicIntelligenceEndsAt;
+            return this;
+        }
+
+        /**
+         * <p>The saved customer tracking settings for the hosted tracking page and Element, with defaults applied. <code>null</code> until set; tracking is off unless <code>enabled</code> is <code>true</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage customerTracking(Nullable<CustomerTrackingPreferences> customerTracking) {
+            if (customerTracking.isNull()) {
+                this.customerTracking = null;
+            } else if (customerTracking.isEmpty()) {
+                this.customerTracking = Optional.empty();
+            } else {
+                this.customerTracking = Optional.of(customerTracking.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The saved customer tracking settings for the hosted tracking page and Element, with defaults applied. <code>null</code> until set; tracking is off unless <code>enabled</code> is <code>true</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage customerTracking(CustomerTrackingPreferences customerTracking) {
+            this.customerTracking = Optional.ofNullable(customerTracking);
+            return this;
+        }
+
+        /**
+         * <p>The saved customer tracking settings for the hosted tracking page and Element, with defaults applied. <code>null</code> until set; tracking is off unless <code>enabled</code> is <code>true</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "customer_tracking", nulls = Nulls.SKIP)
+        public _FinalStage customerTracking(Optional<CustomerTrackingPreferences> customerTracking) {
+            this.customerTracking = customerTracking;
+            return this;
+        }
+
+        /**
+         * <p>Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Refunds on its subaccounts may also take them negative by up to this account's available balance. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage coversSubaccountNegativeBalances(Nullable<Boolean> coversSubaccountNegativeBalances) {
+            if (coversSubaccountNegativeBalances.isNull()) {
+                this.coversSubaccountNegativeBalances = null;
+            } else if (coversSubaccountNegativeBalances.isEmpty()) {
+                this.coversSubaccountNegativeBalances = Optional.empty();
+            } else {
+                this.coversSubaccountNegativeBalances = Optional.of(coversSubaccountNegativeBalances.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Refunds on its subaccounts may also take them negative by up to this account's available balance. <code>null</code> when the account has no subaccounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage coversSubaccountNegativeBalances(Boolean coversSubaccountNegativeBalances) {
+            this.coversSubaccountNegativeBalances = Optional.ofNullable(coversSubaccountNegativeBalances);
+            return this;
+        }
+
+        /**
+         * <p>Whether this account covers its subaccounts' negative balances. When a subaccount's balance drops below zero (from refunds, disputes, or fees), this account's available balance in the same currency pays it back, up to what is available. Refunds on its subaccounts may also take them negative by up to this account's available balance. <code>null</code> when the account has no subaccounts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "covers_subaccount_negative_balances", nulls = Nulls.SKIP)
+        public _FinalStage coversSubaccountNegativeBalances(Optional<Boolean> coversSubaccountNegativeBalances) {
+            this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
             return this;
         }
 
@@ -388,9 +1538,63 @@ public final class RetrievePreferencesResponse {
                     adsReportingCurrency,
                     adsSchedulingTimezone,
                     adsTripleWhaleIntegration,
+                    cancellationEmails,
                     cardsAutoTopUp,
+                    cardsNotifications,
+                    coversSubaccountNegativeBalances,
+                    customerTracking,
                     disputeFighterEnabled,
+                    economicIntelligence,
+                    economicIntelligenceAutoRenew,
+                    economicIntelligenceEndsAt,
+                    economicIntelligenceFeePercentage,
+                    economicIntelligenceFirstRenewalAt,
+                    economicIntelligenceOffers,
+                    economicIntelligencePreviousPeriod,
+                    failedPaymentEmails,
+                    feedbackOptions,
+                    preferredSettlementCurrency,
+                    preferredSettlementCurrencyChangeableAt,
+                    renewalReminderEmails,
+                    reviewRequestEmails,
+                    subaccountNotifications,
+                    subaccountTeamViewOnly,
+                    subscriptionFailureBehavior,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ads_agreement")
+                    || key.equalsIgnoreCase("ads_payment_methods")
+                    || key.equalsIgnoreCase("ads_reporting_currency")
+                    || key.equalsIgnoreCase("ads_scheduling_timezone")
+                    || key.equalsIgnoreCase("ads_triple_whale_integration")
+                    || key.equalsIgnoreCase("cancellation_emails")
+                    || key.equalsIgnoreCase("cards_auto_top_up")
+                    || key.equalsIgnoreCase("cards_notifications")
+                    || key.equalsIgnoreCase("covers_subaccount_negative_balances")
+                    || key.equalsIgnoreCase("customer_tracking")
+                    || key.equalsIgnoreCase("dispute_fighter_enabled")
+                    || key.equalsIgnoreCase("economic_intelligence")
+                    || key.equalsIgnoreCase("economic_intelligence_auto_renew")
+                    || key.equalsIgnoreCase("economic_intelligence_ends_at")
+                    || key.equalsIgnoreCase("economic_intelligence_fee_percentage")
+                    || key.equalsIgnoreCase("economic_intelligence_first_renewal_at")
+                    || key.equalsIgnoreCase("economic_intelligence_offers")
+                    || key.equalsIgnoreCase("economic_intelligence_previous_period")
+                    || key.equalsIgnoreCase("failed_payment_emails")
+                    || key.equalsIgnoreCase("feedback_options")
+                    || key.equalsIgnoreCase("preferred_settlement_currency")
+                    || key.equalsIgnoreCase("preferred_settlement_currency_changeable_at")
+                    || key.equalsIgnoreCase("renewal_reminder_emails")
+                    || key.equalsIgnoreCase("review_request_emails")
+                    || key.equalsIgnoreCase("subaccount_notifications")
+                    || key.equalsIgnoreCase("subaccount_team_view_only")
+                    || key.equalsIgnoreCase("subscription_failure_behavior")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

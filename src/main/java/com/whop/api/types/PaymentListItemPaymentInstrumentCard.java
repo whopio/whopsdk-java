@@ -124,7 +124,6 @@ public final class PaymentListItemPaymentInstrumentCard {
 
         private Optional<String> last4 = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -137,7 +136,6 @@ public final class PaymentListItemPaymentInstrumentCard {
         }
 
         /**
-         * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.</p>
          * <p>The network identifier (<code>visa</code>, <code>amex</code>, …), matching <code>card.networks</code> entries and saved card payment methods.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -187,6 +185,14 @@ public final class PaymentListItemPaymentInstrumentCard {
         @java.lang.Override
         public PaymentListItemPaymentInstrumentCard build() {
             return new PaymentListItemPaymentInstrumentCard(brand, last4, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("brand") || key.equalsIgnoreCase("last4")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -11,6 +11,8 @@ public final class AudienceSourceType {
 
     public static final AudienceSourceType PEOPLE_FILTER = new AudienceSourceType(Value.PEOPLE_FILTER, "people_filter");
 
+    public static final AudienceSourceType ENGAGEMENT = new AudienceSourceType(Value.ENGAGEMENT, "engagement");
+
     private final Value value;
 
     private final String string;
@@ -47,6 +49,8 @@ public final class AudienceSourceType {
                 return visitor.visitCsvUpload();
             case PEOPLE_FILTER:
                 return visitor.visitPeopleFilter();
+            case ENGAGEMENT:
+                return visitor.visitEngagement();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -60,6 +64,8 @@ public final class AudienceSourceType {
                 return CSV_UPLOAD;
             case "people_filter":
                 return PEOPLE_FILTER;
+            case "engagement":
+                return ENGAGEMENT;
             default:
                 return new AudienceSourceType(Value.UNKNOWN, value);
         }
@@ -70,6 +76,8 @@ public final class AudienceSourceType {
 
         PEOPLE_FILTER,
 
+        ENGAGEMENT,
+
         UNKNOWN
     }
 
@@ -77,6 +85,8 @@ public final class AudienceSourceType {
         T visitCsvUpload();
 
         T visitPeopleFilter();
+
+        T visitEngagement();
 
         T visitUnknown(String unknownType);
     }

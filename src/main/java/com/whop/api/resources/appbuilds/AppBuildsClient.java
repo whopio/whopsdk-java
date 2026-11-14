@@ -44,14 +44,14 @@ public class AppBuildsClient {
     }
 
     /**
-     * Uploads a new build artifact for an app. Upload the file first (POST /files or a direct upload), then reference it here; iOS and Android take a .zip bundle, web takes a JavaScript file or a .zip archive of the hosted site.
+     * Uploads a new build artifact for an app. Upload the file first with <code>POST /files</code> or a direct upload, then reference it in <code>attachment</code>.
      */
     public AppBuild create(CreateAppBuildsRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Uploads a new build artifact for an app. Upload the file first (POST /files or a direct upload), then reference it here; iOS and Android take a .zip bundle, web takes a JavaScript file or a .zip archive of the hosted site.
+     * Uploads a new build artifact for an app. Upload the file first with <code>POST /files</code> or a direct upload, then reference it in <code>attachment</code>.
      */
     public AppBuild create(CreateAppBuildsRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

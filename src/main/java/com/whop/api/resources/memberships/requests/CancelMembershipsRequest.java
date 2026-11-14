@@ -22,13 +22,19 @@ import java.util.Optional;
 public final class CancelMembershipsRequest {
     private final Optional<Boolean> cancelAtPeriodEnd;
 
+    private final Optional<String> feedbackOptionId;
+
     private final Optional<String> reason;
 
     private final Map<String, Object> additionalProperties;
 
     private CancelMembershipsRequest(
-            Optional<Boolean> cancelAtPeriodEnd, Optional<String> reason, Map<String, Object> additionalProperties) {
+            Optional<Boolean> cancelAtPeriodEnd,
+            Optional<String> feedbackOptionId,
+            Optional<String> reason,
+            Map<String, Object> additionalProperties) {
         this.cancelAtPeriodEnd = cancelAtPeriodEnd;
+        this.feedbackOptionId = feedbackOptionId;
         this.reason = reason;
         this.additionalProperties = additionalProperties;
     }
@@ -39,6 +45,14 @@ public final class CancelMembershipsRequest {
     @JsonProperty("cancel_at_period_end")
     public Optional<Boolean> getCancelAtPeriodEnd() {
         return cancelAtPeriodEnd;
+    }
+
+    /**
+     * @return The ID of the feedback option the customer picked as their reason for canceling, from the account's <code>feedback_options</code> preference. The membership records the option's label as the customer saw it and its category as <code>cancel_option</code>.
+     */
+    @JsonProperty("feedback_option_id")
+    public Optional<String> getFeedbackOptionId() {
+        return feedbackOptionId;
     }
 
     /**
@@ -61,12 +75,14 @@ public final class CancelMembershipsRequest {
     }
 
     private boolean equalTo(CancelMembershipsRequest other) {
-        return cancelAtPeriodEnd.equals(other.cancelAtPeriodEnd) && reason.equals(other.reason);
+        return cancelAtPeriodEnd.equals(other.cancelAtPeriodEnd)
+                && feedbackOptionId.equals(other.feedbackOptionId)
+                && reason.equals(other.reason);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.cancelAtPeriodEnd, this.reason);
+        return Objects.hash(this.cancelAtPeriodEnd, this.feedbackOptionId, this.reason);
     }
 
     @java.lang.Override
@@ -82,15 +98,17 @@ public final class CancelMembershipsRequest {
     public static final class Builder {
         private Optional<Boolean> cancelAtPeriodEnd = Optional.empty();
 
+        private Optional<String> feedbackOptionId = Optional.empty();
+
         private Optional<String> reason = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CancelMembershipsRequest other) {
             cancelAtPeriodEnd(other.getCancelAtPeriodEnd());
+            feedbackOptionId(other.getFeedbackOptionId());
             reason(other.getReason());
             return this;
         }
@@ -110,6 +128,20 @@ public final class CancelMembershipsRequest {
         }
 
         /**
+         * <p>The ID of the feedback option the customer picked as their reason for canceling, from the account's <code>feedback_options</code> preference. The membership records the option's label as the customer saw it and its category as <code>cancel_option</code>.</p>
+         */
+        @JsonSetter(value = "feedback_option_id", nulls = Nulls.SKIP)
+        public Builder feedbackOptionId(Optional<String> feedbackOptionId) {
+            this.feedbackOptionId = feedbackOptionId;
+            return this;
+        }
+
+        public Builder feedbackOptionId(String feedbackOptionId) {
+            this.feedbackOptionId = Optional.ofNullable(feedbackOptionId);
+            return this;
+        }
+
+        /**
          * <p>Free-form note recording why the membership was canceled.</p>
          */
         @JsonSetter(value = "reason", nulls = Nulls.SKIP)
@@ -124,7 +156,17 @@ public final class CancelMembershipsRequest {
         }
 
         public CancelMembershipsRequest build() {
-            return new CancelMembershipsRequest(cancelAtPeriodEnd, reason, additionalProperties);
+            return new CancelMembershipsRequest(cancelAtPeriodEnd, feedbackOptionId, reason, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("cancel_at_period_end")
+                    || key.equalsIgnoreCase("feedback_option_id")
+                    || key.equalsIgnoreCase("reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

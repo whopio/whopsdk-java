@@ -16,7 +16,6 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,8 +30,6 @@ public final class CreateDepositsResponse {
 
     private final Optional<String> hostedUrl;
 
-    private final Map<String, Object> metadata;
-
     private final CreateDepositsResponseMethods methods;
 
     private final CreateDepositsResponseObject object;
@@ -43,21 +40,19 @@ public final class CreateDepositsResponse {
             Optional<String> accountId,
             Optional<String> amount,
             Optional<String> hostedUrl,
-            Map<String, Object> metadata,
             CreateDepositsResponseMethods methods,
             CreateDepositsResponseObject object,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.amount = amount;
         this.hostedUrl = hostedUrl;
-        this.metadata = metadata;
         this.methods = methods;
         this.object = object;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Account ID of the destination owner. Null for raw wallet address destinations.
+     * @return Account ID of the destination owner.
      */
     @JsonIgnore
     public Optional<String> getAccountId() {
@@ -84,14 +79,6 @@ public final class CreateDepositsResponse {
             return Optional.empty();
         }
         return hostedUrl;
-    }
-
-    /**
-     * @return Metadata from the request.
-     */
-    @JsonProperty("metadata")
-    public Map<String, Object> getMetadata() {
-        return metadata;
     }
 
     /**
@@ -134,14 +121,13 @@ public final class CreateDepositsResponse {
         return accountId.equals(other.accountId)
                 && amount.equals(other.amount)
                 && hostedUrl.equals(other.hostedUrl)
-                && metadata.equals(other.metadata)
                 && methods.equals(other.methods)
                 && object.equals(other.object);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.accountId, this.amount, this.hostedUrl, this.metadata, this.methods, this.object);
+        return Objects.hash(this.accountId, this.amount, this.hostedUrl, this.methods, this.object);
     }
 
     @java.lang.Override
@@ -174,7 +160,7 @@ public final class CreateDepositsResponse {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Account ID of the destination owner. Null for raw wallet address destinations.</p>
+         * <p>Account ID of the destination owner.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
 
@@ -197,15 +183,6 @@ public final class CreateDepositsResponse {
         _FinalStage hostedUrl(String hostedUrl);
 
         _FinalStage hostedUrl(Nullable<String> hostedUrl);
-
-        /**
-         * <p>Metadata from the request.</p>
-         */
-        _FinalStage metadata(Map<String, Object> metadata);
-
-        _FinalStage putAllMetadata(Map<String, Object> metadata);
-
-        _FinalStage metadata(String key, Object value);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -214,15 +191,12 @@ public final class CreateDepositsResponse {
 
         private CreateDepositsResponseObject object;
 
-        private Map<String, Object> metadata = new LinkedHashMap<>();
-
         private Optional<String> hostedUrl = Optional.empty();
 
         private Optional<String> amount = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -232,14 +206,12 @@ public final class CreateDepositsResponse {
             accountId(other.getAccountId());
             amount(other.getAmount());
             hostedUrl(other.getHostedUrl());
-            metadata(other.getMetadata());
             methods(other.getMethods());
             object(other.getObject());
             return this;
         }
 
         /**
-         * <p>Available deposit methods for destination.</p>
          * <p>Available deposit methods for destination.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -254,41 +226,6 @@ public final class CreateDepositsResponse {
         @JsonSetter("object")
         public _FinalStage object(@NotNull CreateDepositsResponseObject object) {
             this.object = Objects.requireNonNull(object, "object must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Metadata from the request.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage metadata(String key, Object value) {
-            this.metadata.put(key, value);
-            return this;
-        }
-
-        /**
-         * <p>Metadata from the request.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage putAllMetadata(Map<String, Object> metadata) {
-            if (metadata != null) {
-                this.metadata.putAll(metadata);
-            }
-            return this;
-        }
-
-        /**
-         * <p>Metadata from the request.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
-        public _FinalStage metadata(Map<String, Object> metadata) {
-            this.metadata.clear();
-            if (metadata != null) {
-                this.metadata.putAll(metadata);
-            }
             return this;
         }
 
@@ -349,7 +286,7 @@ public final class CreateDepositsResponse {
         }
 
         /**
-         * <p>Account ID of the destination owner. Null for raw wallet address destinations.</p>
+         * <p>Account ID of the destination owner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -365,7 +302,7 @@ public final class CreateDepositsResponse {
         }
 
         /**
-         * <p>Account ID of the destination owner. Null for raw wallet address destinations.</p>
+         * <p>Account ID of the destination owner.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -375,7 +312,7 @@ public final class CreateDepositsResponse {
         }
 
         /**
-         * <p>Account ID of the destination owner. Null for raw wallet address destinations.</p>
+         * <p>Account ID of the destination owner.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -386,8 +323,19 @@ public final class CreateDepositsResponse {
 
         @java.lang.Override
         public CreateDepositsResponse build() {
-            return new CreateDepositsResponse(
-                    accountId, amount, hostedUrl, metadata, methods, object, additionalProperties);
+            return new CreateDepositsResponse(accountId, amount, hostedUrl, methods, object, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("hosted_url")
+                    || key.equalsIgnoreCase("methods")
+                    || key.equalsIgnoreCase("object")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

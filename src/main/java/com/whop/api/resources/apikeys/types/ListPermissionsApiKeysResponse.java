@@ -103,7 +103,6 @@ public final class ListPermissionsApiKeysResponse {
 
         private List<Permission> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -149,6 +148,14 @@ public final class ListPermissionsApiKeysResponse {
         @java.lang.Override
         public ListPermissionsApiKeysResponse build() {
             return new ListPermissionsApiKeysResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -17,6 +17,8 @@ public final class CancelOptions {
 
     public static final CancelOptions TOO_EXPENSIVE = new CancelOptions(Value.TOO_EXPENSIVE, "too_expensive");
 
+    public static final CancelOptions UNUSED = new CancelOptions(Value.UNUSED, "unused");
+
     public static final CancelOptions TECHNICAL_ISSUES = new CancelOptions(Value.TECHNICAL_ISSUES, "technical_issues");
 
     public static final CancelOptions MISSING_FEATURES = new CancelOptions(Value.MISSING_FEATURES, "missing_features");
@@ -63,6 +65,8 @@ public final class CancelOptions {
                 return visitor.visitBadExperience();
             case TOO_EXPENSIVE:
                 return visitor.visitTooExpensive();
+            case UNUSED:
+                return visitor.visitUnused();
             case TECHNICAL_ISSUES:
                 return visitor.visitTechnicalIssues();
             case MISSING_FEATURES:
@@ -86,6 +90,8 @@ public final class CancelOptions {
                 return BAD_EXPERIENCE;
             case "too_expensive":
                 return TOO_EXPENSIVE;
+            case "unused":
+                return UNUSED;
             case "technical_issues":
                 return TECHNICAL_ISSUES;
             case "missing_features":
@@ -106,6 +112,8 @@ public final class CancelOptions {
 
         BAD_EXPERIENCE,
 
+        UNUSED,
+
         OTHER,
 
         TESTING,
@@ -123,6 +131,8 @@ public final class CancelOptions {
         T visitTechnicalIssues();
 
         T visitBadExperience();
+
+        T visitUnused();
 
         T visitOther();
 

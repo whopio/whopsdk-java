@@ -34,7 +34,7 @@ public final class ListExperiencesRequest {
     }
 
     /**
-     * @return The number of preferences to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -42,7 +42,7 @@ public final class ListExperiencesRequest {
     }
 
     /**
-     * @return A cursor; returns preferences after this position.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -84,7 +84,6 @@ public final class ListExperiencesRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -96,7 +95,7 @@ public final class ListExperiencesRequest {
         }
 
         /**
-         * <p>The number of preferences to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -110,7 +109,7 @@ public final class ListExperiencesRequest {
         }
 
         /**
-         * <p>A cursor; returns preferences after this position.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -125,6 +124,14 @@ public final class ListExperiencesRequest {
 
         public ListExperiencesRequest build() {
             return new ListExperiencesRequest(first, after, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("first") || key.equalsIgnoreCase("after")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

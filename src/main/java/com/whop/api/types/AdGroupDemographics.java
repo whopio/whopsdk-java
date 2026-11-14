@@ -48,7 +48,7 @@ public final class AdGroupDemographics {
     }
 
     /**
-     * @return Whether automatic audience targeting is on (Advantage+ on Meta). When <code>true</code>, the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.
+     * @return Whether automatic audience targeting is on. When <code>true</code>, delivery can reach beyond the ages and genders you set, treating them as suggestions.
      */
     @JsonProperty("automatic")
     public boolean getAutomatic() {
@@ -131,7 +131,7 @@ public final class AdGroupDemographics {
 
     public interface AutomaticStage {
         /**
-         * <p>Whether automatic audience targeting is on (Advantage+ on Meta). When <code>true</code>, the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.</p>
+         * <p>Whether automatic audience targeting is on. When <code>true</code>, delivery can reach beyond the ages and genders you set, treating them as suggestions.</p>
          */
         GenderStage automatic(boolean automatic);
 
@@ -181,7 +181,6 @@ public final class AdGroupDemographics {
 
         private Optional<Double> maximumAge = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -196,8 +195,7 @@ public final class AdGroupDemographics {
         }
 
         /**
-         * <p>Whether automatic audience targeting is on (Advantage+ on Meta). When <code>true</code>, the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.</p>
-         * <p>Whether automatic audience targeting is on (Advantage+ on Meta). When <code>true</code>, the platform can deliver beyond the ages, genders, and detailed targeting you set, treating them as suggestions.</p>
+         * <p>Whether automatic audience targeting is on. When <code>true</code>, delivery can reach beyond the ages and genders you set, treating them as suggestions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -208,7 +206,6 @@ public final class AdGroupDemographics {
         }
 
         /**
-         * <p>Gender targeted.</p>
          * <p>Gender targeted.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -294,6 +291,17 @@ public final class AdGroupDemographics {
         @java.lang.Override
         public AdGroupDemographics build() {
             return new AdGroupDemographics(automatic, gender, maximumAge, minimumAge, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("automatic")
+                    || key.equalsIgnoreCase("gender")
+                    || key.equalsIgnoreCase("maximum_age")
+                    || key.equalsIgnoreCase("minimum_age")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

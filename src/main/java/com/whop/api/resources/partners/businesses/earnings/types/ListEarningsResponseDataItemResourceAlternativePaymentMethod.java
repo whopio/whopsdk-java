@@ -292,7 +292,6 @@ public final class ListEarningsResponseDataItemResourceAlternativePaymentMethod 
         private Optional<ListEarningsResponseDataItemResourceAlternativePaymentMethodAlternativePaymentMethod>
                 alternativePaymentMethod = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -483,6 +482,22 @@ public final class ListEarningsResponseDataItemResourceAlternativePaymentMethod 
                     paymentMethodType,
                     processor,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("alternative_payment_method")
+                    || key.equalsIgnoreCase("brand")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last4")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payment_method_type")
+                    || key.equalsIgnoreCase("processor")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

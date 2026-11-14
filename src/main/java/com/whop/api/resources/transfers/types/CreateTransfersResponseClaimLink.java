@@ -29,6 +29,12 @@ public final class CreateTransfersResponseClaimLink {
 
     private final String claimUrl;
 
+    private final boolean claimable;
+
+    private final String code;
+
+    private final OffsetDateTime createdAt;
+
     private final String currency;
 
     private final Optional<OffsetDateTime> expiresAt;
@@ -36,6 +42,12 @@ public final class CreateTransfersResponseClaimLink {
     private final String id;
 
     private final int redeemableCount;
+
+    private final int redeemedCount;
+
+    private final int remainingClaims;
+
+    private final CreateTransfersResponseClaimLinkSender sender;
 
     private final CreateTransfersResponseClaimLinkSource source;
 
@@ -46,32 +58,71 @@ public final class CreateTransfersResponseClaimLink {
     private CreateTransfersResponseClaimLink(
             String amount,
             String claimUrl,
+            boolean claimable,
+            String code,
+            OffsetDateTime createdAt,
             String currency,
             Optional<OffsetDateTime> expiresAt,
             String id,
             int redeemableCount,
+            int redeemedCount,
+            int remainingClaims,
+            CreateTransfersResponseClaimLinkSender sender,
             CreateTransfersResponseClaimLinkSource source,
             CreateTransfersResponseClaimLinkStatus status,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
         this.claimUrl = claimUrl;
+        this.claimable = claimable;
+        this.code = code;
+        this.createdAt = createdAt;
         this.currency = currency;
         this.expiresAt = expiresAt;
         this.id = id;
         this.redeemableCount = redeemableCount;
+        this.redeemedCount = redeemedCount;
+        this.remainingClaims = remainingClaims;
+        this.sender = sender;
         this.source = source;
         this.status = status;
         this.additionalProperties = additionalProperties;
     }
 
+    /**
+     * @return Amount each claim receives.
+     */
     @JsonProperty("amount")
     public String getAmount() {
         return amount;
     }
 
+    /**
+     * @return Shareable claim URL.
+     */
     @JsonProperty("claim_url")
     public String getClaimUrl() {
         return claimUrl;
+    }
+
+    /**
+     * @return Whether this link can currently be claimed.
+     */
+    @JsonProperty("claimable")
+    public boolean getClaimable() {
+        return claimable;
+    }
+
+    /**
+     * @return Redeemable claim code.
+     */
+    @JsonProperty("code")
+    public String getCode() {
+        return code;
+    }
+
+    @JsonProperty("created_at")
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
     }
 
     @JsonProperty("currency")
@@ -87,14 +138,44 @@ public final class CreateTransfersResponseClaimLink {
         return expiresAt;
     }
 
+    /**
+     * @return Claim-link ID, prefixed <code>airdrp_</code>.
+     */
     @JsonProperty("id")
     public String getId() {
         return id;
     }
 
+    /**
+     * @return Maximum number of claims.
+     */
     @JsonProperty("redeemable_count")
     public int getRedeemableCount() {
         return redeemableCount;
+    }
+
+    /**
+     * @return Number of completed claims.
+     */
+    @JsonProperty("redeemed_count")
+    public int getRedeemedCount() {
+        return redeemedCount;
+    }
+
+    /**
+     * @return Number of available claims, excluding slots reserved by pending claims.
+     */
+    @JsonProperty("remaining_claims")
+    public int getRemainingClaims() {
+        return remainingClaims;
+    }
+
+    /**
+     * @return The public account or user funding the claim link.
+     */
+    @JsonProperty("sender")
+    public CreateTransfersResponseClaimLinkSender getSender() {
+        return sender;
     }
 
     @JsonProperty("source")
@@ -103,7 +184,7 @@ public final class CreateTransfersResponseClaimLink {
     }
 
     /**
-     * @return A newly funded claim link is always <code>pending</code> — it stays claimable until it is fully claimed, canceled, or expires.
+     * @return The newly funded link is ready to claim.
      */
     @JsonProperty("status")
     public CreateTransfersResponseClaimLinkStatus getStatus() {
@@ -130,10 +211,16 @@ public final class CreateTransfersResponseClaimLink {
     private boolean equalTo(CreateTransfersResponseClaimLink other) {
         return amount.equals(other.amount)
                 && claimUrl.equals(other.claimUrl)
+                && claimable == other.claimable
+                && code.equals(other.code)
+                && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && expiresAt.equals(other.expiresAt)
                 && id.equals(other.id)
                 && redeemableCount == other.redeemableCount
+                && redeemedCount == other.redeemedCount
+                && remainingClaims == other.remainingClaims
+                && sender.equals(other.sender)
                 && source.equals(other.source)
                 && status.equals(other.status);
     }
@@ -143,10 +230,16 @@ public final class CreateTransfersResponseClaimLink {
         return Objects.hash(
                 this.amount,
                 this.claimUrl,
+                this.claimable,
+                this.code,
+                this.createdAt,
                 this.currency,
                 this.expiresAt,
                 this.id,
                 this.redeemableCount,
+                this.redeemedCount,
+                this.remainingClaims,
+                this.sender,
                 this.source,
                 this.status);
     }
@@ -161,13 +254,37 @@ public final class CreateTransfersResponseClaimLink {
     }
 
     public interface AmountStage {
+        /**
+         * <p>Amount each claim receives.</p>
+         */
         ClaimUrlStage amount(@NotNull String amount);
 
         Builder from(CreateTransfersResponseClaimLink other);
     }
 
     public interface ClaimUrlStage {
-        CurrencyStage claimUrl(@NotNull String claimUrl);
+        /**
+         * <p>Shareable claim URL.</p>
+         */
+        ClaimableStage claimUrl(@NotNull String claimUrl);
+    }
+
+    public interface ClaimableStage {
+        /**
+         * <p>Whether this link can currently be claimed.</p>
+         */
+        CodeStage claimable(boolean claimable);
+    }
+
+    public interface CodeStage {
+        /**
+         * <p>Redeemable claim code.</p>
+         */
+        CreatedAtStage code(@NotNull String code);
+    }
+
+    public interface CreatedAtStage {
+        CurrencyStage createdAt(@NotNull OffsetDateTime createdAt);
     }
 
     public interface CurrencyStage {
@@ -175,11 +292,38 @@ public final class CreateTransfersResponseClaimLink {
     }
 
     public interface IdStage {
+        /**
+         * <p>Claim-link ID, prefixed <code>airdrp_</code>.</p>
+         */
         RedeemableCountStage id(@NotNull String id);
     }
 
     public interface RedeemableCountStage {
-        SourceStage redeemableCount(int redeemableCount);
+        /**
+         * <p>Maximum number of claims.</p>
+         */
+        RedeemedCountStage redeemableCount(int redeemableCount);
+    }
+
+    public interface RedeemedCountStage {
+        /**
+         * <p>Number of completed claims.</p>
+         */
+        RemainingClaimsStage redeemedCount(int redeemedCount);
+    }
+
+    public interface RemainingClaimsStage {
+        /**
+         * <p>Number of available claims, excluding slots reserved by pending claims.</p>
+         */
+        SenderStage remainingClaims(int remainingClaims);
+    }
+
+    public interface SenderStage {
+        /**
+         * <p>The public account or user funding the claim link.</p>
+         */
+        SourceStage sender(@NotNull CreateTransfersResponseClaimLinkSender sender);
     }
 
     public interface SourceStage {
@@ -188,7 +332,7 @@ public final class CreateTransfersResponseClaimLink {
 
     public interface StatusStage {
         /**
-         * <p>A newly funded claim link is always <code>pending</code> — it stays claimable until it is fully claimed, canceled, or expires.</p>
+         * <p>The newly funded link is ready to claim.</p>
          */
         _FinalStage status(@NotNull CreateTransfersResponseClaimLinkStatus status);
     }
@@ -211,9 +355,15 @@ public final class CreateTransfersResponseClaimLink {
     public static final class Builder
             implements AmountStage,
                     ClaimUrlStage,
+                    ClaimableStage,
+                    CodeStage,
+                    CreatedAtStage,
                     CurrencyStage,
                     IdStage,
                     RedeemableCountStage,
+                    RedeemedCountStage,
+                    RemainingClaimsStage,
+                    SenderStage,
                     SourceStage,
                     StatusStage,
                     _FinalStage {
@@ -221,11 +371,23 @@ public final class CreateTransfersResponseClaimLink {
 
         private String claimUrl;
 
+        private boolean claimable;
+
+        private String code;
+
+        private OffsetDateTime createdAt;
+
         private String currency;
 
         private String id;
 
         private int redeemableCount;
+
+        private int redeemedCount;
+
+        private int remainingClaims;
+
+        private CreateTransfersResponseClaimLinkSender sender;
 
         private CreateTransfersResponseClaimLinkSource source;
 
@@ -233,7 +395,6 @@ public final class CreateTransfersResponseClaimLink {
 
         private Optional<OffsetDateTime> expiresAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -242,15 +403,25 @@ public final class CreateTransfersResponseClaimLink {
         public Builder from(CreateTransfersResponseClaimLink other) {
             amount(other.getAmount());
             claimUrl(other.getClaimUrl());
+            claimable(other.getClaimable());
+            code(other.getCode());
+            createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             expiresAt(other.getExpiresAt());
             id(other.getId());
             redeemableCount(other.getRedeemableCount());
+            redeemedCount(other.getRedeemedCount());
+            remainingClaims(other.getRemainingClaims());
+            sender(other.getSender());
             source(other.getSource());
             status(other.getStatus());
             return this;
         }
 
+        /**
+         * <p>Amount each claim receives.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("amount")
         public ClaimUrlStage amount(@NotNull String amount) {
@@ -258,10 +429,43 @@ public final class CreateTransfersResponseClaimLink {
             return this;
         }
 
+        /**
+         * <p>Shareable claim URL.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("claim_url")
-        public CurrencyStage claimUrl(@NotNull String claimUrl) {
+        public ClaimableStage claimUrl(@NotNull String claimUrl) {
             this.claimUrl = Objects.requireNonNull(claimUrl, "claimUrl must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether this link can currently be claimed.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("claimable")
+        public CodeStage claimable(boolean claimable) {
+            this.claimable = claimable;
+            return this;
+        }
+
+        /**
+         * <p>Redeemable claim code.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("code")
+        public CreatedAtStage code(@NotNull String code) {
+            this.code = Objects.requireNonNull(code, "code must not be null");
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("created_at")
+        public CurrencyStage createdAt(@NotNull OffsetDateTime createdAt) {
+            this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
             return this;
         }
 
@@ -272,6 +476,10 @@ public final class CreateTransfersResponseClaimLink {
             return this;
         }
 
+        /**
+         * <p>Claim-link ID, prefixed <code>airdrp_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("id")
         public RedeemableCountStage id(@NotNull String id) {
@@ -279,10 +487,47 @@ public final class CreateTransfersResponseClaimLink {
             return this;
         }
 
+        /**
+         * <p>Maximum number of claims.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("redeemable_count")
-        public SourceStage redeemableCount(int redeemableCount) {
+        public RedeemedCountStage redeemableCount(int redeemableCount) {
             this.redeemableCount = redeemableCount;
+            return this;
+        }
+
+        /**
+         * <p>Number of completed claims.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("redeemed_count")
+        public RemainingClaimsStage redeemedCount(int redeemedCount) {
+            this.redeemedCount = redeemedCount;
+            return this;
+        }
+
+        /**
+         * <p>Number of available claims, excluding slots reserved by pending claims.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("remaining_claims")
+        public SenderStage remainingClaims(int remainingClaims) {
+            this.remainingClaims = remainingClaims;
+            return this;
+        }
+
+        /**
+         * <p>The public account or user funding the claim link.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("sender")
+        public SourceStage sender(@NotNull CreateTransfersResponseClaimLinkSender sender) {
+            this.sender = Objects.requireNonNull(sender, "sender must not be null");
             return this;
         }
 
@@ -294,8 +539,7 @@ public final class CreateTransfersResponseClaimLink {
         }
 
         /**
-         * <p>A newly funded claim link is always <code>pending</code> — it stays claimable until it is fully claimed, canceled, or expires.</p>
-         * <p>A newly funded claim link is always <code>pending</code> — it stays claimable until it is fully claimed, canceled, or expires.</p>
+         * <p>The newly funded link is ready to claim.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -333,7 +577,42 @@ public final class CreateTransfersResponseClaimLink {
         @java.lang.Override
         public CreateTransfersResponseClaimLink build() {
             return new CreateTransfersResponseClaimLink(
-                    amount, claimUrl, currency, expiresAt, id, redeemableCount, source, status, additionalProperties);
+                    amount,
+                    claimUrl,
+                    claimable,
+                    code,
+                    createdAt,
+                    currency,
+                    expiresAt,
+                    id,
+                    redeemableCount,
+                    redeemedCount,
+                    remainingClaims,
+                    sender,
+                    source,
+                    status,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("claim_url")
+                    || key.equalsIgnoreCase("claimable")
+                    || key.equalsIgnoreCase("code")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("redeemable_count")
+                    || key.equalsIgnoreCase("redeemed_count")
+                    || key.equalsIgnoreCase("remaining_claims")
+                    || key.equalsIgnoreCase("sender")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("status")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.users.oauthgrants.types.CreateOauthGrantsRequestCodeChallengeMethod;
+import com.whop.api.resources.users.oauthgrants.types.CreateOauthGrantsRequestMcpClient;
 import com.whop.api.resources.users.oauthgrants.types.CreateOauthGrantsRequestResponseType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,11 +30,13 @@ public final class CreateOauthGrantsRequest {
 
     private final String clientId;
 
-    private final String codeChallenge;
+    private final Optional<String> codeChallenge;
 
-    private final CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod;
+    private final Optional<CreateOauthGrantsRequestCodeChallengeMethod> codeChallengeMethod;
 
     private final Optional<Boolean> consentShown;
+
+    private final Optional<CreateOauthGrantsRequestMcpClient> mcpClient;
 
     private final Optional<String> nonce;
 
@@ -50,9 +53,10 @@ public final class CreateOauthGrantsRequest {
     private CreateOauthGrantsRequest(
             Optional<String> accountId,
             String clientId,
-            String codeChallenge,
-            CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod,
+            Optional<String> codeChallenge,
+            Optional<CreateOauthGrantsRequestCodeChallengeMethod> codeChallengeMethod,
             Optional<Boolean> consentShown,
+            Optional<CreateOauthGrantsRequestMcpClient> mcpClient,
             Optional<String> nonce,
             String redirectUri,
             List<String> requestedScopes,
@@ -64,6 +68,7 @@ public final class CreateOauthGrantsRequest {
         this.codeChallenge = codeChallenge;
         this.codeChallengeMethod = codeChallengeMethod;
         this.consentShown = consentShown;
+        this.mcpClient = mcpClient;
         this.nonce = nonce;
         this.redirectUri = redirectUri;
         this.requestedScopes = requestedScopes;
@@ -89,27 +94,35 @@ public final class CreateOauthGrantsRequest {
     }
 
     /**
-     * @return The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding.
+     * @return The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding. Required unless the app is confidential; a confidential app that leaves it out redeems the code with its secret instead of a verifier.
      */
     @JsonProperty("code_challenge")
-    public String getCodeChallenge() {
+    public Optional<String> getCodeChallenge() {
         return codeChallenge;
     }
 
     /**
-     * @return How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted.
+     * @return How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted. Required with <code>code_challenge</code>.
      */
     @JsonProperty("code_challenge_method")
-    public CreateOauthGrantsRequestCodeChallengeMethod getCodeChallengeMethod() {
+    public Optional<CreateOauthGrantsRequestCodeChallengeMethod> getCodeChallengeMethod() {
         return codeChallengeMethod;
     }
 
     /**
-     * @return Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested.
+     * @return Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested, or when the app is one of Whop's own with the consent skip switched on and asks for <code>openid</code> alone.
      */
     @JsonProperty("consent_shown")
     public Optional<Boolean> getConsentShown() {
         return consentShown;
+    }
+
+    /**
+     * @return The downstream MCP client displayed on the consent screen. Requires explicit consent even when the upstream app already has a grant. Bound to the authorization code and returned on token exchange so the MCP server can verify the approved client.
+     */
+    @JsonProperty("mcp_client")
+    public Optional<CreateOauthGrantsRequestMcpClient> getMcpClient() {
+        return mcpClient;
     }
 
     /**
@@ -169,6 +182,7 @@ public final class CreateOauthGrantsRequest {
                 && codeChallenge.equals(other.codeChallenge)
                 && codeChallengeMethod.equals(other.codeChallengeMethod)
                 && consentShown.equals(other.consentShown)
+                && mcpClient.equals(other.mcpClient)
                 && nonce.equals(other.nonce)
                 && redirectUri.equals(other.redirectUri)
                 && requestedScopes.equals(other.requestedScopes)
@@ -184,6 +198,7 @@ public final class CreateOauthGrantsRequest {
                 this.codeChallenge,
                 this.codeChallengeMethod,
                 this.consentShown,
+                this.mcpClient,
                 this.nonce,
                 this.redirectUri,
                 this.requestedScopes,
@@ -204,23 +219,9 @@ public final class CreateOauthGrantsRequest {
         /**
          * <p>The app being authorized, prefixed <code>app_</code>.</p>
          */
-        CodeChallengeStage clientId(@NotNull String clientId);
+        RedirectUriStage clientId(@NotNull String clientId);
 
         Builder from(CreateOauthGrantsRequest other);
-    }
-
-    public interface CodeChallengeStage {
-        /**
-         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding.</p>
-         */
-        CodeChallengeMethodStage codeChallenge(@NotNull String codeChallenge);
-    }
-
-    public interface CodeChallengeMethodStage {
-        /**
-         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted.</p>
-         */
-        RedirectUriStage codeChallengeMethod(@NotNull CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod);
     }
 
     public interface RedirectUriStage {
@@ -245,11 +246,32 @@ public final class CreateOauthGrantsRequest {
         _FinalStage accountId(String accountId);
 
         /**
-         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested.</p>
+         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding. Required unless the app is confidential; a confidential app that leaves it out redeems the code with its secret instead of a verifier.</p>
+         */
+        _FinalStage codeChallenge(Optional<String> codeChallenge);
+
+        _FinalStage codeChallenge(String codeChallenge);
+
+        /**
+         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted. Required with <code>code_challenge</code>.</p>
+         */
+        _FinalStage codeChallengeMethod(Optional<CreateOauthGrantsRequestCodeChallengeMethod> codeChallengeMethod);
+
+        _FinalStage codeChallengeMethod(CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod);
+
+        /**
+         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested, or when the app is one of Whop's own with the consent skip switched on and asks for <code>openid</code> alone.</p>
          */
         _FinalStage consentShown(Optional<Boolean> consentShown);
 
         _FinalStage consentShown(Boolean consentShown);
+
+        /**
+         * <p>The downstream MCP client displayed on the consent screen. Requires explicit consent even when the upstream app already has a grant. Bound to the authorization code and returned on token exchange so the MCP server can verify the approved client.</p>
+         */
+        _FinalStage mcpClient(Optional<CreateOauthGrantsRequestMcpClient> mcpClient);
+
+        _FinalStage mcpClient(CreateOauthGrantsRequestMcpClient mcpClient);
 
         /**
          * <p>OIDC nonce, echoed into the resulting ID token. Required when <code>requested_scopes</code> includes <code>openid</code>.</p>
@@ -283,13 +305,8 @@ public final class CreateOauthGrantsRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder
-            implements ClientIdStage, CodeChallengeStage, CodeChallengeMethodStage, RedirectUriStage, _FinalStage {
+    public static final class Builder implements ClientIdStage, RedirectUriStage, _FinalStage {
         private String clientId;
-
-        private String codeChallenge;
-
-        private CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod;
 
         private String redirectUri;
 
@@ -301,11 +318,16 @@ public final class CreateOauthGrantsRequest {
 
         private Optional<String> nonce = Optional.empty();
 
+        private Optional<CreateOauthGrantsRequestMcpClient> mcpClient = Optional.empty();
+
         private Optional<Boolean> consentShown = Optional.empty();
+
+        private Optional<CreateOauthGrantsRequestCodeChallengeMethod> codeChallengeMethod = Optional.empty();
+
+        private Optional<String> codeChallenge = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -317,6 +339,7 @@ public final class CreateOauthGrantsRequest {
             codeChallenge(other.getCodeChallenge());
             codeChallengeMethod(other.getCodeChallengeMethod());
             consentShown(other.getConsentShown());
+            mcpClient(other.getMcpClient());
             nonce(other.getNonce());
             redirectUri(other.getRedirectUri());
             requestedScopes(other.getRequestedScopes());
@@ -327,44 +350,16 @@ public final class CreateOauthGrantsRequest {
 
         /**
          * <p>The app being authorized, prefixed <code>app_</code>.</p>
-         * <p>The app being authorized, prefixed <code>app_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("client_id")
-        public CodeChallengeStage clientId(@NotNull String clientId) {
+        public RedirectUriStage clientId(@NotNull String clientId) {
             this.clientId = Objects.requireNonNull(clientId, "clientId must not be null");
             return this;
         }
 
         /**
-         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding.</p>
-         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("code_challenge")
-        public CodeChallengeMethodStage codeChallenge(@NotNull String codeChallenge) {
-            this.codeChallenge = Objects.requireNonNull(codeChallenge, "codeChallenge must not be null");
-            return this;
-        }
-
-        /**
-         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted.</p>
-         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("code_challenge_method")
-        public RedirectUriStage codeChallengeMethod(
-                @NotNull CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod) {
-            this.codeChallengeMethod =
-                    Objects.requireNonNull(codeChallengeMethod, "codeChallengeMethod must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Where to send the user once they have consented. Must match one of the app's registered redirect URIs exactly — it is compared as a string, not normalized.</p>
          * <p>Where to send the user once they have consented. Must match one of the app's registered redirect URIs exactly — it is compared as a string, not normalized.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -471,7 +466,27 @@ public final class CreateOauthGrantsRequest {
         }
 
         /**
-         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested.</p>
+         * <p>The downstream MCP client displayed on the consent screen. Requires explicit consent even when the upstream app already has a grant. Bound to the authorization code and returned on token exchange so the MCP server can verify the approved client.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mcpClient(CreateOauthGrantsRequestMcpClient mcpClient) {
+            this.mcpClient = Optional.ofNullable(mcpClient);
+            return this;
+        }
+
+        /**
+         * <p>The downstream MCP client displayed on the consent screen. Requires explicit consent even when the upstream app already has a grant. Bound to the authorization code and returned on token exchange so the MCP server can verify the approved client.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "mcp_client", nulls = Nulls.SKIP)
+        public _FinalStage mcpClient(Optional<CreateOauthGrantsRequestMcpClient> mcpClient) {
+            this.mcpClient = mcpClient;
+            return this;
+        }
+
+        /**
+         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested, or when the app is one of Whop's own with the consent skip switched on and asks for <code>openid</code> alone.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -481,12 +496,53 @@ public final class CreateOauthGrantsRequest {
         }
 
         /**
-         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested.</p>
+         * <p>Whether the consent UI listed these scopes for the user. Sending <code>false</code> succeeds only when the user has already granted every scope requested, or when the app is one of Whop's own with the consent skip switched on and asks for <code>openid</code> alone.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "consent_shown", nulls = Nulls.SKIP)
         public _FinalStage consentShown(Optional<Boolean> consentShown) {
             this.consentShown = consentShown;
+            return this;
+        }
+
+        /**
+         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted. Required with <code>code_challenge</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage codeChallengeMethod(CreateOauthGrantsRequestCodeChallengeMethod codeChallengeMethod) {
+            this.codeChallengeMethod = Optional.ofNullable(codeChallengeMethod);
+            return this;
+        }
+
+        /**
+         * <p>How <code>code_challenge</code> was derived. Only <code>S256</code> is accepted. Required with <code>code_challenge</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "code_challenge_method", nulls = Nulls.SKIP)
+        public _FinalStage codeChallengeMethod(
+                Optional<CreateOauthGrantsRequestCodeChallengeMethod> codeChallengeMethod) {
+            this.codeChallengeMethod = codeChallengeMethod;
+            return this;
+        }
+
+        /**
+         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding. Required unless the app is confidential; a confidential app that leaves it out redeems the code with its secret instead of a verifier.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage codeChallenge(String codeChallenge) {
+            this.codeChallenge = Optional.ofNullable(codeChallenge);
+            return this;
+        }
+
+        /**
+         * <p>The PKCE code challenge: the base64url-encoded SHA-256 of your code verifier, without padding. Required unless the app is confidential; a confidential app that leaves it out redeems the code with its secret instead of a verifier.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "code_challenge", nulls = Nulls.SKIP)
+        public _FinalStage codeChallenge(Optional<String> codeChallenge) {
+            this.codeChallenge = codeChallenge;
             return this;
         }
 
@@ -518,12 +574,31 @@ public final class CreateOauthGrantsRequest {
                     codeChallenge,
                     codeChallengeMethod,
                     consentShown,
+                    mcpClient,
                     nonce,
                     redirectUri,
                     requestedScopes,
                     responseType,
                     state,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("client_id")
+                    || key.equalsIgnoreCase("code_challenge")
+                    || key.equalsIgnoreCase("code_challenge_method")
+                    || key.equalsIgnoreCase("consent_shown")
+                    || key.equalsIgnoreCase("mcp_client")
+                    || key.equalsIgnoreCase("nonce")
+                    || key.equalsIgnoreCase("redirect_uri")
+                    || key.equalsIgnoreCase("requested_scopes")
+                    || key.equalsIgnoreCase("response_type")
+                    || key.equalsIgnoreCase("state")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

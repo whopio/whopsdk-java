@@ -9,31 +9,33 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.teammembers.types.UpdateTeamMembersRequestRole;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateTeamMembersRequest.Builder.class)
 public final class UpdateTeamMembersRequest {
-    private final UpdateTeamMembersRequestRole role;
+    private final Optional<UpdateTeamMembersRequestRole> role;
 
     private final Map<String, Object> additionalProperties;
 
-    private UpdateTeamMembersRequest(UpdateTeamMembersRequestRole role, Map<String, Object> additionalProperties) {
+    private UpdateTeamMembersRequest(
+            Optional<UpdateTeamMembersRequestRole> role, Map<String, Object> additionalProperties) {
         this.role = role;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return The system role to grant.
+     * @return The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.
      */
     @JsonProperty("role")
-    public UpdateTeamMembersRequestRole getRole() {
+    public Optional<UpdateTeamMembersRequestRole> getRole() {
         return role;
     }
 
@@ -62,66 +64,54 @@ public final class UpdateTeamMembersRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static RoleStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface RoleStage {
-        /**
-         * <p>The system role to grant.</p>
-         */
-        _FinalStage role(@NotNull UpdateTeamMembersRequestRole role);
-
-        Builder from(UpdateTeamMembersRequest other);
-    }
-
-    public interface _FinalStage {
-        UpdateTeamMembersRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements RoleStage, _FinalStage {
-        private UpdateTeamMembersRequestRole role;
+    public static final class Builder {
+        private Optional<UpdateTeamMembersRequestRole> role = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(UpdateTeamMembersRequest other) {
             role(other.getRole());
             return this;
         }
 
         /**
-         * <p>The system role to grant.</p>
-         * <p>The system role to grant.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>The system role to grant. Custom roles cannot be granted through the API. The Partner role provides view-only access.</p>
          */
-        @java.lang.Override
-        @JsonSetter("role")
-        public _FinalStage role(@NotNull UpdateTeamMembersRequestRole role) {
-            this.role = Objects.requireNonNull(role, "role must not be null");
+        @JsonSetter(value = "role", nulls = Nulls.SKIP)
+        public Builder role(Optional<UpdateTeamMembersRequestRole> role) {
+            this.role = role;
             return this;
         }
 
-        @java.lang.Override
+        public Builder role(UpdateTeamMembersRequestRole role) {
+            this.role = Optional.ofNullable(role);
+            return this;
+        }
+
         public UpdateTeamMembersRequest build() {
             return new UpdateTeamMembersRequest(role, additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("role")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

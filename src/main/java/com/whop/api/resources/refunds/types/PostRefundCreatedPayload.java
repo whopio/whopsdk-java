@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Refund;
+import com.whop.api.types.RefundLegacy;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public final class PostRefundCreatedPayload {
 
     private final Optional<String> apiVersionDate;
 
-    private final Refund data;
+    private final RefundLegacy data;
 
     private final String id;
 
@@ -48,7 +48,7 @@ public final class PostRefundCreatedPayload {
             Optional<String> accountId,
             PostRefundCreatedPayloadApiVersion apiVersion,
             Optional<String> apiVersionDate,
-            Refund data,
+            RefundLegacy data,
             String id,
             Optional<Map<String, Object>> previousAttributes,
             OffsetDateTime timestamp,
@@ -96,7 +96,7 @@ public final class PostRefundCreatedPayload {
     }
 
     @JsonProperty("data")
-    public Refund getData() {
+    public RefundLegacy getData() {
         return data;
     }
 
@@ -198,7 +198,7 @@ public final class PostRefundCreatedPayload {
     }
 
     public interface DataStage {
-        IdStage data(@NotNull Refund data);
+        IdStage data(@NotNull RefundLegacy data);
     }
 
     public interface IdStage {
@@ -260,7 +260,7 @@ public final class PostRefundCreatedPayload {
             implements ApiVersionStage, DataStage, IdStage, TimestampStage, TypeStage, _FinalStage {
         private PostRefundCreatedPayloadApiVersion apiVersion;
 
-        private Refund data;
+        private RefundLegacy data;
 
         private String id;
 
@@ -274,7 +274,6 @@ public final class PostRefundCreatedPayload {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -294,7 +293,6 @@ public final class PostRefundCreatedPayload {
 
         /**
          * <p>The API version for this webhook</p>
-         * <p>The API version for this webhook</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -306,13 +304,12 @@ public final class PostRefundCreatedPayload {
 
         @java.lang.Override
         @JsonSetter("data")
-        public IdStage data(@NotNull Refund data) {
+        public IdStage data(@NotNull RefundLegacy data) {
             this.data = Objects.requireNonNull(data, "data must not be null");
             return this;
         }
 
         /**
-         * <p>A unique ID for every single webhook request</p>
          * <p>A unique ID for every single webhook request</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -325,7 +322,6 @@ public final class PostRefundCreatedPayload {
 
         /**
          * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
-         * <p>The timestamp in ISO 8601 format that the webhook was sent at on the server</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -336,7 +332,6 @@ public final class PostRefundCreatedPayload {
         }
 
         /**
-         * <p>The webhook event type</p>
          * <p>The webhook event type</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -451,6 +446,21 @@ public final class PostRefundCreatedPayload {
                     timestamp,
                     type,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("api_version")
+                    || key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("data")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("previous_attributes")
+                    || key.equalsIgnoreCase("timestamp")
+                    || key.equalsIgnoreCase("type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

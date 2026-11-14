@@ -25,6 +25,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveStatsResponseData.Builder.class)
 public final class RetrieveStatsResponseData {
+    private final Optional<Boolean> complete;
+
     private final Optional<String> currency;
 
     private final List<RetrieveStatsResponseDataPointsItem> points;
@@ -34,14 +36,27 @@ public final class RetrieveStatsResponseData {
     private final Map<String, Object> additionalProperties;
 
     private RetrieveStatsResponseData(
+            Optional<Boolean> complete,
             Optional<String> currency,
             List<RetrieveStatsResponseDataPointsItem> points,
             Optional<List<RetrieveStatsResponseDataTotalsItem>> totals,
             Map<String, Object> additionalProperties) {
+        this.complete = complete;
         this.currency = currency;
         this.points = points;
         this.totals = totals;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Present for webhook_deliveries. False while older deliveries are still being counted in the background: the points cover what is counted so far. Responses are cached for up to a minute, so wait a minute before requesting the same range again.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getComplete() {
+        if (complete == null) {
+            return Optional.empty();
+        }
+        return complete;
     }
 
     /**
@@ -64,7 +79,7 @@ public final class RetrieveStatsResponseData {
     }
 
     /**
-     * @return Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and unique-people counts exist only at window level.
+     * @return Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and whole-window unique people are distinct across every bucket.
      */
     @JsonIgnore
     public Optional<List<RetrieveStatsResponseDataTotalsItem>> getTotals() {
@@ -72,6 +87,12 @@ public final class RetrieveStatsResponseData {
             return Optional.empty();
         }
         return totals;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("complete")
+    private Optional<Boolean> _getComplete() {
+        return complete;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -98,12 +119,15 @@ public final class RetrieveStatsResponseData {
     }
 
     private boolean equalTo(RetrieveStatsResponseData other) {
-        return currency.equals(other.currency) && points.equals(other.points) && totals.equals(other.totals);
+        return complete.equals(other.complete)
+                && currency.equals(other.currency)
+                && points.equals(other.points)
+                && totals.equals(other.totals);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.currency, this.points, this.totals);
+        return Objects.hash(this.complete, this.currency, this.points, this.totals);
     }
 
     @java.lang.Override
@@ -117,21 +141,48 @@ public final class RetrieveStatsResponseData {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Boolean> complete = Optional.empty();
+
         private Optional<String> currency = Optional.empty();
 
         private List<RetrieveStatsResponseDataPointsItem> points = new ArrayList<>();
 
         private Optional<List<RetrieveStatsResponseDataTotalsItem>> totals = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveStatsResponseData other) {
+            complete(other.getComplete());
             currency(other.getCurrency());
             points(other.getPoints());
             totals(other.getTotals());
+            return this;
+        }
+
+        /**
+         * <p>Present for webhook_deliveries. False while older deliveries are still being counted in the background: the points cover what is counted so far. Responses are cached for up to a minute, so wait a minute before requesting the same range again.</p>
+         */
+        @JsonSetter(value = "complete", nulls = Nulls.SKIP)
+        public Builder complete(Optional<Boolean> complete) {
+            this.complete = complete;
+            return this;
+        }
+
+        public Builder complete(Boolean complete) {
+            this.complete = Optional.ofNullable(complete);
+            return this;
+        }
+
+        public Builder complete(Nullable<Boolean> complete) {
+            if (complete.isNull()) {
+                this.complete = null;
+            } else if (complete.isEmpty()) {
+                this.complete = Optional.empty();
+            } else {
+                this.complete = Optional.of(complete.get());
+            }
             return this;
         }
 
@@ -185,7 +236,7 @@ public final class RetrieveStatsResponseData {
         }
 
         /**
-         * <p>Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and unique-people counts exist only at window level.</p>
+         * <p>Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and whole-window unique people are distinct across every bucket.</p>
          */
         @JsonSetter(value = "totals", nulls = Nulls.SKIP)
         public Builder totals(Optional<List<RetrieveStatsResponseDataTotalsItem>> totals) {
@@ -210,7 +261,18 @@ public final class RetrieveStatsResponseData {
         }
 
         public RetrieveStatsResponseData build() {
-            return new RetrieveStatsResponseData(currency, points, totals, additionalProperties);
+            return new RetrieveStatsResponseData(complete, currency, points, totals, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("complete")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("points")
+                    || key.equalsIgnoreCase("totals")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.partners.types.ReferredUsersPartnersRequestDirection;
+import com.whop.api.resources.partners.types.ReferredUsersPartnersRequestOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,9 +22,21 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ReferredUsersPartnersRequest.Builder.class)
 public final class ReferredUsersPartnersRequest {
+    private final Optional<String> earningPartnerId;
+
+    private final Optional<String> earningPartnerUsername;
+
+    private final Optional<String> referringAccountId;
+
+    private final Optional<String> query;
+
     private final Optional<Boolean> hasBusinesses;
 
     private final Optional<Boolean> hasEarningBusinesses;
+
+    private final Optional<ReferredUsersPartnersRequestOrder> order;
+
+    private final Optional<ReferredUsersPartnersRequestDirection> direction;
 
     private final Optional<Integer> first;
 
@@ -35,20 +49,64 @@ public final class ReferredUsersPartnersRequest {
     private final Map<String, Object> additionalProperties;
 
     private ReferredUsersPartnersRequest(
+            Optional<String> earningPartnerId,
+            Optional<String> earningPartnerUsername,
+            Optional<String> referringAccountId,
+            Optional<String> query,
             Optional<Boolean> hasBusinesses,
             Optional<Boolean> hasEarningBusinesses,
+            Optional<ReferredUsersPartnersRequestOrder> order,
+            Optional<ReferredUsersPartnersRequestDirection> direction,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
             Map<String, Object> additionalProperties) {
+        this.earningPartnerId = earningPartnerId;
+        this.earningPartnerUsername = earningPartnerUsername;
+        this.referringAccountId = referringAccountId;
+        this.query = query;
         this.hasBusinesses = hasBusinesses;
         this.hasEarningBusinesses = hasEarningBusinesses;
+        this.order = order;
+        this.direction = direction;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The selected referring partner's user_ ID. Requires user_id=global; cannot be combined with earning_partner_username.
+     */
+    @JsonProperty("earning_partner_id")
+    public Optional<String> getEarningPartnerId() {
+        return earningPartnerId;
+    }
+
+    /**
+     * @return The selected referring partner's exact username. Requires user_id=global; cannot be combined with earning_partner_id.
+     */
+    @JsonProperty("earning_partner_username")
+    public Optional<String> getEarningPartnerUsername() {
+        return earningPartnerUsername;
+    }
+
+    /**
+     * @return List the users this business's team members referred, past members included, instead of the caller's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every team member's referrals; anyone else reads only their own and those of the people under them in the org chart. earning_partner_id or earning_partner_username then narrows to one team member.
+     */
+    @JsonProperty("referring_account_id")
+    public Optional<String> getReferringAccountId() {
+        return referringAccountId;
+    }
+
+    /**
+     * @return Search referred users by name or username. In global mode, matches the beginning of usernames only.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
     }
 
     /**
@@ -68,7 +126,23 @@ public final class ReferredUsersPartnersRequest {
     }
 
     /**
-     * @return Number of referred users to return from the start of the window.
+     * @return The field to sort by. created_at uses the user's signup date; earnings_usd uses the current primary referrer's cached total affiliate earnings from that user.
+     */
+    @JsonProperty("order")
+    public Optional<ReferredUsersPartnersRequestOrder> getOrder() {
+        return order;
+    }
+
+    /**
+     * @return The direction to sort results.
+     */
+    @JsonProperty("direction")
+    public Optional<ReferredUsersPartnersRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -76,7 +150,7 @@ public final class ReferredUsersPartnersRequest {
     }
 
     /**
-     * @return Cursor to fetch the page after (from page_info.end_cursor).
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -84,7 +158,7 @@ public final class ReferredUsersPartnersRequest {
     }
 
     /**
-     * @return Number of referred users to return from the end of the window.
+     * @return Number of results to return from the end of the range.
      */
     @JsonProperty("last")
     public Optional<Integer> getLast() {
@@ -92,7 +166,7 @@ public final class ReferredUsersPartnersRequest {
     }
 
     /**
-     * @return Cursor to fetch the page before (from page_info.start_cursor).
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -111,8 +185,14 @@ public final class ReferredUsersPartnersRequest {
     }
 
     private boolean equalTo(ReferredUsersPartnersRequest other) {
-        return hasBusinesses.equals(other.hasBusinesses)
+        return earningPartnerId.equals(other.earningPartnerId)
+                && earningPartnerUsername.equals(other.earningPartnerUsername)
+                && referringAccountId.equals(other.referringAccountId)
+                && query.equals(other.query)
+                && hasBusinesses.equals(other.hasBusinesses)
                 && hasEarningBusinesses.equals(other.hasEarningBusinesses)
+                && order.equals(other.order)
+                && direction.equals(other.direction)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
@@ -122,7 +202,18 @@ public final class ReferredUsersPartnersRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.hasBusinesses, this.hasEarningBusinesses, this.first, this.after, this.last, this.before);
+                this.earningPartnerId,
+                this.earningPartnerUsername,
+                this.referringAccountId,
+                this.query,
+                this.hasBusinesses,
+                this.hasEarningBusinesses,
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before);
     }
 
     @java.lang.Override
@@ -136,9 +227,21 @@ public final class ReferredUsersPartnersRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> earningPartnerId = Optional.empty();
+
+        private Optional<String> earningPartnerUsername = Optional.empty();
+
+        private Optional<String> referringAccountId = Optional.empty();
+
+        private Optional<String> query = Optional.empty();
+
         private Optional<Boolean> hasBusinesses = Optional.empty();
 
         private Optional<Boolean> hasEarningBusinesses = Optional.empty();
+
+        private Optional<ReferredUsersPartnersRequestOrder> order = Optional.empty();
+
+        private Optional<ReferredUsersPartnersRequestDirection> direction = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
 
@@ -148,18 +251,79 @@ public final class ReferredUsersPartnersRequest {
 
         private Optional<String> before = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ReferredUsersPartnersRequest other) {
+            earningPartnerId(other.getEarningPartnerId());
+            earningPartnerUsername(other.getEarningPartnerUsername());
+            referringAccountId(other.getReferringAccountId());
+            query(other.getQuery());
             hasBusinesses(other.getHasBusinesses());
             hasEarningBusinesses(other.getHasEarningBusinesses());
+            order(other.getOrder());
+            direction(other.getDirection());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            return this;
+        }
+
+        /**
+         * <p>The selected referring partner's user_ ID. Requires user_id=global; cannot be combined with earning_partner_username.</p>
+         */
+        @JsonSetter(value = "earning_partner_id", nulls = Nulls.SKIP)
+        public Builder earningPartnerId(Optional<String> earningPartnerId) {
+            this.earningPartnerId = earningPartnerId;
+            return this;
+        }
+
+        public Builder earningPartnerId(String earningPartnerId) {
+            this.earningPartnerId = Optional.ofNullable(earningPartnerId);
+            return this;
+        }
+
+        /**
+         * <p>The selected referring partner's exact username. Requires user_id=global; cannot be combined with earning_partner_id.</p>
+         */
+        @JsonSetter(value = "earning_partner_username", nulls = Nulls.SKIP)
+        public Builder earningPartnerUsername(Optional<String> earningPartnerUsername) {
+            this.earningPartnerUsername = earningPartnerUsername;
+            return this;
+        }
+
+        public Builder earningPartnerUsername(String earningPartnerUsername) {
+            this.earningPartnerUsername = Optional.ofNullable(earningPartnerUsername);
+            return this;
+        }
+
+        /**
+         * <p>List the users this business's team members referred, past members included, instead of the caller's own. Requires company:basic:read on that business, which every team member holds, and cannot be combined with user_id. The owner role reads every team member's referrals; anyone else reads only their own and those of the people under them in the org chart. earning_partner_id or earning_partner_username then narrows to one team member.</p>
+         */
+        @JsonSetter(value = "referring_account_id", nulls = Nulls.SKIP)
+        public Builder referringAccountId(Optional<String> referringAccountId) {
+            this.referringAccountId = referringAccountId;
+            return this;
+        }
+
+        public Builder referringAccountId(String referringAccountId) {
+            this.referringAccountId = Optional.ofNullable(referringAccountId);
+            return this;
+        }
+
+        /**
+         * <p>Search referred users by name or username. In global mode, matches the beginning of usernames only.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
             return this;
         }
 
@@ -192,7 +356,35 @@ public final class ReferredUsersPartnersRequest {
         }
 
         /**
-         * <p>Number of referred users to return from the start of the window.</p>
+         * <p>The field to sort by. created_at uses the user's signup date; earnings_usd uses the current primary referrer's cached total affiliate earnings from that user.</p>
+         */
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ReferredUsersPartnersRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ReferredUsersPartnersRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>The direction to sort results.</p>
+         */
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ReferredUsersPartnersRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ReferredUsersPartnersRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -206,7 +398,7 @@ public final class ReferredUsersPartnersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page after (from page_info.end_cursor).</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -220,7 +412,7 @@ public final class ReferredUsersPartnersRequest {
         }
 
         /**
-         * <p>Number of referred users to return from the end of the window.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
         @JsonSetter(value = "last", nulls = Nulls.SKIP)
         public Builder last(Optional<Integer> last) {
@@ -234,7 +426,7 @@ public final class ReferredUsersPartnersRequest {
         }
 
         /**
-         * <p>Cursor to fetch the page before (from page_info.start_cursor).</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -249,7 +441,38 @@ public final class ReferredUsersPartnersRequest {
 
         public ReferredUsersPartnersRequest build() {
             return new ReferredUsersPartnersRequest(
-                    hasBusinesses, hasEarningBusinesses, first, after, last, before, additionalProperties);
+                    earningPartnerId,
+                    earningPartnerUsername,
+                    referringAccountId,
+                    query,
+                    hasBusinesses,
+                    hasEarningBusinesses,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("earning_partner_id")
+                    || key.equalsIgnoreCase("earning_partner_username")
+                    || key.equalsIgnoreCase("referring_account_id")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("has_businesses")
+                    || key.equalsIgnoreCase("has_earning_businesses")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -85,7 +85,6 @@ public final class ExtendMembershipsRequest {
     public static final class Builder implements DaysStage, _FinalStage {
         private int days;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -97,7 +96,6 @@ public final class ExtendMembershipsRequest {
         }
 
         /**
-         * <p>Number of free days to add (1-1095).</p>
          * <p>Number of free days to add (1-1095).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -111,6 +109,14 @@ public final class ExtendMembershipsRequest {
         @java.lang.Override
         public ExtendMembershipsRequest build() {
             return new ExtendMembershipsRequest(days, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("days")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

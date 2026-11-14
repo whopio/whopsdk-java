@@ -94,7 +94,6 @@ public final class RetrievePeopleResponseUsageOsItem {
 
         private String value;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -123,6 +122,14 @@ public final class RetrievePeopleResponseUsageOsItem {
         @java.lang.Override
         public RetrievePeopleResponseUsageOsItem build() {
             return new RetrievePeopleResponseUsageOsItem(events, value, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("events") || key.equalsIgnoreCase("value")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

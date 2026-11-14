@@ -110,7 +110,7 @@ public final class CreateApiKeysRequest {
     }
 
     /**
-     * @return The account (<code>biz_</code>) or app (<code>app_</code>) tag to create the API key for.
+     * @return The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to create the API key for.
      */
     @JsonProperty("resource_id")
     public String getResourceId() {
@@ -197,7 +197,7 @@ public final class CreateApiKeysRequest {
 
     public interface ResourceIdStage {
         /**
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to create the API key for.</p>
+         * <p>The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to create the API key for.</p>
          */
         ResourceTypeStage resourceId(@NotNull String resourceId);
     }
@@ -259,7 +259,6 @@ public final class CreateApiKeysRequest {
 
         private Optional<CreateApiKeysRequestApiVersionDate> apiVersionDate = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -278,7 +277,6 @@ public final class CreateApiKeysRequest {
 
         /**
          * <p>A human-readable name for the API key, such as 'Production API Key'.</p>
-         * <p>A human-readable name for the API key, such as 'Production API Key'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -290,7 +288,6 @@ public final class CreateApiKeysRequest {
 
         /**
          * <p>The permissions policy for the API key: explicit permission statements, or a system role to inherit from. Statements without a <code>resources</code> array default to the owning account (Account API keys) or every key-addressable resource (App API keys).</p>
-         * <p>The permissions policy for the API key: explicit permission statements, or a system role to inherit from. Statements without a <code>resources</code> array default to the owning account (Account API keys) or every key-addressable resource (App API keys).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -301,8 +298,7 @@ public final class CreateApiKeysRequest {
         }
 
         /**
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to create the API key for.</p>
-         * <p>The account (<code>biz_</code>) or app (<code>app_</code>) tag to create the API key for.</p>
+         * <p>The account (<code>biz_</code>), app (<code>app_</code>), or your own user (<code>user_</code>) tag to create the API key for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -313,7 +309,6 @@ public final class CreateApiKeysRequest {
         }
 
         /**
-         * <p>The type of resource that will own this API key.</p>
          * <p>The type of resource that will own this API key.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -427,6 +422,20 @@ public final class CreateApiKeysRequest {
                     resourceId,
                     resourceType,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("api_version_date")
+                    || key.equalsIgnoreCase("expires_at")
+                    || key.equalsIgnoreCase("ip_allowlist")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("permissions")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("resource_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AiChatListItem.Builder.class)
 public final class AiChatListItem {
+    private final AiChatAgentIdentifiers agentIdentifier;
+
     private final String blendedTokenUsage;
 
     private final OffsetDateTime createdAt;
@@ -46,6 +48,7 @@ public final class AiChatListItem {
     private final Map<String, Object> additionalProperties;
 
     private AiChatListItem(
+            AiChatAgentIdentifiers agentIdentifier,
             String blendedTokenUsage,
             OffsetDateTime createdAt,
             String id,
@@ -56,6 +59,7 @@ public final class AiChatListItem {
             OffsetDateTime updatedAt,
             AiChatListItemUser user,
             Map<String, Object> additionalProperties) {
+        this.agentIdentifier = agentIdentifier;
         this.blendedTokenUsage = blendedTokenUsage;
         this.createdAt = createdAt;
         this.id = id;
@@ -66,6 +70,14 @@ public final class AiChatListItem {
         this.updatedAt = updatedAt;
         this.user = user;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The AI agent that handles this chat. Set when the chat is created and fixed for its lifetime.
+     */
+    @JsonProperty("agent_identifier")
+    public AiChatAgentIdentifiers getAgentIdentifier() {
+        return agentIdentifier;
     }
 
     /**
@@ -170,7 +182,8 @@ public final class AiChatListItem {
     }
 
     private boolean equalTo(AiChatListItem other) {
-        return blendedTokenUsage.equals(other.blendedTokenUsage)
+        return agentIdentifier.equals(other.agentIdentifier)
+                && blendedTokenUsage.equals(other.blendedTokenUsage)
                 && createdAt.equals(other.createdAt)
                 && id.equals(other.id)
                 && lastMessageAt.equals(other.lastMessageAt)
@@ -184,6 +197,7 @@ public final class AiChatListItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.agentIdentifier,
                 this.blendedTokenUsage,
                 this.createdAt,
                 this.id,
@@ -200,8 +214,17 @@ public final class AiChatListItem {
         return ObjectMappers.stringify(this);
     }
 
-    public static BlendedTokenUsageStage builder() {
+    public static AgentIdentifierStage builder() {
         return new Builder();
+    }
+
+    public interface AgentIdentifierStage {
+        /**
+         * <p>The AI agent that handles this chat. Set when the chat is created and fixed for its lifetime.</p>
+         */
+        BlendedTokenUsageStage agentIdentifier(@NotNull AiChatAgentIdentifiers agentIdentifier);
+
+        Builder from(AiChatListItem other);
     }
 
     public interface BlendedTokenUsageStage {
@@ -209,8 +232,6 @@ public final class AiChatListItem {
          * <p>The total number of tokens consumed across all messages in this conversation.</p>
          */
         CreatedAtStage blendedTokenUsage(@NotNull String blendedTokenUsage);
-
-        Builder from(AiChatListItem other);
     }
 
     public interface CreatedAtStage {
@@ -283,7 +304,8 @@ public final class AiChatListItem {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements BlendedTokenUsageStage,
+            implements AgentIdentifierStage,
+                    BlendedTokenUsageStage,
                     CreatedAtStage,
                     IdStage,
                     MessageCountStage,
@@ -291,6 +313,8 @@ public final class AiChatListItem {
                     UpdatedAtStage,
                     UserStage,
                     _FinalStage {
+        private AiChatAgentIdentifiers agentIdentifier;
+
         private String blendedTokenUsage;
 
         private OffsetDateTime createdAt;
@@ -309,13 +333,13 @@ public final class AiChatListItem {
 
         private Optional<OffsetDateTime> lastMessageAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AiChatListItem other) {
+            agentIdentifier(other.getAgentIdentifier());
             blendedTokenUsage(other.getBlendedTokenUsage());
             createdAt(other.getCreatedAt());
             id(other.getId());
@@ -329,7 +353,17 @@ public final class AiChatListItem {
         }
 
         /**
-         * <p>The total number of tokens consumed across all messages in this conversation.</p>
+         * <p>The AI agent that handles this chat. Set when the chat is created and fixed for its lifetime.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("agent_identifier")
+        public BlendedTokenUsageStage agentIdentifier(@NotNull AiChatAgentIdentifiers agentIdentifier) {
+            this.agentIdentifier = Objects.requireNonNull(agentIdentifier, "agentIdentifier must not be null");
+            return this;
+        }
+
+        /**
          * <p>The total number of tokens consumed across all messages in this conversation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -342,7 +376,6 @@ public final class AiChatListItem {
 
         /**
          * <p>The datetime the ai chat was created.</p>
-         * <p>The datetime the ai chat was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -353,7 +386,6 @@ public final class AiChatListItem {
         }
 
         /**
-         * <p>The unique identifier for the ai chat.</p>
          * <p>The unique identifier for the ai chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -366,7 +398,6 @@ public final class AiChatListItem {
 
         /**
          * <p>The total number of messages exchanged in this conversation.</p>
-         * <p>The total number of messages exchanged in this conversation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -377,7 +408,6 @@ public final class AiChatListItem {
         }
 
         /**
-         * <p>The notification preference for this AI chat. <code>all</code> delivers AI chat notifications and badges, while <code>none</code> mutes them.</p>
          * <p>The notification preference for this AI chat. <code>all</code> delivers AI chat notifications and badges, while <code>none</code> mutes them.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -391,7 +421,6 @@ public final class AiChatListItem {
 
         /**
          * <p>The datetime the ai chat was last updated.</p>
-         * <p>The datetime the ai chat was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -402,7 +431,6 @@ public final class AiChatListItem {
         }
 
         /**
-         * <p>The user who owns this AI chat conversation.</p>
          * <p>The user who owns this AI chat conversation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -488,6 +516,7 @@ public final class AiChatListItem {
         @java.lang.Override
         public AiChatListItem build() {
             return new AiChatListItem(
+                    agentIdentifier,
                     blendedTokenUsage,
                     createdAt,
                     id,
@@ -498,6 +527,23 @@ public final class AiChatListItem {
                     updatedAt,
                     user,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("agent_identifier")
+                    || key.equalsIgnoreCase("blended_token_usage")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_message_at")
+                    || key.equalsIgnoreCase("message_count")
+                    || key.equalsIgnoreCase("notification_preference")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("user")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

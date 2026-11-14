@@ -22,7 +22,7 @@ import java.util.Optional;
 public final class UpdatePreferencesRequest {
     private final Optional<Boolean> bountyWorkerOnboardingDismissed;
 
-    private final Optional<Boolean> investigationEnabled;
+    private final Optional<Boolean> cardsAutoTopUp;
 
     private final Optional<Boolean> termsAccepted;
 
@@ -30,11 +30,11 @@ public final class UpdatePreferencesRequest {
 
     private UpdatePreferencesRequest(
             Optional<Boolean> bountyWorkerOnboardingDismissed,
-            Optional<Boolean> investigationEnabled,
+            Optional<Boolean> cardsAutoTopUp,
             Optional<Boolean> termsAccepted,
             Map<String, Object> additionalProperties) {
         this.bountyWorkerOnboardingDismissed = bountyWorkerOnboardingDismissed;
-        this.investigationEnabled = investigationEnabled;
+        this.cardsAutoTopUp = cardsAutoTopUp;
         this.termsAccepted = termsAccepted;
         this.additionalProperties = additionalProperties;
     }
@@ -48,11 +48,11 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.
+     * @return Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. Requires a cards balance and the <code>payout:account:update</code> permission.
      */
-    @JsonProperty("investigation_enabled")
-    public Optional<Boolean> getInvestigationEnabled() {
-        return investigationEnabled;
+    @JsonProperty("cards_auto_top_up")
+    public Optional<Boolean> getCardsAutoTopUp() {
+        return cardsAutoTopUp;
     }
 
     /**
@@ -76,13 +76,13 @@ public final class UpdatePreferencesRequest {
 
     private boolean equalTo(UpdatePreferencesRequest other) {
         return bountyWorkerOnboardingDismissed.equals(other.bountyWorkerOnboardingDismissed)
-                && investigationEnabled.equals(other.investigationEnabled)
+                && cardsAutoTopUp.equals(other.cardsAutoTopUp)
                 && termsAccepted.equals(other.termsAccepted);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.bountyWorkerOnboardingDismissed, this.investigationEnabled, this.termsAccepted);
+        return Objects.hash(this.bountyWorkerOnboardingDismissed, this.cardsAutoTopUp, this.termsAccepted);
     }
 
     @java.lang.Override
@@ -98,18 +98,17 @@ public final class UpdatePreferencesRequest {
     public static final class Builder {
         private Optional<Boolean> bountyWorkerOnboardingDismissed = Optional.empty();
 
-        private Optional<Boolean> investigationEnabled = Optional.empty();
+        private Optional<Boolean> cardsAutoTopUp = Optional.empty();
 
         private Optional<Boolean> termsAccepted = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(UpdatePreferencesRequest other) {
             bountyWorkerOnboardingDismissed(other.getBountyWorkerOnboardingDismissed());
-            investigationEnabled(other.getInvestigationEnabled());
+            cardsAutoTopUp(other.getCardsAutoTopUp());
             termsAccepted(other.getTermsAccepted());
             return this;
         }
@@ -129,16 +128,16 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Whether investigation mode is enabled for the user. Only meaningful for staff users with investigation access.</p>
+         * <p>Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. Requires a cards balance and the <code>payout:account:update</code> permission.</p>
          */
-        @JsonSetter(value = "investigation_enabled", nulls = Nulls.SKIP)
-        public Builder investigationEnabled(Optional<Boolean> investigationEnabled) {
-            this.investigationEnabled = investigationEnabled;
+        @JsonSetter(value = "cards_auto_top_up", nulls = Nulls.SKIP)
+        public Builder cardsAutoTopUp(Optional<Boolean> cardsAutoTopUp) {
+            this.cardsAutoTopUp = cardsAutoTopUp;
             return this;
         }
 
-        public Builder investigationEnabled(Boolean investigationEnabled) {
-            this.investigationEnabled = Optional.ofNullable(investigationEnabled);
+        public Builder cardsAutoTopUp(Boolean cardsAutoTopUp) {
+            this.cardsAutoTopUp = Optional.ofNullable(cardsAutoTopUp);
             return this;
         }
 
@@ -158,7 +157,17 @@ public final class UpdatePreferencesRequest {
 
         public UpdatePreferencesRequest build() {
             return new UpdatePreferencesRequest(
-                    bountyWorkerOnboardingDismissed, investigationEnabled, termsAccepted, additionalProperties);
+                    bountyWorkerOnboardingDismissed, cardsAutoTopUp, termsAccepted, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_worker_onboarding_dismissed")
+                    || key.equalsIgnoreCase("cards_auto_top_up")
+                    || key.equalsIgnoreCase("terms_accepted")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

@@ -109,7 +109,6 @@ public final class ListPermissionsRequest {
 
         private Optional<String> actions = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,7 +121,6 @@ public final class ListPermissionsRequest {
         }
 
         /**
-         * <p>Tag of the resource to check against: an account (<code>biz_</code>), product (<code>prod_</code>), experience (<code>exp_</code>), or app (<code>app_</code>). A resource the credential cannot see is reported as granted nothing rather than as an error.</p>
          * <p>Tag of the resource to check against: an account (<code>biz_</code>), product (<code>prod_</code>), experience (<code>exp_</code>), or app (<code>app_</code>). A resource the credential cannot see is reported as granted nothing rather than as an error.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -156,6 +154,14 @@ public final class ListPermissionsRequest {
         @java.lang.Override
         public ListPermissionsRequest build() {
             return new ListPermissionsRequest(resourceId, actions, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("resource_id") || key.equalsIgnoreCase("actions")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

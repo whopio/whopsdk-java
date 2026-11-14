@@ -170,7 +170,6 @@ public final class PaymentListItemProduct {
 
         private Optional<Map<String, Object>> metadata = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -186,7 +185,6 @@ public final class PaymentListItemProduct {
 
         /**
          * <p>The unique identifier for the product.</p>
-         * <p>The unique identifier for the product.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -198,7 +196,6 @@ public final class PaymentListItemProduct {
 
         /**
          * <p>URL slug in the product's public link, e.g. <code>pickaxe-analytics</code> in whop.com/company/pickaxe-analytics.</p>
-         * <p>URL slug in the product's public link, e.g. <code>pickaxe-analytics</code> in whop.com/company/pickaxe-analytics.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -209,7 +206,6 @@ public final class PaymentListItemProduct {
         }
 
         /**
-         * <p>The display name of the product shown to customers on the product page and in search results.</p>
          * <p>The display name of the product shown to customers on the product page and in search results.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -259,6 +255,17 @@ public final class PaymentListItemProduct {
         @java.lang.Override
         public PaymentListItemProduct build() {
             return new PaymentListItemProduct(id, metadata, route, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("route")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

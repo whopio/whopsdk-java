@@ -113,7 +113,7 @@ public final class UserBalance {
     }
 
     /**
-     * @return The user's personal balance in USD: cash (available + pending + in-transit + reserve) + crypto + in-flight treasury deposits. Excludes account balances (see businesses_total_usd).
+     * @return The user's personal balance in USD: cash (available + pending + in-transit + reserve) + other holdings + deposits still in flight. Excludes account balances (see businesses_total_usd).
      */
     @JsonProperty("total_usd")
     public String getTotalUsd() {
@@ -121,7 +121,7 @@ public final class UserBalance {
     }
 
     /**
-     * @return Balance-to-wallet USDT0 withdrawals still in flight, in USD.
+     * @return Balance moves into the user's wallet still in flight, in USD.
      */
     @JsonProperty("treasury_pending_usd")
     public String getTreasuryPendingUsd() {
@@ -206,14 +206,14 @@ public final class UserBalance {
 
     public interface TotalUsdStage {
         /**
-         * <p>The user's personal balance in USD: cash (available + pending + in-transit + reserve) + crypto + in-flight treasury deposits. Excludes account balances (see businesses_total_usd).</p>
+         * <p>The user's personal balance in USD: cash (available + pending + in-transit + reserve) + other holdings + deposits still in flight. Excludes account balances (see businesses_total_usd).</p>
          */
         TreasuryPendingUsdStage totalUsd(@NotNull String totalUsd);
     }
 
     public interface TreasuryPendingUsdStage {
         /**
-         * <p>Balance-to-wallet USDT0 withdrawals still in flight, in USD.</p>
+         * <p>Balance moves into the user's wallet still in flight, in USD.</p>
          */
         _FinalStage treasuryPendingUsd(@NotNull String treasuryPendingUsd);
     }
@@ -271,7 +271,6 @@ public final class UserBalance {
 
         private List<UserBalanceBusiness> businesses = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -292,7 +291,6 @@ public final class UserBalance {
 
         /**
          * <p>Combined USD balance across every account the user owns.</p>
-         * <p>Combined USD balance across every account the user owns.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -303,7 +301,6 @@ public final class UserBalance {
         }
 
         /**
-         * <p>Fiat cash in USD, including pending, in-transit, and reserve.</p>
          * <p>Fiat cash in USD, including pending, in-transit, and reserve.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -316,7 +313,6 @@ public final class UserBalance {
 
         /**
          * <p>Crypto holdings in USD.</p>
-         * <p>Crypto holdings in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -328,7 +324,6 @@ public final class UserBalance {
 
         /**
          * <p>Fiat pending and in-transit balances, plus in-flight treasury deposits, in USD.</p>
-         * <p>Fiat pending and in-transit balances, plus in-flight treasury deposits, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -339,8 +334,7 @@ public final class UserBalance {
         }
 
         /**
-         * <p>The user's personal balance in USD: cash (available + pending + in-transit + reserve) + crypto + in-flight treasury deposits. Excludes account balances (see businesses_total_usd).</p>
-         * <p>The user's personal balance in USD: cash (available + pending + in-transit + reserve) + crypto + in-flight treasury deposits. Excludes account balances (see businesses_total_usd).</p>
+         * <p>The user's personal balance in USD: cash (available + pending + in-transit + reserve) + other holdings + deposits still in flight. Excludes account balances (see businesses_total_usd).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -351,8 +345,7 @@ public final class UserBalance {
         }
 
         /**
-         * <p>Balance-to-wallet USDT0 withdrawals still in flight, in USD.</p>
-         * <p>Balance-to-wallet USDT0 withdrawals still in flight, in USD.</p>
+         * <p>Balance moves into the user's wallet still in flight, in USD.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -447,6 +440,22 @@ public final class UserBalance {
                     totalUsd,
                     treasuryPendingUsd,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("businesses")
+                    || key.equalsIgnoreCase("businesses_total_usd")
+                    || key.equalsIgnoreCase("cash")
+                    || key.equalsIgnoreCase("cash_usd")
+                    || key.equalsIgnoreCase("crypto")
+                    || key.equalsIgnoreCase("crypto_usd")
+                    || key.equalsIgnoreCase("pending_usd")
+                    || key.equalsIgnoreCase("total_usd")
+                    || key.equalsIgnoreCase("treasury_pending_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

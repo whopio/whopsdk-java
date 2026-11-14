@@ -488,7 +488,6 @@ public final class BountyCaptureClip {
 
         private Optional<Integer> durationSeconds = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -514,7 +513,6 @@ public final class BountyCaptureClip {
 
         /**
          * <p>The bounty submission (attempt) this clip belongs to, prefixed <code>btys_</code>.</p>
-         * <p>The bounty submission (attempt) this clip belongs to, prefixed <code>btys_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -525,7 +523,6 @@ public final class BountyCaptureClip {
         }
 
         /**
-         * <p>When the clip was created, as an ISO 8601 timestamp.</p>
          * <p>When the clip was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -538,7 +535,6 @@ public final class BountyCaptureClip {
 
         /**
          * <p>Capture clip ID, prefixed <code>bclip_</code>.</p>
-         * <p>Capture clip ID, prefixed <code>bclip_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -549,7 +545,6 @@ public final class BountyCaptureClip {
         }
 
         /**
-         * <p>The clip's stable order within the attempt, starting at 1.</p>
          * <p>The clip's stable order within the attempt, starting at 1.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -562,7 +557,6 @@ public final class BountyCaptureClip {
 
         /**
          * <p>Recording and validation state. <code>recording</code> is still capturing; <code>verifying</code> is running server-side validation; <code>ready</code> passed validation and counts toward the verified-duration payout gate; <code>failed</code> did not validate.</p>
-         * <p>Recording and validation state. <code>recording</code> is still capturing; <code>verifying</code> is running server-side validation; <code>ready</code> passed validation and counts toward the verified-duration payout gate; <code>failed</code> did not validate.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -573,7 +567,6 @@ public final class BountyCaptureClip {
         }
 
         /**
-         * <p>When the clip was last updated, as an ISO 8601 timestamp.</p>
          * <p>When the clip was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -890,6 +883,27 @@ public final class BountyCaptureClip {
                     updatedAt,
                     videoUrl,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_submission_id")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("duration_seconds")
+                    || key.equalsIgnoreCase("failure_code")
+                    || key.equalsIgnoreCase("failure_message")
+                    || key.equalsIgnoreCase("frames_url")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("imu_url")
+                    || key.equalsIgnoreCase("manifest_url")
+                    || key.equalsIgnoreCase("ready_at")
+                    || key.equalsIgnoreCase("sequence")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("video_url")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

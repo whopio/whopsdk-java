@@ -27,28 +27,28 @@ public class EarningsClient {
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public SyncPagingIterable<ListEarningsResponseDataItem> list(String id) {
         return this.rawClient.list(id).body();
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public SyncPagingIterable<ListEarningsResponseDataItem> list(String id, RequestOptions requestOptions) {
         return this.rawClient.list(id, requestOptions).body();
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public SyncPagingIterable<ListEarningsResponseDataItem> list(String id, ListEarningsRequest request) {
         return this.rawClient.list(id, request).body();
     }
 
     /**
-     * Lists the earnings Whop pays out for one referred business's activity, most recent first.
+     * Lists the earnings Whop pays out for one referred business's activity, most recent first. The original referrer or a caller with company:basic:read on the business credited for the referral can read them.
      */
     public SyncPagingIterable<ListEarningsResponseDataItem> list(
             String id, ListEarningsRequest request, RequestOptions requestOptions) {

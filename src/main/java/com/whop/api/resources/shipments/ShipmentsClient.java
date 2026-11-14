@@ -8,9 +8,11 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.shipments.requests.CreateShipmentsRequest;
 import com.whop.api.resources.shipments.requests.ListShipmentsRequest;
+import com.whop.api.resources.shipments.requests.LookupShipmentsRequest;
 import com.whop.api.resources.shipments.requests.RetrieveShipmentsRequest;
 import com.whop.api.resources.shipments.requests.UpdateShipmentsRequest;
 import com.whop.api.types.Shipment;
+import com.whop.api.types.ShipmentLookup;
 
 public class ShipmentsClient {
     protected final ClientOptions clientOptions;
@@ -30,28 +32,28 @@ public class ShipmentsClient {
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public SyncPagingIterable<Shipment> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public SyncPagingIterable<Shipment> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public SyncPagingIterable<Shipment> list(ListShipmentsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Returns a paginated list of shipments for an account.
+     * Lists an account's shipments.
      */
     public SyncPagingIterable<Shipment> list(ListShipmentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -72,28 +74,42 @@ public class ShipmentsClient {
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public ShipmentLookup lookup(LookupShipmentsRequest request) {
+        return this.rawClient.lookup(request).body();
+    }
+
+    /**
+     * Finds the delivery for a purchase from an account with customer tracking turned on, using exactly one order or tracking number plus the buyer's current receipt email. No authentication is required and no sign-in or session is created. Email matching ignores case and surrounding whitespace, but dots and +tags must match. Every miss returns the same 404: an unknown account, tracking turned off, a wrong number or email, an unpaid order or a purchase with nothing to ship. <code>shipment</code> is <code>null</code> while a paid physical purchase has no tracking yet, unless it has been fully refunded. Limited to 10 attempts per hour per order or tracking number within the account, and 30 attempts per five minutes per client IP and per email within the account. Responses are never cached or replayed with Idempotency-Key.
+     */
+    public ShipmentLookup lookup(LookupShipmentsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.lookup(request, requestOptions).body();
+    }
+
+    /**
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public Shipment retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public Shipment retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public Shipment retrieve(String id, RetrieveShipmentsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a shipment by its id, or by the payment id it fulfills.
+     * Retrieves a shipment by its ID, or by the ID of the payment it fulfills.
      */
     public Shipment retrieve(String id, RetrieveShipmentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();

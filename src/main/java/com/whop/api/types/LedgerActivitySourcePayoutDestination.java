@@ -27,12 +27,18 @@ public final class LedgerActivitySourcePayoutDestination {
 
     private final Optional<String> payerName;
 
+    private final Optional<String> securityAnswer;
+
     private final Map<String, Object> additionalProperties;
 
     private LedgerActivitySourcePayoutDestination(
-            Optional<String> iconUrl, Optional<String> payerName, Map<String, Object> additionalProperties) {
+            Optional<String> iconUrl,
+            Optional<String> payerName,
+            Optional<String> securityAnswer,
+            Map<String, Object> additionalProperties) {
         this.iconUrl = iconUrl;
         this.payerName = payerName;
+        this.securityAnswer = securityAnswer;
         this.additionalProperties = additionalProperties;
     }
 
@@ -52,6 +58,17 @@ public final class LedgerActivitySourcePayoutDestination {
         return payerName;
     }
 
+    /**
+     * @return The security answer the merchant set when adding this payout method (for example an Interac e-Transfer), needed to claim the payout. null when the destination has no custom answer. Requires payout:destination:read.
+     */
+    @JsonIgnore
+    public Optional<String> getSecurityAnswer() {
+        if (securityAnswer == null) {
+            return Optional.empty();
+        }
+        return securityAnswer;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("icon_url")
     private Optional<String> _getIconUrl() {
@@ -62,6 +79,12 @@ public final class LedgerActivitySourcePayoutDestination {
     @JsonProperty("payer_name")
     private Optional<String> _getPayerName() {
         return payerName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("security_answer")
+    private Optional<String> _getSecurityAnswer() {
+        return securityAnswer;
     }
 
     @java.lang.Override
@@ -77,12 +100,14 @@ public final class LedgerActivitySourcePayoutDestination {
     }
 
     private boolean equalTo(LedgerActivitySourcePayoutDestination other) {
-        return iconUrl.equals(other.iconUrl) && payerName.equals(other.payerName);
+        return iconUrl.equals(other.iconUrl)
+                && payerName.equals(other.payerName)
+                && securityAnswer.equals(other.securityAnswer);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.iconUrl, this.payerName);
+        return Objects.hash(this.iconUrl, this.payerName, this.securityAnswer);
     }
 
     @java.lang.Override
@@ -100,7 +125,8 @@ public final class LedgerActivitySourcePayoutDestination {
 
         private Optional<String> payerName = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<String> securityAnswer = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -108,6 +134,7 @@ public final class LedgerActivitySourcePayoutDestination {
         public Builder from(LedgerActivitySourcePayoutDestination other) {
             iconUrl(other.getIconUrl());
             payerName(other.getPayerName());
+            securityAnswer(other.getSecurityAnswer());
             return this;
         }
 
@@ -155,8 +182,43 @@ public final class LedgerActivitySourcePayoutDestination {
             return this;
         }
 
+        /**
+         * <p>The security answer the merchant set when adding this payout method (for example an Interac e-Transfer), needed to claim the payout. null when the destination has no custom answer. Requires payout:destination:read.</p>
+         */
+        @JsonSetter(value = "security_answer", nulls = Nulls.SKIP)
+        public Builder securityAnswer(Optional<String> securityAnswer) {
+            this.securityAnswer = securityAnswer;
+            return this;
+        }
+
+        public Builder securityAnswer(String securityAnswer) {
+            this.securityAnswer = Optional.ofNullable(securityAnswer);
+            return this;
+        }
+
+        public Builder securityAnswer(Nullable<String> securityAnswer) {
+            if (securityAnswer.isNull()) {
+                this.securityAnswer = null;
+            } else if (securityAnswer.isEmpty()) {
+                this.securityAnswer = Optional.empty();
+            } else {
+                this.securityAnswer = Optional.of(securityAnswer.get());
+            }
+            return this;
+        }
+
         public LedgerActivitySourcePayoutDestination build() {
-            return new LedgerActivitySourcePayoutDestination(iconUrl, payerName, additionalProperties);
+            return new LedgerActivitySourcePayoutDestination(iconUrl, payerName, securityAnswer, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("icon_url")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("security_answer")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

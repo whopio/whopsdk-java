@@ -147,7 +147,6 @@ public final class ListCourseLessonsRequest {
 
         private Optional<String> chapterId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -248,6 +247,19 @@ public final class ListCourseLessonsRequest {
 
         public ListCourseLessonsRequest build() {
             return new ListCourseLessonsRequest(after, before, first, last, courseId, chapterId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("course_id")
+                    || key.equalsIgnoreCase("chapter_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

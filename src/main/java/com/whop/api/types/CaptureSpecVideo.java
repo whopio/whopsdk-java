@@ -425,7 +425,6 @@ public final class CaptureSpecVideo {
 
         private List<String> codecs = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -452,7 +451,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Maximum acceptable average bitrate, in megabits per second.</p>
-         * <p>Maximum acceptable average bitrate, in megabits per second.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -463,7 +461,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Minimum acceptable average bitrate, in megabits per second.</p>
          * <p>Minimum acceptable average bitrate, in megabits per second.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -476,7 +473,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Recommended average bitrate to encode at, in megabits per second.</p>
-         * <p>Recommended average bitrate to encode at, in megabits per second.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -487,7 +483,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Which physical lens to record with.</p>
          * <p>Which physical lens to record with.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -500,7 +495,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Whether the client must also write the camera make and model into the video container's metadata. When <code>false</code>, the capture manifest and export CSV are the metadata carrier.</p>
-         * <p>Whether the client must also write the camera make and model into the video container's metadata. When <code>false</code>, the capture manifest and export CSV are the metadata carrier.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -511,7 +505,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Target capture frame rate.</p>
          * <p>Target capture frame rate.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -524,7 +517,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Longest stall between consecutive frames a clip may contain before the client rejects it, in milliseconds. Every frame is timestamped in the frame log, so a stall stays alignable downstream — this bounds how broken a capture may be, not how evenly it must be paced.</p>
-         * <p>Longest stall between consecutive frames a clip may contain before the client rejects it, in milliseconds. Every frame is timestamped in the frame log, so a stall stays alignable downstream — this bounds how broken a capture may be, not how evenly it must be paced.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -535,7 +527,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Required frame height in pixels — recorded footage must match exactly.</p>
          * <p>Required frame height in pixels — recorded footage must match exactly.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -548,7 +539,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Minimum acceptable horizontal field of view, in degrees.</p>
-         * <p>Minimum acceptable horizontal field of view, in degrees.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -559,7 +549,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Device orientation to record in.</p>
          * <p>Device orientation to record in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -572,7 +561,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Preferred horizontal field of view, in degrees.</p>
-         * <p>Preferred horizontal field of view, in degrees.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -583,7 +571,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>How the client must configure video stabilization: <code>off</code> disables EIS so raw motion is preserved for pose extraction, <code>on</code> requires it, <code>any</code> leaves the device default.</p>
          * <p>How the client must configure video stabilization: <code>off</code> disables EIS so raw motion is preserved for pose extraction, <code>on</code> requires it, <code>any</code> leaves the device default.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -597,7 +584,6 @@ public final class CaptureSpecVideo {
 
         /**
          * <p>Whether hardware/software stabilization must be enabled. True exactly when stabilization_mode is <code>on</code>.</p>
-         * <p>Whether hardware/software stabilization must be enabled. True exactly when stabilization_mode is <code>on</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -608,7 +594,6 @@ public final class CaptureSpecVideo {
         }
 
         /**
-         * <p>Required frame width in pixels — recorded footage must match exactly.</p>
          * <p>Required frame width in pixels — recorded footage must match exactly.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -662,6 +647,28 @@ public final class CaptureSpecVideo {
                     stabilizationRequired,
                     width,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bitrate_ceiling_mbps")
+                    || key.equalsIgnoreCase("bitrate_floor_mbps")
+                    || key.equalsIgnoreCase("bitrate_target_mbps")
+                    || key.equalsIgnoreCase("camera_lens")
+                    || key.equalsIgnoreCase("codecs")
+                    || key.equalsIgnoreCase("embed_camera_metadata")
+                    || key.equalsIgnoreCase("fps")
+                    || key.equalsIgnoreCase("frame_gap_tolerance_ms")
+                    || key.equalsIgnoreCase("height")
+                    || key.equalsIgnoreCase("min_fov_degrees")
+                    || key.equalsIgnoreCase("orientation")
+                    || key.equalsIgnoreCase("preferred_fov_degrees")
+                    || key.equalsIgnoreCase("stabilization_mode")
+                    || key.equalsIgnoreCase("stabilization_required")
+                    || key.equalsIgnoreCase("width")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,25 +5,30 @@ package com.whop.api.resources.stats;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
-import com.whop.api.resources.stats.requests.DescribeStatsRequest;
-import com.whop.api.resources.stats.requests.MetricStatsRequest;
-import com.whop.api.resources.stats.requests.RawStatsRequest;
+import com.whop.api.core.Suppliers;
+import com.whop.api.core.WhopApiHttpResponse;
+import com.whop.api.resources.stats.reports.AsyncReportsClient;
 import com.whop.api.resources.stats.requests.RetrieveStatsRequest;
-import com.whop.api.resources.stats.types.DescribeStatsResponse;
+import com.whop.api.resources.stats.timeseries.AsyncTimeSeriesClient;
 import com.whop.api.resources.stats.types.ListStatsResponse;
-import com.whop.api.resources.stats.types.MetricStatsResponse;
-import com.whop.api.resources.stats.types.RawStatsResponse;
 import com.whop.api.resources.stats.types.RetrieveStatsResponse;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class AsyncStatsClient {
     protected final ClientOptions clientOptions;
 
     private final AsyncRawStatsClient rawClient;
 
+    protected final Supplier<AsyncReportsClient> reportsClient;
+
+    protected final Supplier<AsyncTimeSeriesClient> timeSeriesClient;
+
     public AsyncStatsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawStatsClient(clientOptions);
+        this.reportsClient = Suppliers.memoize(() -> new AsyncReportsClient(clientOptions));
+        this.timeSeriesClient = Suppliers.memoize(() -> new AsyncTimeSeriesClient(clientOptions));
     }
 
     /**
@@ -34,121 +39,69 @@ public class AsyncStatsClient {
     }
 
     /**
-     * Lists every metric you can query, with its unit and the properties you can filter or break it down by.
+     * Deprecated. Lists every metric without saying which ones you can chart. List chartable metrics with <code>GET /stats/time_series</code>, and aggregates that are not bucketed over time with <code>GET /stats/reports</code>.
      */
     public CompletableFuture<ListStatsResponse> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListStatsResponse>> rawFuture = this.rawClient.list();
+        CompletableFuture<ListStatsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Lists every metric you can query, with its unit and the properties you can filter or break it down by.
+     * Deprecated. Lists every metric without saying which ones you can chart. List chartable metrics with <code>GET /stats/time_series</code>, and aggregates that are not bucketed over time with <code>GET /stats/reports</code>.
      */
     public CompletableFuture<ListStatsResponse> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<ListStatsResponse>> rawFuture = this.rawClient.list(requestOptions);
+        CompletableFuture<ListStatsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<DescribeStatsResponse> describeStats() {
-        return this.rawClient.describeStats().thenApply(response -> response.body());
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<DescribeStatsResponse> describeStats(RequestOptions requestOptions) {
-        return this.rawClient.describeStats(requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<DescribeStatsResponse> describeStats(DescribeStatsRequest request) {
-        return this.rawClient.describeStats(request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Describe available stats schema. Without resource returns root nodes and metrics. With resource returns node columns, associations, and available metrics.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<DescribeStatsResponse> describeStats(
-            DescribeStatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.describeStats(request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Query an aggregated metric. Returns data grouped by period with optional breakdowns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<MetricStatsResponse> metricStats(MetricStatsRequest request) {
-        return this.rawClient.metricStats(request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Query an aggregated metric. Returns data grouped by period with optional breakdowns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<MetricStatsResponse> metricStats(
-            MetricStatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.metricStats(request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Query raw data from a resource. Returns paginated rows with all columns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<RawStatsResponse> rawStats(RawStatsRequest request) {
-        return this.rawClient.rawStats(request).thenApply(response -> response.body());
-    }
-
-    /**
-     * Query raw data from a resource. Returns paginated rows with all columns.
-     * <p>Required permissions:</p>
-     * <ul>
-     * <li><code>stats:read</code></li>
-     * </ul>
-     */
-    public CompletableFuture<RawStatsResponse> rawStats(RawStatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.rawStats(request, requestOptions).thenApply(response -> response.body());
-    }
-
-    /**
-     * Retrieves a metric as a time series of points for an account or user over a time range. The <code>market_prices</code> metric is public and requires no authentication.
+     * Deprecated compatibility endpoint. Retrieve a metric's time series with <code>GET /stats/time_series/{metric}</code> instead.
      */
     public CompletableFuture<RetrieveStatsResponse> retrieve(String metric, RetrieveStatsRequest request) {
-        return this.rawClient.retrieve(metric, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveStatsResponse>> rawFuture =
+                this.rawClient.retrieve(metric, request);
+        CompletableFuture<RetrieveStatsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves a metric as a time series of points for an account or user over a time range. The <code>market_prices</code> metric is public and requires no authentication.
+     * Deprecated compatibility endpoint. Retrieve a metric's time series with <code>GET /stats/time_series/{metric}</code> instead.
      */
     public CompletableFuture<RetrieveStatsResponse> retrieve(
             String metric, RetrieveStatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(metric, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveStatsResponse>> rawFuture =
+                this.rawClient.retrieve(metric, request, requestOptions);
+        CompletableFuture<RetrieveStatsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    public AsyncReportsClient reports() {
+        return this.reportsClient.get();
+    }
+
+    public AsyncTimeSeriesClient timeSeries() {
+        return this.timeSeriesClient.get();
     }
 }

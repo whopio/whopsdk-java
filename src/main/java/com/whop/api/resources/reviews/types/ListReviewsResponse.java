@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.PageInfo;
 import com.whop.api.types.ReviewListItem;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,30 +25,24 @@ import org.jetbrains.annotations.NotNull;
 public final class ListReviewsResponse {
     private final List<ReviewListItem> data;
 
-    private final PageInfo pageInfo;
+    private final ListReviewsResponsePageInfo pageInfo;
 
     private final Map<String, Object> additionalProperties;
 
     private ListReviewsResponse(
-            List<ReviewListItem> data, PageInfo pageInfo, Map<String, Object> additionalProperties) {
+            List<ReviewListItem> data, ListReviewsResponsePageInfo pageInfo, Map<String, Object> additionalProperties) {
         this.data = data;
         this.pageInfo = pageInfo;
         this.additionalProperties = additionalProperties;
     }
 
-    /**
-     * @return A list of nodes.
-     */
     @JsonProperty("data")
     public List<ReviewListItem> getData() {
         return data;
     }
 
-    /**
-     * @return Information to aid in pagination.
-     */
     @JsonProperty("page_info")
-    public PageInfo getPageInfo() {
+    public ListReviewsResponsePageInfo getPageInfo() {
         return pageInfo;
     }
 
@@ -83,10 +76,7 @@ public final class ListReviewsResponse {
     }
 
     public interface PageInfoStage {
-        /**
-         * <p>Information to aid in pagination.</p>
-         */
-        _FinalStage pageInfo(@NotNull PageInfo pageInfo);
+        _FinalStage pageInfo(@NotNull ListReviewsResponsePageInfo pageInfo);
 
         Builder from(ListReviewsResponse other);
     }
@@ -98,9 +88,6 @@ public final class ListReviewsResponse {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        /**
-         * <p>A list of nodes.</p>
-         */
         _FinalStage data(List<ReviewListItem> data);
 
         _FinalStage addData(ReviewListItem data);
@@ -110,11 +97,10 @@ public final class ListReviewsResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements PageInfoStage, _FinalStage {
-        private PageInfo pageInfo;
+        private ListReviewsResponsePageInfo pageInfo;
 
         private List<ReviewListItem> data = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -126,22 +112,13 @@ public final class ListReviewsResponse {
             return this;
         }
 
-        /**
-         * <p>Information to aid in pagination.</p>
-         * <p>Information to aid in pagination.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         @JsonSetter("page_info")
-        public _FinalStage pageInfo(@NotNull PageInfo pageInfo) {
+        public _FinalStage pageInfo(@NotNull ListReviewsResponsePageInfo pageInfo) {
             this.pageInfo = Objects.requireNonNull(pageInfo, "pageInfo must not be null");
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage addAllData(List<ReviewListItem> data) {
             if (data != null) {
@@ -150,19 +127,12 @@ public final class ListReviewsResponse {
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
         @java.lang.Override
         public _FinalStage addData(ReviewListItem data) {
             this.data.add(data);
             return this;
         }
 
-        /**
-         * <p>A list of nodes.</p>
-         */
         @java.lang.Override
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
         public _FinalStage data(List<ReviewListItem> data) {
@@ -176,6 +146,14 @@ public final class ListReviewsResponse {
         @java.lang.Override
         public ListReviewsResponse build() {
             return new ListReviewsResponse(data, pageInfo, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("data") || key.equalsIgnoreCase("page_info")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

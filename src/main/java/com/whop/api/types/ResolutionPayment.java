@@ -214,7 +214,6 @@ public final class ResolutionPayment {
 
         private Optional<String> cardBrand = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -231,7 +230,6 @@ public final class ResolutionPayment {
 
         /**
          * <p>When the payment was made, as an ISO 8601 timestamp.</p>
-         * <p>When the payment was made, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -242,7 +240,6 @@ public final class ResolutionPayment {
         }
 
         /**
-         * <p>Payment ID, prefixed <code>pay_</code>.</p>
          * <p>Payment ID, prefixed <code>pay_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -364,6 +361,18 @@ public final class ResolutionPayment {
         @java.lang.Override
         public ResolutionPayment build() {
             return new ResolutionPayment(cardBrand, cardLast4, createdAt, id, paymentMethodType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_brand")
+                    || key.equalsIgnoreCase("card_last4")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment_method_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

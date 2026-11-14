@@ -19,8 +19,23 @@ public final class ListSocialAccountsRequestPlatform {
     public static final ListSocialAccountsRequestPlatform DISCORD =
             new ListSocialAccountsRequestPlatform(Value.DISCORD, "discord");
 
+    public static final ListSocialAccountsRequestPlatform SNAPCHAT =
+            new ListSocialAccountsRequestPlatform(Value.SNAPCHAT, "snapchat");
+
+    public static final ListSocialAccountsRequestPlatform KLAVIYO =
+            new ListSocialAccountsRequestPlatform(Value.KLAVIYO, "klaviyo");
+
+    public static final ListSocialAccountsRequestPlatform AIMERCE =
+            new ListSocialAccountsRequestPlatform(Value.AIMERCE, "aimerce");
+
     public static final ListSocialAccountsRequestPlatform TELEGRAM =
             new ListSocialAccountsRequestPlatform(Value.TELEGRAM, "telegram");
+
+    public static final ListSocialAccountsRequestPlatform QUICKBOOKS =
+            new ListSocialAccountsRequestPlatform(Value.QUICKBOOKS, "quickbooks");
+
+    public static final ListSocialAccountsRequestPlatform LINKEDIN =
+            new ListSocialAccountsRequestPlatform(Value.LINKEDIN, "linkedin");
 
     public static final ListSocialAccountsRequestPlatform X = new ListSocialAccountsRequestPlatform(Value.X, "x");
 
@@ -68,8 +83,18 @@ public final class ListSocialAccountsRequestPlatform {
                 return visitor.visitYoutube();
             case DISCORD:
                 return visitor.visitDiscord();
+            case SNAPCHAT:
+                return visitor.visitSnapchat();
+            case KLAVIYO:
+                return visitor.visitKlaviyo();
+            case AIMERCE:
+                return visitor.visitAimerce();
             case TELEGRAM:
                 return visitor.visitTelegram();
+            case QUICKBOOKS:
+                return visitor.visitQuickbooks();
+            case LINKEDIN:
+                return visitor.visitLinkedin();
             case X:
                 return visitor.visitX();
             case TIKTOK:
@@ -91,8 +116,18 @@ public final class ListSocialAccountsRequestPlatform {
                 return YOUTUBE;
             case "discord":
                 return DISCORD;
+            case "snapchat":
+                return SNAPCHAT;
+            case "klaviyo":
+                return KLAVIYO;
+            case "aimerce":
+                return AIMERCE;
             case "telegram":
                 return TELEGRAM;
+            case "quickbooks":
+                return QUICKBOOKS;
+            case "linkedin":
+                return LINKEDIN;
             case "x":
                 return X;
             case "tiktok":
@@ -117,6 +152,16 @@ public final class ListSocialAccountsRequestPlatform {
 
         TELEGRAM,
 
+        LINKEDIN,
+
+        SNAPCHAT,
+
+        KLAVIYO,
+
+        QUICKBOOKS,
+
+        AIMERCE,
+
         UNKNOWN
     }
 
@@ -134,6 +179,16 @@ public final class ListSocialAccountsRequestPlatform {
         T visitDiscord();
 
         T visitTelegram();
+
+        T visitLinkedin();
+
+        T visitSnapchat();
+
+        T visitKlaviyo();
+
+        T visitQuickbooks();
+
+        T visitAimerce();
 
         T visitUnknown(String unknownType);
     }

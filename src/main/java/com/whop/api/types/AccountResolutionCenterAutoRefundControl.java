@@ -192,7 +192,6 @@ public final class AccountResolutionCenterAutoRefundControl {
 
         private Optional<Double> cardThresholdUsd = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -207,7 +206,6 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Whether the account owner is prevented from changing these thresholds.</p>
          * <p>Whether the account owner is prevented from changing these thresholds.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -330,6 +328,17 @@ public final class AccountResolutionCenterAutoRefundControl {
         public AccountResolutionCenterAutoRefundControl build() {
             return new AccountResolutionCenterAutoRefundControl(
                     cardThresholdUsd, financingThresholdUsd, locked, paypalThresholdUsd, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card_threshold_usd")
+                    || key.equalsIgnoreCase("financing_threshold_usd")
+                    || key.equalsIgnoreCase("locked")
+                    || key.equalsIgnoreCase("paypal_threshold_usd")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

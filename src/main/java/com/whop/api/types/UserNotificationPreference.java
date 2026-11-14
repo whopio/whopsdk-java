@@ -199,7 +199,6 @@ public final class UserNotificationPreference {
 
         private String updatedAt;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -217,7 +216,6 @@ public final class UserNotificationPreference {
 
         /**
          * <p>When the preference was created, as an ISO 8601 timestamp.</p>
-         * <p>When the preference was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -228,7 +226,6 @@ public final class UserNotificationPreference {
         }
 
         /**
-         * <p>Notification preference ID, prefixed <code>unpf_</code>.</p>
          * <p>Notification preference ID, prefixed <code>unpf_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -241,7 +238,6 @@ public final class UserNotificationPreference {
 
         /**
          * <p>What the user is notified about in this scope: <code>all</code> or <code>nothing</code>.</p>
-         * <p>What the user is notified about in this scope: <code>all</code> or <code>nothing</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -252,7 +248,6 @@ public final class UserNotificationPreference {
         }
 
         /**
-         * <p>The type of object. Always <code>notification_preference</code>.</p>
          * <p>The type of object. Always <code>notification_preference</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -265,7 +260,6 @@ public final class UserNotificationPreference {
 
         /**
          * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
-         * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -276,7 +270,6 @@ public final class UserNotificationPreference {
         }
 
         /**
-         * <p>When the preference was last changed, as an ISO 8601 timestamp.</p>
          * <p>When the preference was last changed, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -290,6 +283,19 @@ public final class UserNotificationPreference {
         @java.lang.Override
         public UserNotificationPreference build() {
             return new UserNotificationPreference(createdAt, id, level, object, scope, updatedAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("level")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("scope")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

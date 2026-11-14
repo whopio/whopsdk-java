@@ -35,7 +35,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
     }
 
     /**
-     * @return The ad platform's key for the city in its location taxonomy.
+     * @return The city's key in the location taxonomy.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -81,7 +81,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
 
     public interface KeyStage {
         /**
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
+         * <p>The city's key in the location taxonomy.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -109,7 +109,6 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
 
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,8 +121,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
         }
 
         /**
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
-         * <p>The ad platform's key for the city in its location taxonomy.</p>
+         * <p>The city's key in the location taxonomy.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -156,6 +154,14 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
         @java.lang.Override
         public AdGroupGeoLocationsBodyCitiesItem build() {
             return new AdGroupGeoLocationsBodyCitiesItem(key, name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("key") || key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

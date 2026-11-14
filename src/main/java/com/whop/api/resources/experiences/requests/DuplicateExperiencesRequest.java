@@ -82,7 +82,6 @@ public final class DuplicateExperiencesRequest {
     public static final class Builder {
         private Optional<String> name = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -119,6 +118,14 @@ public final class DuplicateExperiencesRequest {
 
         public DuplicateExperiencesRequest build() {
             return new DuplicateExperiencesRequest(name, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("name")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

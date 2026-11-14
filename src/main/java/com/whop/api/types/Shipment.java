@@ -319,7 +319,6 @@ public final class Shipment {
 
         private Optional<String> carrier = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -341,7 +340,6 @@ public final class Shipment {
 
         /**
          * <p>The account that owns this shipment, prefixed <code>biz_</code>.</p>
-         * <p>The account that owns this shipment, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -352,7 +350,6 @@ public final class Shipment {
         }
 
         /**
-         * <p>The datetime the shipment was created (ISO 8601).</p>
          * <p>The datetime the shipment was created (ISO 8601).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -365,7 +362,6 @@ public final class Shipment {
 
         /**
          * <p>Shipment ID, prefixed <code>ship_</code>.</p>
-         * <p>Shipment ID, prefixed <code>ship_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -376,7 +372,6 @@ public final class Shipment {
         }
 
         /**
-         * <p>The payment this shipment fulfills, prefixed <code>pay_</code>.</p>
          * <p>The payment this shipment fulfills, prefixed <code>pay_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -389,7 +384,6 @@ public final class Shipment {
 
         /**
          * <p>The current delivery status of this shipment.</p>
-         * <p>The current delivery status of this shipment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -400,7 +394,6 @@ public final class Shipment {
         }
 
         /**
-         * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
          * <p>The carrier-assigned tracking number used to look up shipment progress.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -413,7 +406,6 @@ public final class Shipment {
 
         /**
          * <p>A customer-facing URL to track this shipment's progress.</p>
-         * <p>A customer-facing URL to track this shipment's progress.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -424,7 +416,6 @@ public final class Shipment {
         }
 
         /**
-         * <p>The datetime the shipment was last updated (ISO 8601).</p>
          * <p>The datetime the shipment was last updated (ISO 8601).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -509,6 +500,23 @@ public final class Shipment {
                     trackingUrl,
                     updatedAt,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("carrier")
+                    || key.equalsIgnoreCase("checkpoints")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("tracking_number")
+                    || key.equalsIgnoreCase("tracking_url")
+                    || key.equalsIgnoreCase("updated_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -5,6 +5,7 @@ package com.whop.api.resources.users.preferences.notifications.experiences;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.users.preferences.notifications.experiences.requests.ListExperiencesRequest;
 import com.whop.api.types.ExperienceNotificationPreference;
@@ -31,14 +32,32 @@ public class AsyncExperiencesClient {
      * Lists the authenticated user's per-experience notification levels. Experiences the user never set a level for are omitted — their effective level is <code>all</code>.
      */
     public CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceNotificationPreference>>> rawFuture =
+                this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Lists the authenticated user's per-experience notification levels. Experiences the user never set a level for are omitted — their effective level is <code>all</code>.
      */
     public CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceNotificationPreference>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -46,7 +65,16 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> list(
             ListExperiencesRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceNotificationPreference>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -54,6 +82,15 @@ public class AsyncExperiencesClient {
      */
     public CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> list(
             ListExperiencesRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ExperienceNotificationPreference>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ExperienceNotificationPreference>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

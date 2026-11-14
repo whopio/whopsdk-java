@@ -53,7 +53,7 @@ public final class AdGroupGeoLocationsBody {
     }
 
     /**
-     * @return Cities, keyed by the ad platform's location taxonomy.
+     * @return Cities, keyed by the location taxonomy.
      */
     @JsonProperty("cities")
     public Optional<List<AdGroupGeoLocationsBodyCitiesItem>> getCities() {
@@ -93,7 +93,7 @@ public final class AdGroupGeoLocationsBody {
     }
 
     /**
-     * @return ZIP and postal codes, as bare strings or objects with a key.
+     * @return ZIP and postal codes, keyed as <code>COUNTRY:CODE</code>, such as <code>US:78756</code>. Include the country: a bare code is ambiguous, because the same one exists in several countries.
      */
     @JsonProperty("zips")
     public Optional<List<AdGroupGeoLocationsBodyZipsItem>> getZips() {
@@ -149,7 +149,6 @@ public final class AdGroupGeoLocationsBody {
 
         private Optional<List<AdGroupGeoLocationsBodyZipsItem>> zips = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -165,7 +164,7 @@ public final class AdGroupGeoLocationsBody {
         }
 
         /**
-         * <p>Cities, keyed by the ad platform's location taxonomy.</p>
+         * <p>Cities, keyed by the location taxonomy.</p>
          */
         @JsonSetter(value = "cities", nulls = Nulls.SKIP)
         public Builder cities(Optional<List<AdGroupGeoLocationsBodyCitiesItem>> cities) {
@@ -235,7 +234,7 @@ public final class AdGroupGeoLocationsBody {
         }
 
         /**
-         * <p>ZIP and postal codes, as bare strings or objects with a key.</p>
+         * <p>ZIP and postal codes, keyed as <code>COUNTRY:CODE</code>, such as <code>US:78756</code>. Include the country: a bare code is ambiguous, because the same one exists in several countries.</p>
          */
         @JsonSetter(value = "zips", nulls = Nulls.SKIP)
         public Builder zips(Optional<List<AdGroupGeoLocationsBodyZipsItem>> zips) {
@@ -251,6 +250,19 @@ public final class AdGroupGeoLocationsBody {
         public AdGroupGeoLocationsBody build() {
             return new AdGroupGeoLocationsBody(
                     cities, countries, countryGroups, customLocations, regions, zips, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("cities")
+                    || key.equalsIgnoreCase("countries")
+                    || key.equalsIgnoreCase("country_groups")
+                    || key.equalsIgnoreCase("custom_locations")
+                    || key.equalsIgnoreCase("regions")
+                    || key.equalsIgnoreCase("zips")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

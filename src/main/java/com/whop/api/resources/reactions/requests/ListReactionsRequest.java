@@ -178,7 +178,6 @@ public final class ListReactionsRequest {
 
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -194,7 +193,6 @@ public final class ListReactionsRequest {
         }
 
         /**
-         * <p>The unique identifier of the message or forum post to list reactions for.</p>
          * <p>The unique identifier of the message or forum post to list reactions for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -288,6 +286,18 @@ public final class ListReactionsRequest {
         @java.lang.Override
         public ListReactionsRequest build() {
             return new ListReactionsRequest(after, before, first, last, resourceId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("resource_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

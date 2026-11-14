@@ -12,103 +12,83 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.Direction;
+import com.whop.api.resources.setupintents.types.ListSetupIntentsRequestDirection;
+import com.whop.api.resources.setupintents.types.ListSetupIntentsRequestOrder;
+import com.whop.api.resources.setupintents.types.ListSetupIntentsRequestStatus;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListSetupIntentsRequest.Builder.class)
 public final class ListSetupIntentsRequest {
-    private final Optional<String> after;
+    private final Optional<String> accountId;
 
-    private final Optional<String> before;
-
-    private final Optional<Integer> first;
-
-    private final Optional<Integer> last;
-
-    private final String companyId;
-
-    private final Optional<Direction> direction;
+    private final Optional<ListSetupIntentsRequestStatus> status;
 
     private final Optional<OffsetDateTime> createdBefore;
 
     private final Optional<OffsetDateTime> createdAfter;
 
+    private final Optional<ListSetupIntentsRequestOrder> order;
+
+    private final Optional<ListSetupIntentsRequestDirection> direction;
+
+    private final Optional<Integer> first;
+
+    private final Optional<String> after;
+
+    private final Optional<Integer> last;
+
+    private final Optional<String> before;
+
     private final Map<String, Object> additionalProperties;
 
     private ListSetupIntentsRequest(
-            Optional<String> after,
-            Optional<String> before,
-            Optional<Integer> first,
-            Optional<Integer> last,
-            String companyId,
-            Optional<Direction> direction,
+            Optional<String> accountId,
+            Optional<ListSetupIntentsRequestStatus> status,
             Optional<OffsetDateTime> createdBefore,
             Optional<OffsetDateTime> createdAfter,
+            Optional<ListSetupIntentsRequestOrder> order,
+            Optional<ListSetupIntentsRequestDirection> direction,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
             Map<String, Object> additionalProperties) {
-        this.after = after;
-        this.before = before;
-        this.first = first;
-        this.last = last;
-        this.companyId = companyId;
-        this.direction = direction;
+        this.accountId = accountId;
+        this.status = status;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.order = order;
+        this.direction = direction;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return <p>the elements in the list that come after the specified cursor.</p>
+     * @return Only setup intents for this account, prefixed <code>biz_</code>.
      */
-    @JsonProperty("after")
-    public Optional<String> getAfter() {
-        return after;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     /**
-     * @return <p>the elements in the list that come before the specified cursor.</p>
+     * @return Only setup intents in this state.
      */
-    @JsonProperty("before")
-    public Optional<String> getBefore() {
-        return before;
+    @JsonProperty("status")
+    public Optional<ListSetupIntentsRequestStatus> getStatus() {
+        return status;
     }
 
     /**
-     * @return <p>the first <em>n</em> elements from the list.</p>
-     */
-    @JsonProperty("first")
-    public Optional<Integer> getFirst() {
-        return first;
-    }
-
-    /**
-     * @return <p>the last <em>n</em> elements from the list.</p>
-     */
-    @JsonProperty("last")
-    public Optional<Integer> getLast() {
-        return last;
-    }
-
-    /**
-     * @return The unique identifier of the company to list setup intents for.
-     */
-    @JsonProperty("company_id")
-    public String getCompanyId() {
-        return companyId;
-    }
-
-    @JsonProperty("direction")
-    public Optional<Direction> getDirection() {
-        return direction;
-    }
-
-    /**
-     * @return Only return setup intents created before this timestamp.
+     * @return Only setup intents created before this ISO 8601 timestamp.
      */
     @JsonProperty("created_before")
     public Optional<OffsetDateTime> getCreatedBefore() {
@@ -116,11 +96,59 @@ public final class ListSetupIntentsRequest {
     }
 
     /**
-     * @return Only return setup intents created after this timestamp.
+     * @return Only setup intents created after this ISO 8601 timestamp.
      */
     @JsonProperty("created_after")
     public Optional<OffsetDateTime> getCreatedAfter() {
         return createdAfter;
+    }
+
+    /**
+     * @return The field to sort by.
+     */
+    @JsonProperty("order")
+    public Optional<ListSetupIntentsRequestOrder> getOrder() {
+        return order;
+    }
+
+    /**
+     * @return The sort direction.
+     */
+    @JsonProperty("direction")
+    public Optional<ListSetupIntentsRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
+     */
+    @JsonProperty("first")
+    public Optional<Integer> getFirst() {
+        return first;
+    }
+
+    /**
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
+     */
+    @JsonProperty("last")
+    public Optional<Integer> getLast() {
+        return last;
+    }
+
+    /**
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
+     */
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
     }
 
     @java.lang.Override
@@ -135,27 +163,31 @@ public final class ListSetupIntentsRequest {
     }
 
     private boolean equalTo(ListSetupIntentsRequest other) {
-        return after.equals(other.after)
-                && before.equals(other.before)
-                && first.equals(other.first)
-                && last.equals(other.last)
-                && companyId.equals(other.companyId)
-                && direction.equals(other.direction)
+        return accountId.equals(other.accountId)
+                && status.equals(other.status)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && order.equals(other.order)
+                && direction.equals(other.direction)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && last.equals(other.last)
+                && before.equals(other.before);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.after,
-                this.before,
-                this.first,
-                this.last,
-                this.companyId,
-                this.direction,
+                this.accountId,
+                this.status,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before);
     }
 
     @java.lang.Override
@@ -163,275 +195,227 @@ public final class ListSetupIntentsRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static CompanyIdStage builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public interface CompanyIdStage {
-        /**
-         * <p>The unique identifier of the company to list setup intents for.</p>
-         */
-        _FinalStage companyId(@NotNull String companyId);
-
-        Builder from(ListSetupIntentsRequest other);
-    }
-
-    public interface _FinalStage {
-        ListSetupIntentsRequest build();
-
-        _FinalStage additionalProperty(String key, Object value);
-
-        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
-         */
-        _FinalStage after(Optional<String> after);
-
-        _FinalStage after(String after);
-
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
-         */
-        _FinalStage before(Optional<String> before);
-
-        _FinalStage before(String before);
-
-        /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
-         */
-        _FinalStage first(Optional<Integer> first);
-
-        _FinalStage first(Integer first);
-
-        /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
-         */
-        _FinalStage last(Optional<Integer> last);
-
-        _FinalStage last(Integer last);
-
-        _FinalStage direction(Optional<Direction> direction);
-
-        _FinalStage direction(Direction direction);
-
-        /**
-         * <p>Only return setup intents created before this timestamp.</p>
-         */
-        _FinalStage createdBefore(Optional<OffsetDateTime> createdBefore);
-
-        _FinalStage createdBefore(OffsetDateTime createdBefore);
-
-        /**
-         * <p>Only return setup intents created after this timestamp.</p>
-         */
-        _FinalStage createdAfter(Optional<OffsetDateTime> createdAfter);
-
-        _FinalStage createdAfter(OffsetDateTime createdAfter);
-    }
-
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements CompanyIdStage, _FinalStage {
-        private String companyId;
+    public static final class Builder {
+        private Optional<String> accountId = Optional.empty();
 
-        private Optional<OffsetDateTime> createdAfter = Optional.empty();
+        private Optional<ListSetupIntentsRequestStatus> status = Optional.empty();
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
-        private Optional<Direction> direction = Optional.empty();
+        private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
-        private Optional<Integer> last = Optional.empty();
+        private Optional<ListSetupIntentsRequestOrder> order = Optional.empty();
+
+        private Optional<ListSetupIntentsRequestDirection> direction = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
 
-        private Optional<String> before = Optional.empty();
-
         private Optional<String> after = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
-        @java.lang.Override
         public Builder from(ListSetupIntentsRequest other) {
-            after(other.getAfter());
-            before(other.getBefore());
-            first(other.getFirst());
-            last(other.getLast());
-            companyId(other.getCompanyId());
-            direction(other.getDirection());
+            accountId(other.getAccountId());
+            status(other.getStatus());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            order(other.getOrder());
+            direction(other.getDirection());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to list setup intents for.</p>
-         * <p>The unique identifier of the company to list setup intents for.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Only setup intents for this account, prefixed <code>biz_</code>.</p>
          */
-        @java.lang.Override
-        @JsonSetter("company_id")
-        public _FinalStage companyId(@NotNull String companyId) {
-            this.companyId = Objects.requireNonNull(companyId, "companyId must not be null");
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
-         * <p>Only return setup intents created after this timestamp.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
+         * <p>Only setup intents in this state.</p>
          */
-        @java.lang.Override
-        public _FinalStage createdAfter(OffsetDateTime createdAfter) {
-            this.createdAfter = Optional.ofNullable(createdAfter);
+        @JsonSetter(value = "status", nulls = Nulls.SKIP)
+        public Builder status(Optional<ListSetupIntentsRequestStatus> status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder status(ListSetupIntentsRequestStatus status) {
+            this.status = Optional.ofNullable(status);
             return this;
         }
 
         /**
-         * <p>Only return setup intents created after this timestamp.</p>
+         * <p>Only setup intents created before this ISO 8601 timestamp.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
-        public _FinalStage createdAfter(Optional<OffsetDateTime> createdAfter) {
-            this.createdAfter = createdAfter;
+        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
+        public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
+            this.createdBefore = createdBefore;
             return this;
         }
 
-        /**
-         * <p>Only return setup intents created before this timestamp.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdBefore(OffsetDateTime createdBefore) {
+        public Builder createdBefore(OffsetDateTime createdBefore) {
             this.createdBefore = Optional.ofNullable(createdBefore);
             return this;
         }
 
         /**
-         * <p>Only return setup intents created before this timestamp.</p>
+         * <p>Only setup intents created after this ISO 8601 timestamp.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
-        public _FinalStage createdBefore(Optional<OffsetDateTime> createdBefore) {
-            this.createdBefore = createdBefore;
+        @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
+        public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
+            this.createdAfter = createdAfter;
             return this;
         }
 
-        @java.lang.Override
-        public _FinalStage direction(Direction direction) {
-            this.direction = Optional.ofNullable(direction);
+        public Builder createdAfter(OffsetDateTime createdAfter) {
+            this.createdAfter = Optional.ofNullable(createdAfter);
             return this;
         }
 
-        @java.lang.Override
+        /**
+         * <p>The field to sort by.</p>
+         */
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListSetupIntentsRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListSetupIntentsRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>The sort direction.</p>
+         */
         @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public _FinalStage direction(Optional<Direction> direction) {
+        public Builder direction(Optional<ListSetupIntentsRequestDirection> direction) {
             this.direction = direction;
             return this;
         }
 
-        /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage last(Integer last) {
-            this.last = Optional.ofNullable(last);
+        public Builder direction(ListSetupIntentsRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
             return this;
         }
 
         /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public _FinalStage last(Optional<Integer> last) {
-            this.last = last;
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
             return this;
         }
 
-        /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage first(Integer first) {
+        public Builder first(Integer first) {
             this.first = Optional.ofNullable(first);
             return this;
         }
 
         /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public _FinalStage first(Optional<Integer> first) {
-            this.first = first;
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
             return this;
         }
 
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage before(String before) {
-            this.before = Optional.ofNullable(before);
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public _FinalStage before(Optional<String> before) {
-            this.before = before;
-            return this;
-        }
-
-        /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage after(String after) {
+        public Builder after(String after) {
             this.after = Optional.ofNullable(after);
             return this;
         }
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Number of results to return from the end of the range.</p>
          */
-        @java.lang.Override
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public _FinalStage after(Optional<String> after) {
-            this.after = after;
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
             return this;
         }
 
-        @java.lang.Override
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
+            return this;
+        }
+
         public ListSetupIntentsRequest build() {
             return new ListSetupIntentsRequest(
-                    after,
-                    before,
-                    first,
-                    last,
-                    companyId,
-                    direction,
+                    accountId,
+                    status,
                     createdBefore,
                     createdAfter,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
                     additionalProperties);
         }
 
-        @java.lang.Override
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
+        }
+
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
-        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

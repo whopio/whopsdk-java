@@ -95,7 +95,6 @@ public final class DeletePaymentMethodDomainsResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -124,6 +123,14 @@ public final class DeletePaymentMethodDomainsResponse {
         @java.lang.Override
         public DeletePaymentMethodDomainsResponse build() {
             return new DeletePaymentMethodDomainsResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

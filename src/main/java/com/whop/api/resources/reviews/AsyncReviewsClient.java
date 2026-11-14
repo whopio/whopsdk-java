@@ -5,9 +5,12 @@ package com.whop.api.resources.reviews;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.reviews.requests.DeleteReviewsRequest;
 import com.whop.api.resources.reviews.requests.ListReviewsRequest;
 import com.whop.api.resources.reviews.requests.RetrieveReviewsRequest;
+import com.whop.api.resources.reviews.types.DeleteReviewsResponse;
 import com.whop.api.types.Review;
 import com.whop.api.types.ReviewListItem;
 import java.util.concurrent.CompletableFuture;
@@ -30,46 +33,178 @@ public class AsyncReviewsClient {
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
-    public CompletableFuture<SyncPagingIterable<ReviewListItem>> list(ListReviewsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+    public CompletableFuture<SyncPagingIterable<ReviewListItem>> list() {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<ReviewListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of customer reviews for a specific product, with optional filtering by star rating and creation date.
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public CompletableFuture<SyncPagingIterable<ReviewListItem>> list(RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<ReviewListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
+     */
+    public CompletableFuture<SyncPagingIterable<ReviewListItem>> list(ListReviewsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ReviewListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the published reviews for a product or account. Without <code>account_id</code> or <code>product_id</code>, a user lists the reviews they wrote, an account or app API key lists its account's reviews, and a request without credentials returns 400.
      */
     public CompletableFuture<SyncPagingIterable<ReviewListItem>> list(
             ListReviewsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReviewListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ReviewListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public CompletableFuture<Review> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Review>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<Review> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public CompletableFuture<Review> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Review>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<Review> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public CompletableFuture<Review> retrieve(String id, RetrieveReviewsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Review>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<Review> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieves the details of an existing review.
+     * Retrieves a published review. Reviews that are not published return 404.
      */
     public CompletableFuture<Review> retrieve(
             String id, RetrieveReviewsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Review>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<Review> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public CompletableFuture<DeleteReviewsResponse> delete(String id) {
+        CompletableFuture<WhopApiHttpResponse<DeleteReviewsResponse>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<DeleteReviewsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public CompletableFuture<DeleteReviewsResponse> delete(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteReviewsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteReviewsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public CompletableFuture<DeleteReviewsResponse> delete(String id, DeleteReviewsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<DeleteReviewsResponse>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<DeleteReviewsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a review the signed-in user wrote. Requires the <code>review:delete</code> scope, and returns 404 for a review another user wrote.
+     */
+    public CompletableFuture<DeleteReviewsResponse> delete(
+            String id, DeleteReviewsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteReviewsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteReviewsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

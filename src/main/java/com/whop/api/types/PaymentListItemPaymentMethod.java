@@ -171,7 +171,6 @@ public final class PaymentListItemPaymentMethod {
 
         private Optional<PaymentListItemPaymentMethodCard> card = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -187,7 +186,6 @@ public final class PaymentListItemPaymentMethod {
 
         /**
          * <p>The datetime the payment token was created.</p>
-         * <p>The datetime the payment token was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -199,7 +197,6 @@ public final class PaymentListItemPaymentMethod {
 
         /**
          * <p>The unique identifier for the payment token.</p>
-         * <p>The unique identifier for the payment token.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +207,6 @@ public final class PaymentListItemPaymentMethod {
         }
 
         /**
-         * <p>The payment method type of the payment method</p>
          * <p>The payment method type of the payment method</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -260,6 +256,17 @@ public final class PaymentListItemPaymentMethod {
         @java.lang.Override
         public PaymentListItemPaymentMethod build() {
             return new PaymentListItemPaymentMethod(card, createdAt, id, paymentMethodType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("payment_method_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

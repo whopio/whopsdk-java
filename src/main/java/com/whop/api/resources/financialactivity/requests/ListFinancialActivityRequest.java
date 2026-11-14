@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.financialactivity.types.ListFinancialActivityRequestBalanceType;
+import com.whop.api.resources.financialactivity.types.ListFinancialActivityRequestDirection;
 import com.whop.api.resources.financialactivity.types.ListFinancialActivityRequestLineTypesItem;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -33,6 +35,20 @@ public final class ListFinancialActivityRequest {
     private final Optional<Boolean> includeOwnedAccounts;
 
     private final Optional<Boolean> includeResource;
+
+    private final Optional<ListFinancialActivityRequestDirection> direction;
+
+    private final Optional<String> resourceId;
+
+    private final Optional<String> paymentId;
+
+    private final Optional<String> activityId;
+
+    private final Optional<Boolean> excludeInternalMovements;
+
+    private final Optional<ListFinancialActivityRequestBalanceType> balanceType;
+
+    private final Optional<String> withdrawalId;
 
     private final Optional<String> currency;
 
@@ -56,6 +72,13 @@ public final class ListFinancialActivityRequest {
             Optional<String> userId,
             Optional<Boolean> includeOwnedAccounts,
             Optional<Boolean> includeResource,
+            Optional<ListFinancialActivityRequestDirection> direction,
+            Optional<String> resourceId,
+            Optional<String> paymentId,
+            Optional<String> activityId,
+            Optional<Boolean> excludeInternalMovements,
+            Optional<ListFinancialActivityRequestBalanceType> balanceType,
+            Optional<String> withdrawalId,
             Optional<String> currency,
             Optional<OffsetDateTime> postedAfter,
             Optional<OffsetDateTime> postedBefore,
@@ -69,6 +92,13 @@ public final class ListFinancialActivityRequest {
         this.userId = userId;
         this.includeOwnedAccounts = includeOwnedAccounts;
         this.includeResource = includeResource;
+        this.direction = direction;
+        this.resourceId = resourceId;
+        this.paymentId = paymentId;
+        this.activityId = activityId;
+        this.excludeInternalMovements = excludeInternalMovements;
+        this.balanceType = balanceType;
+        this.withdrawalId = withdrawalId;
         this.currency = currency;
         this.postedAfter = postedAfter;
         this.postedBefore = postedBefore;
@@ -120,6 +150,62 @@ public final class ListFinancialActivityRequest {
     }
 
     /**
+     * @return Optional direction filter. <code>money_in</code> returns positive activity and <code>money_out</code> returns negative activity.
+     */
+    @JsonProperty("direction")
+    public Optional<ListFinancialActivityRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Optional prefixed resource ID. Returns activity associated with that resource.
+     */
+    @JsonProperty("resource_id")
+    public Optional<String> getResourceId() {
+        return resourceId;
+    }
+
+    /**
+     * @return Filter activity by payment ID (pay_), including related refunds, disputes, and fees. Combines with resource_id and other filters within the selected accounts. Unknown payments return an empty list.
+     */
+    @JsonProperty("payment_id")
+    public Optional<String> getPaymentId() {
+        return paymentId;
+    }
+
+    /**
+     * @return Optional ledger activity ID (for example <code>line_3</code>). Returns at most that one activity.
+     */
+    @JsonProperty("activity_id")
+    public Optional<String> getActivityId() {
+        return activityId;
+    }
+
+    /**
+     * @return Whether to exclude balance reservations and balanced movements between the account's own balances.
+     */
+    @JsonProperty("exclude_internal_movements")
+    public Optional<Boolean> getExcludeInternalMovements() {
+        return excludeInternalMovements;
+    }
+
+    /**
+     * @return Which balance the activity changes. <code>total</code> includes available, pending, and reserved funds. <code>available</code> includes only movements into or out of available funds, including reservations, releases, and fees. Movements within the selected balance are omitted. Omit to preserve the existing activity feed. Requires account_id or user_id; cannot be combined with available_after or available_before.
+     */
+    @JsonProperty("balance_type")
+    public Optional<ListFinancialActivityRequestBalanceType> getBalanceType() {
+        return balanceType;
+    }
+
+    /**
+     * @return Withdrawal ID (wdrl_). With balance_type=available, selects the same period as its statement, after the previous withdrawal and through this withdrawal, excluding this withdrawal and its fee. Requires a single account. Overrides currency and posted-date filters.
+     */
+    @JsonProperty("withdrawal_id")
+    public Optional<String> getWithdrawalId() {
+        return withdrawalId;
+    }
+
+    /**
      * @return Optional currency code filter, for example <code>usd</code>.
      */
     @JsonProperty("currency")
@@ -144,7 +230,7 @@ public final class ListFinancialActivityRequest {
     }
 
     /**
-     * @return Only include rows whose funds became withdrawable on or after this <code>YYYY-MM-DD</code> settlement date (UTC), distinct from posted_at. Requires currency.
+     * @return Only include balance credits and debits available on or after this <code>YYYY-MM-DD</code> date (UTC), distinct from posted_at. Requires currency.
      */
     @JsonProperty("available_after")
     public Optional<String> getAvailableAfter() {
@@ -152,7 +238,7 @@ public final class ListFinancialActivityRequest {
     }
 
     /**
-     * @return Only include rows whose funds became withdrawable on or before this <code>YYYY-MM-DD</code> settlement date (UTC). Set equal to available_after for a single day. Requires currency.
+     * @return Only include balance credits and debits available on or before this <code>YYYY-MM-DD</code> date (UTC). Set equal to available_after for a single day. Requires currency.
      */
     @JsonProperty("available_before")
     public Optional<String> getAvailableBefore() {
@@ -192,6 +278,13 @@ public final class ListFinancialActivityRequest {
                 && userId.equals(other.userId)
                 && includeOwnedAccounts.equals(other.includeOwnedAccounts)
                 && includeResource.equals(other.includeResource)
+                && direction.equals(other.direction)
+                && resourceId.equals(other.resourceId)
+                && paymentId.equals(other.paymentId)
+                && activityId.equals(other.activityId)
+                && excludeInternalMovements.equals(other.excludeInternalMovements)
+                && balanceType.equals(other.balanceType)
+                && withdrawalId.equals(other.withdrawalId)
                 && currency.equals(other.currency)
                 && postedAfter.equals(other.postedAfter)
                 && postedBefore.equals(other.postedBefore)
@@ -209,6 +302,13 @@ public final class ListFinancialActivityRequest {
                 this.userId,
                 this.includeOwnedAccounts,
                 this.includeResource,
+                this.direction,
+                this.resourceId,
+                this.paymentId,
+                this.activityId,
+                this.excludeInternalMovements,
+                this.balanceType,
+                this.withdrawalId,
                 this.currency,
                 this.postedAfter,
                 this.postedBefore,
@@ -239,6 +339,20 @@ public final class ListFinancialActivityRequest {
 
         private Optional<Boolean> includeResource = Optional.empty();
 
+        private Optional<ListFinancialActivityRequestDirection> direction = Optional.empty();
+
+        private Optional<String> resourceId = Optional.empty();
+
+        private Optional<String> paymentId = Optional.empty();
+
+        private Optional<String> activityId = Optional.empty();
+
+        private Optional<Boolean> excludeInternalMovements = Optional.empty();
+
+        private Optional<ListFinancialActivityRequestBalanceType> balanceType = Optional.empty();
+
+        private Optional<String> withdrawalId = Optional.empty();
+
         private Optional<String> currency = Optional.empty();
 
         private Optional<OffsetDateTime> postedAfter = Optional.empty();
@@ -253,7 +367,6 @@ public final class ListFinancialActivityRequest {
 
         private Optional<String> cursor = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -264,6 +377,13 @@ public final class ListFinancialActivityRequest {
             userId(other.getUserId());
             includeOwnedAccounts(other.getIncludeOwnedAccounts());
             includeResource(other.getIncludeResource());
+            direction(other.getDirection());
+            resourceId(other.getResourceId());
+            paymentId(other.getPaymentId());
+            activityId(other.getActivityId());
+            excludeInternalMovements(other.getExcludeInternalMovements());
+            balanceType(other.getBalanceType());
+            withdrawalId(other.getWithdrawalId());
             currency(other.getCurrency());
             postedAfter(other.getPostedAfter());
             postedBefore(other.getPostedBefore());
@@ -350,6 +470,104 @@ public final class ListFinancialActivityRequest {
         }
 
         /**
+         * <p>Optional direction filter. <code>money_in</code> returns positive activity and <code>money_out</code> returns negative activity.</p>
+         */
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListFinancialActivityRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListFinancialActivityRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>Optional prefixed resource ID. Returns activity associated with that resource.</p>
+         */
+        @JsonSetter(value = "resource_id", nulls = Nulls.SKIP)
+        public Builder resourceId(Optional<String> resourceId) {
+            this.resourceId = resourceId;
+            return this;
+        }
+
+        public Builder resourceId(String resourceId) {
+            this.resourceId = Optional.ofNullable(resourceId);
+            return this;
+        }
+
+        /**
+         * <p>Filter activity by payment ID (pay_), including related refunds, disputes, and fees. Combines with resource_id and other filters within the selected accounts. Unknown payments return an empty list.</p>
+         */
+        @JsonSetter(value = "payment_id", nulls = Nulls.SKIP)
+        public Builder paymentId(Optional<String> paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        public Builder paymentId(String paymentId) {
+            this.paymentId = Optional.ofNullable(paymentId);
+            return this;
+        }
+
+        /**
+         * <p>Optional ledger activity ID (for example <code>line_3</code>). Returns at most that one activity.</p>
+         */
+        @JsonSetter(value = "activity_id", nulls = Nulls.SKIP)
+        public Builder activityId(Optional<String> activityId) {
+            this.activityId = activityId;
+            return this;
+        }
+
+        public Builder activityId(String activityId) {
+            this.activityId = Optional.ofNullable(activityId);
+            return this;
+        }
+
+        /**
+         * <p>Whether to exclude balance reservations and balanced movements between the account's own balances.</p>
+         */
+        @JsonSetter(value = "exclude_internal_movements", nulls = Nulls.SKIP)
+        public Builder excludeInternalMovements(Optional<Boolean> excludeInternalMovements) {
+            this.excludeInternalMovements = excludeInternalMovements;
+            return this;
+        }
+
+        public Builder excludeInternalMovements(Boolean excludeInternalMovements) {
+            this.excludeInternalMovements = Optional.ofNullable(excludeInternalMovements);
+            return this;
+        }
+
+        /**
+         * <p>Which balance the activity changes. <code>total</code> includes available, pending, and reserved funds. <code>available</code> includes only movements into or out of available funds, including reservations, releases, and fees. Movements within the selected balance are omitted. Omit to preserve the existing activity feed. Requires account_id or user_id; cannot be combined with available_after or available_before.</p>
+         */
+        @JsonSetter(value = "balance_type", nulls = Nulls.SKIP)
+        public Builder balanceType(Optional<ListFinancialActivityRequestBalanceType> balanceType) {
+            this.balanceType = balanceType;
+            return this;
+        }
+
+        public Builder balanceType(ListFinancialActivityRequestBalanceType balanceType) {
+            this.balanceType = Optional.ofNullable(balanceType);
+            return this;
+        }
+
+        /**
+         * <p>Withdrawal ID (wdrl_). With balance_type=available, selects the same period as its statement, after the previous withdrawal and through this withdrawal, excluding this withdrawal and its fee. Requires a single account. Overrides currency and posted-date filters.</p>
+         */
+        @JsonSetter(value = "withdrawal_id", nulls = Nulls.SKIP)
+        public Builder withdrawalId(Optional<String> withdrawalId) {
+            this.withdrawalId = withdrawalId;
+            return this;
+        }
+
+        public Builder withdrawalId(String withdrawalId) {
+            this.withdrawalId = Optional.ofNullable(withdrawalId);
+            return this;
+        }
+
+        /**
          * <p>Optional currency code filter, for example <code>usd</code>.</p>
          */
         @JsonSetter(value = "currency", nulls = Nulls.SKIP)
@@ -392,7 +610,7 @@ public final class ListFinancialActivityRequest {
         }
 
         /**
-         * <p>Only include rows whose funds became withdrawable on or after this <code>YYYY-MM-DD</code> settlement date (UTC), distinct from posted_at. Requires currency.</p>
+         * <p>Only include balance credits and debits available on or after this <code>YYYY-MM-DD</code> date (UTC), distinct from posted_at. Requires currency.</p>
          */
         @JsonSetter(value = "available_after", nulls = Nulls.SKIP)
         public Builder availableAfter(Optional<String> availableAfter) {
@@ -406,7 +624,7 @@ public final class ListFinancialActivityRequest {
         }
 
         /**
-         * <p>Only include rows whose funds became withdrawable on or before this <code>YYYY-MM-DD</code> settlement date (UTC). Set equal to available_after for a single day. Requires currency.</p>
+         * <p>Only include balance credits and debits available on or before this <code>YYYY-MM-DD</code> date (UTC). Set equal to available_after for a single day. Requires currency.</p>
          */
         @JsonSetter(value = "available_before", nulls = Nulls.SKIP)
         public Builder availableBefore(Optional<String> availableBefore) {
@@ -454,6 +672,13 @@ public final class ListFinancialActivityRequest {
                     userId,
                     includeOwnedAccounts,
                     includeResource,
+                    direction,
+                    resourceId,
+                    paymentId,
+                    activityId,
+                    excludeInternalMovements,
+                    balanceType,
+                    withdrawalId,
                     currency,
                     postedAfter,
                     postedBefore,
@@ -462,6 +687,32 @@ public final class ListFinancialActivityRequest {
                     limit,
                     cursor,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("line_types")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("include_owned_accounts")
+                    || key.equalsIgnoreCase("include_resource")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("activity_id")
+                    || key.equalsIgnoreCase("exclude_internal_movements")
+                    || key.equalsIgnoreCase("balance_type")
+                    || key.equalsIgnoreCase("withdrawal_id")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("posted_after")
+                    || key.equalsIgnoreCase("posted_before")
+                    || key.equalsIgnoreCase("available_after")
+                    || key.equalsIgnoreCase("available_before")
+                    || key.equalsIgnoreCase("limit")
+                    || key.equalsIgnoreCase("cursor")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

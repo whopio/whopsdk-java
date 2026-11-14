@@ -52,7 +52,7 @@ public final class PaymentInstrument {
     }
 
     /**
-     * @return Card payments only: the card's network and last four.
+     * @return Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.
      */
     @JsonIgnore
     public Optional<PaymentInstrumentCard> getCard() {
@@ -173,7 +173,7 @@ public final class PaymentInstrument {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Card payments only: the card's network and last four.</p>
+         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          */
         _FinalStage card(Optional<PaymentInstrumentCard> card);
 
@@ -203,7 +203,6 @@ public final class PaymentInstrument {
 
         private Optional<PaymentInstrumentCard> card = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -220,7 +219,6 @@ public final class PaymentInstrument {
 
         /**
          * <p>Buyer-facing instrument name — &quot;Visa •••• 4242&quot; when the card surfaced, else the method's own name (&quot;Klarna&quot;).</p>
-         * <p>Buyer-facing instrument name — &quot;Visa •••• 4242&quot; when the card surfaced, else the method's own name (&quot;Klarna&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -232,7 +230,6 @@ public final class PaymentInstrument {
 
         /**
          * <p>The standard icon set: square and card shapes, each in light and dark colorways.</p>
-         * <p>The standard icon set: square and card shapes, each in light and dark colorways.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -243,7 +240,6 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>The payment method type identifier, e.g. <code>card</code>, <code>klarna</code>, <code>apple_pay</code>.</p>
          * <p>The payment method type identifier, e.g. <code>card</code>, <code>klarna</code>, <code>apple_pay</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -291,7 +287,7 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network and last four.</p>
+         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -307,7 +303,7 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network and last four.</p>
+         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -317,7 +313,7 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network and last four.</p>
+         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "card", nulls = Nulls.SKIP)
@@ -330,6 +326,18 @@ public final class PaymentInstrument {
         public PaymentInstrument build() {
             return new PaymentInstrument(
                     card, displayName, icons, installmentCount, paymentMethodType, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("card")
+                    || key.equalsIgnoreCase("display_name")
+                    || key.equalsIgnoreCase("icons")
+                    || key.equalsIgnoreCase("installment_count")
+                    || key.equalsIgnoreCase("payment_method_type")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

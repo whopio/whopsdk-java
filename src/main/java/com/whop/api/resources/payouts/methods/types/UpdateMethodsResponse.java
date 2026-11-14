@@ -59,11 +59,15 @@ public final class UpdateMethodsResponse {
 
     private final Optional<Map<String, Object>> quote;
 
+    private final Optional<UpdateMethodsResponseRecipient> recipient;
+
     private final UpdateMethodsResponseStatus status;
 
     private final Optional<String> statusReason;
 
     private final Optional<UpdateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod;
+
+    private final UpdateMethodsResponseType type;
 
     private final Optional<UpdateMethodsResponseUnavailableReason> unavailableReason;
 
@@ -87,9 +91,11 @@ public final class UpdateMethodsResponse {
             UpdateMethodsResponseObject object,
             Optional<String> payerName,
             Optional<Map<String, Object>> quote,
+            Optional<UpdateMethodsResponseRecipient> recipient,
             UpdateMethodsResponseStatus status,
             Optional<String> statusReason,
             Optional<UpdateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod,
+            UpdateMethodsResponseType type,
             Optional<UpdateMethodsResponseUnavailableReason> unavailableReason,
             Map<String, Object> additionalProperties) {
         this.accountReference = accountReference;
@@ -109,9 +115,11 @@ public final class UpdateMethodsResponse {
         this.object = object;
         this.payerName = payerName;
         this.quote = quote;
+        this.recipient = recipient;
         this.status = status;
         this.statusReason = statusReason;
         this.supportedPayoutMethod = supportedPayoutMethod;
+        this.type = type;
         this.unavailableReason = unavailableReason;
         this.additionalProperties = additionalProperties;
     }
@@ -262,6 +270,14 @@ public final class UpdateMethodsResponse {
     }
 
     /**
+     * @return The recipient of a third-party payout method. Present only for recipient payout methods.
+     */
+    @JsonProperty("recipient")
+    public Optional<UpdateMethodsResponseRecipient> getRecipient() {
+        return recipient;
+    }
+
+    /**
      * @return <code>created</code> — saved, no payout has completed through it yet. <code>active</code> — a payout through it completed. <code>broken</code> — a payout through it failed with an error attributable to the method, and it no longer accepts payouts; a later successful payout returns it to <code>active</code>.
      */
     @JsonProperty("status")
@@ -286,6 +302,14 @@ public final class UpdateMethodsResponse {
             return Optional.empty();
         }
         return supportedPayoutMethod;
+    }
+
+    /**
+     * @return The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.
+     */
+    @JsonProperty("type")
+    public UpdateMethodsResponseType getType() {
+        return type;
     }
 
     /**
@@ -400,9 +424,11 @@ public final class UpdateMethodsResponse {
                 && object.equals(other.object)
                 && payerName.equals(other.payerName)
                 && quote.equals(other.quote)
+                && recipient.equals(other.recipient)
                 && status.equals(other.status)
                 && statusReason.equals(other.statusReason)
                 && supportedPayoutMethod.equals(other.supportedPayoutMethod)
+                && type.equals(other.type)
                 && unavailableReason.equals(other.unavailableReason);
     }
 
@@ -426,9 +452,11 @@ public final class UpdateMethodsResponse {
                 this.object,
                 this.payerName,
                 this.quote,
+                this.recipient,
                 this.status,
                 this.statusReason,
                 this.supportedPayoutMethod,
+                this.type,
                 this.unavailableReason);
     }
 
@@ -491,7 +519,14 @@ public final class UpdateMethodsResponse {
         /**
          * <p><code>created</code> — saved, no payout has completed through it yet. <code>active</code> — a payout through it completed. <code>broken</code> — a payout through it failed with an error attributable to the method, and it no longer accepts payouts; a later successful payout returns it to <code>active</code>.</p>
          */
-        _FinalStage status(@NotNull UpdateMethodsResponseStatus status);
+        TypeStage status(@NotNull UpdateMethodsResponseStatus status);
+    }
+
+    public interface TypeStage {
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         */
+        _FinalStage type(@NotNull UpdateMethodsResponseType type);
     }
 
     public interface _FinalStage {
@@ -577,6 +612,13 @@ public final class UpdateMethodsResponse {
         _FinalStage quote(Nullable<Map<String, Object>> quote);
 
         /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        _FinalStage recipient(Optional<UpdateMethodsResponseRecipient> recipient);
+
+        _FinalStage recipient(UpdateMethodsResponseRecipient recipient);
+
+        /**
          * <p>Machine-readable code for why the method is <code>broken</code> — the newest failure recorded through it, whether a payout error or a pre-payout rejection. <code>null</code> unless the method is broken, or when it was disabled without a recorded failure.</p>
          */
         _FinalStage statusReason(Optional<String> statusReason);
@@ -612,6 +654,7 @@ public final class UpdateMethodsResponse {
                     NeedsPlaidReconnectStage,
                     ObjectStage,
                     StatusStage,
+                    TypeStage,
                     _FinalStage {
         private OffsetDateTime createdAt;
 
@@ -631,11 +674,15 @@ public final class UpdateMethodsResponse {
 
         private UpdateMethodsResponseStatus status;
 
+        private UpdateMethodsResponseType type;
+
         private Optional<UpdateMethodsResponseUnavailableReason> unavailableReason = Optional.empty();
 
         private Optional<UpdateMethodsResponseSupportedPayoutMethod> supportedPayoutMethod = Optional.empty();
 
         private Optional<String> statusReason = Optional.empty();
+
+        private Optional<UpdateMethodsResponseRecipient> recipient = Optional.empty();
 
         private Optional<Map<String, Object>> quote = Optional.empty();
 
@@ -655,7 +702,6 @@ public final class UpdateMethodsResponse {
 
         private Optional<String> accountReference = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -679,9 +725,11 @@ public final class UpdateMethodsResponse {
             object(other.getObject());
             payerName(other.getPayerName());
             quote(other.getQuote());
+            recipient(other.getRecipient());
             status(other.getStatus());
             statusReason(other.getStatusReason());
             supportedPayoutMethod(other.getSupportedPayoutMethod());
+            type(other.getType());
             unavailableReason(other.getUnavailableReason());
             return this;
         }
@@ -703,7 +751,6 @@ public final class UpdateMethodsResponse {
 
         /**
          * <p>Payout method ID, prefixed <code>potk_</code>.</p>
-         * <p>Payout method ID, prefixed <code>potk_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -714,7 +761,6 @@ public final class UpdateMethodsResponse {
         }
 
         /**
-         * <p>Whether this method is a copy of one saved on another of the payer's accounts.</p>
          * <p>Whether this method is a copy of one saved on another of the payer's accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -734,7 +780,6 @@ public final class UpdateMethodsResponse {
 
         /**
          * <p>Whether the payer added this method by signing in to their bank rather than typing account details.</p>
-         * <p>Whether the payer added this method by signing in to their bank rather than typing account details.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -745,7 +790,6 @@ public final class UpdateMethodsResponse {
         }
 
         /**
-         * <p>Whether the bank sign-in behind this method has expired and must be redone before it counts as linked.</p>
          * <p>Whether the bank sign-in behind this method has expired and must be redone before it counts as linked.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -765,13 +809,23 @@ public final class UpdateMethodsResponse {
 
         /**
          * <p><code>created</code> — saved, no payout has completed through it yet. <code>active</code> — a payout through it completed. <code>broken</code> — a payout through it failed with an error attributable to the method, and it no longer accepts payouts; a later successful payout returns it to <code>active</code>.</p>
-         * <p><code>created</code> — saved, no payout has completed through it yet. <code>active</code> — a payout through it completed. <code>broken</code> — a payout through it failed with an error attributable to the method, and it no longer accepts payouts; a later successful payout returns it to <code>active</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
-        public _FinalStage status(@NotNull UpdateMethodsResponseStatus status) {
+        public TypeStage status(@NotNull UpdateMethodsResponseStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The kind of payout method. <code>external</code> sends funds out of Whop. <code>whop_card</code> moves funds onto the account's own Whop Card. A <code>whop_card</code> method takes standard-speed payouts only, and cannot be updated, reconnected, or deleted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull UpdateMethodsResponseType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
@@ -871,6 +925,26 @@ public final class UpdateMethodsResponse {
         @JsonSetter(value = "status_reason", nulls = Nulls.SKIP)
         public _FinalStage statusReason(Optional<String> statusReason) {
             this.statusReason = statusReason;
+            return this;
+        }
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recipient(UpdateMethodsResponseRecipient recipient) {
+            this.recipient = Optional.ofNullable(recipient);
+            return this;
+        }
+
+        /**
+         * <p>The recipient of a third-party payout method. Present only for recipient payout methods.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recipient", nulls = Nulls.SKIP)
+        public _FinalStage recipient(Optional<UpdateMethodsResponseRecipient> recipient) {
+            this.recipient = recipient;
             return this;
         }
 
@@ -1198,11 +1272,43 @@ public final class UpdateMethodsResponse {
                     object,
                     payerName,
                     quote,
+                    recipient,
                     status,
                     statusReason,
                     supportedPayoutMethod,
+                    type,
                     unavailableReason,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_reference")
+                    || key.equalsIgnoreCase("bank_verification_state")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("destination_currency")
+                    || key.equalsIgnoreCase("estimated_arrival")
+                    || key.equalsIgnoreCase("fee_structure")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("institution_name")
+                    || key.equalsIgnoreCase("is_clone")
+                    || key.equalsIgnoreCase("is_default")
+                    || key.equalsIgnoreCase("last_paid_out_at")
+                    || key.equalsIgnoreCase("linked_via_plaid")
+                    || key.equalsIgnoreCase("needs_plaid_reconnect")
+                    || key.equalsIgnoreCase("nickname")
+                    || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("payer_name")
+                    || key.equalsIgnoreCase("quote")
+                    || key.equalsIgnoreCase("recipient")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_reason")
+                    || key.equalsIgnoreCase("supported_payout_method")
+                    || key.equalsIgnoreCase("type")
+                    || key.equalsIgnoreCase("unavailable_reason")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

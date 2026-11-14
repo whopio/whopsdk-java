@@ -152,7 +152,7 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
     }
 
     /**
-     * @return SWIFT/BIC code for international wires, when available.
+     * @return SWIFT/BIC of the intermediary bank the sending bank routes an international wire through. Null unless <code>origin_bic</code> is provided and an intermediary is published for that bank and currency.
      */
     @JsonIgnore
     public Optional<String> getSwiftBic() {
@@ -331,7 +331,7 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
         _FinalStage routingNumber(Nullable<String> routingNumber);
 
         /**
-         * <p>SWIFT/BIC code for international wires, when available.</p>
+         * <p>SWIFT/BIC of the intermediary bank the sending bank routes an international wire through. Null unless <code>origin_bic</code> is provided and an intermediary is published for that bank and currency.</p>
          */
         _FinalStage swiftBic(Optional<String> swiftBic);
 
@@ -360,7 +360,6 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
 
         private Optional<String> accountNumber = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -381,7 +380,6 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
 
         /**
          * <p>Currency supported by these bank instructions.</p>
-         * <p>Currency supported by these bank instructions.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -392,7 +390,7 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
         }
 
         /**
-         * <p>SWIFT/BIC code for international wires, when available.</p>
+         * <p>SWIFT/BIC of the intermediary bank the sending bank routes an international wire through. Null unless <code>origin_bic</code> is provided and an intermediary is published for that bank and currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -408,7 +406,7 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
         }
 
         /**
-         * <p>SWIFT/BIC code for international wires, when available.</p>
+         * <p>SWIFT/BIC of the intermediary bank the sending bank routes an international wire through. Null unless <code>origin_bic</code> is provided and an intermediary is published for that bank and currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -418,7 +416,7 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
         }
 
         /**
-         * <p>SWIFT/BIC code for international wires, when available.</p>
+         * <p>SWIFT/BIC of the intermediary bank the sending bank routes an international wire through. Null unless <code>origin_bic</code> is provided and an intermediary is published for that bank and currency.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "swift_bic", nulls = Nulls.SKIP)
@@ -691,6 +689,22 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItem {
                     routingNumber,
                     swiftBic,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_number")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("deposit_bank_address")
+                    || key.equalsIgnoreCase("deposit_bank_name")
+                    || key.equalsIgnoreCase("deposit_beneficiary_name")
+                    || key.equalsIgnoreCase("deposit_reference")
+                    || key.equalsIgnoreCase("rails")
+                    || key.equalsIgnoreCase("routing_number")
+                    || key.equalsIgnoreCase("swift_bic")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -148,7 +148,6 @@ public final class AppRequestedPermission {
 
         private Optional<String> justification = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -163,7 +162,6 @@ public final class AppRequestedPermission {
 
         /**
          * <p>Whether the app requires the permission to be granted on install, as opposed to requesting it optionally.</p>
-         * <p>Whether the app requires the permission to be granted on install, as opposed to requesting it optionally.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -174,7 +172,6 @@ public final class AppRequestedPermission {
         }
 
         /**
-         * <p>The permission action the app requests.</p>
          * <p>The permission action the app requests.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -224,6 +221,16 @@ public final class AppRequestedPermission {
         @java.lang.Override
         public AppRequestedPermission build() {
             return new AppRequestedPermission(isRequired, justification, permissionAction, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("is_required")
+                    || key.equalsIgnoreCase("justification")
+                    || key.equalsIgnoreCase("permission_action")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

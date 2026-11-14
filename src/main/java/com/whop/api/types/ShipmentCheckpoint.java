@@ -192,7 +192,6 @@ public final class ShipmentCheckpoint {
 
         private Optional<String> location = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -207,7 +206,6 @@ public final class ShipmentCheckpoint {
         }
 
         /**
-         * <p>Delivery status this carrier scan maps to.</p>
          * <p>Delivery status this carrier scan maps to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -329,6 +327,17 @@ public final class ShipmentCheckpoint {
         @java.lang.Override
         public ShipmentCheckpoint build() {
             return new ShipmentCheckpoint(location, message, status, timestamp, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("location")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("timestamp")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

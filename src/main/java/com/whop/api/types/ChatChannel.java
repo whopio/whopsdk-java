@@ -82,7 +82,7 @@ public final class ChatChannel {
     }
 
     /**
-     * @return A list of words that are automatically filtered from messages in this chat.
+     * @return A list of words that are automatically filtered from messages in this chat. Empty unless the caller has permission to moderate this chat.
      */
     @JsonProperty("banned_words")
     public List<String> getBannedWords() {
@@ -234,7 +234,7 @@ public final class ChatChannel {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>A list of words that are automatically filtered from messages in this chat.</p>
+         * <p>A list of words that are automatically filtered from messages in this chat. Empty unless the caller has permission to moderate this chat.</p>
          */
         _FinalStage bannedWords(List<String> bannedWords);
 
@@ -277,7 +277,6 @@ public final class ChatChannel {
 
         private List<String> bannedWords = new ArrayList<>();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -297,7 +296,6 @@ public final class ChatChannel {
 
         /**
          * <p>Whether media uploads such as images and videos are blocked in this chat.</p>
-         * <p>Whether media uploads such as images and videos are blocked in this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -308,7 +306,6 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>Whether URL links are blocked from being posted in this chat.</p>
          * <p>Whether URL links are blocked from being posted in this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -321,7 +318,6 @@ public final class ChatChannel {
 
         /**
          * <p>The experience this chat feed is attached to.</p>
-         * <p>The experience this chat feed is attached to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -332,7 +328,6 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>The unique identifier for the entity</p>
          * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -345,7 +340,6 @@ public final class ChatChannel {
 
         /**
          * <p>The permission level controlling which users can send messages in this chat.</p>
-         * <p>The permission level controlling which users can send messages in this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -356,7 +350,6 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>The permission level controlling which users can add reactions in this chat.</p>
          * <p>The permission level controlling which users can add reactions in this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -404,7 +397,7 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>A list of words that are automatically filtered from messages in this chat.</p>
+         * <p>A list of words that are automatically filtered from messages in this chat. Empty unless the caller has permission to moderate this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -416,7 +409,7 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>A list of words that are automatically filtered from messages in this chat.</p>
+         * <p>A list of words that are automatically filtered from messages in this chat. Empty unless the caller has permission to moderate this chat.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -426,7 +419,7 @@ public final class ChatChannel {
         }
 
         /**
-         * <p>A list of words that are automatically filtered from messages in this chat.</p>
+         * <p>A list of words that are automatically filtered from messages in this chat. Empty unless the caller has permission to moderate this chat.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "banned_words", nulls = Nulls.SKIP)
@@ -450,6 +443,21 @@ public final class ChatChannel {
                     whoCanPost,
                     whoCanReact,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("ban_media")
+                    || key.equalsIgnoreCase("ban_urls")
+                    || key.equalsIgnoreCase("banned_words")
+                    || key.equalsIgnoreCase("experience")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("user_posts_cooldown_seconds")
+                    || key.equalsIgnoreCase("who_can_post")
+                    || key.equalsIgnoreCase("who_can_react")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

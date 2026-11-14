@@ -27,28 +27,28 @@ public class LogsClient {
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public SyncPagingIterable<ListLogsResponseDataItem> list(String id) {
         return this.rawClient.list(id).body();
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public SyncPagingIterable<ListLogsResponseDataItem> list(String id, RequestOptions requestOptions) {
         return this.rawClient.list(id, requestOptions).body();
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public SyncPagingIterable<ListLogsResponseDataItem> list(String id, ListLogsRequest request) {
         return this.rawClient.list(id, request).body();
     }
 
     /**
-     * Lists activity for a member and all of their non-drafted memberships, most recent first.
+     * Lists activity for a member and all of their memberships that are not <code>drafted</code>, most recent first.
      */
     public SyncPagingIterable<ListLogsResponseDataItem> list(
             String id, ListLogsRequest request, RequestOptions requestOptions) {

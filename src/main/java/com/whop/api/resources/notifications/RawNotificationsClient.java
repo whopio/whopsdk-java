@@ -4,11 +4,14 @@
 package com.whop.api.resources.notifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
@@ -28,7 +31,6 @@ import com.whop.api.resources.notifications.types.CreateNotificationsResponse;
 import com.whop.api.resources.notifications.types.ListNotificationsResponse;
 import com.whop.api.resources.notifications.types.MarkReadNotificationsResponse;
 import com.whop.api.types.Notification;
-import com.whop.api.types.V1ErrorResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -48,32 +50,32 @@ public class RawNotificationsClient {
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Notification>> list() {
         return list(ListNotificationsRequest.builder().build());
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Notification>> list(RequestOptions requestOptions) {
         return list(ListNotificationsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Notification>> list(ListNotificationsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the authenticated user's notifications, newest first. Requires a user credential — an account API key has no notification feed. Without filters the feed spans every experience the user belongs to plus the teams they are a member of.
+     * Lists the authenticated user's notifications, newest first. Without filters the feed spans every experience the user belongs to plus the teams they are a member of. Requires a user credential — an account API key has no notification feed.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Notification>> list(
             ListNotificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications");
         if (request.getUnread().isPresent()) {
@@ -115,6 +117,15 @@ public class RawNotificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -129,8 +140,11 @@ public class RawNotificationsClient {
                 List<Notification> result = parsedResponse.getData();
                 return new WhopApiHttpResponse<>(
                         new SyncPagingIterable<Notification>(
-                                startingAfter != null, result, parsedResponse, () -> list(nextRequest, requestOptions)
-                                        .body()),
+                                startingAfter.isPresent()
+                                        && !startingAfter.get().isEmpty(),
+                                result,
+                                parsedResponse,
+                                () -> list(nextRequest, requestOptions).body()),
                         response);
             }
             try {
@@ -151,6 +165,8 @@ public class RawNotificationsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -168,7 +184,7 @@ public class RawNotificationsClient {
      */
     public WhopApiHttpResponse<CreateNotificationsResponse> create(
             CreateNotificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications");
         if (requestOptions != null) {
@@ -179,7 +195,9 @@ public class RawNotificationsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -193,6 +211,15 @@ public class RawNotificationsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -215,8 +242,7 @@ public class RawNotificationsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -224,6 +250,8 @@ public class RawNotificationsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
@@ -255,7 +283,7 @@ public class RawNotificationsClient {
      */
     public WhopApiHttpResponse<BadgesNotificationsResponse> badges(
             BadgesNotificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications/badges");
         if (request.getLastFetchedAt().isPresent()) {
@@ -281,6 +309,15 @@ public class RawNotificationsClient {
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
         }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
             String responseBodyString = responseBody != null ? responseBody.string() : "{}";
@@ -304,38 +341,40 @@ public class RawNotificationsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public WhopApiHttpResponse<MarkReadNotificationsResponse> markRead() {
         return markRead(MarkReadNotificationsRequest.builder().build());
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public WhopApiHttpResponse<MarkReadNotificationsResponse> markRead(RequestOptions requestOptions) {
         return markRead(MarkReadNotificationsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public WhopApiHttpResponse<MarkReadNotificationsResponse> markRead(MarkReadNotificationsRequest request) {
         return markRead(request, null);
     }
 
     /**
-     * Marks the authenticated user's notifications as read: one experience's (<code>experience_id</code>) or everything (<code>all: true</code>) — exactly one of the two. Requires a user credential. Responds with the refreshed badge rows for the affected scope.
+     * Marks the authenticated user's notifications as read, for one experience or all of them, and returns the refreshed badge rows for that scope. Requires a user credential.
      */
     public WhopApiHttpResponse<MarkReadNotificationsResponse> markRead(
             MarkReadNotificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications/mark_read");
         if (requestOptions != null) {
@@ -346,7 +385,9 @@ public class RawNotificationsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
             throw new WhopApiException("Failed to serialize request", e);
         }
@@ -360,6 +401,15 @@ public class RawNotificationsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -385,8 +435,7 @@ public class RawNotificationsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, V1ErrorResponse.class),
-                                response);
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -394,41 +443,43 @@ public class RawNotificationsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public WhopApiHttpResponse<Notification> retrieve(String id) {
         return retrieve(id, RetrieveNotificationsRequest.builder().build());
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public WhopApiHttpResponse<Notification> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveNotificationsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public WhopApiHttpResponse<Notification> retrieve(String id, RetrieveNotificationsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a single notification by id — either an <code>id</code> returned by List Notifications, or the ephemeral id delivered with a push/websocket event. Requires a user credential.
+     * Retrieves a single notification, from the feed or from a push or websocket event. Requires a user credential.
      */
     public WhopApiHttpResponse<Notification> retrieve(
             String id, RetrieveNotificationsRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("notifications")
-                .addPathSegment(id);
+                .addPathSegment(PathSegments.validate(id));
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
@@ -443,6 +494,15 @@ public class RawNotificationsClient {
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
         }
         try (Response response = client.newCall(okhttpRequest).execute()) {
             ResponseBody responseBody = response.body();
@@ -466,6 +526,8 @@ public class RawNotificationsClient {
             Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
             throw new WhopApiApiException(
                     "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new WhopApiException("Network error executing HTTP request", e);
         }

@@ -35,7 +35,7 @@ public final class CreatePaymentMethodDomainsRequest {
     }
 
     /**
-     * @return Account to register the domain for (<code>biz_</code> tag). Defaults to the caller's account.
+     * @return Account to register the domain for (<code>biz_</code> tag). Required when authenticating as a user; an account API key supplies its own account.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -43,7 +43,7 @@ public final class CreatePaymentMethodDomainsRequest {
     }
 
     /**
-     * @return Hostname to register (e.g. <code>checkout.shinetime.example</code>).
+     * @return Hostname to register (e.g. <code>checkout.shinetime.com</code>).
      */
     @JsonProperty("hostname")
     public String getHostname() {
@@ -81,7 +81,7 @@ public final class CreatePaymentMethodDomainsRequest {
 
     public interface HostnameStage {
         /**
-         * <p>Hostname to register (e.g. <code>checkout.shinetime.example</code>).</p>
+         * <p>Hostname to register (e.g. <code>checkout.shinetime.com</code>).</p>
          */
         _FinalStage hostname(@NotNull String hostname);
 
@@ -96,7 +96,7 @@ public final class CreatePaymentMethodDomainsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Account to register the domain for (<code>biz_</code> tag). Defaults to the caller's account.</p>
+         * <p>Account to register the domain for (<code>biz_</code> tag). Required when authenticating as a user; an account API key supplies its own account.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
 
@@ -109,7 +109,6 @@ public final class CreatePaymentMethodDomainsRequest {
 
         private Optional<String> accountId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -122,8 +121,7 @@ public final class CreatePaymentMethodDomainsRequest {
         }
 
         /**
-         * <p>Hostname to register (e.g. <code>checkout.shinetime.example</code>).</p>
-         * <p>Hostname to register (e.g. <code>checkout.shinetime.example</code>).</p>
+         * <p>Hostname to register (e.g. <code>checkout.shinetime.com</code>).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -134,7 +132,7 @@ public final class CreatePaymentMethodDomainsRequest {
         }
 
         /**
-         * <p>Account to register the domain for (<code>biz_</code> tag). Defaults to the caller's account.</p>
+         * <p>Account to register the domain for (<code>biz_</code> tag). Required when authenticating as a user; an account API key supplies its own account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -144,7 +142,7 @@ public final class CreatePaymentMethodDomainsRequest {
         }
 
         /**
-         * <p>Account to register the domain for (<code>biz_</code> tag). Defaults to the caller's account.</p>
+         * <p>Account to register the domain for (<code>biz_</code> tag). Required when authenticating as a user; an account API key supplies its own account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -156,6 +154,14 @@ public final class CreatePaymentMethodDomainsRequest {
         @java.lang.Override
         public CreatePaymentMethodDomainsRequest build() {
             return new CreatePaymentMethodDomainsRequest(accountId, hostname, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("account_id") || key.equalsIgnoreCase("hostname")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

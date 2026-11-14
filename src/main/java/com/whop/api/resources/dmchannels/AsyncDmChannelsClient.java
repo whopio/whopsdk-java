@@ -5,6 +5,7 @@ package com.whop.api.resources.dmchannels;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.dmchannels.requests.CreateDmChannelsRequest;
 import com.whop.api.resources.dmchannels.requests.DeleteDmChannelsRequest;
@@ -33,40 +34,66 @@ public class AsyncDmChannelsClient {
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<DmChannelListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<DmChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<DmChannelListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<DmChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
      * </ul>
      */
     public CompletableFuture<SyncPagingIterable<DmChannelListItem>> list(ListDmChannelsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<DmChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Returns a paginated list of DM channels for the currently authenticated user, sorted by most recently active.
+     * Lists the authenticated user's DM channels, most recently active first.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:read</code></li>
@@ -74,29 +101,52 @@ public class AsyncDmChannelsClient {
      */
     public CompletableFuture<SyncPagingIterable<DmChannelListItem>> list(
             ListDmChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<DmChannelListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<DmChannelListItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
      * </ul>
      */
     public CompletableFuture<DmChannel> create(CreateDmChannelsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Create a new DM channel between two or more users, optionally scoped to a specific company. Returns the existing channel if one already exists.
+     * Creates a DM channel between two or more users, optionally scoped to an account. Returns the existing channel if one already exists.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
      * </ul>
      */
     public CompletableFuture<DmChannel> create(CreateDmChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -108,7 +158,14 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -120,7 +177,14 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -132,7 +196,14 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> retrieve(String id, RetrieveDmChannelsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -145,11 +216,19 @@ public class AsyncDmChannelsClient {
      */
     public CompletableFuture<DmChannel> retrieve(
             String id, RetrieveDmChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -157,11 +236,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -169,11 +255,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -181,11 +274,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteDmChannelsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Permanently delete a DM channel and all of its messages. Only an admin of the channel can perform this action.
+     * Permanently deletes a DM channel and all of its messages. Only a channel admin can delete it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -194,11 +294,18 @@ public class AsyncDmChannelsClient {
      */
     public CompletableFuture<Boolean> delete(
             String id, DeleteDmChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -206,11 +313,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -218,11 +332,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -230,11 +351,18 @@ public class AsyncDmChannelsClient {
      * </ul>
      */
     public CompletableFuture<DmChannel> update(String id, UpdateDmChannelsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update the settings of an existing DM channel, such as its display name. Only an admin of the channel can perform this action.
+     * Updates a DM channel's settings, such as its display name. Only a channel admin can update it.
      * <p>Required permissions (one of):</p>
      * <ul>
      * <li><code>dms:channel:manage</code></li>
@@ -243,6 +371,14 @@ public class AsyncDmChannelsClient {
      */
     public CompletableFuture<DmChannel> update(
             String id, UpdateDmChannelsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DmChannel>> rawFuture =
+                this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<DmChannel> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

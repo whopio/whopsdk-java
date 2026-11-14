@@ -7,13 +7,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType {
-    public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType PAPER_CHECK =
-            new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(
-                    Value.PAPER_CHECK, "paper_check");
-
     public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType CRYPTOCURRENCY =
             new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(
                     Value.CRYPTOCURRENCY, "cryptocurrency");
+
+    public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType CHECK =
+            new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(Value.CHECK, "check");
+
+    public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType CARD =
+            new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(Value.CARD, "card");
 
     public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType UNKNOWN =
             new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(Value.UNKNOWN, "unknown");
@@ -25,10 +27,6 @@ public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodD
     public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType BANK_DEPOSIT =
             new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(
                     Value.BANK_DEPOSIT, "bank_deposit");
-
-    public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType MASSPAY_CARD =
-            new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(
-                    Value.MASSPAY_CARD, "masspay_card");
 
     public static final ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType MOBILE_WALLET =
             new ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType(
@@ -76,18 +74,18 @@ public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodD
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAPER_CHECK:
-                return visitor.visitPaperCheck();
             case CRYPTOCURRENCY:
                 return visitor.visitCryptocurrency();
+            case CHECK:
+                return visitor.visitCheck();
+            case CARD:
+                return visitor.visitCard();
             case UNKNOWN:
                 return visitor.visitUnknown();
             case HOME_DELIVERY:
                 return visitor.visitHomeDelivery();
             case BANK_DEPOSIT:
                 return visitor.visitBankDeposit();
-            case MASSPAY_CARD:
-                return visitor.visitMasspayCard();
             case MOBILE_WALLET:
                 return visitor.visitMobileWallet();
             case CASH_PICKUP:
@@ -103,18 +101,18 @@ public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodD
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodDeliveryType valueOf(String value) {
         switch (value) {
-            case "paper_check":
-                return PAPER_CHECK;
             case "cryptocurrency":
                 return CRYPTOCURRENCY;
+            case "check":
+                return CHECK;
+            case "card":
+                return CARD;
             case "unknown":
                 return UNKNOWN;
             case "home_delivery":
                 return HOME_DELIVERY;
             case "bank_deposit":
                 return BANK_DEPOSIT;
-            case "masspay_card":
-                return MASSPAY_CARD;
             case "mobile_wallet":
                 return MOBILE_WALLET;
             case "cash_pickup":
@@ -136,9 +134,9 @@ public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodD
 
         MOBILE_WALLET,
 
-        MASSPAY_CARD,
+        CARD,
 
-        PAPER_CHECK,
+        CHECK,
 
         BILL,
 
@@ -158,9 +156,9 @@ public final class ListPayoutsResponseDataItemPayoutMethodSupportedPayoutMethodD
 
         T visitMobileWallet();
 
-        T visitMasspayCard();
+        T visitCard();
 
-        T visitPaperCheck();
+        T visitCheck();
 
         T visitBill();
 

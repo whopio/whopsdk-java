@@ -5,6 +5,7 @@ package com.whop.api.resources.checkoutconfigurations;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.checkoutconfigurations.requests.CreateCheckoutConfigurationsRequest;
 import com.whop.api.resources.checkoutconfigurations.requests.DeleteCheckoutConfigurationsRequest;
@@ -38,7 +39,16 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>> list(
             ListCheckoutConfigurationsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>>>
+                rawFuture = this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -46,43 +56,97 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>> list(
             ListCheckoutConfigurationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>>>
+                rawFuture = this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<ListCheckoutConfigurationsResponseDataItem>> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CompletableFuture<CreateCheckoutConfigurationsResponse> create() {
-        return this.rawClient.create().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.create();
+        CompletableFuture<CreateCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CompletableFuture<CreateCheckoutConfigurationsResponse> create(RequestOptions requestOptions) {
-        return this.rawClient.create(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.create(requestOptions);
+        CompletableFuture<CreateCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CompletableFuture<CreateCheckoutConfigurationsResponse> create(CreateCheckoutConfigurationsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.create(request);
+        CompletableFuture<CreateCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Creates a reusable checkout configuration for an existing or inline plan.
+     * Creates a reusable checkout configuration for an existing or inline variant. Send customers to its <code>purchase_url</code> to check out.
      */
     public CompletableFuture<CreateCheckoutConfigurationsResponse> create(
             CreateCheckoutConfigurationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves a checkout configuration by ID. This endpoint is public so a checkout page can load from the configuration URL.
      */
     public CompletableFuture<RetrieveCheckoutConfigurationsResponse> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.retrieve(id);
+        CompletableFuture<RetrieveCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -90,7 +154,16 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<RetrieveCheckoutConfigurationsResponse> retrieve(
             String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<RetrieveCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -98,7 +171,16 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<RetrieveCheckoutConfigurationsResponse> retrieve(
             String id, RetrieveCheckoutConfigurationsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request);
+        CompletableFuture<RetrieveCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -106,21 +188,48 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<RetrieveCheckoutConfigurationsResponse> retrieve(
             String id, RetrieveCheckoutConfigurationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<RetrieveCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<RetrieveCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a checkout configuration so its checkout URL can no longer be used.
      */
     public CompletableFuture<DeleteCheckoutConfigurationsResponse> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.delete(id);
+        CompletableFuture<DeleteCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Deletes a checkout configuration so its checkout URL can no longer be used.
      */
     public CompletableFuture<DeleteCheckoutConfigurationsResponse> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.delete(id, requestOptions);
+        CompletableFuture<DeleteCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -128,7 +237,16 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<DeleteCheckoutConfigurationsResponse> delete(
             String id, DeleteCheckoutConfigurationsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.delete(id, request);
+        CompletableFuture<DeleteCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -136,6 +254,15 @@ public class AsyncCheckoutConfigurationsClient {
      */
     public CompletableFuture<DeleteCheckoutConfigurationsResponse> delete(
             String id, DeleteCheckoutConfigurationsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<DeleteCheckoutConfigurationsResponse>> rawFuture =
+                this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<DeleteCheckoutConfigurationsResponse> future =
+                rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

@@ -695,7 +695,6 @@ public final class Course {
 
         private Optional<Boolean> certificateAfterCompletionEnabled = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -729,7 +728,6 @@ public final class Course {
 
         /**
          * <p>The total number of chapters in this course, including chapters whose lessons are all hidden from the current user.</p>
-         * <p>The total number of chapters in this course, including chapters whose lessons are all hidden from the current user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -740,7 +738,6 @@ public final class Course {
         }
 
         /**
-         * <p>The number of lessons in this course that the current user has marked as completed. Zero when the request is not made on behalf of a user.</p>
          * <p>The number of lessons in this course that the current user has marked as completed. Zero when the request is not made on behalf of a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -753,7 +750,6 @@ public final class Course {
 
         /**
          * <p>The datetime the course was created.</p>
-         * <p>The datetime the course was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -764,7 +760,6 @@ public final class Course {
         }
 
         /**
-         * <p>The unique identifier for the course.</p>
          * <p>The unique identifier for the course.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -777,7 +772,6 @@ public final class Course {
 
         /**
          * <p>The spoken language of the video content, used to generate accurate closed captions. One of: en, es, it, pt, de, fr, pl, ru, nl, ca, tr, sv, uk, no, fi, sk, el, cs, hr, da, ro, bg.</p>
-         * <p>The spoken language of the video content, used to generate accurate closed captions. One of: en, es, it, pt, de, fr, pl, ru, nl, ca, tr, sv, uk, no, fi, sk, el, cs, hr, da, ro, bg.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -788,7 +782,6 @@ public final class Course {
         }
 
         /**
-         * <p>The sort position of this course within its parent experience, as a decimal for flexible ordering.</p>
          * <p>The sort position of this course within its parent experience, as a decimal for flexible ordering.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -801,7 +794,6 @@ public final class Course {
 
         /**
          * <p>Whether students must complete each lesson sequentially before advancing to the next one.</p>
-         * <p>Whether students must complete each lesson sequentially before advancing to the next one.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -812,7 +804,6 @@ public final class Course {
         }
 
         /**
-         * <p>The combined duration in seconds of every hosted video across the lessons visible to the current user.</p>
          * <p>The combined duration in seconds of every hosted video across the lessons visible to the current user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -825,7 +816,6 @@ public final class Course {
 
         /**
          * <p>The number of lessons in this course visible to the current user.</p>
-         * <p>The number of lessons in this course visible to the current user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -837,7 +827,6 @@ public final class Course {
 
         /**
          * <p>The datetime the course was last updated.</p>
-         * <p>The datetime the course was last updated.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -848,7 +837,6 @@ public final class Course {
         }
 
         /**
-         * <p>The visibility setting that controls whether this course appears to students. One of: visible, hidden.</p>
          * <p>The visibility setting that controls whether this course appears to students. One of: visible, hidden.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1279,6 +1267,35 @@ public final class Course {
                     updatedAt,
                     visibility,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("certificate_after_completion_enabled")
+                    || key.equalsIgnoreCase("chapters")
+                    || key.equalsIgnoreCase("chapters_count")
+                    || key.equalsIgnoreCase("completed_lessons_count")
+                    || key.equalsIgnoreCase("cover_image")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("language")
+                    || key.equalsIgnoreCase("latest_lesson_created_at")
+                    || key.equalsIgnoreCase("lesson_unlock_days")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("require_completing_lessons_in_order")
+                    || key.equalsIgnoreCase("resume_lesson")
+                    || key.equalsIgnoreCase("started_at")
+                    || key.equalsIgnoreCase("tagline")
+                    || key.equalsIgnoreCase("thumbnail")
+                    || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("total_duration_seconds")
+                    || key.equalsIgnoreCase("total_lessons_count")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("visibility")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

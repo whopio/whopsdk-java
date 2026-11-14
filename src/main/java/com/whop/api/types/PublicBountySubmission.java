@@ -380,7 +380,6 @@ public final class PublicBountySubmission {
 
         private Optional<String> claimedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -403,7 +402,6 @@ public final class PublicBountySubmission {
 
         /**
          * <p>The bounty the work was submitted to, prefixed <code>bnty_</code>.</p>
-         * <p>The bounty the work was submitted to, prefixed <code>bnty_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -414,7 +412,6 @@ public final class PublicBountySubmission {
         }
 
         /**
-         * <p>When the submission was created, as an ISO 8601 timestamp.</p>
          * <p>When the submission was created, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -427,7 +424,6 @@ public final class PublicBountySubmission {
 
         /**
          * <p>Submission ID, prefixed <code>btys_</code>.</p>
-         * <p>Submission ID, prefixed <code>btys_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -438,7 +434,6 @@ public final class PublicBountySubmission {
         }
 
         /**
-         * <p>Lifecycle state. <code>submitted</code> submissions await review; <code>approved</code> submissions were accepted and paid; <code>denied</code> submissions were rejected. In-progress attempts never appear on the public list.</p>
          * <p>Lifecycle state. <code>submitted</code> submissions await review; <code>approved</code> submissions were accepted and paid; <code>denied</code> submissions were rejected. In-progress attempts never appear on the public list.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -451,7 +446,6 @@ public final class PublicBountySubmission {
 
         /**
          * <p>When the submission was last updated, as an ISO 8601 timestamp.</p>
-         * <p>When the submission was last updated, as an ISO 8601 timestamp.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -462,7 +456,6 @@ public final class PublicBountySubmission {
         }
 
         /**
-         * <p>User who submitted the work.</p>
          * <p>User who submitted the work.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -670,6 +663,24 @@ public final class PublicBountySubmission {
                     updatedAt,
                     worker,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("bounty_id")
+                    || key.equalsIgnoreCase("claimed_at")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("denial_reason")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("latest_proof_livestream_feed")
+                    || key.equalsIgnoreCase("resolved_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("submitted_at")
+                    || key.equalsIgnoreCase("updated_at")
+                    || key.equalsIgnoreCase("worker")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -12,12 +12,17 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.types.BillingReasons;
-import com.whop.api.types.Currencies;
-import com.whop.api.types.Direction;
-import com.whop.api.types.FriendlyReceiptStatus;
-import com.whop.api.types.ReceiptStatus;
-import com.whop.api.types.ReceiptV2Order;
+import com.whop.api.resources.payments.types.ListPaymentsRequestBillingReason;
+import com.whop.api.resources.payments.types.ListPaymentsRequestBillingReasonsItem;
+import com.whop.api.resources.payments.types.ListPaymentsRequestDirection;
+import com.whop.api.resources.payments.types.ListPaymentsRequestMode;
+import com.whop.api.resources.payments.types.ListPaymentsRequestOrder;
+import com.whop.api.resources.payments.types.ListPaymentsRequestPaymentMethodsItem;
+import com.whop.api.resources.payments.types.ListPaymentsRequestStatus;
+import com.whop.api.resources.payments.types.ListPaymentsRequestStatusesItem;
+import com.whop.api.resources.payments.types.ListPaymentsRequestSubstatusesItem;
+import com.whop.api.resources.payments.types.ListPaymentsRequestTrackingStatesItem;
+import com.whop.api.resources.payments.types.ListPaymentsRequestTrackingStatus;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,95 +34,207 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListPaymentsRequest.Builder.class)
 public final class ListPaymentsRequest {
+    private final Optional<List<ListPaymentsRequestStatusesItem>> statuses;
+
+    private final Optional<List<ListPaymentsRequestSubstatusesItem>> substatuses;
+
+    private final Optional<List<ListPaymentsRequestBillingReasonsItem>> billingReasons;
+
+    private final Optional<List<String>> currencies;
+
+    private final Optional<List<String>> variantIds;
+
     private final Optional<List<String>> productIds;
 
-    private final Optional<List<BillingReasons>> billingReasons;
+    private final Optional<List<ListPaymentsRequestPaymentMethodsItem>> paymentMethods;
 
-    private final Optional<List<Currencies>> currencies;
+    private final Optional<List<ListPaymentsRequestTrackingStatesItem>> trackingStates;
 
-    private final Optional<List<String>> planIds;
+    private final Optional<ListPaymentsRequestMode> mode;
 
-    private final Optional<List<ReceiptStatus>> statuses;
+    private final Optional<String> accountId;
 
-    private final Optional<List<FriendlyReceiptStatus>> substatuses;
+    private final Optional<ListPaymentsRequestStatus> status;
 
-    private final Optional<List<String>> checkoutConfigurationIds;
+    private final Optional<ListPaymentsRequestTrackingStatus> trackingStatus;
 
-    private final Optional<String> after;
+    private final Optional<ListPaymentsRequestBillingReason> billingReason;
 
-    private final Optional<String> before;
+    private final Optional<String> currency;
 
-    private final Optional<Integer> first;
+    private final Optional<String> userId;
 
-    private final Optional<Integer> last;
+    private final Optional<String> query;
 
-    private final Optional<String> companyId;
+    private final Optional<Boolean> includeSubaccounts;
 
-    private final Optional<Direction> direction;
+    private final Optional<String> memberId;
 
-    private final Optional<ReceiptV2Order> order;
+    private final Optional<String> membershipId;
 
-    private final Optional<Boolean> includeFree;
+    private final Optional<String> productId;
+
+    private final Optional<String> variantId;
 
     private final Optional<OffsetDateTime> createdBefore;
 
     private final Optional<OffsetDateTime> createdAfter;
 
-    private final Optional<OffsetDateTime> updatedBefore;
+    private final Optional<Double> minAmount;
 
-    private final Optional<OffsetDateTime> updatedAfter;
+    private final Optional<Double> maxAmount;
 
-    private final Optional<String> query;
+    private final Optional<OffsetDateTime> refundedAfter;
+
+    private final Optional<OffsetDateTime> refundedBefore;
+
+    private final Optional<OffsetDateTime> disputeAlertedAfter;
+
+    private final Optional<OffsetDateTime> disputeAlertedBefore;
+
+    private final Optional<OffsetDateTime> disputeCreatedAfter;
+
+    private final Optional<OffsetDateTime> disputeCreatedBefore;
+
+    private final Optional<ListPaymentsRequestOrder> order;
+
+    private final Optional<ListPaymentsRequestDirection> direction;
+
+    private final Optional<Integer> first;
+
+    private final Optional<String> after;
+
+    private final Optional<Integer> last;
+
+    private final Optional<String> before;
+
+    private final Optional<Boolean> includeTotalCount;
 
     private final Map<String, Object> additionalProperties;
 
     private ListPaymentsRequest(
+            Optional<List<ListPaymentsRequestStatusesItem>> statuses,
+            Optional<List<ListPaymentsRequestSubstatusesItem>> substatuses,
+            Optional<List<ListPaymentsRequestBillingReasonsItem>> billingReasons,
+            Optional<List<String>> currencies,
+            Optional<List<String>> variantIds,
             Optional<List<String>> productIds,
-            Optional<List<BillingReasons>> billingReasons,
-            Optional<List<Currencies>> currencies,
-            Optional<List<String>> planIds,
-            Optional<List<ReceiptStatus>> statuses,
-            Optional<List<FriendlyReceiptStatus>> substatuses,
-            Optional<List<String>> checkoutConfigurationIds,
-            Optional<String> after,
-            Optional<String> before,
-            Optional<Integer> first,
-            Optional<Integer> last,
-            Optional<String> companyId,
-            Optional<Direction> direction,
-            Optional<ReceiptV2Order> order,
-            Optional<Boolean> includeFree,
+            Optional<List<ListPaymentsRequestPaymentMethodsItem>> paymentMethods,
+            Optional<List<ListPaymentsRequestTrackingStatesItem>> trackingStates,
+            Optional<ListPaymentsRequestMode> mode,
+            Optional<String> accountId,
+            Optional<ListPaymentsRequestStatus> status,
+            Optional<ListPaymentsRequestTrackingStatus> trackingStatus,
+            Optional<ListPaymentsRequestBillingReason> billingReason,
+            Optional<String> currency,
+            Optional<String> userId,
+            Optional<String> query,
+            Optional<Boolean> includeSubaccounts,
+            Optional<String> memberId,
+            Optional<String> membershipId,
+            Optional<String> productId,
+            Optional<String> variantId,
             Optional<OffsetDateTime> createdBefore,
             Optional<OffsetDateTime> createdAfter,
-            Optional<OffsetDateTime> updatedBefore,
-            Optional<OffsetDateTime> updatedAfter,
-            Optional<String> query,
+            Optional<Double> minAmount,
+            Optional<Double> maxAmount,
+            Optional<OffsetDateTime> refundedAfter,
+            Optional<OffsetDateTime> refundedBefore,
+            Optional<OffsetDateTime> disputeAlertedAfter,
+            Optional<OffsetDateTime> disputeAlertedBefore,
+            Optional<OffsetDateTime> disputeCreatedAfter,
+            Optional<OffsetDateTime> disputeCreatedBefore,
+            Optional<ListPaymentsRequestOrder> order,
+            Optional<ListPaymentsRequestDirection> direction,
+            Optional<Integer> first,
+            Optional<String> after,
+            Optional<Integer> last,
+            Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
-        this.productIds = productIds;
-        this.billingReasons = billingReasons;
-        this.currencies = currencies;
-        this.planIds = planIds;
         this.statuses = statuses;
         this.substatuses = substatuses;
-        this.checkoutConfigurationIds = checkoutConfigurationIds;
-        this.after = after;
-        this.before = before;
-        this.first = first;
-        this.last = last;
-        this.companyId = companyId;
-        this.direction = direction;
-        this.order = order;
-        this.includeFree = includeFree;
+        this.billingReasons = billingReasons;
+        this.currencies = currencies;
+        this.variantIds = variantIds;
+        this.productIds = productIds;
+        this.paymentMethods = paymentMethods;
+        this.trackingStates = trackingStates;
+        this.mode = mode;
+        this.accountId = accountId;
+        this.status = status;
+        this.trackingStatus = trackingStatus;
+        this.billingReason = billingReason;
+        this.currency = currency;
+        this.userId = userId;
+        this.query = query;
+        this.includeSubaccounts = includeSubaccounts;
+        this.memberId = memberId;
+        this.membershipId = membershipId;
+        this.productId = productId;
+        this.variantId = variantId;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
-        this.updatedBefore = updatedBefore;
-        this.updatedAfter = updatedAfter;
-        this.query = query;
+        this.minAmount = minAmount;
+        this.maxAmount = maxAmount;
+        this.refundedAfter = refundedAfter;
+        this.refundedBefore = refundedBefore;
+        this.disputeAlertedAfter = disputeAlertedAfter;
+        this.disputeAlertedBefore = disputeAlertedBefore;
+        this.disputeCreatedAfter = disputeCreatedAfter;
+        this.disputeCreatedBefore = disputeCreatedBefore;
+        this.order = order;
+        this.direction = direction;
+        this.first = first;
+        this.after = after;
+        this.last = last;
+        this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Filter payments to only those associated with these specific product identifiers.
+     * @return Only payments in any of these lifecycle states, with the same meanings as <code>status</code>. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.
+     */
+    @JsonProperty("statuses")
+    public Optional<List<ListPaymentsRequestStatusesItem>> getStatuses() {
+        return statuses;
+    }
+
+    /**
+     * @return Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded.
+     */
+    @JsonProperty("substatuses")
+    public Optional<List<ListPaymentsRequestSubstatusesItem>> getSubstatuses() {
+        return substatuses;
+    }
+
+    /**
+     * @return Only payments charged for any of these reasons, with the same meanings as <code>billing_reason</code>. Repeat the parameter to pass several. Combined with <code>billing_reason</code> when both are sent.
+     */
+    @JsonProperty("billing_reasons")
+    public Optional<List<ListPaymentsRequestBillingReasonsItem>> getBillingReasons() {
+        return billingReasons;
+    }
+
+    /**
+     * @return Only payments presented in any of these three-letter currencies. Repeat the parameter to pass several. Combined with <code>currency</code> when both are sent.
+     */
+    @JsonProperty("currencies")
+    public Optional<List<String>> getCurrencies() {
+        return currencies;
+    }
+
+    /**
+     * @return Only payments priced by any of these variants, each prefixed <code>plan_</code>. Repeat the parameter to pass several. Combined with <code>variant_id</code> when both are sent.
+     */
+    @JsonProperty("variant_ids")
+    public Optional<List<String>> getVariantIds() {
+        return variantIds;
+    }
+
+    /**
+     * @return Only payments for any of these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several. Combined with <code>product_id</code> when both are sent.
      */
     @JsonProperty("product_ids")
     public Optional<List<String>> getProductIds() {
@@ -125,113 +242,127 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Filter payments by their billing reason.
+     * @return Only payments paid with any of these methods: a card brand such as <code>amex</code>, a wallet such as <code>apple_pay</code>, or a payment method type such as <code>paypal</code>. Repeat the parameter to pass several.
      */
-    @JsonProperty("billing_reasons")
-    public Optional<List<BillingReasons>> getBillingReasons() {
-        return billingReasons;
+    @JsonProperty("payment_methods")
+    public Optional<List<ListPaymentsRequestPaymentMethodsItem>> getPaymentMethods() {
+        return paymentMethods;
     }
 
     /**
-     * @return Filter payments by their currency code.
+     * @return Only payments whose shipment is in any of these tracking states, or that still need a tracking number (<code>needs_tracking</code>). Repeat the parameter to pass several. Requires <code>account_id</code> and the shipment:basic:read permission.
      */
-    @JsonProperty("currencies")
-    public Optional<List<Currencies>> getCurrencies() {
-        return currencies;
+    @JsonProperty("tracking_states")
+    public Optional<List<ListPaymentsRequestTrackingStatesItem>> getTrackingStates() {
+        return trackingStates;
     }
 
     /**
-     * @return Filter payments to only those associated with these specific plan identifiers.
+     * @return Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.
      */
-    @JsonProperty("plan_ids")
-    public Optional<List<String>> getPlanIds() {
-        return planIds;
+    @JsonProperty("mode")
+    public Optional<ListPaymentsRequestMode> getMode() {
+        return mode;
     }
 
     /**
-     * @return Filter payments by their current status.
+     * @return Only payments charged by this account, prefixed <code>biz_</code>.
      */
-    @JsonProperty("statuses")
-    public Optional<List<ReceiptStatus>> getStatuses() {
-        return statuses;
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     /**
-     * @return Filter payments by their current substatus for more granular filtering.
+     * @return Only payments in this lifecycle state.
      */
-    @JsonProperty("substatuses")
-    public Optional<List<FriendlyReceiptStatus>> getSubstatuses() {
-        return substatuses;
+    @JsonProperty("status")
+    public Optional<ListPaymentsRequestStatus> getStatus() {
+        return status;
     }
 
     /**
-     * @return Only return payments from these checkout configurations.
+     * @return Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes. Only supported with <code>mode=account_sales</code>.
      */
-    @JsonProperty("checkout_configuration_ids")
-    public Optional<List<String>> getCheckoutConfigurationIds() {
-        return checkoutConfigurationIds;
+    @JsonProperty("tracking_status")
+    public Optional<ListPaymentsRequestTrackingStatus> getTrackingStatus() {
+        return trackingStatus;
     }
 
     /**
-     * @return <p>the elements in the list that come after the specified cursor.</p>
+     * @return Only payments charged for this reason. <code>subscription_cycle</code> also matches renewals recorded as <code>subscription_update</code>.
      */
-    @JsonProperty("after")
-    public Optional<String> getAfter() {
-        return after;
+    @JsonProperty("billing_reason")
+    public Optional<ListPaymentsRequestBillingReason> getBillingReason() {
+        return billingReason;
     }
 
     /**
-     * @return <p>the elements in the list that come before the specified cursor.</p>
+     * @return Only payments presented in this three-letter currency, such as <code>usd</code>.
      */
-    @JsonProperty("before")
-    public Optional<String> getBefore() {
-        return before;
+    @JsonProperty("currency")
+    public Optional<String> getCurrency() {
+        return currency;
     }
 
     /**
-     * @return <p>the first <em>n</em> elements from the list.</p>
+     * @return Only payments made by this buyer, prefixed <code>user_</code>. This filters sales the caller can read, so <code>me</code> is not accepted; list the caller's own purchases with <code>GET /memberships?user_id=me</code>.
      */
-    @JsonProperty("first")
-    public Optional<Integer> getFirst() {
-        return first;
+    @JsonProperty("user_id")
+    public Optional<String> getUserId() {
+        return userId;
     }
 
     /**
-     * @return <p>the last <em>n</em> elements from the list.</p>
+     * @return Search payments by payment ID, dispute ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
      */
-    @JsonProperty("last")
-    public Optional<Integer> getLast() {
-        return last;
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
     }
 
     /**
-     * @return The unique identifier of the company to list payments for.
+     * @return Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, lists the payments of the account and every subaccount, newest first by <code>created_at</code> only; another <code>order</code> is a 400. The listing is cut off after 10 seconds, which a rare filter on an account with little recent activity can reach; add a <code>query</code> to narrow it. With <code>query</code>, matches on payment, dispute, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' payments are returned only for subaccounts you can read payments on.
      */
-    @JsonProperty("company_id")
-    public Optional<String> getCompanyId() {
-        return companyId;
-    }
-
-    @JsonProperty("direction")
-    public Optional<Direction> getDirection() {
-        return direction;
-    }
-
-    @JsonProperty("order")
-    public Optional<ReceiptV2Order> getOrder() {
-        return order;
+    @JsonProperty("include_subaccounts")
+    public Optional<Boolean> getIncludeSubaccounts() {
+        return includeSubaccounts;
     }
 
     /**
-     * @return Whether to include payments with a zero amount.
+     * @return Only payments made by this member, prefixed <code>mber_</code>.
      */
-    @JsonProperty("include_free")
-    public Optional<Boolean> getIncludeFree() {
-        return includeFree;
+    @JsonProperty("member_id")
+    public Optional<String> getMemberId() {
+        return memberId;
     }
 
     /**
-     * @return Only return payments created before this timestamp.
+     * @return Only payments billed under this membership, prefixed <code>mem_</code>.
+     */
+    @JsonProperty("membership_id")
+    public Optional<String> getMembershipId() {
+        return membershipId;
+    }
+
+    /**
+     * @return Only payments for this product, prefixed <code>prod_</code>.
+     */
+    @JsonProperty("product_id")
+    public Optional<String> getProductId() {
+        return productId;
+    }
+
+    /**
+     * @return Only payments priced by this variant, prefixed <code>plan_</code>.
+     */
+    @JsonProperty("variant_id")
+    public Optional<String> getVariantId() {
+        return variantId;
+    }
+
+    /**
+     * @return Only payments created before this ISO 8601 timestamp.
      */
     @JsonProperty("created_before")
     public Optional<OffsetDateTime> getCreatedBefore() {
@@ -239,7 +370,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only return payments created after this timestamp.
+     * @return Only payments created after this ISO 8601 timestamp.
      */
     @JsonProperty("created_after")
     public Optional<OffsetDateTime> getCreatedAfter() {
@@ -247,27 +378,123 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only return payments last updated before this timestamp.
+     * @return Only payments charged at least this amount: what the buyer was charged after discounts and including tax, in the currency each payment was presented in, the same amount <code>order=amount</code> sorts by. Where tax is added on top of the price (<code>tax_behavior</code> is <code>exclusive</code>), that is the price plus the tax, so a 995 price with tax added does not match <code>995</code>: match a range instead. A failed payment that charged nothing matches 0, not its price. Inclusive and compared to the cent. Pair it with <code>currencies</code> when the account sells in several. Send the same value as <code>max_amount</code> to match one exact amount.
      */
-    @JsonProperty("updated_before")
-    public Optional<OffsetDateTime> getUpdatedBefore() {
-        return updatedBefore;
+    @JsonProperty("min_amount")
+    public Optional<Double> getMinAmount() {
+        return minAmount;
     }
 
     /**
-     * @return Only return payments last updated after this timestamp.
+     * @return Only payments charged at most this amount, measured like <code>min_amount</code>: after discounts and including tax, in the currency each payment was presented in. Inclusive and compared to the cent. Must not be less than <code>min_amount</code>.
      */
-    @JsonProperty("updated_after")
-    public Optional<OffsetDateTime> getUpdatedAfter() {
-        return updatedAfter;
+    @JsonProperty("max_amount")
+    public Optional<Double> getMaxAmount() {
+        return maxAmount;
     }
 
     /**
-     * @return Search payments by user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.
+     * @return Only payments refunded after this ISO 8601 timestamp.
      */
-    @JsonProperty("query")
-    public Optional<String> getQuery() {
-        return query;
+    @JsonProperty("refunded_after")
+    public Optional<OffsetDateTime> getRefundedAfter() {
+        return refundedAfter;
+    }
+
+    /**
+     * @return Only payments refunded before this ISO 8601 timestamp.
+     */
+    @JsonProperty("refunded_before")
+    public Optional<OffsetDateTime> getRefundedBefore() {
+        return refundedBefore;
+    }
+
+    /**
+     * @return Only payments with a dispute alert after this ISO 8601 timestamp.
+     */
+    @JsonProperty("dispute_alerted_after")
+    public Optional<OffsetDateTime> getDisputeAlertedAfter() {
+        return disputeAlertedAfter;
+    }
+
+    /**
+     * @return Only payments with a dispute alert before this ISO 8601 timestamp.
+     */
+    @JsonProperty("dispute_alerted_before")
+    public Optional<OffsetDateTime> getDisputeAlertedBefore() {
+        return disputeAlertedBefore;
+    }
+
+    /**
+     * @return Only payments with a dispute opened after this ISO 8601 timestamp.
+     */
+    @JsonProperty("dispute_created_after")
+    public Optional<OffsetDateTime> getDisputeCreatedAfter() {
+        return disputeCreatedAfter;
+    }
+
+    /**
+     * @return Only payments with a dispute opened before this ISO 8601 timestamp.
+     */
+    @JsonProperty("dispute_created_before")
+    public Optional<OffsetDateTime> getDisputeCreatedBefore() {
+        return disputeCreatedBefore;
+    }
+
+    /**
+     * @return The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in.
+     */
+    @JsonProperty("order")
+    public Optional<ListPaymentsRequestOrder> getOrder() {
+        return order;
+    }
+
+    /**
+     * @return The sort direction.
+     */
+    @JsonProperty("direction")
+    public Optional<ListPaymentsRequestDirection> getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return Number of results to return from the start of the range.
+     */
+    @JsonProperty("first")
+    public Optional<Integer> getFirst() {
+        return first;
+    }
+
+    /**
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
+     */
+    @JsonProperty("after")
+    public Optional<String> getAfter() {
+        return after;
+    }
+
+    /**
+     * @return Number of results to return from the end of the range.
+     */
+    @JsonProperty("last")
+    public Optional<Integer> getLast() {
+        return last;
+    }
+
+    /**
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
+     */
+    @JsonProperty("before")
+    public Optional<String> getBefore() {
+        return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     @java.lang.Override
@@ -282,51 +509,87 @@ public final class ListPaymentsRequest {
     }
 
     private boolean equalTo(ListPaymentsRequest other) {
-        return productIds.equals(other.productIds)
+        return statuses.equals(other.statuses)
+                && substatuses.equals(other.substatuses)
                 && billingReasons.equals(other.billingReasons)
                 && currencies.equals(other.currencies)
-                && planIds.equals(other.planIds)
-                && statuses.equals(other.statuses)
-                && substatuses.equals(other.substatuses)
-                && checkoutConfigurationIds.equals(other.checkoutConfigurationIds)
-                && after.equals(other.after)
-                && before.equals(other.before)
-                && first.equals(other.first)
-                && last.equals(other.last)
-                && companyId.equals(other.companyId)
-                && direction.equals(other.direction)
-                && order.equals(other.order)
-                && includeFree.equals(other.includeFree)
+                && variantIds.equals(other.variantIds)
+                && productIds.equals(other.productIds)
+                && paymentMethods.equals(other.paymentMethods)
+                && trackingStates.equals(other.trackingStates)
+                && mode.equals(other.mode)
+                && accountId.equals(other.accountId)
+                && status.equals(other.status)
+                && trackingStatus.equals(other.trackingStatus)
+                && billingReason.equals(other.billingReason)
+                && currency.equals(other.currency)
+                && userId.equals(other.userId)
+                && query.equals(other.query)
+                && includeSubaccounts.equals(other.includeSubaccounts)
+                && memberId.equals(other.memberId)
+                && membershipId.equals(other.membershipId)
+                && productId.equals(other.productId)
+                && variantId.equals(other.variantId)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
-                && updatedBefore.equals(other.updatedBefore)
-                && updatedAfter.equals(other.updatedAfter)
-                && query.equals(other.query);
+                && minAmount.equals(other.minAmount)
+                && maxAmount.equals(other.maxAmount)
+                && refundedAfter.equals(other.refundedAfter)
+                && refundedBefore.equals(other.refundedBefore)
+                && disputeAlertedAfter.equals(other.disputeAlertedAfter)
+                && disputeAlertedBefore.equals(other.disputeAlertedBefore)
+                && disputeCreatedAfter.equals(other.disputeCreatedAfter)
+                && disputeCreatedBefore.equals(other.disputeCreatedBefore)
+                && order.equals(other.order)
+                && direction.equals(other.direction)
+                && first.equals(other.first)
+                && after.equals(other.after)
+                && last.equals(other.last)
+                && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.productIds,
-                this.billingReasons,
-                this.currencies,
-                this.planIds,
                 this.statuses,
                 this.substatuses,
-                this.checkoutConfigurationIds,
-                this.after,
-                this.before,
-                this.first,
-                this.last,
-                this.companyId,
-                this.direction,
-                this.order,
-                this.includeFree,
+                this.billingReasons,
+                this.currencies,
+                this.variantIds,
+                this.productIds,
+                this.paymentMethods,
+                this.trackingStates,
+                this.mode,
+                this.accountId,
+                this.status,
+                this.trackingStatus,
+                this.billingReason,
+                this.currency,
+                this.userId,
+                this.query,
+                this.includeSubaccounts,
+                this.memberId,
+                this.membershipId,
+                this.productId,
+                this.variantId,
                 this.createdBefore,
                 this.createdAfter,
-                this.updatedBefore,
-                this.updatedAfter,
-                this.query);
+                this.minAmount,
+                this.maxAmount,
+                this.refundedAfter,
+                this.refundedBefore,
+                this.disputeAlertedAfter,
+                this.disputeAlertedBefore,
+                this.disputeCreatedAfter,
+                this.disputeCreatedBefore,
+                this.order,
+                this.direction,
+                this.first,
+                this.after,
+                this.last,
+                this.before,
+                this.includeTotalCount);
     }
 
     @java.lang.Override
@@ -340,77 +603,225 @@ public final class ListPaymentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<ListPaymentsRequestStatusesItem>> statuses = Optional.empty();
+
+        private Optional<List<ListPaymentsRequestSubstatusesItem>> substatuses = Optional.empty();
+
+        private Optional<List<ListPaymentsRequestBillingReasonsItem>> billingReasons = Optional.empty();
+
+        private Optional<List<String>> currencies = Optional.empty();
+
+        private Optional<List<String>> variantIds = Optional.empty();
+
         private Optional<List<String>> productIds = Optional.empty();
 
-        private Optional<List<BillingReasons>> billingReasons = Optional.empty();
+        private Optional<List<ListPaymentsRequestPaymentMethodsItem>> paymentMethods = Optional.empty();
 
-        private Optional<List<Currencies>> currencies = Optional.empty();
+        private Optional<List<ListPaymentsRequestTrackingStatesItem>> trackingStates = Optional.empty();
 
-        private Optional<List<String>> planIds = Optional.empty();
+        private Optional<ListPaymentsRequestMode> mode = Optional.empty();
 
-        private Optional<List<ReceiptStatus>> statuses = Optional.empty();
+        private Optional<String> accountId = Optional.empty();
 
-        private Optional<List<FriendlyReceiptStatus>> substatuses = Optional.empty();
+        private Optional<ListPaymentsRequestStatus> status = Optional.empty();
 
-        private Optional<List<String>> checkoutConfigurationIds = Optional.empty();
+        private Optional<ListPaymentsRequestTrackingStatus> trackingStatus = Optional.empty();
 
-        private Optional<String> after = Optional.empty();
+        private Optional<ListPaymentsRequestBillingReason> billingReason = Optional.empty();
 
-        private Optional<String> before = Optional.empty();
+        private Optional<String> currency = Optional.empty();
 
-        private Optional<Integer> first = Optional.empty();
+        private Optional<String> userId = Optional.empty();
 
-        private Optional<Integer> last = Optional.empty();
+        private Optional<String> query = Optional.empty();
 
-        private Optional<String> companyId = Optional.empty();
+        private Optional<Boolean> includeSubaccounts = Optional.empty();
 
-        private Optional<Direction> direction = Optional.empty();
+        private Optional<String> memberId = Optional.empty();
 
-        private Optional<ReceiptV2Order> order = Optional.empty();
+        private Optional<String> membershipId = Optional.empty();
 
-        private Optional<Boolean> includeFree = Optional.empty();
+        private Optional<String> productId = Optional.empty();
+
+        private Optional<String> variantId = Optional.empty();
 
         private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
         private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
-        private Optional<OffsetDateTime> updatedBefore = Optional.empty();
+        private Optional<Double> minAmount = Optional.empty();
 
-        private Optional<OffsetDateTime> updatedAfter = Optional.empty();
+        private Optional<Double> maxAmount = Optional.empty();
 
-        private Optional<String> query = Optional.empty();
+        private Optional<OffsetDateTime> refundedAfter = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<OffsetDateTime> refundedBefore = Optional.empty();
+
+        private Optional<OffsetDateTime> disputeAlertedAfter = Optional.empty();
+
+        private Optional<OffsetDateTime> disputeAlertedBefore = Optional.empty();
+
+        private Optional<OffsetDateTime> disputeCreatedAfter = Optional.empty();
+
+        private Optional<OffsetDateTime> disputeCreatedBefore = Optional.empty();
+
+        private Optional<ListPaymentsRequestOrder> order = Optional.empty();
+
+        private Optional<ListPaymentsRequestDirection> direction = Optional.empty();
+
+        private Optional<Integer> first = Optional.empty();
+
+        private Optional<String> after = Optional.empty();
+
+        private Optional<Integer> last = Optional.empty();
+
+        private Optional<String> before = Optional.empty();
+
+        private Optional<Boolean> includeTotalCount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(ListPaymentsRequest other) {
-            productIds(other.getProductIds());
-            billingReasons(other.getBillingReasons());
-            currencies(other.getCurrencies());
-            planIds(other.getPlanIds());
             statuses(other.getStatuses());
             substatuses(other.getSubstatuses());
-            checkoutConfigurationIds(other.getCheckoutConfigurationIds());
-            after(other.getAfter());
-            before(other.getBefore());
-            first(other.getFirst());
-            last(other.getLast());
-            companyId(other.getCompanyId());
-            direction(other.getDirection());
-            order(other.getOrder());
-            includeFree(other.getIncludeFree());
+            billingReasons(other.getBillingReasons());
+            currencies(other.getCurrencies());
+            variantIds(other.getVariantIds());
+            productIds(other.getProductIds());
+            paymentMethods(other.getPaymentMethods());
+            trackingStates(other.getTrackingStates());
+            mode(other.getMode());
+            accountId(other.getAccountId());
+            status(other.getStatus());
+            trackingStatus(other.getTrackingStatus());
+            billingReason(other.getBillingReason());
+            currency(other.getCurrency());
+            userId(other.getUserId());
+            query(other.getQuery());
+            includeSubaccounts(other.getIncludeSubaccounts());
+            memberId(other.getMemberId());
+            membershipId(other.getMembershipId());
+            productId(other.getProductId());
+            variantId(other.getVariantId());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
-            updatedBefore(other.getUpdatedBefore());
-            updatedAfter(other.getUpdatedAfter());
-            query(other.getQuery());
+            minAmount(other.getMinAmount());
+            maxAmount(other.getMaxAmount());
+            refundedAfter(other.getRefundedAfter());
+            refundedBefore(other.getRefundedBefore());
+            disputeAlertedAfter(other.getDisputeAlertedAfter());
+            disputeAlertedBefore(other.getDisputeAlertedBefore());
+            disputeCreatedAfter(other.getDisputeCreatedAfter());
+            disputeCreatedBefore(other.getDisputeCreatedBefore());
+            order(other.getOrder());
+            direction(other.getDirection());
+            first(other.getFirst());
+            after(other.getAfter());
+            last(other.getLast());
+            before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             return this;
         }
 
         /**
-         * <p>Filter payments to only those associated with these specific product identifiers.</p>
+         * <p>Only payments in any of these lifecycle states, with the same meanings as <code>status</code>. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "statuses", nulls = Nulls.SKIP)
+        public Builder statuses(Optional<List<ListPaymentsRequestStatusesItem>> statuses) {
+            this.statuses = statuses;
+            return this;
+        }
+
+        public Builder statuses(List<ListPaymentsRequestStatusesItem> statuses) {
+            this.statuses = Optional.ofNullable(statuses);
+            return this;
+        }
+
+        public Builder statuses(ListPaymentsRequestStatusesItem statuses) {
+            this.statuses = Optional.of(Collections.singletonList(statuses));
+            return this;
+        }
+
+        /**
+         * <p>Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded.</p>
+         */
+        @JsonSetter(value = "substatuses", nulls = Nulls.SKIP)
+        public Builder substatuses(Optional<List<ListPaymentsRequestSubstatusesItem>> substatuses) {
+            this.substatuses = substatuses;
+            return this;
+        }
+
+        public Builder substatuses(List<ListPaymentsRequestSubstatusesItem> substatuses) {
+            this.substatuses = Optional.ofNullable(substatuses);
+            return this;
+        }
+
+        public Builder substatuses(ListPaymentsRequestSubstatusesItem substatuses) {
+            this.substatuses = Optional.of(Collections.singletonList(substatuses));
+            return this;
+        }
+
+        /**
+         * <p>Only payments charged for any of these reasons, with the same meanings as <code>billing_reason</code>. Repeat the parameter to pass several. Combined with <code>billing_reason</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "billing_reasons", nulls = Nulls.SKIP)
+        public Builder billingReasons(Optional<List<ListPaymentsRequestBillingReasonsItem>> billingReasons) {
+            this.billingReasons = billingReasons;
+            return this;
+        }
+
+        public Builder billingReasons(List<ListPaymentsRequestBillingReasonsItem> billingReasons) {
+            this.billingReasons = Optional.ofNullable(billingReasons);
+            return this;
+        }
+
+        public Builder billingReasons(ListPaymentsRequestBillingReasonsItem billingReasons) {
+            this.billingReasons = Optional.of(Collections.singletonList(billingReasons));
+            return this;
+        }
+
+        /**
+         * <p>Only payments presented in any of these three-letter currencies. Repeat the parameter to pass several. Combined with <code>currency</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "currencies", nulls = Nulls.SKIP)
+        public Builder currencies(Optional<List<String>> currencies) {
+            this.currencies = currencies;
+            return this;
+        }
+
+        public Builder currencies(List<String> currencies) {
+            this.currencies = Optional.ofNullable(currencies);
+            return this;
+        }
+
+        public Builder currencies(String currencies) {
+            this.currencies = Optional.of(Collections.singletonList(currencies));
+            return this;
+        }
+
+        /**
+         * <p>Only payments priced by any of these variants, each prefixed <code>plan_</code>. Repeat the parameter to pass several. Combined with <code>variant_id</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "variant_ids", nulls = Nulls.SKIP)
+        public Builder variantIds(Optional<List<String>> variantIds) {
+            this.variantIds = variantIds;
+            return this;
+        }
+
+        public Builder variantIds(List<String> variantIds) {
+            this.variantIds = Optional.ofNullable(variantIds);
+            return this;
+        }
+
+        public Builder variantIds(String variantIds) {
+            this.variantIds = Optional.of(Collections.singletonList(variantIds));
+            return this;
+        }
+
+        /**
+         * <p>Only payments for any of these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several. Combined with <code>product_id</code> when both are sent.</p>
          */
         @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
         public Builder productIds(Optional<List<String>> productIds) {
@@ -429,227 +840,227 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Filter payments by their billing reason.</p>
+         * <p>Only payments paid with any of these methods: a card brand such as <code>amex</code>, a wallet such as <code>apple_pay</code>, or a payment method type such as <code>paypal</code>. Repeat the parameter to pass several.</p>
          */
-        @JsonSetter(value = "billing_reasons", nulls = Nulls.SKIP)
-        public Builder billingReasons(Optional<List<BillingReasons>> billingReasons) {
-            this.billingReasons = billingReasons;
+        @JsonSetter(value = "payment_methods", nulls = Nulls.SKIP)
+        public Builder paymentMethods(Optional<List<ListPaymentsRequestPaymentMethodsItem>> paymentMethods) {
+            this.paymentMethods = paymentMethods;
             return this;
         }
 
-        public Builder billingReasons(List<BillingReasons> billingReasons) {
-            this.billingReasons = Optional.ofNullable(billingReasons);
+        public Builder paymentMethods(List<ListPaymentsRequestPaymentMethodsItem> paymentMethods) {
+            this.paymentMethods = Optional.ofNullable(paymentMethods);
             return this;
         }
 
-        public Builder billingReasons(BillingReasons billingReasons) {
-            this.billingReasons = Optional.of(Collections.singletonList(billingReasons));
+        public Builder paymentMethods(ListPaymentsRequestPaymentMethodsItem paymentMethods) {
+            this.paymentMethods = Optional.of(Collections.singletonList(paymentMethods));
             return this;
         }
 
         /**
-         * <p>Filter payments by their currency code.</p>
+         * <p>Only payments whose shipment is in any of these tracking states, or that still need a tracking number (<code>needs_tracking</code>). Repeat the parameter to pass several. Requires <code>account_id</code> and the shipment:basic:read permission.</p>
          */
-        @JsonSetter(value = "currencies", nulls = Nulls.SKIP)
-        public Builder currencies(Optional<List<Currencies>> currencies) {
-            this.currencies = currencies;
+        @JsonSetter(value = "tracking_states", nulls = Nulls.SKIP)
+        public Builder trackingStates(Optional<List<ListPaymentsRequestTrackingStatesItem>> trackingStates) {
+            this.trackingStates = trackingStates;
             return this;
         }
 
-        public Builder currencies(List<Currencies> currencies) {
-            this.currencies = Optional.ofNullable(currencies);
+        public Builder trackingStates(List<ListPaymentsRequestTrackingStatesItem> trackingStates) {
+            this.trackingStates = Optional.ofNullable(trackingStates);
             return this;
         }
 
-        public Builder currencies(Currencies currencies) {
-            this.currencies = Optional.of(Collections.singletonList(currencies));
+        public Builder trackingStates(ListPaymentsRequestTrackingStatesItem trackingStates) {
+            this.trackingStates = Optional.of(Collections.singletonList(trackingStates));
             return this;
         }
 
         /**
-         * <p>Filter payments to only those associated with these specific plan identifiers.</p>
+         * <p>Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.</p>
          */
-        @JsonSetter(value = "plan_ids", nulls = Nulls.SKIP)
-        public Builder planIds(Optional<List<String>> planIds) {
-            this.planIds = planIds;
+        @JsonSetter(value = "mode", nulls = Nulls.SKIP)
+        public Builder mode(Optional<ListPaymentsRequestMode> mode) {
+            this.mode = mode;
             return this;
         }
 
-        public Builder planIds(List<String> planIds) {
-            this.planIds = Optional.ofNullable(planIds);
-            return this;
-        }
-
-        public Builder planIds(String planIds) {
-            this.planIds = Optional.of(Collections.singletonList(planIds));
+        public Builder mode(ListPaymentsRequestMode mode) {
+            this.mode = Optional.ofNullable(mode);
             return this;
         }
 
         /**
-         * <p>Filter payments by their current status.</p>
+         * <p>Only payments charged by this account, prefixed <code>biz_</code>.</p>
          */
-        @JsonSetter(value = "statuses", nulls = Nulls.SKIP)
-        public Builder statuses(Optional<List<ReceiptStatus>> statuses) {
-            this.statuses = statuses;
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
             return this;
         }
 
-        public Builder statuses(List<ReceiptStatus> statuses) {
-            this.statuses = Optional.ofNullable(statuses);
-            return this;
-        }
-
-        public Builder statuses(ReceiptStatus statuses) {
-            this.statuses = Optional.of(Collections.singletonList(statuses));
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
-         * <p>Filter payments by their current substatus for more granular filtering.</p>
+         * <p>Only payments in this lifecycle state.</p>
          */
-        @JsonSetter(value = "substatuses", nulls = Nulls.SKIP)
-        public Builder substatuses(Optional<List<FriendlyReceiptStatus>> substatuses) {
-            this.substatuses = substatuses;
+        @JsonSetter(value = "status", nulls = Nulls.SKIP)
+        public Builder status(Optional<ListPaymentsRequestStatus> status) {
+            this.status = status;
             return this;
         }
 
-        public Builder substatuses(List<FriendlyReceiptStatus> substatuses) {
-            this.substatuses = Optional.ofNullable(substatuses);
-            return this;
-        }
-
-        public Builder substatuses(FriendlyReceiptStatus substatuses) {
-            this.substatuses = Optional.of(Collections.singletonList(substatuses));
+        public Builder status(ListPaymentsRequestStatus status) {
+            this.status = Optional.ofNullable(status);
             return this;
         }
 
         /**
-         * <p>Only return payments from these checkout configurations.</p>
+         * <p>Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes. Only supported with <code>mode=account_sales</code>.</p>
          */
-        @JsonSetter(value = "checkout_configuration_ids", nulls = Nulls.SKIP)
-        public Builder checkoutConfigurationIds(Optional<List<String>> checkoutConfigurationIds) {
-            this.checkoutConfigurationIds = checkoutConfigurationIds;
+        @JsonSetter(value = "tracking_status", nulls = Nulls.SKIP)
+        public Builder trackingStatus(Optional<ListPaymentsRequestTrackingStatus> trackingStatus) {
+            this.trackingStatus = trackingStatus;
             return this;
         }
 
-        public Builder checkoutConfigurationIds(List<String> checkoutConfigurationIds) {
-            this.checkoutConfigurationIds = Optional.ofNullable(checkoutConfigurationIds);
-            return this;
-        }
-
-        public Builder checkoutConfigurationIds(String checkoutConfigurationIds) {
-            this.checkoutConfigurationIds = Optional.of(Collections.singletonList(checkoutConfigurationIds));
+        public Builder trackingStatus(ListPaymentsRequestTrackingStatus trackingStatus) {
+            this.trackingStatus = Optional.ofNullable(trackingStatus);
             return this;
         }
 
         /**
-         * <p>Returns the elements in the list that come after the specified cursor.</p>
+         * <p>Only payments charged for this reason. <code>subscription_cycle</code> also matches renewals recorded as <code>subscription_update</code>.</p>
          */
-        @JsonSetter(value = "after", nulls = Nulls.SKIP)
-        public Builder after(Optional<String> after) {
-            this.after = after;
+        @JsonSetter(value = "billing_reason", nulls = Nulls.SKIP)
+        public Builder billingReason(Optional<ListPaymentsRequestBillingReason> billingReason) {
+            this.billingReason = billingReason;
             return this;
         }
 
-        public Builder after(String after) {
-            this.after = Optional.ofNullable(after);
+        public Builder billingReason(ListPaymentsRequestBillingReason billingReason) {
+            this.billingReason = Optional.ofNullable(billingReason);
             return this;
         }
 
         /**
-         * <p>Returns the elements in the list that come before the specified cursor.</p>
+         * <p>Only payments presented in this three-letter currency, such as <code>usd</code>.</p>
          */
-        @JsonSetter(value = "before", nulls = Nulls.SKIP)
-        public Builder before(Optional<String> before) {
-            this.before = before;
+        @JsonSetter(value = "currency", nulls = Nulls.SKIP)
+        public Builder currency(Optional<String> currency) {
+            this.currency = currency;
             return this;
         }
 
-        public Builder before(String before) {
-            this.before = Optional.ofNullable(before);
+        public Builder currency(String currency) {
+            this.currency = Optional.ofNullable(currency);
             return this;
         }
 
         /**
-         * <p>Returns the first <em>n</em> elements from the list.</p>
+         * <p>Only payments made by this buyer, prefixed <code>user_</code>. This filters sales the caller can read, so <code>me</code> is not accepted; list the caller's own purchases with <code>GET /memberships?user_id=me</code>.</p>
          */
-        @JsonSetter(value = "first", nulls = Nulls.SKIP)
-        public Builder first(Optional<Integer> first) {
-            this.first = first;
+        @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
+        public Builder userId(Optional<String> userId) {
+            this.userId = userId;
             return this;
         }
 
-        public Builder first(Integer first) {
-            this.first = Optional.ofNullable(first);
+        public Builder userId(String userId) {
+            this.userId = Optional.ofNullable(userId);
             return this;
         }
 
         /**
-         * <p>Returns the last <em>n</em> elements from the list.</p>
+         * <p>Search payments by payment ID, dispute ID, user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.</p>
          */
-        @JsonSetter(value = "last", nulls = Nulls.SKIP)
-        public Builder last(Optional<Integer> last) {
-            this.last = last;
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
             return this;
         }
 
-        public Builder last(Integer last) {
-            this.last = Optional.ofNullable(last);
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
             return this;
         }
 
         /**
-         * <p>The unique identifier of the company to list payments for.</p>
+         * <p>Also cover the account's subaccounts. Requires <code>account_id</code>, and is a 400 without it. Without <code>query</code>, lists the payments of the account and every subaccount, newest first by <code>created_at</code> only; another <code>order</code> is a 400. The listing is cut off after 10 seconds, which a rare filter on an account with little recent activity can reach; add a <code>query</code> to narrow it. With <code>query</code>, matches on payment, dispute, user or membership ID, buyer email, or a card's first 6 or 8 digits and last 4 separated by a space or dash (<code>424242 4242</code>); free-text queries such as a name search only the named account. Subaccounts' payments are returned only for subaccounts you can read payments on.</p>
          */
-        @JsonSetter(value = "company_id", nulls = Nulls.SKIP)
-        public Builder companyId(Optional<String> companyId) {
-            this.companyId = companyId;
+        @JsonSetter(value = "include_subaccounts", nulls = Nulls.SKIP)
+        public Builder includeSubaccounts(Optional<Boolean> includeSubaccounts) {
+            this.includeSubaccounts = includeSubaccounts;
             return this;
         }
 
-        public Builder companyId(String companyId) {
-            this.companyId = Optional.ofNullable(companyId);
-            return this;
-        }
-
-        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
-        public Builder direction(Optional<Direction> direction) {
-            this.direction = direction;
-            return this;
-        }
-
-        public Builder direction(Direction direction) {
-            this.direction = Optional.ofNullable(direction);
-            return this;
-        }
-
-        @JsonSetter(value = "order", nulls = Nulls.SKIP)
-        public Builder order(Optional<ReceiptV2Order> order) {
-            this.order = order;
-            return this;
-        }
-
-        public Builder order(ReceiptV2Order order) {
-            this.order = Optional.ofNullable(order);
+        public Builder includeSubaccounts(Boolean includeSubaccounts) {
+            this.includeSubaccounts = Optional.ofNullable(includeSubaccounts);
             return this;
         }
 
         /**
-         * <p>Whether to include payments with a zero amount.</p>
+         * <p>Only payments made by this member, prefixed <code>mber_</code>.</p>
          */
-        @JsonSetter(value = "include_free", nulls = Nulls.SKIP)
-        public Builder includeFree(Optional<Boolean> includeFree) {
-            this.includeFree = includeFree;
+        @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
+        public Builder memberId(Optional<String> memberId) {
+            this.memberId = memberId;
             return this;
         }
 
-        public Builder includeFree(Boolean includeFree) {
-            this.includeFree = Optional.ofNullable(includeFree);
+        public Builder memberId(String memberId) {
+            this.memberId = Optional.ofNullable(memberId);
             return this;
         }
 
         /**
-         * <p>Only return payments created before this timestamp.</p>
+         * <p>Only payments billed under this membership, prefixed <code>mem_</code>.</p>
+         */
+        @JsonSetter(value = "membership_id", nulls = Nulls.SKIP)
+        public Builder membershipId(Optional<String> membershipId) {
+            this.membershipId = membershipId;
+            return this;
+        }
+
+        public Builder membershipId(String membershipId) {
+            this.membershipId = Optional.ofNullable(membershipId);
+            return this;
+        }
+
+        /**
+         * <p>Only payments for this product, prefixed <code>prod_</code>.</p>
+         */
+        @JsonSetter(value = "product_id", nulls = Nulls.SKIP)
+        public Builder productId(Optional<String> productId) {
+            this.productId = productId;
+            return this;
+        }
+
+        public Builder productId(String productId) {
+            this.productId = Optional.ofNullable(productId);
+            return this;
+        }
+
+        /**
+         * <p>Only payments priced by this variant, prefixed <code>plan_</code>.</p>
+         */
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public Builder variantId(Optional<String> variantId) {
+            this.variantId = variantId;
+            return this;
+        }
+
+        public Builder variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        /**
+         * <p>Only payments created before this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
         public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
@@ -663,7 +1074,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only return payments created after this timestamp.</p>
+         * <p>Only payments created after this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
         public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
@@ -677,70 +1088,301 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only return payments last updated before this timestamp.</p>
+         * <p>Only payments charged at least this amount: what the buyer was charged after discounts and including tax, in the currency each payment was presented in, the same amount <code>order=amount</code> sorts by. Where tax is added on top of the price (<code>tax_behavior</code> is <code>exclusive</code>), that is the price plus the tax, so a 995 price with tax added does not match <code>995</code>: match a range instead. A failed payment that charged nothing matches 0, not its price. Inclusive and compared to the cent. Pair it with <code>currencies</code> when the account sells in several. Send the same value as <code>max_amount</code> to match one exact amount.</p>
          */
-        @JsonSetter(value = "updated_before", nulls = Nulls.SKIP)
-        public Builder updatedBefore(Optional<OffsetDateTime> updatedBefore) {
-            this.updatedBefore = updatedBefore;
+        @JsonSetter(value = "min_amount", nulls = Nulls.SKIP)
+        public Builder minAmount(Optional<Double> minAmount) {
+            this.minAmount = minAmount;
             return this;
         }
 
-        public Builder updatedBefore(OffsetDateTime updatedBefore) {
-            this.updatedBefore = Optional.ofNullable(updatedBefore);
+        public Builder minAmount(Double minAmount) {
+            this.minAmount = Optional.ofNullable(minAmount);
             return this;
         }
 
         /**
-         * <p>Only return payments last updated after this timestamp.</p>
+         * <p>Only payments charged at most this amount, measured like <code>min_amount</code>: after discounts and including tax, in the currency each payment was presented in. Inclusive and compared to the cent. Must not be less than <code>min_amount</code>.</p>
          */
-        @JsonSetter(value = "updated_after", nulls = Nulls.SKIP)
-        public Builder updatedAfter(Optional<OffsetDateTime> updatedAfter) {
-            this.updatedAfter = updatedAfter;
+        @JsonSetter(value = "max_amount", nulls = Nulls.SKIP)
+        public Builder maxAmount(Optional<Double> maxAmount) {
+            this.maxAmount = maxAmount;
             return this;
         }
 
-        public Builder updatedAfter(OffsetDateTime updatedAfter) {
-            this.updatedAfter = Optional.ofNullable(updatedAfter);
+        public Builder maxAmount(Double maxAmount) {
+            this.maxAmount = Optional.ofNullable(maxAmount);
             return this;
         }
 
         /**
-         * <p>Search payments by user ID, membership ID, user email, name, or username. Email filtering requires the member:email:read permission.</p>
+         * <p>Only payments refunded after this ISO 8601 timestamp.</p>
          */
-        @JsonSetter(value = "query", nulls = Nulls.SKIP)
-        public Builder query(Optional<String> query) {
-            this.query = query;
+        @JsonSetter(value = "refunded_after", nulls = Nulls.SKIP)
+        public Builder refundedAfter(Optional<OffsetDateTime> refundedAfter) {
+            this.refundedAfter = refundedAfter;
             return this;
         }
 
-        public Builder query(String query) {
-            this.query = Optional.ofNullable(query);
+        public Builder refundedAfter(OffsetDateTime refundedAfter) {
+            this.refundedAfter = Optional.ofNullable(refundedAfter);
+            return this;
+        }
+
+        /**
+         * <p>Only payments refunded before this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "refunded_before", nulls = Nulls.SKIP)
+        public Builder refundedBefore(Optional<OffsetDateTime> refundedBefore) {
+            this.refundedBefore = refundedBefore;
+            return this;
+        }
+
+        public Builder refundedBefore(OffsetDateTime refundedBefore) {
+            this.refundedBefore = Optional.ofNullable(refundedBefore);
+            return this;
+        }
+
+        /**
+         * <p>Only payments with a dispute alert after this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "dispute_alerted_after", nulls = Nulls.SKIP)
+        public Builder disputeAlertedAfter(Optional<OffsetDateTime> disputeAlertedAfter) {
+            this.disputeAlertedAfter = disputeAlertedAfter;
+            return this;
+        }
+
+        public Builder disputeAlertedAfter(OffsetDateTime disputeAlertedAfter) {
+            this.disputeAlertedAfter = Optional.ofNullable(disputeAlertedAfter);
+            return this;
+        }
+
+        /**
+         * <p>Only payments with a dispute alert before this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "dispute_alerted_before", nulls = Nulls.SKIP)
+        public Builder disputeAlertedBefore(Optional<OffsetDateTime> disputeAlertedBefore) {
+            this.disputeAlertedBefore = disputeAlertedBefore;
+            return this;
+        }
+
+        public Builder disputeAlertedBefore(OffsetDateTime disputeAlertedBefore) {
+            this.disputeAlertedBefore = Optional.ofNullable(disputeAlertedBefore);
+            return this;
+        }
+
+        /**
+         * <p>Only payments with a dispute opened after this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "dispute_created_after", nulls = Nulls.SKIP)
+        public Builder disputeCreatedAfter(Optional<OffsetDateTime> disputeCreatedAfter) {
+            this.disputeCreatedAfter = disputeCreatedAfter;
+            return this;
+        }
+
+        public Builder disputeCreatedAfter(OffsetDateTime disputeCreatedAfter) {
+            this.disputeCreatedAfter = Optional.ofNullable(disputeCreatedAfter);
+            return this;
+        }
+
+        /**
+         * <p>Only payments with a dispute opened before this ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "dispute_created_before", nulls = Nulls.SKIP)
+        public Builder disputeCreatedBefore(Optional<OffsetDateTime> disputeCreatedBefore) {
+            this.disputeCreatedBefore = disputeCreatedBefore;
+            return this;
+        }
+
+        public Builder disputeCreatedBefore(OffsetDateTime disputeCreatedBefore) {
+            this.disputeCreatedBefore = Optional.ofNullable(disputeCreatedBefore);
+            return this;
+        }
+
+        /**
+         * <p>The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in.</p>
+         */
+        @JsonSetter(value = "order", nulls = Nulls.SKIP)
+        public Builder order(Optional<ListPaymentsRequestOrder> order) {
+            this.order = order;
+            return this;
+        }
+
+        public Builder order(ListPaymentsRequestOrder order) {
+            this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>The sort direction.</p>
+         */
+        @JsonSetter(value = "direction", nulls = Nulls.SKIP)
+        public Builder direction(Optional<ListPaymentsRequestDirection> direction) {
+            this.direction = direction;
+            return this;
+        }
+
+        public Builder direction(ListPaymentsRequestDirection direction) {
+            this.direction = Optional.ofNullable(direction);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the start of the range.</p>
+         */
+        @JsonSetter(value = "first", nulls = Nulls.SKIP)
+        public Builder first(Optional<Integer> first) {
+            this.first = first;
+            return this;
+        }
+
+        public Builder first(Integer first) {
+            this.first = Optional.ofNullable(first);
+            return this;
+        }
+
+        /**
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
+         */
+        @JsonSetter(value = "after", nulls = Nulls.SKIP)
+        public Builder after(Optional<String> after) {
+            this.after = after;
+            return this;
+        }
+
+        public Builder after(String after) {
+            this.after = Optional.ofNullable(after);
+            return this;
+        }
+
+        /**
+         * <p>Number of results to return from the end of the range.</p>
+         */
+        @JsonSetter(value = "last", nulls = Nulls.SKIP)
+        public Builder last(Optional<Integer> last) {
+            this.last = last;
+            return this;
+        }
+
+        public Builder last(Integer last) {
+            this.last = Optional.ofNullable(last);
+            return this;
+        }
+
+        /**
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
+         */
+        @JsonSetter(value = "before", nulls = Nulls.SKIP)
+        public Builder before(Optional<String> before) {
+            this.before = before;
+            return this;
+        }
+
+        public Builder before(String before) {
+            this.before = Optional.ofNullable(before);
+            return this;
+        }
+
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
             return this;
         }
 
         public ListPaymentsRequest build() {
             return new ListPaymentsRequest(
-                    productIds,
-                    billingReasons,
-                    currencies,
-                    planIds,
                     statuses,
                     substatuses,
-                    checkoutConfigurationIds,
-                    after,
-                    before,
-                    first,
-                    last,
-                    companyId,
-                    direction,
-                    order,
-                    includeFree,
+                    billingReasons,
+                    currencies,
+                    variantIds,
+                    productIds,
+                    paymentMethods,
+                    trackingStates,
+                    mode,
+                    accountId,
+                    status,
+                    trackingStatus,
+                    billingReason,
+                    currency,
+                    userId,
+                    query,
+                    includeSubaccounts,
+                    memberId,
+                    membershipId,
+                    productId,
+                    variantId,
                     createdBefore,
                     createdAfter,
-                    updatedBefore,
-                    updatedAfter,
-                    query,
+                    minAmount,
+                    maxAmount,
+                    refundedAfter,
+                    refundedBefore,
+                    disputeAlertedAfter,
+                    disputeAlertedBefore,
+                    disputeCreatedAfter,
+                    disputeCreatedBefore,
+                    order,
+                    direction,
+                    first,
+                    after,
+                    last,
+                    before,
+                    includeTotalCount,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("statuses")
+                    || key.equalsIgnoreCase("substatuses")
+                    || key.equalsIgnoreCase("billing_reasons")
+                    || key.equalsIgnoreCase("currencies")
+                    || key.equalsIgnoreCase("variant_ids")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("payment_methods")
+                    || key.equalsIgnoreCase("tracking_states")
+                    || key.equalsIgnoreCase("mode")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("tracking_status")
+                    || key.equalsIgnoreCase("billing_reason")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("user_id")
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("include_subaccounts")
+                    || key.equalsIgnoreCase("member_id")
+                    || key.equalsIgnoreCase("membership_id")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("variant_id")
+                    || key.equalsIgnoreCase("created_before")
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("min_amount")
+                    || key.equalsIgnoreCase("max_amount")
+                    || key.equalsIgnoreCase("refunded_after")
+                    || key.equalsIgnoreCase("refunded_before")
+                    || key.equalsIgnoreCase("dispute_alerted_after")
+                    || key.equalsIgnoreCase("dispute_alerted_before")
+                    || key.equalsIgnoreCase("dispute_created_after")
+                    || key.equalsIgnoreCase("dispute_created_before")
+                    || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("last")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

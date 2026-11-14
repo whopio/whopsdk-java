@@ -106,7 +106,6 @@ public final class DeleteAdGroupsResponse {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -120,7 +119,6 @@ public final class DeleteAdGroupsResponse {
 
         /**
          * <p>Always true.</p>
-         * <p>Always true.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +129,6 @@ public final class DeleteAdGroupsResponse {
         }
 
         /**
-         * <p>ID of the deleted ad group.</p>
          * <p>ID of the deleted ad group.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -145,6 +142,14 @@ public final class DeleteAdGroupsResponse {
         @java.lang.Override
         public DeleteAdGroupsResponse build() {
             return new DeleteAdGroupsResponse(deleted, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("deleted") || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

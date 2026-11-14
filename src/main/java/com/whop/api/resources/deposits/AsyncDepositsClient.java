@@ -5,8 +5,11 @@ package com.whop.api.resources.deposits;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.resources.deposits.requests.CreateDepositsRequest;
+import com.whop.api.resources.deposits.requests.ReverseDepositsRequest;
 import com.whop.api.resources.deposits.types.CreateDepositsResponse;
+import com.whop.api.types.LedgerActivity;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncDepositsClient {
@@ -27,17 +30,106 @@ public class AsyncDepositsClient {
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<CreateDepositsResponse> create(CreateDepositsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<CreateDepositsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Retrieve the deposit methods for an account, including crypto and bank transfer.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<CreateDepositsResponse> create(
             CreateDepositsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> rawFuture =
+                this.rawClient.create(request, requestOptions);
+        CompletableFuture<CreateDepositsResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<LedgerActivity> reverse(String id) {
+        CompletableFuture<WhopApiHttpResponse<LedgerActivity>> rawFuture = this.rawClient.reverse(id);
+        CompletableFuture<LedgerActivity> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<LedgerActivity> reverse(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<LedgerActivity>> rawFuture = this.rawClient.reverse(id, requestOptions);
+        CompletableFuture<LedgerActivity> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<LedgerActivity> reverse(String id, ReverseDepositsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<LedgerActivity>> rawFuture = this.rawClient.reverse(id, request);
+        CompletableFuture<LedgerActivity> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Sends a deposit back where it came from. If the available balance doesn't cover it, nothing is sent.
+     * <ul>
+     * <li><strong>Bank deposit:</strong> pass its <code>vbt_</code> ID. The deposit fee is returned, so the balance only has to cover the rest. Returns a <code>topup_reversal</code> row.</li>
+     * <li><strong>Card deposit:</strong> pass its <code>pay_</code> ID. It's refunded to the card, and its fees aren't returned. Returns a <code>payment_refund</code> row.</li>
+     * </ul>
+     */
+    public CompletableFuture<LedgerActivity> reverse(
+            String id, ReverseDepositsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<LedgerActivity>> rawFuture =
+                this.rawClient.reverse(id, request, requestOptions);
+        CompletableFuture<LedgerActivity> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

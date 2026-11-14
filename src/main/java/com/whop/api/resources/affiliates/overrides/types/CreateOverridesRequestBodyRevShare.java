@@ -217,7 +217,6 @@ public final class CreateOverridesRequestBodyRevShare {
 
         private Optional<AffiliatePayoutTypes> commissionType = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -234,7 +233,6 @@ public final class CreateOverridesRequestBodyRevShare {
 
         /**
          * <p>The commission value (percentage 1-100 or flat fee).</p>
-         * <p>The commission value (percentage 1-100 or flat fee).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -245,7 +243,6 @@ public final class CreateOverridesRequestBodyRevShare {
         }
 
         /**
-         * <p>The affiliate ID.</p>
          * <p>The affiliate ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -368,6 +365,18 @@ public final class CreateOverridesRequestBodyRevShare {
         public CreateOverridesRequestBodyRevShare build() {
             return new CreateOverridesRequestBodyRevShare(
                     commissionType, commissionValue, id, productId, revenueBasis, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("commission_type")
+                    || key.equalsIgnoreCase("commission_value")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("revenue_basis")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

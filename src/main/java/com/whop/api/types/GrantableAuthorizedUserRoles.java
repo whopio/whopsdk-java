@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class GrantableAuthorizedUserRoles {
+    public static final GrantableAuthorizedUserRoles PARTNER =
+            new GrantableAuthorizedUserRoles(Value.PARTNER, "partner");
+
     public static final GrantableAuthorizedUserRoles OWNER = new GrantableAuthorizedUserRoles(Value.OWNER, "owner");
 
     public static final GrantableAuthorizedUserRoles ADMIN = new GrantableAuthorizedUserRoles(Value.ADMIN, "admin");
@@ -53,6 +56,8 @@ public final class GrantableAuthorizedUserRoles {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case PARTNER:
+                return visitor.visitPartner();
             case OWNER:
                 return visitor.visitOwner();
             case ADMIN:
@@ -72,6 +77,8 @@ public final class GrantableAuthorizedUserRoles {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static GrantableAuthorizedUserRoles valueOf(String value) {
         switch (value) {
+            case "partner":
+                return PARTNER;
             case "owner":
                 return OWNER;
             case "admin":
@@ -92,6 +99,8 @@ public final class GrantableAuthorizedUserRoles {
 
         ADMIN,
 
+        PARTNER,
+
         SALES_MANAGER,
 
         MODERATOR,
@@ -105,6 +114,8 @@ public final class GrantableAuthorizedUserRoles {
         T visitOwner();
 
         T visitAdmin();
+
+        T visitPartner();
 
         T visitSalesManager();
 

@@ -85,7 +85,6 @@ public final class ReplayWebhooksResponse {
     public static final class Builder implements QueuedStage, _FinalStage {
         private boolean queued;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -97,7 +96,6 @@ public final class ReplayWebhooksResponse {
         }
 
         /**
-         * <p>Whether the replay was accepted. Watch the webhook's delivery log for the re-sends.</p>
          * <p>Whether the replay was accepted. Watch the webhook's delivery log for the re-sends.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -111,6 +109,14 @@ public final class ReplayWebhooksResponse {
         @java.lang.Override
         public ReplayWebhooksResponse build() {
             return new ReplayWebhooksResponse(queued, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("queued")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

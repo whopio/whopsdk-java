@@ -207,7 +207,6 @@ public final class PaymentListItemApplicationFee {
 
         private String id;
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -225,7 +224,6 @@ public final class PaymentListItemApplicationFee {
 
         /**
          * <p>The application fee amount.</p>
-         * <p>The application fee amount.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -236,7 +234,6 @@ public final class PaymentListItemApplicationFee {
         }
 
         /**
-         * <p>The amount of the application fee that has been captured.</p>
          * <p>The amount of the application fee that has been captured.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -249,7 +246,6 @@ public final class PaymentListItemApplicationFee {
 
         /**
          * <p>The amount of the application fee that has been refunded.</p>
-         * <p>The amount of the application fee that has been refunded.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -260,7 +256,6 @@ public final class PaymentListItemApplicationFee {
         }
 
         /**
-         * <p>The datetime the application fee was created.</p>
          * <p>The datetime the application fee was created.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -273,7 +268,6 @@ public final class PaymentListItemApplicationFee {
 
         /**
          * <p>The currency of the application fee.</p>
-         * <p>The currency of the application fee.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -284,7 +278,6 @@ public final class PaymentListItemApplicationFee {
         }
 
         /**
-         * <p>The unique identifier for the application fee.</p>
          * <p>The unique identifier for the application fee.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -299,6 +292,19 @@ public final class PaymentListItemApplicationFee {
         public PaymentListItemApplicationFee build() {
             return new PaymentListItemApplicationFee(
                     amount, amountCaptured, amountRefunded, createdAt, currency, id, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("amount_captured")
+                    || key.equalsIgnoreCase("amount_refunded")
+                    || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

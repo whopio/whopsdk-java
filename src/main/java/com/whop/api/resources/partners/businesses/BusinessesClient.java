@@ -8,10 +8,16 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.earnings.EarningsClient;
+import com.whop.api.resources.partners.businesses.requests.AcceptCommissionAdvanceBusinessesRequest;
 import com.whop.api.resources.partners.businesses.requests.ListBusinessesRequest;
+import com.whop.api.resources.partners.businesses.requests.ResendInviteBusinessesRequest;
 import com.whop.api.resources.partners.businesses.requests.RetrieveBusinessesRequest;
+import com.whop.api.resources.partners.businesses.requests.UpdateBusinessesRequest;
+import com.whop.api.resources.partners.businesses.types.AcceptCommissionAdvanceBusinessesResponse;
 import com.whop.api.resources.partners.businesses.types.ListBusinessesResponseDataItem;
+import com.whop.api.resources.partners.businesses.types.ResendInviteBusinessesResponse;
 import com.whop.api.resources.partners.businesses.types.RetrieveBusinessesResponse;
+import com.whop.api.resources.partners.businesses.types.UpdateBusinessesResponse;
 import java.util.function.Supplier;
 
 public class BusinessesClient {
@@ -64,32 +70,93 @@ public class BusinessesClient {
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public RetrieveBusinessesResponse retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public RetrieveBusinessesResponse retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public RetrieveBusinessesResponse retrieve(String id, RetrieveBusinessesRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a single referred business and its referral terms.
+     * Retrieves a single referred business and its referral terms. The original referrer or a caller with company:basic:read on the business credited for the referral can read it.
      */
     public RetrieveBusinessesResponse retrieve(
             String id, RetrieveBusinessesRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public UpdateBusinessesResponse update(String id) {
+        return this.rawClient.update(id).body();
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public UpdateBusinessesResponse update(String id, RequestOptions requestOptions) {
+        return this.rawClient.update(id, requestOptions).body();
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public UpdateBusinessesResponse update(String id, UpdateBusinessesRequest request) {
+        return this.rawClient.update(id, request).body();
+    }
+
+    /**
+     * Save annual payment projections for a business referred by the authenticated partner. Unaccepted projections can be replaced with updated annual card and BNPL payment volume. To qualify, payment volume over the last 30 days must reach 5% of the annual payment projection. Ads are excluded from CPA; ordinary ad commissions continue. Pass withdraw_projections: true without projection amounts to remove unaccepted projections. Accepted projections are immutable. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public UpdateBusinessesResponse update(String id, UpdateBusinessesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Accept the authenticated partner's CPA offer with the reviewed terms and signed offer token. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public AcceptCommissionAdvanceBusinessesResponse acceptCommissionAdvance(
+            String id, AcceptCommissionAdvanceBusinessesRequest request) {
+        return this.rawClient.acceptCommissionAdvance(id, request).body();
+    }
+
+    /**
+     * Accept the authenticated partner's CPA offer with the reviewed terms and signed offer token. Public API access requires a partner OAuth token; business API keys are not supported.
+     */
+    public AcceptCommissionAdvanceBusinessesResponse acceptCommissionAdvance(
+            String id, AcceptCommissionAdvanceBusinessesRequest request, RequestOptions requestOptions) {
+        return this.rawClient
+                .acceptCommissionAdvance(id, request, requestOptions)
+                .body();
+    }
+
+    /**
+     * Re-emails an outstanding invite to claim ownership of a referred business. Find the invite in the business's <code>pending_owner_invites</code>. Only the first-tier partner can resend, from a whop.com session or the Whop CLI or MCP with <code>partner:handoff</code>. Rate limited to one resend per invite every five minutes.
+     */
+    public ResendInviteBusinessesResponse resendInvite(String id, ResendInviteBusinessesRequest request) {
+        return this.rawClient.resendInvite(id, request).body();
+    }
+
+    /**
+     * Re-emails an outstanding invite to claim ownership of a referred business. Find the invite in the business's <code>pending_owner_invites</code>. Only the first-tier partner can resend, from a whop.com session or the Whop CLI or MCP with <code>partner:handoff</code>. Rate limited to one resend per invite every five minutes.
+     */
+    public ResendInviteBusinessesResponse resendInvite(
+            String id, ResendInviteBusinessesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.resendInvite(id, request, requestOptions).body();
     }
 
     public EarningsClient earnings() {

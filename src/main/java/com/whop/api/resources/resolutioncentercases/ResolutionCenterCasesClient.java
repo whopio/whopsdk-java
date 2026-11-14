@@ -169,14 +169,14 @@ public class ResolutionCenterCasesClient {
     }
 
     /**
-     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once.
+     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once, within 7 days of the decision.
      */
     public ResolutionCenterCase appeal(String id, AppealResolutionCenterCasesRequest request) {
         return this.rawClient.appeal(id, request).body();
     }
 
     /**
-     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once.
+     * Appeals a decision, as the customer, on a case that closed in the merchant's favor. Escalates the case to Whop for platform review. A case can be appealed once, within 7 days of the decision.
      */
     public ResolutionCenterCase appeal(
             String id, AppealResolutionCenterCasesRequest request, RequestOptions requestOptions) {

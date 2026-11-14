@@ -139,7 +139,7 @@ public final class ListEventsRequest {
     }
 
     /**
-     * @return The number of events to return.
+     * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
     public Optional<Integer> getFirst() {
@@ -147,7 +147,7 @@ public final class ListEventsRequest {
     }
 
     /**
-     * @return A cursor for fetching events after a previous page.
+     * @return Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.
      */
     @JsonProperty("after")
     public Optional<String> getAfter() {
@@ -155,7 +155,7 @@ public final class ListEventsRequest {
     }
 
     /**
-     * @return A cursor for fetching events before a later page.
+     * @return Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.
      */
     @JsonProperty("before")
     public Optional<String> getBefore() {
@@ -179,7 +179,7 @@ public final class ListEventsRequest {
     }
 
     /**
-     * @return Canonical source path, exact or with a trailing :* prefix (whop:&lt;campaign&gt;:<em>, ext:meta:</em>, referrer:&lt;domain&gt;, direct). Restricts the list to conversion targets attributed to that source — the debuggability twin of a metric cell's source parameter.
+     * @return Canonical source path, exact or with a trailing :* prefix (whop:&lt;campaign&gt;:<em>, ext:meta:</em>, referrer:&lt;domain&gt;, direct, unknown). Selects conversions credited to this source.
      */
     @JsonProperty("source")
     public Optional<String> getSource() {
@@ -364,7 +364,6 @@ public final class ListEventsRequest {
 
         private Optional<String> page = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -449,7 +448,7 @@ public final class ListEventsRequest {
         }
 
         /**
-         * <p>The number of events to return.</p>
+         * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
         public Builder first(Optional<Integer> first) {
@@ -463,7 +462,7 @@ public final class ListEventsRequest {
         }
 
         /**
-         * <p>A cursor for fetching events after a previous page.</p>
+         * <p>Return results after this cursor. Use <code>page_info.end_cursor</code> from the previous response to fetch the next page.</p>
          */
         @JsonSetter(value = "after", nulls = Nulls.SKIP)
         public Builder after(Optional<String> after) {
@@ -477,7 +476,7 @@ public final class ListEventsRequest {
         }
 
         /**
-         * <p>A cursor for fetching events before a later page.</p>
+         * <p>Return results before this cursor. Use <code>page_info.start_cursor</code> from the previous response to fetch the previous page.</p>
          */
         @JsonSetter(value = "before", nulls = Nulls.SKIP)
         public Builder before(Optional<String> before) {
@@ -519,7 +518,7 @@ public final class ListEventsRequest {
         }
 
         /**
-         * <p>Canonical source path, exact or with a trailing :* prefix (whop:&lt;campaign&gt;:<em>, ext:meta:</em>, referrer:&lt;domain&gt;, direct). Restricts the list to conversion targets attributed to that source — the debuggability twin of a metric cell's source parameter.</p>
+         * <p>Canonical source path, exact or with a trailing :* prefix (whop:&lt;campaign&gt;:<em>, ext:meta:</em>, referrer:&lt;domain&gt;, direct, unknown). Selects conversions credited to this source.</p>
          */
         @JsonSetter(value = "source", nulls = Nulls.SKIP)
         public Builder source(Optional<String> source) {
@@ -680,6 +679,32 @@ public final class ListEventsRequest {
                     hostname,
                     page,
                     additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("identifier")
+                    || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("from")
+                    || key.equalsIgnoreCase("to")
+                    || key.equalsIgnoreCase("first")
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("direction")
+                    || key.equalsIgnoreCase("event")
+                    || key.equalsIgnoreCase("source")
+                    || key.equalsIgnoreCase("attribution_model")
+                    || key.equalsIgnoreCase("country")
+                    || key.equalsIgnoreCase("city")
+                    || key.equalsIgnoreCase("device")
+                    || key.equalsIgnoreCase("browser")
+                    || key.equalsIgnoreCase("os")
+                    || key.equalsIgnoreCase("utm_source")
+                    || key.equalsIgnoreCase("hostname")
+                    || key.equalsIgnoreCase("page")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

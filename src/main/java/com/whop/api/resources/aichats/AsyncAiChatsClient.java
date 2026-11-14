@@ -5,6 +5,7 @@ package com.whop.api.resources.aichats;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.aichats.requests.CreateAiChatsRequest;
 import com.whop.api.resources.aichats.requests.DeleteAiChatsRequest;
@@ -34,31 +35,78 @@ public class AsyncAiChatsClient {
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AiChatListItem>> list() {
-        return this.rawClient.list().thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> rawFuture = this.rawClient.list();
+        CompletableFuture<SyncPagingIterable<AiChatListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AiChatListItem>> list(RequestOptions requestOptions) {
-        return this.rawClient.list(requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> rawFuture =
+                this.rawClient.list(requestOptions);
+        CompletableFuture<SyncPagingIterable<AiChatListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AiChatListItem>> list(ListAiChatsRequest request) {
-        return this.rawClient.list(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> rawFuture =
+                this.rawClient.list(request);
+        CompletableFuture<SyncPagingIterable<AiChatListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Returns a paginated list of AI chat threads for the current authenticated user.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<SyncPagingIterable<AiChatListItem>> list(
             ListAiChatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.list(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AiChatListItem>>> rawFuture =
+                this.rawClient.list(request, requestOptions);
+        CompletableFuture<SyncPagingIterable<AiChatListItem>> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -69,7 +117,14 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<AiChat> create(CreateAiChatsRequest request) {
-        return this.rawClient.create(request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.create(request);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -80,36 +135,87 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<AiChat> create(CreateAiChatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.create(request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.create(request, requestOptions);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<AiChat> retrieve(String id) {
-        return this.rawClient.retrieve(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.retrieve(id);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<AiChat> retrieve(String id, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.retrieve(id, requestOptions);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<AiChat> retrieve(String id, RetrieveAiChatsRequest request) {
-        return this.rawClient.retrieve(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.retrieve(id, request);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
      * Retrieves the details of an existing AI chat.
+     * <p>Required permissions:</p>
+     * <ul>
+     * <li><code>ai_chat:read</code></li>
+     * </ul>
      */
     public CompletableFuture<AiChat> retrieve(
             String id, RetrieveAiChatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.retrieve(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.retrieve(id, request, requestOptions);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -120,7 +226,14 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id) {
-        return this.rawClient.delete(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -131,7 +244,14 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -142,7 +262,14 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteAiChatsRequest request) {
-        return this.rawClient.delete(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
@@ -153,50 +280,85 @@ public class AsyncAiChatsClient {
      * </ul>
      */
     public CompletableFuture<Boolean> delete(String id, DeleteAiChatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.delete(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<Boolean>> rawFuture = this.rawClient.delete(id, request, requestOptions);
+        CompletableFuture<Boolean> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
      * </ul>
      */
     public CompletableFuture<AiChat> update(String id) {
-        return this.rawClient.update(id).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.update(id);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
      * </ul>
      */
     public CompletableFuture<AiChat> update(String id, RequestOptions requestOptions) {
-        return this.rawClient.update(id, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.update(id, requestOptions);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
      * </ul>
      */
     public CompletableFuture<AiChat> update(String id, UpdateAiChatsRequest request) {
-        return this.rawClient.update(id, request).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.update(id, request);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 
     /**
-     * Update an AI chat's title, notification preferences, or associated company context.
+     * Update an AI chat's title, notification preferences, or associated account context.
      * <p>Required permissions:</p>
      * <ul>
      * <li><code>ai_chat:update</code></li>
      * </ul>
      */
     public CompletableFuture<AiChat> update(String id, UpdateAiChatsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.update(id, request, requestOptions).thenApply(response -> response.body());
+        CompletableFuture<WhopApiHttpResponse<AiChat>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<AiChat> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
     }
 }

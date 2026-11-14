@@ -25,6 +25,10 @@ import java.util.Optional;
 public final class PaymentVerificationChecks {
     private final Optional<String> addressLine1;
 
+    private final Optional<String> arn;
+
+    private final Optional<String> authorizationCode;
+
     private final Optional<String> cardHolderName;
 
     private final Optional<String> cardSecurityCode;
@@ -35,11 +39,15 @@ public final class PaymentVerificationChecks {
 
     private PaymentVerificationChecks(
             Optional<String> addressLine1,
+            Optional<String> arn,
+            Optional<String> authorizationCode,
             Optional<String> cardHolderName,
             Optional<String> cardSecurityCode,
             Optional<String> zipCode,
             Map<String, Object> additionalProperties) {
         this.addressLine1 = addressLine1;
+        this.arn = arn;
+        this.authorizationCode = authorizationCode;
         this.cardHolderName = cardHolderName;
         this.cardSecurityCode = cardSecurityCode;
         this.zipCode = zipCode;
@@ -47,7 +55,7 @@ public final class PaymentVerificationChecks {
     }
 
     /**
-     * @return Whether the billing street address the customer entered matched the address the issuer has on file.
+     * @return The Address Verification Service (AVS) result for the billing street address.
      */
     @JsonIgnore
     public Optional<String> getAddressLine1() {
@@ -58,7 +66,29 @@ public final class PaymentVerificationChecks {
     }
 
     /**
-     * @return Whether the cardholder name the customer entered matched the name the issuer has on file.
+     * @return The Acquirer Reference Number (ARN) that traces this charge through the card network, or null when the processor did not return one.
+     */
+    @JsonIgnore
+    public Optional<String> getArn() {
+        if (arn == null) {
+            return Optional.empty();
+        }
+        return arn;
+    }
+
+    /**
+     * @return The card issuer's authorization code for this charge, or null when the processor did not return one.
+     */
+    @JsonIgnore
+    public Optional<String> getAuthorizationCode() {
+        if (authorizationCode == null) {
+            return Optional.empty();
+        }
+        return authorizationCode;
+    }
+
+    /**
+     * @return Whether the cardholder name matched the issuer's records.
      */
     @JsonIgnore
     public Optional<String> getCardHolderName() {
@@ -69,7 +99,7 @@ public final class PaymentVerificationChecks {
     }
 
     /**
-     * @return Whether the CVV / CVC the customer entered matched the card.
+     * @return The Card Verification Value (CVV/CVC) result.
      */
     @JsonIgnore
     public Optional<String> getCardSecurityCode() {
@@ -80,7 +110,7 @@ public final class PaymentVerificationChecks {
     }
 
     /**
-     * @return Whether the billing postal code the customer entered matched the postal code the issuer has on file.
+     * @return The Address Verification Service (AVS) result for the billing postal code.
      */
     @JsonIgnore
     public Optional<String> getZipCode() {
@@ -94,6 +124,18 @@ public final class PaymentVerificationChecks {
     @JsonProperty("address_line1")
     private Optional<String> _getAddressLine1() {
         return addressLine1;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("arn")
+    private Optional<String> _getArn() {
+        return arn;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("authorization_code")
+    private Optional<String> _getAuthorizationCode() {
+        return authorizationCode;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -127,6 +169,8 @@ public final class PaymentVerificationChecks {
 
     private boolean equalTo(PaymentVerificationChecks other) {
         return addressLine1.equals(other.addressLine1)
+                && arn.equals(other.arn)
+                && authorizationCode.equals(other.authorizationCode)
                 && cardHolderName.equals(other.cardHolderName)
                 && cardSecurityCode.equals(other.cardSecurityCode)
                 && zipCode.equals(other.zipCode);
@@ -134,7 +178,13 @@ public final class PaymentVerificationChecks {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.addressLine1, this.cardHolderName, this.cardSecurityCode, this.zipCode);
+        return Objects.hash(
+                this.addressLine1,
+                this.arn,
+                this.authorizationCode,
+                this.cardHolderName,
+                this.cardSecurityCode,
+                this.zipCode);
     }
 
     @java.lang.Override
@@ -150,19 +200,24 @@ public final class PaymentVerificationChecks {
     public static final class Builder {
         private Optional<String> addressLine1 = Optional.empty();
 
+        private Optional<String> arn = Optional.empty();
+
+        private Optional<String> authorizationCode = Optional.empty();
+
         private Optional<String> cardHolderName = Optional.empty();
 
         private Optional<String> cardSecurityCode = Optional.empty();
 
         private Optional<String> zipCode = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(PaymentVerificationChecks other) {
             addressLine1(other.getAddressLine1());
+            arn(other.getArn());
+            authorizationCode(other.getAuthorizationCode());
             cardHolderName(other.getCardHolderName());
             cardSecurityCode(other.getCardSecurityCode());
             zipCode(other.getZipCode());
@@ -170,7 +225,7 @@ public final class PaymentVerificationChecks {
         }
 
         /**
-         * <p>Whether the billing street address the customer entered matched the address the issuer has on file.</p>
+         * <p>The Address Verification Service (AVS) result for the billing street address.</p>
          */
         @JsonSetter(value = "address_line1", nulls = Nulls.SKIP)
         public Builder addressLine1(Optional<String> addressLine1) {
@@ -195,7 +250,57 @@ public final class PaymentVerificationChecks {
         }
 
         /**
-         * <p>Whether the cardholder name the customer entered matched the name the issuer has on file.</p>
+         * <p>The Acquirer Reference Number (ARN) that traces this charge through the card network, or null when the processor did not return one.</p>
+         */
+        @JsonSetter(value = "arn", nulls = Nulls.SKIP)
+        public Builder arn(Optional<String> arn) {
+            this.arn = arn;
+            return this;
+        }
+
+        public Builder arn(String arn) {
+            this.arn = Optional.ofNullable(arn);
+            return this;
+        }
+
+        public Builder arn(Nullable<String> arn) {
+            if (arn.isNull()) {
+                this.arn = null;
+            } else if (arn.isEmpty()) {
+                this.arn = Optional.empty();
+            } else {
+                this.arn = Optional.of(arn.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The card issuer's authorization code for this charge, or null when the processor did not return one.</p>
+         */
+        @JsonSetter(value = "authorization_code", nulls = Nulls.SKIP)
+        public Builder authorizationCode(Optional<String> authorizationCode) {
+            this.authorizationCode = authorizationCode;
+            return this;
+        }
+
+        public Builder authorizationCode(String authorizationCode) {
+            this.authorizationCode = Optional.ofNullable(authorizationCode);
+            return this;
+        }
+
+        public Builder authorizationCode(Nullable<String> authorizationCode) {
+            if (authorizationCode.isNull()) {
+                this.authorizationCode = null;
+            } else if (authorizationCode.isEmpty()) {
+                this.authorizationCode = Optional.empty();
+            } else {
+                this.authorizationCode = Optional.of(authorizationCode.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Whether the cardholder name matched the issuer's records.</p>
          */
         @JsonSetter(value = "card_holder_name", nulls = Nulls.SKIP)
         public Builder cardHolderName(Optional<String> cardHolderName) {
@@ -220,7 +325,7 @@ public final class PaymentVerificationChecks {
         }
 
         /**
-         * <p>Whether the CVV / CVC the customer entered matched the card.</p>
+         * <p>The Card Verification Value (CVV/CVC) result.</p>
          */
         @JsonSetter(value = "card_security_code", nulls = Nulls.SKIP)
         public Builder cardSecurityCode(Optional<String> cardSecurityCode) {
@@ -245,7 +350,7 @@ public final class PaymentVerificationChecks {
         }
 
         /**
-         * <p>Whether the billing postal code the customer entered matched the postal code the issuer has on file.</p>
+         * <p>The Address Verification Service (AVS) result for the billing postal code.</p>
          */
         @JsonSetter(value = "zip_code", nulls = Nulls.SKIP)
         public Builder zipCode(Optional<String> zipCode) {
@@ -271,7 +376,26 @@ public final class PaymentVerificationChecks {
 
         public PaymentVerificationChecks build() {
             return new PaymentVerificationChecks(
-                    addressLine1, cardHolderName, cardSecurityCode, zipCode, additionalProperties);
+                    addressLine1,
+                    arn,
+                    authorizationCode,
+                    cardHolderName,
+                    cardSecurityCode,
+                    zipCode,
+                    additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("address_line1")
+                    || key.equalsIgnoreCase("arn")
+                    || key.equalsIgnoreCase("authorization_code")
+                    || key.equalsIgnoreCase("card_holder_name")
+                    || key.equalsIgnoreCase("card_security_code")
+                    || key.equalsIgnoreCase("zip_code")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

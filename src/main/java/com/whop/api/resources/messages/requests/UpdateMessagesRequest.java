@@ -5,17 +5,16 @@ package com.whop.api.resources.messages.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.whop.api.core.Nullable;
-import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.messages.types.UpdateMessagesRequestAttachmentsItem;
+import com.whop.api.resources.messages.types.UpdateMessagesRequestGifsItem;
+import com.whop.api.resources.messages.types.UpdateMessagesRequestLinkPreviewsItem;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,70 +28,55 @@ public final class UpdateMessagesRequest {
 
     private final Optional<String> content;
 
-    private final Optional<Boolean> isPinned;
+    private final Optional<List<UpdateMessagesRequestGifsItem>> gifs;
+
+    private final Optional<List<UpdateMessagesRequestLinkPreviewsItem>> linkPreviews;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateMessagesRequest(
             Optional<List<UpdateMessagesRequestAttachmentsItem>> attachments,
             Optional<String> content,
-            Optional<Boolean> isPinned,
+            Optional<List<UpdateMessagesRequestGifsItem>> gifs,
+            Optional<List<UpdateMessagesRequestLinkPreviewsItem>> linkPreviews,
             Map<String, Object> additionalProperties) {
         this.attachments = attachments;
         this.content = content;
-        this.isPinned = isPinned;
+        this.gifs = gifs;
+        this.linkPreviews = linkPreviews;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return A replacement list of file attachments for this message, such as images or videos.
+     * @return Replacement attachment list; pass an empty list to remove attachments.
      */
-    @JsonIgnore
-    public Optional<List<UpdateMessagesRequestAttachmentsItem>> getAttachments() {
-        if (attachments == null) {
-            return Optional.empty();
-        }
-        return attachments;
-    }
-
-    /**
-     * @return The updated body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.
-     */
-    @JsonIgnore
-    public Optional<String> getContent() {
-        if (content == null) {
-            return Optional.empty();
-        }
-        return content;
-    }
-
-    /**
-     * @return Whether this message should be pinned to the top of the channel.
-     */
-    @JsonIgnore
-    public Optional<Boolean> getIsPinned() {
-        if (isPinned == null) {
-            return Optional.empty();
-        }
-        return isPinned;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("attachments")
-    private Optional<List<UpdateMessagesRequestAttachmentsItem>> _getAttachments() {
+    public Optional<List<UpdateMessagesRequestAttachmentsItem>> getAttachments() {
         return attachments;
     }
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    /**
+     * @return Replacement Markdown content.
+     */
     @JsonProperty("content")
-    private Optional<String> _getContent() {
+    public Optional<String> getContent() {
         return content;
     }
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("is_pinned")
-    private Optional<Boolean> _getIsPinned() {
-        return isPinned;
+    /**
+     * @return Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.
+     */
+    @JsonProperty("gifs")
+    public Optional<List<UpdateMessagesRequestGifsItem>> getGifs() {
+        return gifs;
+    }
+
+    /**
+     * @return Replacement preview URLs; pass an empty list to remove previews.
+     */
+    @JsonProperty("link_previews")
+    public Optional<List<UpdateMessagesRequestLinkPreviewsItem>> getLinkPreviews() {
+        return linkPreviews;
     }
 
     @java.lang.Override
@@ -109,12 +93,13 @@ public final class UpdateMessagesRequest {
     private boolean equalTo(UpdateMessagesRequest other) {
         return attachments.equals(other.attachments)
                 && content.equals(other.content)
-                && isPinned.equals(other.isPinned);
+                && gifs.equals(other.gifs)
+                && linkPreviews.equals(other.linkPreviews);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.attachments, this.content, this.isPinned);
+        return Objects.hash(this.attachments, this.content, this.gifs, this.linkPreviews);
     }
 
     @java.lang.Override
@@ -132,9 +117,10 @@ public final class UpdateMessagesRequest {
 
         private Optional<String> content = Optional.empty();
 
-        private Optional<Boolean> isPinned = Optional.empty();
+        private Optional<List<UpdateMessagesRequestGifsItem>> gifs = Optional.empty();
 
-        @JsonAnySetter
+        private Optional<List<UpdateMessagesRequestLinkPreviewsItem>> linkPreviews = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,12 +128,13 @@ public final class UpdateMessagesRequest {
         public Builder from(UpdateMessagesRequest other) {
             attachments(other.getAttachments());
             content(other.getContent());
-            isPinned(other.getIsPinned());
+            gifs(other.getGifs());
+            linkPreviews(other.getLinkPreviews());
             return this;
         }
 
         /**
-         * <p>A replacement list of file attachments for this message, such as images or videos.</p>
+         * <p>Replacement attachment list; pass an empty list to remove attachments.</p>
          */
         @JsonSetter(value = "attachments", nulls = Nulls.SKIP)
         public Builder attachments(Optional<List<UpdateMessagesRequestAttachmentsItem>> attachments) {
@@ -160,19 +147,8 @@ public final class UpdateMessagesRequest {
             return this;
         }
 
-        public Builder attachments(Nullable<List<UpdateMessagesRequestAttachmentsItem>> attachments) {
-            if (attachments.isNull()) {
-                this.attachments = null;
-            } else if (attachments.isEmpty()) {
-                this.attachments = Optional.empty();
-            } else {
-                this.attachments = Optional.of(attachments.get());
-            }
-            return this;
-        }
-
         /**
-         * <p>The updated body of the message in Markdown format. For example, 'Hello <strong>world</strong>'.</p>
+         * <p>Replacement Markdown content.</p>
          */
         @JsonSetter(value = "content", nulls = Nulls.SKIP)
         public Builder content(Optional<String> content) {
@@ -185,44 +161,47 @@ public final class UpdateMessagesRequest {
             return this;
         }
 
-        public Builder content(Nullable<String> content) {
-            if (content.isNull()) {
-                this.content = null;
-            } else if (content.isEmpty()) {
-                this.content = Optional.empty();
-            } else {
-                this.content = Optional.of(content.get());
-            }
+        /**
+         * <p>Up to 10 GIFs to attach. URLs must use HTTPS on static.klipy.com, static1.klipy.com, or static2.klipy.com. Omit to preserve on edit; an empty list clears them.</p>
+         */
+        @JsonSetter(value = "gifs", nulls = Nulls.SKIP)
+        public Builder gifs(Optional<List<UpdateMessagesRequestGifsItem>> gifs) {
+            this.gifs = gifs;
+            return this;
+        }
+
+        public Builder gifs(List<UpdateMessagesRequestGifsItem> gifs) {
+            this.gifs = Optional.ofNullable(gifs);
             return this;
         }
 
         /**
-         * <p>Whether this message should be pinned to the top of the channel.</p>
+         * <p>Replacement preview URLs; pass an empty list to remove previews.</p>
          */
-        @JsonSetter(value = "is_pinned", nulls = Nulls.SKIP)
-        public Builder isPinned(Optional<Boolean> isPinned) {
-            this.isPinned = isPinned;
+        @JsonSetter(value = "link_previews", nulls = Nulls.SKIP)
+        public Builder linkPreviews(Optional<List<UpdateMessagesRequestLinkPreviewsItem>> linkPreviews) {
+            this.linkPreviews = linkPreviews;
             return this;
         }
 
-        public Builder isPinned(Boolean isPinned) {
-            this.isPinned = Optional.ofNullable(isPinned);
-            return this;
-        }
-
-        public Builder isPinned(Nullable<Boolean> isPinned) {
-            if (isPinned.isNull()) {
-                this.isPinned = null;
-            } else if (isPinned.isEmpty()) {
-                this.isPinned = Optional.empty();
-            } else {
-                this.isPinned = Optional.of(isPinned.get());
-            }
+        public Builder linkPreviews(List<UpdateMessagesRequestLinkPreviewsItem> linkPreviews) {
+            this.linkPreviews = Optional.ofNullable(linkPreviews);
             return this;
         }
 
         public UpdateMessagesRequest build() {
-            return new UpdateMessagesRequest(attachments, content, isPinned, additionalProperties);
+            return new UpdateMessagesRequest(attachments, content, gifs, linkPreviews, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("attachments")
+                    || key.equalsIgnoreCase("content")
+                    || key.equalsIgnoreCase("gifs")
+                    || key.equalsIgnoreCase("link_previews")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         public Builder additionalProperty(String key, Object value) {

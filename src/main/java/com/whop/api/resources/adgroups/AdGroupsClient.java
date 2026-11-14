@@ -9,18 +9,14 @@ import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.adgroups.requests.CreateAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DeleteAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.DuplicateAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.EstimateReachAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.ListAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.PauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.RetrieveAdGroupsRequest;
-import com.whop.api.resources.adgroups.requests.SearchTargetingOptionsAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UnpauseAdGroupsRequest;
 import com.whop.api.resources.adgroups.requests.UpdateAdGroupsRequest;
 import com.whop.api.resources.adgroups.types.DeleteAdGroupsResponse;
 import com.whop.api.resources.adgroups.types.DuplicateAdGroupsResponse;
-import com.whop.api.resources.adgroups.types.SearchTargetingOptionsAdGroupsResponse;
 import com.whop.api.types.AdGroup;
-import com.whop.api.types.ReachEstimate;
 
 public class AdGroupsClient {
     protected final ClientOptions clientOptions;
@@ -82,86 +78,56 @@ public class AdGroupsClient {
     }
 
     /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public ReachEstimate estimateReach(EstimateReachAdGroupsRequest request) {
-        return this.rawClient.estimateReach(request).body();
-    }
-
-    /**
-     * Estimates how many people a draft targeting spec can reach, before an ad group is created. The body takes the same targeting fields as creating an ad group — <code>regions</code>, <code>demographics</code>, <code>detailed_targeting</code>, <code>audiences</code>, <code>languages</code>, and <code>devices</code> — and nothing is persisted.
-     */
-    public ReachEstimate estimateReach(EstimateReachAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.estimateReach(request, requestOptions).body();
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public SearchTargetingOptionsAdGroupsResponse searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request) {
-        return this.rawClient.searchTargetingOptions(request).body();
-    }
-
-    /**
-     * Searches the ad platform's targeting taxonomy for options to target an ad group with. Each result comes back in the exact shape the ad-group body accepts for its <code>type</code>, so it can be used in <code>detailed_targeting</code>, <code>regions</code>, or <code>languages</code> as-is. A blank <code>query</code> browses the small fixed lists (behaviors, browse demographic categories, languages); interests, work employers, job titles, schools, majors, and locations need a search term.
-     */
-    public SearchTargetingOptionsAdGroupsResponse searchTargetingOptions(
-            SearchTargetingOptionsAdGroupsRequest request, RequestOptions requestOptions) {
-        return this.rawClient.searchTargetingOptions(request, requestOptions).body();
-    }
-
-    /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public AdGroup retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public AdGroup retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public AdGroup retrieve(String id, RetrieveAdGroupsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Retrieves a single ad group.
+     * Retrieves an ad group, with performance stats for the window set by <code>stats_from</code> and <code>stats_to</code>.
      */
     public AdGroup retrieve(String id, RetrieveAdGroupsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public DeleteAdGroupsResponse delete(String id) {
         return this.rawClient.delete(id).body();
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public DeleteAdGroupsResponse delete(String id, RequestOptions requestOptions) {
         return this.rawClient.delete(id, requestOptions).body();
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public DeleteAdGroupsResponse delete(String id, DeleteAdGroupsRequest request) {
         return this.rawClient.delete(id, request).body();
     }
 
     /**
-     * Deletes an ad group.
+     * Deletes an ad group and stops its delivery.
      */
     public DeleteAdGroupsResponse delete(String id, DeleteAdGroupsRequest request, RequestOptions requestOptions) {
         return this.rawClient.delete(id, request, requestOptions).body();
@@ -196,28 +162,28 @@ public class AdGroupsClient {
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public DuplicateAdGroupsResponse duplicate(String id) {
         return this.rawClient.duplicate(id).body();
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public DuplicateAdGroupsResponse duplicate(String id, RequestOptions requestOptions) {
         return this.rawClient.duplicate(id, requestOptions).body();
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public DuplicateAdGroupsResponse duplicate(String id, DuplicateAdGroupsRequest request) {
         return this.rawClient.duplicate(id, request).body();
     }
 
     /**
-     * Creates copies of the ad group in <code>duplicating</code> status and returns them — into its own campaign, or into target_ad_campaign_id (which must belong to the same account and be compatible with the ad group's targeting and goals); each copy transitions to its final status (matching the source's active/paused state) once duplication completes. Poll each returned ad group until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
      */
     public DuplicateAdGroupsResponse duplicate(
             String id, DuplicateAdGroupsRequest request, RequestOptions requestOptions) {

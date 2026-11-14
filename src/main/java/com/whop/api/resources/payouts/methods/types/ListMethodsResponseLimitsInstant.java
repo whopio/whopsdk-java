@@ -226,7 +226,6 @@ public final class ListMethodsResponseLimitsInstant {
 
         private Optional<Float> dailyAmountRemaining = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -242,7 +241,6 @@ public final class ListMethodsResponseLimitsInstant {
         }
 
         /**
-         * <p>The maximum amount an instant payout can move right now, in whole currency units. Already bounded by the remaining daily instant allowance; 0 while an eligibility error blocks instant payouts.</p>
          * <p>The maximum amount an instant payout can move right now, in whole currency units. Already bounded by the remaining daily instant allowance; 0 while an eligibility error blocks instant payouts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -401,6 +399,18 @@ public final class ListMethodsResponseLimitsInstant {
         public ListMethodsResponseLimitsInstant build() {
             return new ListMethodsResponseLimitsInstant(
                     dailyAmountRemaining, errorCode, errorMessage, maxAmount, resetsAt, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("daily_amount_remaining")
+                    || key.equalsIgnoreCase("error_code")
+                    || key.equalsIgnoreCase("error_message")
+                    || key.equalsIgnoreCase("max_amount")
+                    || key.equalsIgnoreCase("resets_at")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdPlatformIssue.Builder.class)
 public final class AdPlatformIssue {
+    private final AdPlatformIssueCategory category;
+
     private final String id;
 
     private final String message;
@@ -32,19 +34,33 @@ public final class AdPlatformIssue {
 
     private final AdPlatformIssueResourceType resourceType;
 
+    private final String title;
+
     private final Map<String, Object> additionalProperties;
 
     private AdPlatformIssue(
+            AdPlatformIssueCategory category,
             String id,
             String message,
             Optional<String> resourceId,
             AdPlatformIssueResourceType resourceType,
+            String title,
             Map<String, Object> additionalProperties) {
+        this.category = category;
         this.id = id;
         this.message = message;
         this.resourceId = resourceId;
         this.resourceType = resourceType;
+        this.title = title;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The kind of issue: information about delivery, a warning, or an error requiring attention.
+     */
+    @JsonProperty("category")
+    public AdPlatformIssueCategory getCategory() {
+        return category;
     }
 
     /**
@@ -82,6 +98,14 @@ public final class AdPlatformIssue {
         return resourceType;
     }
 
+    /**
+     * @return A short, creator-facing title for the issue: the rule a content-review rejection names, or a generic label.
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("resource_id")
     private Optional<String> _getResourceId() {
@@ -100,15 +124,17 @@ public final class AdPlatformIssue {
     }
 
     private boolean equalTo(AdPlatformIssue other) {
-        return id.equals(other.id)
+        return category.equals(other.category)
+                && id.equals(other.id)
                 && message.equals(other.message)
                 && resourceId.equals(other.resourceId)
-                && resourceType.equals(other.resourceType);
+                && resourceType.equals(other.resourceType)
+                && title.equals(other.title);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.message, this.resourceId, this.resourceType);
+        return Objects.hash(this.category, this.id, this.message, this.resourceId, this.resourceType, this.title);
     }
 
     @java.lang.Override
@@ -116,8 +142,17 @@ public final class AdPlatformIssue {
         return ObjectMappers.stringify(this);
     }
 
-    public static IdStage builder() {
+    public static CategoryStage builder() {
         return new Builder();
+    }
+
+    public interface CategoryStage {
+        /**
+         * <p>The kind of issue: information about delivery, a warning, or an error requiring attention.</p>
+         */
+        IdStage category(@NotNull AdPlatformIssueCategory category);
+
+        Builder from(AdPlatformIssue other);
     }
 
     public interface IdStage {
@@ -125,8 +160,6 @@ public final class AdPlatformIssue {
          * <p>Unique identifier for the issue.</p>
          */
         MessageStage id(@NotNull String id);
-
-        Builder from(AdPlatformIssue other);
     }
 
     public interface MessageStage {
@@ -140,7 +173,14 @@ public final class AdPlatformIssue {
         /**
          * <p>The type of resource the issue is attached to.</p>
          */
-        _FinalStage resourceType(@NotNull AdPlatformIssueResourceType resourceType);
+        TitleStage resourceType(@NotNull AdPlatformIssueResourceType resourceType);
+    }
+
+    public interface TitleStage {
+        /**
+         * <p>A short, creator-facing title for the issue: the rule a content-review rejection names, or a generic label.</p>
+         */
+        _FinalStage title(@NotNull String title);
     }
 
     public interface _FinalStage {
@@ -161,31 +201,47 @@ public final class AdPlatformIssue {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, MessageStage, ResourceTypeStage, _FinalStage {
+    public static final class Builder
+            implements CategoryStage, IdStage, MessageStage, ResourceTypeStage, TitleStage, _FinalStage {
+        private AdPlatformIssueCategory category;
+
         private String id;
 
         private String message;
 
         private AdPlatformIssueResourceType resourceType;
 
+        private String title;
+
         private Optional<String> resourceId = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AdPlatformIssue other) {
+            category(other.getCategory());
             id(other.getId());
             message(other.getMessage());
             resourceId(other.getResourceId());
             resourceType(other.getResourceType());
+            title(other.getTitle());
             return this;
         }
 
         /**
-         * <p>Unique identifier for the issue.</p>
+         * <p>The kind of issue: information about delivery, a warning, or an error requiring attention.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("category")
+        public IdStage category(@NotNull AdPlatformIssueCategory category) {
+            this.category = Objects.requireNonNull(category, "category must not be null");
+            return this;
+        }
+
+        /**
          * <p>Unique identifier for the issue.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -198,7 +254,6 @@ public final class AdPlatformIssue {
 
         /**
          * <p>A description of what the issue is and how it can be resolved.</p>
-         * <p>A description of what the issue is and how it can be resolved.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,13 +265,23 @@ public final class AdPlatformIssue {
 
         /**
          * <p>The type of resource the issue is attached to.</p>
-         * <p>The type of resource the issue is attached to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("resource_type")
-        public _FinalStage resourceType(@NotNull AdPlatformIssueResourceType resourceType) {
+        public TitleStage resourceType(@NotNull AdPlatformIssueResourceType resourceType) {
             this.resourceType = Objects.requireNonNull(resourceType, "resourceType must not be null");
+            return this;
+        }
+
+        /**
+         * <p>A short, creator-facing title for the issue: the rule a content-review rejection names, or a generic label.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("title")
+        public _FinalStage title(@NotNull String title) {
+            this.title = Objects.requireNonNull(title, "title must not be null");
             return this;
         }
 
@@ -258,7 +323,20 @@ public final class AdPlatformIssue {
 
         @java.lang.Override
         public AdPlatformIssue build() {
-            return new AdPlatformIssue(id, message, resourceId, resourceType, additionalProperties);
+            return new AdPlatformIssue(category, id, message, resourceId, resourceType, title, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("resource_id")
+                    || key.equalsIgnoreCase("resource_type")
+                    || key.equalsIgnoreCase("title")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

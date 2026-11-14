@@ -158,7 +158,6 @@ public final class ListPeopleResponseDataItemMember {
 
         private Optional<OffsetDateTime> joinedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -245,6 +244,17 @@ public final class ListPeopleResponseDataItemMember {
         @java.lang.Override
         public ListPeopleResponseDataItemMember build() {
             return new ListPeopleResponseDataItemMember(id, joinedAt, status, usdTotalSpend, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("usd_total_spend")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override

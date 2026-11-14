@@ -216,7 +216,6 @@ public final class DmMember {
 
         private Optional<String> lastViewedAt = Optional.empty();
 
-        @JsonAnySetter
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -234,7 +233,6 @@ public final class DmMember {
 
         /**
          * <p>The unique identifier of the messaging channel this membership belongs to.</p>
-         * <p>The unique identifier of the messaging channel this membership belongs to.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -246,7 +244,6 @@ public final class DmMember {
 
         /**
          * <p>The unique identifier for the entity</p>
-         * <p>The unique identifier for the entity</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -257,7 +254,6 @@ public final class DmMember {
         }
 
         /**
-         * <p>The notification level for this channel: all, mentions, or none.</p>
          * <p>The notification level for this channel: all, mentions, or none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -272,7 +268,6 @@ public final class DmMember {
 
         /**
          * <p>The current state of this membership: requested, accepted, hidden, closed, or archived.</p>
-         * <p>The current state of this membership: requested, accepted, hidden, closed, or archived.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -283,7 +278,6 @@ public final class DmMember {
         }
 
         /**
-         * <p>The unique identifier of the user who holds this channel membership.</p>
          * <p>The unique identifier of the user who holds this channel membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -334,6 +328,19 @@ public final class DmMember {
         public DmMember build() {
             return new DmMember(
                     channelId, id, lastViewedAt, notificationPreference, status, userId, additionalProperties);
+        }
+
+        @JsonAnySetter
+        private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("channel_id")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("last_viewed_at")
+                    || key.equalsIgnoreCase("notification_preference")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("user_id")) {
+                return;
+            }
+            this.additionalProperties.put(key, value);
         }
 
         @java.lang.Override
