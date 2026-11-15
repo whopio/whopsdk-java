@@ -90,3 +90,6 @@ src/main/resources/META-INF/proguard/whop-java.pro
 .github/public-maven.py
 .github/test_public_maven.py
 INSTALL.md
+
+# Hand-written quick start. Remove when Fern emits this format with verified install steps.
+README.md
