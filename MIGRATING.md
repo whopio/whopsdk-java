@@ -45,6 +45,12 @@ Closing a client releases HTTP resources the SDK created. A supplied `OkHttpClie
 
 The generated builder sends the API version matching its models. An explicit `apiVersionDate(...)` still overrides that pin; select an older API date only when your integration also expects its response shapes.
 
+## Android release builds
+
+The SDK JAR includes consumer rules in `META-INF/proguard/whop-java.pro`. Android builds consume these automatically when R8 is enabled. They preserve Jackson model annotations, generated request and response models, and the `NullableNonemptyFilter` constructor and methods used through reflection.
+
+Without the filter rule, an optimized app can read API responses but fail while serializing a request with nullable fields. A debug build does not exercise that shrinker behavior. Validate a minified app when changing these rules.
+
 ## Installing and releasing the package
 
 This change builds and tests the SDK without publishing it. `gradle.properties` keeps `version=0.0.0`, and the release workflow refuses to publish that placeholder. Generated metadata records the generator's input version; the release workflow stamps the artifact, source headers, and metadata from `gradle.properties` before building them.
