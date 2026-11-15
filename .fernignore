@@ -84,3 +84,5 @@ src/test/java/com/whop/api/helpers/
 .fern/replay.lock
 .fern/replay.yml
 .gitattributes
+# Remove when Fern emits and tests equivalent Android consumer rules.
+src/main/resources/META-INF/proguard/whop-java.pro

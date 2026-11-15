@@ -1,0 +1,7 @@
+-keepattributes Signature,*Annotation*,InnerClasses,EnclosingMethod
+-keep class com.whop.api.types.** { *; }
+-keep class com.whop.api.resources.**.types.** { *; }
+-keep class com.whop.api.resources.**.requests.** { *; }
+-keep class com.whop.api.core.NullableNonemptyFilter { *; }
+-keep class com.fasterxml.jackson.databind.annotation.JacksonStdImpl
+-keep,allowobfuscation,allowshrinking @com.fasterxml.jackson.databind.annotation.JacksonStdImpl class *

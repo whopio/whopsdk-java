@@ -25,6 +25,19 @@ public final class PackageConsumer {
         require(
                 version.equals(WhopApiClient.class.getPackage().getImplementationVersion()),
                 "installed jar manifest has an incorrect version");
+        try (java.io.InputStream rules =
+                WhopApiClient.class.getResourceAsStream("/META-INF/proguard/whop-java.pro")) {
+            require(rules != null, "installed jar is missing Android consumer rules");
+            String contents = new String(rules.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            require(
+                    contents.contains("-keep class com.whop.api.core.NullableNonemptyFilter { *; }"),
+                    "installed jar does not preserve the reflective nullable filter");
+            require(
+                    contents.contains("com.whop.api.types.**")
+                            && contents.contains("com.whop.api.resources.**.requests.**")
+                            && contents.contains("-keepattributes Signature,*Annotation*,InnerClasses,EnclosingMethod"),
+                    "installed jar does not preserve Jackson models and annotations");
+        }
         String apiVersion = java.util.Arrays.stream(ApiKeyApiVersionDate.class.getFields())
                 .filter(field ->
                         Modifier.isStatic(field.getModifiers()) && field.getType() == ApiKeyApiVersionDate.class)
