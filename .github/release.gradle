@@ -38,6 +38,19 @@ gradle.projectsLoaded {
                                 connection = 'scm:git:https://github.com/whopio/whopsdk-java.git'
                                 developerConnection = 'scm:git:ssh://git@github.com/whopio/whopsdk-java.git'
                             }
+                            withXml {
+                                def okhttp = root.configurations.api.dependencies.find {
+                                    it.group == 'com.squareup.okhttp3' && it.name == 'okhttp'
+                                }
+                                if (okhttp == null || !okhttp.version) {
+                                    throw new GradleException('Cannot derive the OkHttp JVM dependency for Maven consumers')
+                                }
+                                def dependency = asNode().dependencies[0].appendNode('dependency')
+                                dependency.appendNode('groupId', okhttp.group)
+                                dependency.appendNode('artifactId', 'okhttp-jvm')
+                                dependency.appendNode('version', okhttp.version)
+                                dependency.appendNode('scope', 'compile')
+                            }
                         }
                     }
                 }
