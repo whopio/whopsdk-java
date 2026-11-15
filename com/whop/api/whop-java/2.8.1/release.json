@@ -1,0 +1,32 @@
+{
+  "coordinate": "com.whop.api:whop-java:2.8.1",
+  "sha256": {
+    "whop-java-2.8.1-javadoc.jar": "a02fde3ccf4edb783a59e0d3530ddce8bc893906938dbb11a6fb07209b0b0725",
+    "whop-java-2.8.1-javadoc.jar.md5": "ffd2f59a3ac90f1b06a34e943c0e900452d4a916271583f1b8561a0e7d28a4d6",
+    "whop-java-2.8.1-javadoc.jar.sha1": "8cf3fc2b5ce2a79e08542c47c7525447ea6e3f1a0068e7e86b0a306a3b244e3f",
+    "whop-java-2.8.1-javadoc.jar.sha256": "d337b54bdba9143d3ab67fde3aae70ff4dd976b1a6bf3440c042aa91112613b8",
+    "whop-java-2.8.1-javadoc.jar.sha512": "43d7054869bd0d5acde0529b9480231daee08c158967a7f7999b802f42542373",
+    "whop-java-2.8.1-sources.jar": "1c36d2614b8f1e25d1b4ade8dfe20e68acc4bd2d836f787221541cd2666bd3d3",
+    "whop-java-2.8.1-sources.jar.md5": "035687c554e0276cf4e04508923b82959347ad11626ce1bfb3d6a0e3e4439ee2",
+    "whop-java-2.8.1-sources.jar.sha1": "2d559a630e1abe241de04db5a09b6f6f9a7dc4c11fb0c7e2dd1b6e2092ba8a77",
+    "whop-java-2.8.1-sources.jar.sha256": "1df3087f66b466b139eaac22806ce6ef8cb9426cb1b4aeb36e7cf633bb9a88b0",
+    "whop-java-2.8.1-sources.jar.sha512": "ad4d0c8dbfd10b9a1ae65c37e5e0508980076b6096fda97e253a23ca914a185c",
+    "whop-java-2.8.1.jar": "4c902e9854877fba59e1a9007f3b58bd8ded9c56aa6e33f7e849c81ebd25a9c6",
+    "whop-java-2.8.1.jar.md5": "391ecf0f277c346c861ebf392a3305f493af8d26f2935d40e6aeb93bbb6a0b95",
+    "whop-java-2.8.1.jar.sha1": "6f6c680d2c2a1049d6367de0d51960891995c802543f4eef8795aa8ff9fe2d47",
+    "whop-java-2.8.1.jar.sha256": "75bb672d5d59b659353ca18065d690f6c8dad68056e2366f0bd51c96255a867f",
+    "whop-java-2.8.1.jar.sha512": "eafcf44a1b3a732d2c9b52bdc62d2a24cb33ba57a0f002bea8ba969ae37af120",
+    "whop-java-2.8.1.module": "fbe694821ec8fd7e400e5b79f98aefcdca3d0cffe2f43b1005c2bb2ae78558e3",
+    "whop-java-2.8.1.module.md5": "687d0d8fe1a1cb8bea952c9fc7bc9083a28aed511c9d2ea51612962ca4c459d2",
+    "whop-java-2.8.1.module.sha1": "9ff46672cbc341c0f3827acff8a20ac66eb76ffd4f746f908f7e6b0727ecbed7",
+    "whop-java-2.8.1.module.sha256": "38fc77e717a846e2b4d1da0295cd2e1b7561c737af74d1683e56070c58d6e14c",
+    "whop-java-2.8.1.module.sha512": "abc0ce3b42721bf8d4a6db2eb3a5e7fe4babf3fc4243c2f2aa032d16ab2265f9",
+    "whop-java-2.8.1.pom": "4974040d9d056d5a09d4a2dfa3519735e0344c6de8b2bcc9d5ae94b322cd4a19",
+    "whop-java-2.8.1.pom.md5": "9df078bf5207bf0c9e2c7e4de331e812bc6535ab2740e3f2bca67d519bfceb71",
+    "whop-java-2.8.1.pom.sha1": "b0ebdd95131467d89dd0475535e9d5483c38cf3eb22f3891b4a5c9158fce194f",
+    "whop-java-2.8.1.pom.sha256": "4876eed99db030a1d0085640578721a1facb5e5fe769d4f85e84fa2734c2dca4",
+    "whop-java-2.8.1.pom.sha512": "0d7892207f52d339b4f3ef3c32f0cd59ff2cf16104efa2c4b3813327ea53b55a"
+  },
+  "sourceCommit": "e8f72d2af61066f5903840705addb6bc1139b621",
+  "version": "2.8.1"
+}

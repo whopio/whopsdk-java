@@ -1,0 +1,160 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.whop.api",
+    "module": "whop-java",
+    "version": "2.8.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.14.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "5.2.1"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.18.6"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jdk8",
+          "version": {
+            "requires": "2.18.6"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jsr310",
+          "version": {
+            "requires": "2.18.6"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "whop-java-2.8.1.jar",
+          "url": "whop-java-2.8.1.jar",
+          "size": 26688053,
+          "sha512": "18946688ae8be1e7d7edca4ab03ee2a8d4b7ef8288c4bbdb1e58dc3e651aaa67682d8fd41a399f840044a91697aefca8c033c467886ca8253929be8c38e80914",
+          "sha256": "4c902e9854877fba59e1a9007f3b58bd8ded9c56aa6e33f7e849c81ebd25a9c6",
+          "sha1": "c7fc3f7097f408365f8eb763b74bbcb1f03bd927",
+          "md5": "dbfaed7b21430e72eff376b12247506b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "5.2.1"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.18.6"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jdk8",
+          "version": {
+            "requires": "2.18.6"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jsr310",
+          "version": {
+            "requires": "2.18.6"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "whop-java-2.8.1.jar",
+          "url": "whop-java-2.8.1.jar",
+          "size": 26688053,
+          "sha512": "18946688ae8be1e7d7edca4ab03ee2a8d4b7ef8288c4bbdb1e58dc3e651aaa67682d8fd41a399f840044a91697aefca8c033c467886ca8253929be8c38e80914",
+          "sha256": "4c902e9854877fba59e1a9007f3b58bd8ded9c56aa6e33f7e849c81ebd25a9c6",
+          "sha1": "c7fc3f7097f408365f8eb763b74bbcb1f03bd927",
+          "md5": "dbfaed7b21430e72eff376b12247506b"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "whop-java-2.8.1-sources.jar",
+          "url": "whop-java-2.8.1-sources.jar",
+          "size": 8644414,
+          "sha512": "3e56b15585fe0759ff20e9f801b1447daeea06a58a11d497efbe179e004ee4500b1979e1e3ca5ff0ac67b140fe59f6f65eb97558ef33d1dbf6751e3cf613b9aa",
+          "sha256": "1c36d2614b8f1e25d1b4ade8dfe20e68acc4bd2d836f787221541cd2666bd3d3",
+          "sha1": "04d8343a1de593d45c0cb5e2f62646995fb95ea8",
+          "md5": "f2d51df1bf55c7b11c317d2df17637e1"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "whop-java-2.8.1-javadoc.jar",
+          "url": "whop-java-2.8.1-javadoc.jar",
+          "size": 57577305,
+          "sha512": "ecfa5f11fe7e6d5057d332114ffb7850944856bab19e7b823a8777bcd03e093eb97db083dec6aed0bd8d963b6b32c144db80b3ec7c496cb40da6b0cb9b770ad5",
+          "sha256": "a02fde3ccf4edb783a59e0d3530ddce8bc893906938dbb11a6fb07209b0b0725",
+          "sha1": "9286810636d8e3f02703b5adf6c55a1aa4078476",
+          "md5": "8746e3b835378bb994631d01a859fb60"
+        }
+      ]
+    }
+  ]
+}
