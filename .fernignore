@@ -5,12 +5,11 @@
 #
 # publish-main.yml is hand-written: it releases com.whop.api:whop-java when a merge to main
 # lands a gradle.properties version that is not yet published, and it is meant to be the
-# only publish path. It has two targets behind one set of guards — GitHub Packages
-# (whopio-internal, authenticated with the run's own GITHUB_TOKEN, no namespace to
-# register) and the Sonatype Central Portal (public, blocked on DNS verification and a
-# signing key). RELEASE_TARGET sets the default, a workflow_dispatch input overrides it,
-# and every pull request rehearses both so neither path rots while the other is the live
-# one.
+# only publish path. Public Maven hosting on GitHub Pages is the default; the same
+# verified bundle can also target GitHub Packages or Maven Central. Maven Central
+# requires namespace verification and main-only signing/publishing credentials.
+# Public release bytes and provenance are retained on the maven branch; reruns reuse
+# that version only for the same source commit and verify the stored hashes.
 #
 # stamp-version.py is that workflow's version stamp: gradle.properties, every source file
 # carrying X-Fern-SDK-Version, and .fern/metadata.json. It is a file rather than a script
@@ -86,3 +85,8 @@ src/test/java/com/whop/api/helpers/
 .gitattributes
 # Remove when Fern emits and tests equivalent Android consumer rules.
 src/main/resources/META-INF/proguard/whop-java.pro
+
+# Remove when Fern provides immutable public Maven hosting and equivalent checks.
+.github/public-maven.py
+.github/test_public_maven.py
+INSTALL.md

@@ -30,6 +30,10 @@ API reference documentation is available [here](https://docs.whop.com/api-refere
 
 A full reference for this library is available [here](./reference.md).
 
+## Installation
+
+See [INSTALL.md](INSTALL.md) for public Gradle, Android, and Maven installation instructions.
+
 ## Usage
 
 Instantiate and use the client with the following:
