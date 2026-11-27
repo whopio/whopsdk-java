@@ -112,7 +112,7 @@ public final class CreateVerificationsRequestBodyIndividual {
     }
 
     /**
-     * @return The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
+     * @return The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
      */
     @JsonProperty("business_tax_identification_number")
     public Optional<String> getBusinessTaxIdentificationNumber() {
@@ -355,7 +355,7 @@ public final class CreateVerificationsRequestBodyIndividual {
         }
 
         /**
-         * <p>The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
+         * <p>The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
          */
         @JsonSetter(value = "business_tax_identification_number", nulls = Nulls.SKIP)
         public Builder businessTaxIdentificationNumber(Optional<String> businessTaxIdentificationNumber) {

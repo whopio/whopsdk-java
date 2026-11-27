@@ -21,7 +21,6 @@ import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.ServiceUnavailableError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.externalaccounts.requests.ConnectExternalAccountsRequest;
 import com.whop.api.resources.externalaccounts.requests.DeleteExternalAccountsRequest;
@@ -468,28 +467,28 @@ public class RawExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public WhopApiHttpResponse<ExternalAccount> refresh(String id) {
         return refresh(id, RefreshExternalAccountsRequest.builder().build());
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public WhopApiHttpResponse<ExternalAccount> refresh(String id, RequestOptions requestOptions) {
         return refresh(id, RefreshExternalAccountsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public WhopApiHttpResponse<ExternalAccount> refresh(String id, RefreshExternalAccountsRequest request) {
         return refresh(id, request, null);
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public WhopApiHttpResponse<ExternalAccount> refresh(
             String id, RefreshExternalAccountsRequest request, RequestOptions requestOptions) {
@@ -541,9 +540,6 @@ public class RawExternalAccountsClient {
             }
             try {
                 switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
@@ -555,9 +551,6 @@ public class RawExternalAccountsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 409:
                         throw new ConflictError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 429:
-                        throw new TooManyRequestsError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {

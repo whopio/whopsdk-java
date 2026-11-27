@@ -24,6 +24,7 @@ import com.whop.api.resources.paymentrules.requests.ActivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.CreatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeactivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeletePaymentRulesRequest;
+import com.whop.api.resources.paymentrules.requests.ListFieldsPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ListPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ReplacePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.RetrievePaymentRulesRequest;
@@ -178,14 +179,14 @@ public class RawPaymentRulesClient {
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public WhopApiHttpResponse<PaymentRule> create(CreatePaymentRulesRequest request) {
         return create(request, null);
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public WhopApiHttpResponse<PaymentRule> create(CreatePaymentRulesRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
@@ -261,27 +262,46 @@ public class RawPaymentRulesClient {
      * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
      */
     public WhopApiHttpResponse<ListFieldsPaymentRulesResponse> listFields() {
-        return listFields(null);
+        return listFields(ListFieldsPaymentRulesRequest.builder().build());
     }
 
     /**
      * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
      */
     public WhopApiHttpResponse<ListFieldsPaymentRulesResponse> listFields(RequestOptions requestOptions) {
+        return listFields(ListFieldsPaymentRulesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public WhopApiHttpResponse<ListFieldsPaymentRulesResponse> listFields(ListFieldsPaymentRulesRequest request) {
+        return listFields(request, null);
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public WhopApiHttpResponse<ListFieldsPaymentRulesResponse> listFields(
+            ListFieldsPaymentRulesRequest request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
                 .newBuilder()
                 .addPathSegments("payment_rules/fields");
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request okhttpRequest = new Request.Builder()
+        Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
                 .method("GET", null)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json")
-                .build();
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);

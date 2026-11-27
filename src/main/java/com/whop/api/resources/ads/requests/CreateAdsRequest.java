@@ -26,6 +26,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateAdsRequest.Builder.class)
 public final class CreateAdsRequest {
+    private final Optional<String> accountId;
+
     private final Optional<Map<String, Object>> adGroup;
 
     private final Optional<String> adGroupId;
@@ -49,6 +51,7 @@ public final class CreateAdsRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateAdsRequest(
+            Optional<String> accountId,
             Optional<Map<String, Object>> adGroup,
             Optional<String> adGroupId,
             Optional<CreateAdsRequestCallToAction> callToAction,
@@ -60,6 +63,7 @@ public final class CreateAdsRequest {
             Optional<String> url,
             Optional<Map<String, Object>> urlParameters,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.adGroup = adGroup;
         this.adGroupId = adGroupId;
         this.callToAction = callToAction;
@@ -71,6 +75,14 @@ public final class CreateAdsRequest {
         this.url = url;
         this.urlParameters = urlParameters;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The account to create an inline <code>ad_group.ad_campaign</code> under. Defaults to the account-scoped key's own account.
+     */
+    @JsonProperty("account_id")
+    public Optional<String> getAccountId() {
+        return accountId;
     }
 
     /**
@@ -165,7 +177,8 @@ public final class CreateAdsRequest {
     }
 
     private boolean equalTo(CreateAdsRequest other) {
-        return adGroup.equals(other.adGroup)
+        return accountId.equals(other.accountId)
+                && adGroup.equals(other.adGroup)
                 && adGroupId.equals(other.adGroupId)
                 && callToAction.equals(other.callToAction)
                 && creatives.equals(other.creatives)
@@ -180,6 +193,7 @@ public final class CreateAdsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.adGroup,
                 this.adGroupId,
                 this.callToAction,
@@ -203,6 +217,8 @@ public final class CreateAdsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> accountId = Optional.empty();
+
         private Optional<Map<String, Object>> adGroup = Optional.empty();
 
         private Optional<String> adGroupId = Optional.empty();
@@ -228,6 +244,7 @@ public final class CreateAdsRequest {
         private Builder() {}
 
         public Builder from(CreateAdsRequest other) {
+            accountId(other.getAccountId());
             adGroup(other.getAdGroup());
             adGroupId(other.getAdGroupId());
             callToAction(other.getCallToAction());
@@ -238,6 +255,20 @@ public final class CreateAdsRequest {
             title(other.getTitle());
             url(other.getUrl());
             urlParameters(other.getUrlParameters());
+            return this;
+        }
+
+        /**
+         * <p>The account to create an inline <code>ad_group.ad_campaign</code> under. Defaults to the account-scoped key's own account.</p>
+         */
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public Builder accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
+        public Builder accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
@@ -383,6 +414,7 @@ public final class CreateAdsRequest {
 
         public CreateAdsRequest build() {
             return new CreateAdsRequest(
+                    accountId,
                     adGroup,
                     adGroupId,
                     callToAction,
@@ -398,7 +430,8 @@ public final class CreateAdsRequest {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("ad_group")
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("ad_group")
                     || key.equalsIgnoreCase("ad_group_id")
                     || key.equalsIgnoreCase("call_to_action")
                     || key.equalsIgnoreCase("creatives")

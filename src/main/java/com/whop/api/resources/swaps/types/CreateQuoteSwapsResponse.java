@@ -43,6 +43,8 @@ public final class CreateQuoteSwapsResponse {
 
     private final Map<String, Object> metadata;
 
+    private final Optional<String> midMarketRate;
+
     private final CreateQuoteSwapsResponseObject object;
 
     private final String rate;
@@ -65,6 +67,7 @@ public final class CreateQuoteSwapsResponse {
             Optional<String> fromAddress,
             Map<String, Object> fromToken,
             Map<String, Object> metadata,
+            Optional<String> midMarketRate,
             CreateQuoteSwapsResponseObject object,
             String rate,
             Optional<Boolean> requiresTokenApproval,
@@ -80,6 +83,7 @@ public final class CreateQuoteSwapsResponse {
         this.fromAddress = fromAddress;
         this.fromToken = fromToken;
         this.metadata = metadata;
+        this.midMarketRate = midMarketRate;
         this.object = object;
         this.rate = rate;
         this.requiresTokenApproval = requiresTokenApproval;
@@ -169,6 +173,17 @@ public final class CreateQuoteSwapsResponse {
         return metadata;
     }
 
+    /**
+     * @return Mid-market exchange rate for a fiat pair, before the FX charge, as a decimal string. <code>rate</code> is after the FX charge. <code>null</code> for a crypto pair.
+     */
+    @JsonIgnore
+    public Optional<String> getMidMarketRate() {
+        if (midMarketRate == null) {
+            return Optional.empty();
+        }
+        return midMarketRate;
+    }
+
     @JsonProperty("object")
     public CreateQuoteSwapsResponseObject getObject() {
         return object;
@@ -231,6 +246,12 @@ public final class CreateQuoteSwapsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("mid_market_rate")
+    private Optional<String> _getMidMarketRate() {
+        return midMarketRate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("requires_token_approval")
     private Optional<Boolean> _getRequiresTokenApproval() {
         return requiresTokenApproval;
@@ -263,6 +284,7 @@ public final class CreateQuoteSwapsResponse {
                 && fromAddress.equals(other.fromAddress)
                 && fromToken.equals(other.fromToken)
                 && metadata.equals(other.metadata)
+                && midMarketRate.equals(other.midMarketRate)
                 && object.equals(other.object)
                 && rate.equals(other.rate)
                 && requiresTokenApproval.equals(other.requiresTokenApproval)
@@ -282,6 +304,7 @@ public final class CreateQuoteSwapsResponse {
                 this.fromAddress,
                 this.fromToken,
                 this.metadata,
+                this.midMarketRate,
                 this.object,
                 this.rate,
                 this.requiresTokenApproval,
@@ -392,6 +415,15 @@ public final class CreateQuoteSwapsResponse {
         _FinalStage metadata(String key, Object value);
 
         /**
+         * <p>Mid-market exchange rate for a fiat pair, before the FX charge, as a decimal string. <code>rate</code> is after the FX charge. <code>null</code> for a crypto pair.</p>
+         */
+        _FinalStage midMarketRate(Optional<String> midMarketRate);
+
+        _FinalStage midMarketRate(String midMarketRate);
+
+        _FinalStage midMarketRate(Nullable<String> midMarketRate);
+
+        /**
          * <p>Whether the source token needs approval before swapping.</p>
          */
         _FinalStage requiresTokenApproval(Optional<Boolean> requiresTokenApproval);
@@ -438,6 +470,8 @@ public final class CreateQuoteSwapsResponse {
 
         private Optional<Boolean> requiresTokenApproval = Optional.empty();
 
+        private Optional<String> midMarketRate = Optional.empty();
+
         private Map<String, Object> metadata = new LinkedHashMap<>();
 
         private Map<String, Object> fromToken = new LinkedHashMap<>();
@@ -465,6 +499,7 @@ public final class CreateQuoteSwapsResponse {
             fromAddress(other.getFromAddress());
             fromToken(other.getFromToken());
             metadata(other.getMetadata());
+            midMarketRate(other.getMidMarketRate());
             object(other.getObject());
             rate(other.getRate());
             requiresTokenApproval(other.getRequiresTokenApproval());
@@ -628,6 +663,42 @@ public final class CreateQuoteSwapsResponse {
         @JsonSetter(value = "requires_token_approval", nulls = Nulls.SKIP)
         public _FinalStage requiresTokenApproval(Optional<Boolean> requiresTokenApproval) {
             this.requiresTokenApproval = requiresTokenApproval;
+            return this;
+        }
+
+        /**
+         * <p>Mid-market exchange rate for a fiat pair, before the FX charge, as a decimal string. <code>rate</code> is after the FX charge. <code>null</code> for a crypto pair.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage midMarketRate(Nullable<String> midMarketRate) {
+            if (midMarketRate.isNull()) {
+                this.midMarketRate = null;
+            } else if (midMarketRate.isEmpty()) {
+                this.midMarketRate = Optional.empty();
+            } else {
+                this.midMarketRate = Optional.of(midMarketRate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Mid-market exchange rate for a fiat pair, before the FX charge, as a decimal string. <code>rate</code> is after the FX charge. <code>null</code> for a crypto pair.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage midMarketRate(String midMarketRate) {
+            this.midMarketRate = Optional.ofNullable(midMarketRate);
+            return this;
+        }
+
+        /**
+         * <p>Mid-market exchange rate for a fiat pair, before the FX charge, as a decimal string. <code>rate</code> is after the FX charge. <code>null</code> for a crypto pair.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "mid_market_rate", nulls = Nulls.SKIP)
+        public _FinalStage midMarketRate(Optional<String> midMarketRate) {
+            this.midMarketRate = midMarketRate;
             return this;
         }
 
@@ -841,6 +912,7 @@ public final class CreateQuoteSwapsResponse {
                     fromAddress,
                     fromToken,
                     metadata,
+                    midMarketRate,
                     object,
                     rate,
                     requiresTokenApproval,
@@ -860,6 +932,7 @@ public final class CreateQuoteSwapsResponse {
                     || key.equalsIgnoreCase("from_address")
                     || key.equalsIgnoreCase("from_token")
                     || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("mid_market_rate")
                     || key.equalsIgnoreCase("object")
                     || key.equalsIgnoreCase("rate")
                     || key.equalsIgnoreCase("requires_token_approval")

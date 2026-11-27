@@ -7,20 +7,26 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
+    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus REVISE_CONTENT =
+            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.REVISE_CONTENT, "revise_content");
+
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus PROCESSING =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.PROCESSING, "processing");
 
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus COMPLETED =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.COMPLETED, "completed");
 
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus ADS_OFF =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.ADS_OFF, "ads_off");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus ALL_ADS_REJECTED =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.ALL_ADS_REJECTED, "all_ads_rejected");
+    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus PAUSED =
+            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.PAUSED, "paused");
 
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus SCHEDULED =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.SCHEDULED, "scheduled");
+
+    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus ISSUES =
+            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.ISSUES, "issues");
+
+    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus REJECTED =
+            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.REJECTED, "rejected");
 
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus DRAFT =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.DRAFT, "draft");
@@ -30,27 +36,6 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
 
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus IN_REVIEW =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.IN_REVIEW, "in_review");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus NO_ADS =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.NO_ADS, "no_ads");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus IN_APPEAL =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.IN_APPEAL, "in_appeal");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus CAMPAIGN_PAUSED =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.CAMPAIGN_PAUSED, "campaign_paused");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus PAUSED =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.PAUSED, "paused");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus ISSUES =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.ISSUES, "issues");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus REJECTED =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.REJECTED, "rejected");
-
-    public static final PostAdGroupUpdatedPayloadDataDeliveryStatus LEARNING_LIMITED =
-            new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.LEARNING_LIMITED, "learning_limited");
 
     public static final PostAdGroupUpdatedPayloadDataDeliveryStatus ACTIVE =
             new PostAdGroupUpdatedPayloadDataDeliveryStatus(Value.ACTIVE, "active");
@@ -88,36 +73,26 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case REVISE_CONTENT:
+                return visitor.visitReviseContent();
             case PROCESSING:
                 return visitor.visitProcessing();
             case COMPLETED:
                 return visitor.visitCompleted();
-            case ADS_OFF:
-                return visitor.visitAdsOff();
-            case ALL_ADS_REJECTED:
-                return visitor.visitAllAdsRejected();
+            case PAUSED:
+                return visitor.visitPaused();
             case SCHEDULED:
                 return visitor.visitScheduled();
+            case ISSUES:
+                return visitor.visitIssues();
+            case REJECTED:
+                return visitor.visitRejected();
             case DRAFT:
                 return visitor.visitDraft();
             case LEARNING:
                 return visitor.visitLearning();
             case IN_REVIEW:
                 return visitor.visitInReview();
-            case NO_ADS:
-                return visitor.visitNoAds();
-            case IN_APPEAL:
-                return visitor.visitInAppeal();
-            case CAMPAIGN_PAUSED:
-                return visitor.visitCampaignPaused();
-            case PAUSED:
-                return visitor.visitPaused();
-            case ISSUES:
-                return visitor.visitIssues();
-            case REJECTED:
-                return visitor.visitRejected();
-            case LEARNING_LIMITED:
-                return visitor.visitLearningLimited();
             case ACTIVE:
                 return visitor.visitActive();
             case UNKNOWN:
@@ -129,36 +104,26 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PostAdGroupUpdatedPayloadDataDeliveryStatus valueOf(String value) {
         switch (value) {
+            case "revise_content":
+                return REVISE_CONTENT;
             case "processing":
                 return PROCESSING;
             case "completed":
                 return COMPLETED;
-            case "ads_off":
-                return ADS_OFF;
-            case "all_ads_rejected":
-                return ALL_ADS_REJECTED;
+            case "paused":
+                return PAUSED;
             case "scheduled":
                 return SCHEDULED;
+            case "issues":
+                return ISSUES;
+            case "rejected":
+                return REJECTED;
             case "draft":
                 return DRAFT;
             case "learning":
                 return LEARNING;
             case "in_review":
                 return IN_REVIEW;
-            case "no_ads":
-                return NO_ADS;
-            case "in_appeal":
-                return IN_APPEAL;
-            case "campaign_paused":
-                return CAMPAIGN_PAUSED;
-            case "paused":
-                return PAUSED;
-            case "issues":
-                return ISSUES;
-            case "rejected":
-                return REJECTED;
-            case "learning_limited":
-                return LEARNING_LIMITED;
             case "active":
                 return ACTIVE;
             default:
@@ -167,17 +132,9 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
     }
 
     public enum Value {
-        IN_APPEAL,
-
-        ALL_ADS_REJECTED,
-
         REJECTED,
 
         DRAFT,
-
-        NO_ADS,
-
-        CAMPAIGN_PAUSED,
 
         PAUSED,
 
@@ -185,15 +142,13 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
 
         PROCESSING,
 
+        REVISE_CONTENT,
+
         ISSUES,
 
         SCHEDULED,
 
         COMPLETED,
-
-        ADS_OFF,
-
-        LEARNING_LIMITED,
 
         LEARNING,
 
@@ -203,17 +158,9 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
     }
 
     public interface Visitor<T> {
-        T visitInAppeal();
-
-        T visitAllAdsRejected();
-
         T visitRejected();
 
         T visitDraft();
-
-        T visitNoAds();
-
-        T visitCampaignPaused();
 
         T visitPaused();
 
@@ -221,15 +168,13 @@ public final class PostAdGroupUpdatedPayloadDataDeliveryStatus {
 
         T visitProcessing();
 
+        T visitReviseContent();
+
         T visitIssues();
 
         T visitScheduled();
 
         T visitCompleted();
-
-        T visitAdsOff();
-
-        T visitLearningLimited();
 
         T visitLearning();
 

@@ -11,6 +11,10 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReas
             new PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason(
                     Value.MINIMUM_CRYPTO_SALES_NOT_MET, "minimum_crypto_sales_not_met");
 
+    public static final PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason NEW_PAYOUT_METHOD_HOLD =
+            new PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason(
+                    Value.NEW_PAYOUT_METHOD_HOLD, "new_payout_method_hold");
+
     private final Value value;
 
     private final String string;
@@ -47,6 +51,8 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReas
         switch (value) {
             case MINIMUM_CRYPTO_SALES_NOT_MET:
                 return visitor.visitMinimumCryptoSalesNotMet();
+            case NEW_PAYOUT_METHOD_HOLD:
+                return visitor.visitNewPayoutMethodHold();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -58,6 +64,8 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReas
         switch (value) {
             case "minimum_crypto_sales_not_met":
                 return MINIMUM_CRYPTO_SALES_NOT_MET;
+            case "new_payout_method_hold":
+                return NEW_PAYOUT_METHOD_HOLD;
             default:
                 return new PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason(Value.UNKNOWN, value);
         }
@@ -66,11 +74,15 @@ public final class PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReas
     public enum Value {
         MINIMUM_CRYPTO_SALES_NOT_MET,
 
+        NEW_PAYOUT_METHOD_HOLD,
+
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitMinimumCryptoSalesNotMet();
+
+        T visitNewPayoutMethodHold();
 
         T visitUnknown(String unknownType);
     }

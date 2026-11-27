@@ -99,6 +99,9 @@ public final class CreatePromoCodesRequest {
         return accountId;
     }
 
+    /**
+     * @return The discount. For <code>percentage</code>, a whole percent from 0.01 to 100 (25 means 25% off). Responses return it as a fraction, 0.25. For <code>flat_amount</code>, an amount in <code>base_currency</code> units, such as dollars (5 means $5.00).
+     */
     @JsonProperty("amount_off")
     public double getAmountOff() {
         return amountOff;
@@ -114,6 +117,9 @@ public final class CreatePromoCodesRequest {
         return churnedUsersOnly;
     }
 
+    /**
+     * @return The code customers enter at checkout. Stored lowercase.
+     */
     @JsonProperty("code")
     public String getCode() {
         return code;
@@ -150,6 +156,9 @@ public final class CreatePromoCodesRequest {
         return productId;
     }
 
+    /**
+     * @return How many billing cycles the discount applies to: 0 for every payment, 1 for the first payment only, N to cover the first N payments.
+     */
     @JsonProperty("promo_duration_months")
     public int getPromoDurationMonths() {
         return promoDurationMonths;
@@ -160,6 +169,9 @@ public final class CreatePromoCodesRequest {
         return promoType;
     }
 
+    /**
+     * @return How many times the code can be used. Required unless <code>unlimited_stock</code> is true.
+     */
     @JsonIgnore
     public Optional<Integer> getStock() {
         if (stock == null) {
@@ -168,6 +180,9 @@ public final class CreatePromoCodesRequest {
         return stock;
     }
 
+    /**
+     * @return Allow unlimited uses. When false or omitted, <code>stock</code> is required.
+     */
     @JsonProperty("unlimited_stock")
     public Optional<Boolean> getUnlimitedStock() {
         return unlimitedStock;
@@ -261,6 +276,9 @@ public final class CreatePromoCodesRequest {
     }
 
     public interface AmountOffStage {
+        /**
+         * <p>The discount. For <code>percentage</code>, a whole percent from 0.01 to 100 (25 means 25% off). Responses return it as a fraction, 0.25. For <code>flat_amount</code>, an amount in <code>base_currency</code> units, such as dollars (5 means $5.00).</p>
+         */
         BaseCurrencyStage amountOff(double amountOff);
     }
 
@@ -269,6 +287,9 @@ public final class CreatePromoCodesRequest {
     }
 
     public interface CodeStage {
+        /**
+         * <p>The code customers enter at checkout. Stored lowercase.</p>
+         */
         NewUsersOnlyStage code(@NotNull String code);
     }
 
@@ -277,6 +298,9 @@ public final class CreatePromoCodesRequest {
     }
 
     public interface PromoDurationMonthsStage {
+        /**
+         * <p>How many billing cycles the discount applies to: 0 for every payment, 1 for the first payment only, N to cover the first N payments.</p>
+         */
         PromoTypeStage promoDurationMonths(int promoDurationMonths);
     }
 
@@ -315,12 +339,18 @@ public final class CreatePromoCodesRequest {
 
         _FinalStage productId(Nullable<String> productId);
 
+        /**
+         * <p>How many times the code can be used. Required unless <code>unlimited_stock</code> is true.</p>
+         */
         _FinalStage stock(Optional<Integer> stock);
 
         _FinalStage stock(Integer stock);
 
         _FinalStage stock(Nullable<Integer> stock);
 
+        /**
+         * <p>Allow unlimited uses. When false or omitted, <code>stock</code> is required.</p>
+         */
         _FinalStage unlimitedStock(Optional<Boolean> unlimitedStock);
 
         _FinalStage unlimitedStock(Boolean unlimitedStock);
@@ -401,6 +431,10 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>The discount. For <code>percentage</code>, a whole percent from 0.01 to 100 (25 means 25% off). Responses return it as a fraction, 0.25. For <code>flat_amount</code>, an amount in <code>base_currency</code> units, such as dollars (5 means $5.00).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("amount_off")
         public BaseCurrencyStage amountOff(double amountOff) {
@@ -415,6 +449,10 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>The code customers enter at checkout. Stored lowercase.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("code")
         public NewUsersOnlyStage code(@NotNull String code) {
@@ -429,6 +467,10 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>How many billing cycles the discount applies to: 0 for every payment, 1 for the first payment only, N to cover the first N payments.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("promo_duration_months")
         public PromoTypeStage promoDurationMonths(int promoDurationMonths) {
@@ -456,12 +498,19 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>Allow unlimited uses. When false or omitted, <code>stock</code> is required.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage unlimitedStock(Boolean unlimitedStock) {
             this.unlimitedStock = Optional.ofNullable(unlimitedStock);
             return this;
         }
 
+        /**
+         * <p>Allow unlimited uses. When false or omitted, <code>stock</code> is required.</p>
+         */
         @java.lang.Override
         @JsonSetter(value = "unlimited_stock", nulls = Nulls.SKIP)
         public _FinalStage unlimitedStock(Optional<Boolean> unlimitedStock) {
@@ -469,6 +518,10 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>How many times the code can be used. Required unless <code>unlimited_stock</code> is true.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage stock(Nullable<Integer> stock) {
             if (stock.isNull()) {
@@ -481,12 +534,19 @@ public final class CreatePromoCodesRequest {
             return this;
         }
 
+        /**
+         * <p>How many times the code can be used. Required unless <code>unlimited_stock</code> is true.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage stock(Integer stock) {
             this.stock = Optional.ofNullable(stock);
             return this;
         }
 
+        /**
+         * <p>How many times the code can be used. Required unless <code>unlimited_stock</code> is true.</p>
+         */
         @java.lang.Override
         @JsonSetter(value = "stock", nulls = Nulls.SKIP)
         public _FinalStage stock(Optional<Integer> stock) {

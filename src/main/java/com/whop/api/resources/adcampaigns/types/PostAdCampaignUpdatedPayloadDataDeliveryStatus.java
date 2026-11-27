@@ -7,20 +7,29 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
+    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus REVISE_CONTENT =
+            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.REVISE_CONTENT, "revise_content");
+
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus PROCESSING =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.PROCESSING, "processing");
 
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus COMPLETED =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.COMPLETED, "completed");
 
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus NO_AD_GROUPS =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.NO_AD_GROUPS, "no_ad_groups");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus ALL_ADS_REJECTED =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.ALL_ADS_REJECTED, "all_ads_rejected");
+    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus PAUSED =
+            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.PAUSED, "paused");
 
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus SCHEDULED =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.SCHEDULED, "scheduled");
+
+    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus PAYMENT_FAILED =
+            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.PAYMENT_FAILED, "payment_failed");
+
+    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus ISSUES =
+            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.ISSUES, "issues");
+
+    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus REJECTED =
+            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.REJECTED, "rejected");
 
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus DRAFT =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.DRAFT, "draft");
@@ -30,27 +39,6 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
 
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus IN_REVIEW =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.IN_REVIEW, "in_review");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus AD_GROUPS_OFF =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.AD_GROUPS_OFF, "ad_groups_off");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus NO_ADS =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.NO_ADS, "no_ads");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus WAITING_FOR_EIN =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.WAITING_FOR_EIN, "waiting_for_ein");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus IN_APPEAL =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.IN_APPEAL, "in_appeal");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus PAUSED =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.PAUSED, "paused");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus PAYMENT_FAILED =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.PAYMENT_FAILED, "payment_failed");
-
-    public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus ISSUES =
-            new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.ISSUES, "issues");
 
     public static final PostAdCampaignUpdatedPayloadDataDeliveryStatus ACTIVE =
             new PostAdCampaignUpdatedPayloadDataDeliveryStatus(Value.ACTIVE, "active");
@@ -88,36 +76,28 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case REVISE_CONTENT:
+                return visitor.visitReviseContent();
             case PROCESSING:
                 return visitor.visitProcessing();
             case COMPLETED:
                 return visitor.visitCompleted();
-            case NO_AD_GROUPS:
-                return visitor.visitNoAdGroups();
-            case ALL_ADS_REJECTED:
-                return visitor.visitAllAdsRejected();
+            case PAUSED:
+                return visitor.visitPaused();
             case SCHEDULED:
                 return visitor.visitScheduled();
+            case PAYMENT_FAILED:
+                return visitor.visitPaymentFailed();
+            case ISSUES:
+                return visitor.visitIssues();
+            case REJECTED:
+                return visitor.visitRejected();
             case DRAFT:
                 return visitor.visitDraft();
             case LEARNING:
                 return visitor.visitLearning();
             case IN_REVIEW:
                 return visitor.visitInReview();
-            case AD_GROUPS_OFF:
-                return visitor.visitAdGroupsOff();
-            case NO_ADS:
-                return visitor.visitNoAds();
-            case WAITING_FOR_EIN:
-                return visitor.visitWaitingForEin();
-            case IN_APPEAL:
-                return visitor.visitInAppeal();
-            case PAUSED:
-                return visitor.visitPaused();
-            case PAYMENT_FAILED:
-                return visitor.visitPaymentFailed();
-            case ISSUES:
-                return visitor.visitIssues();
             case ACTIVE:
                 return visitor.visitActive();
             case UNKNOWN:
@@ -129,36 +109,28 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PostAdCampaignUpdatedPayloadDataDeliveryStatus valueOf(String value) {
         switch (value) {
+            case "revise_content":
+                return REVISE_CONTENT;
             case "processing":
                 return PROCESSING;
             case "completed":
                 return COMPLETED;
-            case "no_ad_groups":
-                return NO_AD_GROUPS;
-            case "all_ads_rejected":
-                return ALL_ADS_REJECTED;
+            case "paused":
+                return PAUSED;
             case "scheduled":
                 return SCHEDULED;
+            case "payment_failed":
+                return PAYMENT_FAILED;
+            case "issues":
+                return ISSUES;
+            case "rejected":
+                return REJECTED;
             case "draft":
                 return DRAFT;
             case "learning":
                 return LEARNING;
             case "in_review":
                 return IN_REVIEW;
-            case "ad_groups_off":
-                return AD_GROUPS_OFF;
-            case "no_ads":
-                return NO_ADS;
-            case "waiting_for_ein":
-                return WAITING_FOR_EIN;
-            case "in_appeal":
-                return IN_APPEAL;
-            case "paused":
-                return PAUSED;
-            case "payment_failed":
-                return PAYMENT_FAILED;
-            case "issues":
-                return ISSUES;
             case "active":
                 return ACTIVE;
             default:
@@ -169,17 +141,9 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
     public enum Value {
         PAYMENT_FAILED,
 
-        WAITING_FOR_EIN,
-
-        IN_APPEAL,
-
-        ALL_ADS_REJECTED,
+        REJECTED,
 
         DRAFT,
-
-        NO_AD_GROUPS,
-
-        NO_ADS,
 
         PAUSED,
 
@@ -189,13 +153,13 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
 
         PROCESSING,
 
+        REVISE_CONTENT,
+
         ISSUES,
 
         SCHEDULED,
 
         COMPLETED,
-
-        AD_GROUPS_OFF,
 
         ACTIVE,
 
@@ -205,17 +169,9 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
     public interface Visitor<T> {
         T visitPaymentFailed();
 
-        T visitWaitingForEin();
-
-        T visitInAppeal();
-
-        T visitAllAdsRejected();
+        T visitRejected();
 
         T visitDraft();
-
-        T visitNoAdGroups();
-
-        T visitNoAds();
 
         T visitPaused();
 
@@ -225,13 +181,13 @@ public final class PostAdCampaignUpdatedPayloadDataDeliveryStatus {
 
         T visitProcessing();
 
+        T visitReviseContent();
+
         T visitIssues();
 
         T visitScheduled();
 
         T visitCompleted();
-
-        T visitAdGroupsOff();
 
         T visitActive();
 

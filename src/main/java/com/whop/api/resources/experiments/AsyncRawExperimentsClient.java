@@ -25,10 +25,12 @@ import com.whop.api.resources.experiments.requests.EndExperimentsRequest;
 import com.whop.api.resources.experiments.requests.ExposuresExperimentsRequest;
 import com.whop.api.resources.experiments.requests.ListExperimentsRequest;
 import com.whop.api.resources.experiments.requests.PauseExperimentsRequest;
+import com.whop.api.resources.experiments.requests.ResultsExperimentsRequest;
 import com.whop.api.resources.experiments.requests.RetrieveExperimentsRequest;
 import com.whop.api.resources.experiments.requests.UpdateExperimentsRequest;
 import com.whop.api.resources.experiments.types.ExposuresExperimentsResponse;
 import com.whop.api.resources.experiments.types.ListExperimentsResponse;
+import com.whop.api.resources.experiments.types.ResultsExperimentsResponse;
 import com.whop.api.types.Experiment;
 import java.io.IOException;
 import java.util.List;
@@ -643,28 +645,28 @@ public class AsyncRawExperimentsClient {
     }
 
     /**
-     * Starts (or resumes) an experiment or feature flag so evaluation begins serving it. Activating a draft stamps <code>started_at</code>; resuming a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account: while the account's <code>economic_intelligence</code> is <code>false</code>, this returns a <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing and ending an experiment don't need it.
+     * Starts or resumes an experiment or feature flag so evaluation begins serving it. Activating a draft sets <code>started_at</code>. Activating a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account. When it is off, the request returns <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing, and ending an experiment without a winner do not need it.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> activate(String id) {
         return activate(id, ActivateExperimentsRequest.builder().build());
     }
 
     /**
-     * Starts (or resumes) an experiment or feature flag so evaluation begins serving it. Activating a draft stamps <code>started_at</code>; resuming a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account: while the account's <code>economic_intelligence</code> is <code>false</code>, this returns a <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing and ending an experiment don't need it.
+     * Starts or resumes an experiment or feature flag so evaluation begins serving it. Activating a draft sets <code>started_at</code>. Activating a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account. When it is off, the request returns <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing, and ending an experiment without a winner do not need it.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> activate(String id, RequestOptions requestOptions) {
         return activate(id, ActivateExperimentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Starts (or resumes) an experiment or feature flag so evaluation begins serving it. Activating a draft stamps <code>started_at</code>; resuming a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account: while the account's <code>economic_intelligence</code> is <code>false</code>, this returns a <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing and ending an experiment don't need it.
+     * Starts or resumes an experiment or feature flag so evaluation begins serving it. Activating a draft sets <code>started_at</code>. Activating a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account. When it is off, the request returns <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing, and ending an experiment without a winner do not need it.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> activate(String id, ActivateExperimentsRequest request) {
         return activate(id, request, null);
     }
 
     /**
-     * Starts (or resumes) an experiment or feature flag so evaluation begins serving it. Activating a draft stamps <code>started_at</code>; resuming a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account: while the account's <code>economic_intelligence</code> is <code>false</code>, this returns a <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing and ending an experiment don't need it.
+     * Starts or resumes an experiment or feature flag so evaluation begins serving it. Activating a draft sets <code>started_at</code>. Activating a paused experiment keeps the original start. Only drafts and paused experiments can be activated. Requires <code>experiment:manage</code> on the owning account. Activating needs Economic Intelligence on for the owning account. When it is off, the request returns <code>403</code> and the experiment keeps its status. Turn it on with <code>PATCH /accounts/:account_id/preferences</code>. Creating, editing, pausing, and ending an experiment without a winner do not need it.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> activate(
             String id, ActivateExperimentsRequest request, RequestOptions requestOptions) {
@@ -765,14 +767,14 @@ public class AsyncRawExperimentsClient {
     }
 
     /**
-     * Concludes the experiment and records required <code>findings</code>. Pass <code>winning_arm</code> to serve the winning treatment to everyone; omit it when control won. Ended experiments cannot restart, but may be ended again to correct the winner. Requires <code>experiment:manage</code> on the owning account.
+     * Concludes the experiment and records required <code>findings</code>. Pass <code>winning_arm</code> to serve the winning treatment to everyone. Omit it when control won. Ended experiments cannot restart, but may be ended again to correct the winner. Requires <code>experiment:manage</code> on the owning account. Passing <code>winning_arm</code> needs Economic Intelligence on for the owning account, like activating. Ending without one does not.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> end(String id, EndExperimentsRequest request) {
         return end(id, request, null);
     }
 
     /**
-     * Concludes the experiment and records required <code>findings</code>. Pass <code>winning_arm</code> to serve the winning treatment to everyone; omit it when control won. Ended experiments cannot restart, but may be ended again to correct the winner. Requires <code>experiment:manage</code> on the owning account.
+     * Concludes the experiment and records required <code>findings</code>. Pass <code>winning_arm</code> to serve the winning treatment to everyone. Omit it when control won. Ended experiments cannot restart, but may be ended again to correct the winner. Requires <code>experiment:manage</code> on the owning account. Passing <code>winning_arm</code> needs Economic Intelligence on for the owning account, like activating. Ending without one does not.
      */
     public CompletableFuture<WhopApiHttpResponse<Experiment>> end(
             String id, EndExperimentsRequest request, RequestOptions requestOptions) {
@@ -950,6 +952,122 @@ public class AsyncRawExperimentsClient {
                     try {
                         if (response.code() == 409) {
                             future.completeExceptionally(new ConflictError(
+                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
+                            return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Returns an experiment's results: one reading per target stat, with the arms it was read on. Requires <code>experiment:read</code> on the owning account, and the read scope of each target stat's metric, <code>stats:read</code> for most.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ResultsExperimentsResponse>> results(String id) {
+        return results(id, ResultsExperimentsRequest.builder().build());
+    }
+
+    /**
+     * Returns an experiment's results: one reading per target stat, with the arms it was read on. Requires <code>experiment:read</code> on the owning account, and the read scope of each target stat's metric, <code>stats:read</code> for most.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ResultsExperimentsResponse>> results(
+            String id, RequestOptions requestOptions) {
+        return results(id, ResultsExperimentsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns an experiment's results: one reading per target stat, with the arms it was read on. Requires <code>experiment:read</code> on the owning account, and the read scope of each target stat's metric, <code>stats:read</code> for most.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ResultsExperimentsResponse>> results(
+            String id, ResultsExperimentsRequest request) {
+        return results(id, request, null);
+    }
+
+    /**
+     * Returns an experiment's results: one reading per target stat, with the arms it was read on. Requires <code>experiment:read</code> on the owning account, and the read scope of each target stat's metric, <code>stats:read</code> for most.
+     */
+    public CompletableFuture<WhopApiHttpResponse<ResultsExperimentsResponse>> results(
+            String id, ResultsExperimentsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("experiments")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("results");
+        if (request.getAccountId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_id", request.getAccountId().get(), false);
+        }
+        if (request.getFrom().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "from", request.getFrom().get(), false);
+        }
+        if (request.getTo().isPresent()) {
+            QueryStringMapper.addQueryParameter(httpUrl, "to", request.getTo().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<ResultsExperimentsResponse>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, ResultsExperimentsResponse.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        if (response.code() == 404) {
+                            future.completeExceptionally(new NotFoundError(
                                     ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
                             return;
                         }

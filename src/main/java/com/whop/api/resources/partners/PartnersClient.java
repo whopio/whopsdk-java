@@ -6,15 +6,12 @@ package com.whop.api.resources.partners;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
-import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.BusinessesClient;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
-import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
 import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
 import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
-import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
 import com.whop.api.types.Partner;
 import java.util.function.Supplier;
 
@@ -92,36 +89,6 @@ public class PartnersClient {
      */
     public LeaderboardPartnersResponse leaderboard(LeaderboardPartnersRequest request, RequestOptions requestOptions) {
         return this.rawClient.leaderboard(request, requestOptions).body();
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers() {
-        return this.rawClient.referredUsers().body();
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(RequestOptions requestOptions) {
-        return this.rawClient.referredUsers(requestOptions).body();
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(
-            ReferredUsersPartnersRequest request) {
-        return this.rawClient.referredUsers(request).body();
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public SyncPagingIterable<ReferredUsersPartnersResponseDataItem> referredUsers(
-            ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
-        return this.rawClient.referredUsers(request, requestOptions).body();
     }
 
     /**

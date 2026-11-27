@@ -8,6 +8,7 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.accounts.affiliateprogram.AsyncAffiliateProgramClient;
 import com.whop.api.resources.accounts.customertracking.AsyncCustomerTrackingClient;
 import com.whop.api.resources.accounts.fees.AsyncFeesClient;
 import com.whop.api.resources.accounts.financingproviders.AsyncFinancingProvidersClient;
@@ -38,6 +39,8 @@ public class AsyncAccountsClient {
 
     private final AsyncRawAccountsClient rawClient;
 
+    protected final Supplier<AsyncAffiliateProgramClient> affiliateProgramClient;
+
     protected final Supplier<AsyncCustomerTrackingClient> customerTrackingClient;
 
     protected final Supplier<AsyncFeesClient> feesClient;
@@ -51,6 +54,7 @@ public class AsyncAccountsClient {
     public AsyncAccountsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new AsyncRawAccountsClient(clientOptions);
+        this.affiliateProgramClient = Suppliers.memoize(() -> new AsyncAffiliateProgramClient(clientOptions));
         this.customerTrackingClient = Suppliers.memoize(() -> new AsyncCustomerTrackingClient(clientOptions));
         this.feesClient = Suppliers.memoize(() -> new AsyncFeesClient(clientOptions));
         this.financingProvidersClient = Suppliers.memoize(() -> new AsyncFinancingProvidersClient(clientOptions));
@@ -237,7 +241,7 @@ public class AsyncAccountsClient {
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public CompletableFuture<SyncPagingIterable<AccountSearchResult>> search(SearchAccountsRequest request) {
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AccountSearchResult>>> rawFuture =
@@ -253,7 +257,7 @@ public class AsyncAccountsClient {
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public CompletableFuture<SyncPagingIterable<AccountSearchResult>> search(
             SearchAccountsRequest request, RequestOptions requestOptions) {
@@ -623,6 +627,10 @@ public class AsyncAccountsClient {
             }
         });
         return future;
+    }
+
+    public AsyncAffiliateProgramClient affiliateProgram() {
+        return this.affiliateProgramClient.get();
     }
 
     public AsyncCustomerTrackingClient customerTracking() {

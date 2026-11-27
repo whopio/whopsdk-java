@@ -5,15 +5,20 @@ package com.whop.api.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -21,12 +26,16 @@ import org.jetbrains.annotations.NotNull;
 public final class TeamMemberManager {
     private final String id;
 
+    private final Optional<String> legalName;
+
     private final UserSummary user;
 
     private final Map<String, Object> additionalProperties;
 
-    private TeamMemberManager(String id, UserSummary user, Map<String, Object> additionalProperties) {
+    private TeamMemberManager(
+            String id, Optional<String> legalName, UserSummary user, Map<String, Object> additionalProperties) {
         this.id = id;
+        this.legalName = legalName;
         this.user = user;
         this.additionalProperties = additionalProperties;
     }
@@ -40,11 +49,28 @@ public final class TeamMemberManager {
     }
 
     /**
+     * @return The first and last name on the manager's approved identity verification, set only when the manager has no profile name. Returned to the account's own API key when listing a partner account's team. <code>null</code> when the manager has a profile name or no approved verification, and for other callers.
+     */
+    @JsonIgnore
+    public Optional<String> getLegalName() {
+        if (legalName == null) {
+            return Optional.empty();
+        }
+        return legalName;
+    }
+
+    /**
      * @return The user behind the manager's team membership.
      */
     @JsonProperty("user")
     public UserSummary getUser() {
         return user;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("legal_name")
+    private Optional<String> _getLegalName() {
+        return legalName;
     }
 
     @java.lang.Override
@@ -59,12 +85,12 @@ public final class TeamMemberManager {
     }
 
     private boolean equalTo(TeamMemberManager other) {
-        return id.equals(other.id) && user.equals(other.user);
+        return id.equals(other.id) && legalName.equals(other.legalName) && user.equals(other.user);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.user);
+        return Objects.hash(this.id, this.legalName, this.user);
     }
 
     @java.lang.Override
@@ -98,6 +124,15 @@ public final class TeamMemberManager {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The first and last name on the manager's approved identity verification, set only when the manager has no profile name. Returned to the account's own API key when listing a partner account's team. <code>null</code> when the manager has a profile name or no approved verification, and for other callers.</p>
+         */
+        _FinalStage legalName(Optional<String> legalName);
+
+        _FinalStage legalName(String legalName);
+
+        _FinalStage legalName(Nullable<String> legalName);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -106,6 +141,8 @@ public final class TeamMemberManager {
 
         private UserSummary user;
 
+        private Optional<String> legalName = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -113,6 +150,7 @@ public final class TeamMemberManager {
         @java.lang.Override
         public Builder from(TeamMemberManager other) {
             id(other.getId());
+            legalName(other.getLegalName());
             user(other.getUser());
             return this;
         }
@@ -139,14 +177,50 @@ public final class TeamMemberManager {
             return this;
         }
 
+        /**
+         * <p>The first and last name on the manager's approved identity verification, set only when the manager has no profile name. Returned to the account's own API key when listing a partner account's team. <code>null</code> when the manager has a profile name or no approved verification, and for other callers.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage legalName(Nullable<String> legalName) {
+            if (legalName.isNull()) {
+                this.legalName = null;
+            } else if (legalName.isEmpty()) {
+                this.legalName = Optional.empty();
+            } else {
+                this.legalName = Optional.of(legalName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The first and last name on the manager's approved identity verification, set only when the manager has no profile name. Returned to the account's own API key when listing a partner account's team. <code>null</code> when the manager has a profile name or no approved verification, and for other callers.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage legalName(String legalName) {
+            this.legalName = Optional.ofNullable(legalName);
+            return this;
+        }
+
+        /**
+         * <p>The first and last name on the manager's approved identity verification, set only when the manager has no profile name. Returned to the account's own API key when listing a partner account's team. <code>null</code> when the manager has a profile name or no approved verification, and for other callers.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "legal_name", nulls = Nulls.SKIP)
+        public _FinalStage legalName(Optional<String> legalName) {
+            this.legalName = legalName;
+            return this;
+        }
+
         @java.lang.Override
         public TeamMemberManager build() {
-            return new TeamMemberManager(id, user, additionalProperties);
+            return new TeamMemberManager(id, legalName, user, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("user")) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("legal_name") || key.equalsIgnoreCase("user")) {
                 return;
             }
             this.additionalProperties.put(key, value);

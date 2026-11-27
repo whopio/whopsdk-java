@@ -41,6 +41,8 @@ public final class Course {
 
     private final Optional<String> description;
 
+    private final CourseExperience experience;
+
     private final String id;
 
     private final Languages language;
@@ -81,6 +83,7 @@ public final class Course {
             Optional<String> coverImage,
             OffsetDateTime createdAt,
             Optional<String> description,
+            CourseExperience experience,
             String id,
             Languages language,
             Optional<OffsetDateTime> latestLessonCreatedAt,
@@ -104,6 +107,7 @@ public final class Course {
         this.coverImage = coverImage;
         this.createdAt = createdAt;
         this.description = description;
+        this.experience = experience;
         this.id = id;
         this.language = language;
         this.latestLessonCreatedAt = latestLessonCreatedAt;
@@ -185,6 +189,14 @@ public final class Course {
             return Optional.empty();
         }
         return description;
+    }
+
+    /**
+     * @return The parent experience that this course belongs to.
+     */
+    @JsonProperty("experience")
+    public CourseExperience getExperience() {
+        return experience;
     }
 
     /**
@@ -398,6 +410,7 @@ public final class Course {
                 && coverImage.equals(other.coverImage)
                 && createdAt.equals(other.createdAt)
                 && description.equals(other.description)
+                && experience.equals(other.experience)
                 && id.equals(other.id)
                 && language.equals(other.language)
                 && latestLessonCreatedAt.equals(other.latestLessonCreatedAt)
@@ -425,6 +438,7 @@ public final class Course {
                 this.coverImage,
                 this.createdAt,
                 this.description,
+                this.experience,
                 this.id,
                 this.language,
                 this.latestLessonCreatedAt,
@@ -471,7 +485,14 @@ public final class Course {
         /**
          * <p>The datetime the course was created.</p>
          */
-        IdStage createdAt(@NotNull OffsetDateTime createdAt);
+        ExperienceStage createdAt(@NotNull OffsetDateTime createdAt);
+    }
+
+    public interface ExperienceStage {
+        /**
+         * <p>The parent experience that this course belongs to.</p>
+         */
+        IdStage experience(@NotNull CourseExperience experience);
     }
 
     public interface IdStage {
@@ -642,6 +663,7 @@ public final class Course {
             implements ChaptersCountStage,
                     CompletedLessonsCountStage,
                     CreatedAtStage,
+                    ExperienceStage,
                     IdStage,
                     LanguageStage,
                     OrderStage,
@@ -656,6 +678,8 @@ public final class Course {
         private int completedLessonsCount;
 
         private OffsetDateTime createdAt;
+
+        private CourseExperience experience;
 
         private String id;
 
@@ -708,6 +732,7 @@ public final class Course {
             coverImage(other.getCoverImage());
             createdAt(other.getCreatedAt());
             description(other.getDescription());
+            experience(other.getExperience());
             id(other.getId());
             language(other.getLanguage());
             latestLessonCreatedAt(other.getLatestLessonCreatedAt());
@@ -754,8 +779,19 @@ public final class Course {
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull OffsetDateTime createdAt) {
+        public ExperienceStage createdAt(@NotNull OffsetDateTime createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The parent experience that this course belongs to.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("experience")
+        public IdStage experience(@NotNull CourseExperience experience) {
+            this.experience = Objects.requireNonNull(experience, "experience must not be null");
             return this;
         }
 
@@ -1251,6 +1287,7 @@ public final class Course {
                     coverImage,
                     createdAt,
                     description,
+                    experience,
                     id,
                     language,
                     latestLessonCreatedAt,
@@ -1278,6 +1315,7 @@ public final class Course {
                     || key.equalsIgnoreCase("cover_image")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("experience")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("language")
                     || key.equalsIgnoreCase("latest_lesson_created_at")

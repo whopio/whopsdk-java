@@ -15,6 +15,7 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesRequestActivity;
 import com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesRequestEventType;
 import com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesRequestInterval;
+import com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesRequestMode;
 import com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesRequestSnapshotWindow;
 import com.whop.api.types.RetrieveTimeSeriesRequestSteps;
 import java.time.OffsetDateTime;
@@ -34,6 +35,10 @@ public final class RetrieveTimeSeriesRequest {
     private final Optional<List<String>> adGroupIds;
 
     private final Optional<List<String>> adIds;
+
+    private final Optional<List<String>> accountIds;
+
+    private final Optional<List<String>> runnerIds;
 
     private final Optional<String> accountId;
 
@@ -181,12 +186,16 @@ public final class RetrieveTimeSeriesRequest {
 
     private final Optional<Integer> breakdownLimit;
 
+    private final Optional<RetrieveTimeSeriesRequestMode> mode;
+
     private final Map<String, Object> additionalProperties;
 
     private RetrieveTimeSeriesRequest(
             Optional<List<String>> adCampaignIds,
             Optional<List<String>> adGroupIds,
             Optional<List<String>> adIds,
+            Optional<List<String>> accountIds,
+            Optional<List<String>> runnerIds,
             Optional<String> accountId,
             Optional<String> userId,
             String from,
@@ -260,10 +269,13 @@ public final class RetrieveTimeSeriesRequest {
             Optional<String> teamLeadId,
             Optional<RetrieveTimeSeriesRequestActivity> activity,
             Optional<Integer> breakdownLimit,
+            Optional<RetrieveTimeSeriesRequestMode> mode,
             Map<String, Object> additionalProperties) {
         this.adCampaignIds = adCampaignIds;
         this.adGroupIds = adGroupIds;
         this.adIds = adIds;
+        this.accountIds = accountIds;
+        this.runnerIds = runnerIds;
         this.accountId = accountId;
         this.userId = userId;
         this.from = from;
@@ -337,6 +349,7 @@ public final class RetrieveTimeSeriesRequest {
         this.teamLeadId = teamLeadId;
         this.activity = activity;
         this.breakdownLimit = breakdownLimit;
+        this.mode = mode;
         this.additionalProperties = additionalProperties;
     }
 
@@ -362,6 +375,22 @@ public final class RetrieveTimeSeriesRequest {
     @JsonProperty("ad_ids")
     public Optional<List<String>> getAdIds() {
         return adIds;
+    }
+
+    /**
+     * @return Business ids (biz_...) to scope the series to. The series sums their figures. On a metric that lists account as a breakdown, it replaces account_id and takes at most 50 ids. On such a metric, breakdown_by=account returns an entry for each id. Available on metrics that list account_ids. With a mode other than <code>owner</code>, <code>global</code> and <code>public</code>, it is used with account_id. It keeps only these accounts inside the mode. An account that is not inside the mode adds nothing. It cannot be combined with <code>global</code> or <code>public</code>.
+     */
+    @JsonProperty("account_ids")
+    public Optional<List<String>> getAccountIds() {
+        return accountIds;
+    }
+
+    /**
+     * @return Runner user ids (user_...) to scope the series to; the series sums the figures of the campaigns they hold. Available on metrics that list runner_ids.
+     */
+    @JsonProperty("runner_ids")
+    public Optional<List<String>> getRunnerIds() {
+        return runnerIds;
     }
 
     /**
@@ -629,7 +658,7 @@ public final class RetrieveTimeSeriesRequest {
     }
 
     /**
-     * @return Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.
+     * @return Filter to one product category, for example <code>algo_trading_program</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.
      */
     @JsonProperty("product_category")
     public Optional<String> getProductCategory() {
@@ -685,7 +714,7 @@ public final class RetrieveTimeSeriesRequest {
     }
 
     /**
-     * @return Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.
+     * @return Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true. Defaults confidence_level to 0.95. Also returns all_entrant_totals, which include entrants whose conversion window has not elapsed yet. Comparisons are left out until the baseline has mature entrants.
      */
     @JsonProperty("compare_to")
     public Optional<String> getCompareTo() {
@@ -941,11 +970,19 @@ public final class RetrieveTimeSeriesRequest {
     }
 
     /**
-     * @return With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.
+     * @return With a single breakdown_by, keep this many groups with the highest whole-range values. Every other group folds into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups.
      */
     @JsonProperty("breakdown_limit")
     public Optional<Integer> getBreakdownLimit() {
         return breakdownLimit;
+    }
+
+    /**
+     * @return Whose figures the metric reads, one of the modes the metric lists. <code>global</code> reads all of Whop and takes no account_id. <code>public</code> reads the figures of Whop that are shown in public, and takes no account_id. Without it, the metric reads the account or user named.
+     */
+    @JsonProperty("mode")
+    public Optional<RetrieveTimeSeriesRequestMode> getMode() {
+        return mode;
     }
 
     @java.lang.Override
@@ -963,6 +1000,8 @@ public final class RetrieveTimeSeriesRequest {
         return adCampaignIds.equals(other.adCampaignIds)
                 && adGroupIds.equals(other.adGroupIds)
                 && adIds.equals(other.adIds)
+                && accountIds.equals(other.accountIds)
+                && runnerIds.equals(other.runnerIds)
                 && accountId.equals(other.accountId)
                 && userId.equals(other.userId)
                 && from.equals(other.from)
@@ -1035,7 +1074,8 @@ public final class RetrieveTimeSeriesRequest {
                 && referringAccountId.equals(other.referringAccountId)
                 && teamLeadId.equals(other.teamLeadId)
                 && activity.equals(other.activity)
-                && breakdownLimit.equals(other.breakdownLimit);
+                && breakdownLimit.equals(other.breakdownLimit)
+                && mode.equals(other.mode);
     }
 
     @java.lang.Override
@@ -1044,6 +1084,8 @@ public final class RetrieveTimeSeriesRequest {
                 this.adCampaignIds,
                 this.adGroupIds,
                 this.adIds,
+                this.accountIds,
+                this.runnerIds,
                 this.accountId,
                 this.userId,
                 this.from,
@@ -1116,7 +1158,8 @@ public final class RetrieveTimeSeriesRequest {
                 this.referringAccountId,
                 this.teamLeadId,
                 this.activity,
-                this.breakdownLimit);
+                this.breakdownLimit,
+                this.mode);
     }
 
     @java.lang.Override
@@ -1177,6 +1220,24 @@ public final class RetrieveTimeSeriesRequest {
         _FinalStage adIds(List<String> adIds);
 
         _FinalStage adIds(String adIds);
+
+        /**
+         * <p>Business ids (biz_...) to scope the series to. The series sums their figures. On a metric that lists account as a breakdown, it replaces account_id and takes at most 50 ids. On such a metric, breakdown_by=account returns an entry for each id. Available on metrics that list account_ids. With a mode other than <code>owner</code>, <code>global</code> and <code>public</code>, it is used with account_id. It keeps only these accounts inside the mode. An account that is not inside the mode adds nothing. It cannot be combined with <code>global</code> or <code>public</code>.</p>
+         */
+        _FinalStage accountIds(Optional<List<String>> accountIds);
+
+        _FinalStage accountIds(List<String> accountIds);
+
+        _FinalStage accountIds(String accountIds);
+
+        /**
+         * <p>Runner user ids (user_...) to scope the series to; the series sums the figures of the campaigns they hold. Available on metrics that list runner_ids.</p>
+         */
+        _FinalStage runnerIds(Optional<List<String>> runnerIds);
+
+        _FinalStage runnerIds(List<String> runnerIds);
+
+        _FinalStage runnerIds(String runnerIds);
 
         /**
          * <p>Account this query concerns, prefixed <code>biz_</code>, or <code>platform</code> for all of Whop.</p>
@@ -1396,7 +1457,7 @@ public final class RetrieveTimeSeriesRequest {
         _FinalStage industryType(String industryType);
 
         /**
-         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         * <p>Filter to one product category, for example <code>algo_trading_program</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
          */
         _FinalStage productCategory(Optional<String> productCategory);
 
@@ -1445,7 +1506,7 @@ public final class RetrieveTimeSeriesRequest {
         _FinalStage steps(RetrieveTimeSeriesRequestSteps steps);
 
         /**
-         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true. Defaults confidence_level to 0.95. Also returns all_entrant_totals, which include entrants whose conversion window has not elapsed yet. Comparisons are left out until the baseline has mature entrants.</p>
          */
         _FinalStage compareTo(Optional<String> compareTo);
 
@@ -1669,11 +1730,18 @@ public final class RetrieveTimeSeriesRequest {
         _FinalStage activity(RetrieveTimeSeriesRequestActivity activity);
 
         /**
-         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         * <p>With a single breakdown_by, keep this many groups with the highest whole-range values. Every other group folds into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups.</p>
          */
         _FinalStage breakdownLimit(Optional<Integer> breakdownLimit);
 
         _FinalStage breakdownLimit(Integer breakdownLimit);
+
+        /**
+         * <p>Whose figures the metric reads, one of the modes the metric lists. <code>global</code> reads all of Whop and takes no account_id. <code>public</code> reads the figures of Whop that are shown in public, and takes no account_id. Without it, the metric reads the account or user named.</p>
+         */
+        _FinalStage mode(Optional<RetrieveTimeSeriesRequestMode> mode);
+
+        _FinalStage mode(RetrieveTimeSeriesRequestMode mode);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -1681,6 +1749,8 @@ public final class RetrieveTimeSeriesRequest {
         private String from;
 
         private String to;
+
+        private Optional<RetrieveTimeSeriesRequestMode> mode = Optional.empty();
 
         private Optional<Integer> breakdownLimit = Optional.empty();
 
@@ -1824,6 +1894,10 @@ public final class RetrieveTimeSeriesRequest {
 
         private Optional<String> accountId = Optional.empty();
 
+        private Optional<List<String>> runnerIds = Optional.empty();
+
+        private Optional<List<String>> accountIds = Optional.empty();
+
         private Optional<List<String>> adIds = Optional.empty();
 
         private Optional<List<String>> adGroupIds = Optional.empty();
@@ -1839,6 +1913,8 @@ public final class RetrieveTimeSeriesRequest {
             adCampaignIds(other.getAdCampaignIds());
             adGroupIds(other.getAdGroupIds());
             adIds(other.getAdIds());
+            accountIds(other.getAccountIds());
+            runnerIds(other.getRunnerIds());
             accountId(other.getAccountId());
             userId(other.getUserId());
             from(other.getFrom());
@@ -1912,6 +1988,7 @@ public final class RetrieveTimeSeriesRequest {
             teamLeadId(other.getTeamLeadId());
             activity(other.getActivity());
             breakdownLimit(other.getBreakdownLimit());
+            mode(other.getMode());
             return this;
         }
 
@@ -1938,7 +2015,27 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         * <p>Whose figures the metric reads, one of the modes the metric lists. <code>global</code> reads all of Whop and takes no account_id. <code>public</code> reads the figures of Whop that are shown in public, and takes no account_id. Without it, the metric reads the account or user named.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage mode(RetrieveTimeSeriesRequestMode mode) {
+            this.mode = Optional.ofNullable(mode);
+            return this;
+        }
+
+        /**
+         * <p>Whose figures the metric reads, one of the modes the metric lists. <code>global</code> reads all of Whop and takes no account_id. <code>public</code> reads the figures of Whop that are shown in public, and takes no account_id. Without it, the metric reads the account or user named.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "mode", nulls = Nulls.SKIP)
+        public _FinalStage mode(Optional<RetrieveTimeSeriesRequestMode> mode) {
+            this.mode = mode;
+            return this;
+        }
+
+        /**
+         * <p>With a single breakdown_by, keep this many groups with the highest whole-range values. Every other group folds into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1948,7 +2045,7 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>With a single breakdown_by, keep the groups with the highest whole-range values, up to this many, and fold every other group into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups. Available on partner metrics only.</p>
+         * <p>With a single breakdown_by, keep this many groups with the highest whole-range values. Every other group folds into one entry named other. A rate or an average ranks its groups by the deals it divides by. The other entry is measured from the underlying rows, so a distinct count or a rate stays exact rather than being added up from groups.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "breakdown_limit", nulls = Nulls.SKIP)
@@ -2578,7 +2675,7 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true. Defaults confidence_level to 0.95. Also returns all_entrant_totals, which include entrants whose conversion window has not elapsed yet. Comparisons are left out until the baseline has mature entrants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2588,7 +2685,7 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true; defaults confidence_level to 0.95.</p>
+         * <p>Funnel only. The breakdown value to use as baseline for whole-window final conversion. Requires breakdown_by and mature_only=true. Defaults confidence_level to 0.95. Also returns all_entrant_totals, which include entrants whose conversion window has not elapsed yet. Comparisons are left out until the baseline has mature entrants.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "compare_to", nulls = Nulls.SKIP)
@@ -2718,7 +2815,7 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         * <p>Filter to one product category, for example <code>algo_trading_program</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2728,7 +2825,7 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         /**
-         * <p>Filter to one product category, for example <code>algo_trading_course</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
+         * <p>Filter to one product category, for example <code>algo_trading_program</code>. Pair with <code>breakdown_by=product_category</code> to split by product category. Available on metrics that list <code>product_category</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
@@ -3358,6 +3455,58 @@ public final class RetrieveTimeSeriesRequest {
         }
 
         @java.lang.Override
+        public _FinalStage runnerIds(String runnerIds) {
+            this.runnerIds = Optional.of(Collections.singletonList(runnerIds));
+            return this;
+        }
+
+        /**
+         * <p>Runner user ids (user_...) to scope the series to; the series sums the figures of the campaigns they hold. Available on metrics that list runner_ids.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage runnerIds(List<String> runnerIds) {
+            this.runnerIds = Optional.ofNullable(runnerIds);
+            return this;
+        }
+
+        /**
+         * <p>Runner user ids (user_...) to scope the series to; the series sums the figures of the campaigns they hold. Available on metrics that list runner_ids.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "runner_ids", nulls = Nulls.SKIP)
+        public _FinalStage runnerIds(Optional<List<String>> runnerIds) {
+            this.runnerIds = runnerIds;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage accountIds(String accountIds) {
+            this.accountIds = Optional.of(Collections.singletonList(accountIds));
+            return this;
+        }
+
+        /**
+         * <p>Business ids (biz_...) to scope the series to. The series sums their figures. On a metric that lists account as a breakdown, it replaces account_id and takes at most 50 ids. On such a metric, breakdown_by=account returns an entry for each id. Available on metrics that list account_ids. With a mode other than <code>owner</code>, <code>global</code> and <code>public</code>, it is used with account_id. It keeps only these accounts inside the mode. An account that is not inside the mode adds nothing. It cannot be combined with <code>global</code> or <code>public</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountIds(List<String> accountIds) {
+            this.accountIds = Optional.ofNullable(accountIds);
+            return this;
+        }
+
+        /**
+         * <p>Business ids (biz_...) to scope the series to. The series sums their figures. On a metric that lists account as a breakdown, it replaces account_id and takes at most 50 ids. On such a metric, breakdown_by=account returns an entry for each id. Available on metrics that list account_ids. With a mode other than <code>owner</code>, <code>global</code> and <code>public</code>, it is used with account_id. It keeps only these accounts inside the mode. An account that is not inside the mode adds nothing. It cannot be combined with <code>global</code> or <code>public</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_ids", nulls = Nulls.SKIP)
+        public _FinalStage accountIds(Optional<List<String>> accountIds) {
+            this.accountIds = accountIds;
+            return this;
+        }
+
+        @java.lang.Override
         public _FinalStage adIds(String adIds) {
             this.adIds = Optional.of(Collections.singletonList(adIds));
             return this;
@@ -3441,6 +3590,8 @@ public final class RetrieveTimeSeriesRequest {
                     adCampaignIds,
                     adGroupIds,
                     adIds,
+                    accountIds,
+                    runnerIds,
                     accountId,
                     userId,
                     from,
@@ -3514,6 +3665,7 @@ public final class RetrieveTimeSeriesRequest {
                     teamLeadId,
                     activity,
                     breakdownLimit,
+                    mode,
                     additionalProperties);
         }
 
@@ -3522,6 +3674,8 @@ public final class RetrieveTimeSeriesRequest {
             if (key.equalsIgnoreCase("ad_campaign_ids")
                     || key.equalsIgnoreCase("ad_group_ids")
                     || key.equalsIgnoreCase("ad_ids")
+                    || key.equalsIgnoreCase("account_ids")
+                    || key.equalsIgnoreCase("runner_ids")
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("user_id")
                     || key.equalsIgnoreCase("from")
@@ -3594,7 +3748,8 @@ public final class RetrieveTimeSeriesRequest {
                     || key.equalsIgnoreCase("referring_account_id")
                     || key.equalsIgnoreCase("team_lead_id")
                     || key.equalsIgnoreCase("activity")
-                    || key.equalsIgnoreCase("breakdown_limit")) {
+                    || key.equalsIgnoreCase("breakdown_limit")
+                    || key.equalsIgnoreCase("mode")) {
                 return;
             }
             this.additionalProperties.put(key, value);

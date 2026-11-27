@@ -207,7 +207,7 @@ public final class PostAdCampaignUpdatedPayloadData {
     }
 
     /**
-     * @return The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.
+     * @return The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when no target is set.
      */
     @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
@@ -242,7 +242,7 @@ public final class PostAdCampaignUpdatedPayloadData {
     }
 
     /**
-     * @return The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.
+     * @return The goal the campaign optimizes toward. <code>awareness</code> optimizes for impressions. <code>engagement</code> appears only on campaigns created before it was retired.
      */
     @JsonIgnore
     public Optional<PostAdCampaignUpdatedPayloadDataObjective> getObjective() {
@@ -277,7 +277,7 @@ public final class PostAdCampaignUpdatedPayloadData {
     }
 
     /**
-     * @return The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.
+     * @return The desired cost per result for <code>target_result_event</code>, in USD. For <code>impressions</code>, it's the cost per 1,000 impressions. <code>null</code> when none is set or the ad groups set different ones.
      */
     @JsonIgnore
     public Optional<Double> getTargetCostPerResult() {
@@ -561,7 +561,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         _FinalStage budgetType(Nullable<PostAdCampaignUpdatedPayloadDataBudgetType> budgetType);
 
         /**
-         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when no target is set.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
@@ -585,7 +585,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         _FinalStage addAllIssues(List<AdPlatformIssue> issues);
 
         /**
-         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> optimizes for impressions. <code>engagement</code> appears only on campaigns created before it was retired.</p>
          */
         _FinalStage objective(Optional<PostAdCampaignUpdatedPayloadDataObjective> objective);
 
@@ -611,7 +611,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         _FinalStage startsAt(Nullable<String> startsAt);
 
         /**
-         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. For <code>impressions</code>, it's the cost per 1,000 impressions. <code>null</code> when none is set or the ad groups set different ones.</p>
          */
         _FinalStage targetCostPerResult(Optional<Double> targetCostPerResult);
 
@@ -837,7 +837,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. For <code>impressions</code>, it's the cost per 1,000 impressions. <code>null</code> when none is set or the ad groups set different ones.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -853,7 +853,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. For <code>impressions</code>, it's the cost per 1,000 impressions. <code>null</code> when none is set or the ad groups set different ones.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -863,7 +863,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The desired cost per result for <code>target_result_event</code>, in USD. <code>null</code> when none is set.</p>
+         * <p>The desired cost per result for <code>target_result_event</code>, in USD. For <code>impressions</code>, it's the cost per 1,000 impressions. <code>null</code> when none is set or the ad groups set different ones.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "target_cost_per_result", nulls = Nulls.SKIP)
@@ -936,7 +936,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> optimizes for impressions. <code>engagement</code> appears only on campaigns created before it was retired.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -952,7 +952,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> optimizes for impressions. <code>engagement</code> appears only on campaigns created before it was retired.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -962,7 +962,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The goal the campaign optimizes toward. <code>awareness</code> appears only on campaigns created before it was retired; those campaigns can't launch.</p>
+         * <p>The goal the campaign optimizes toward. <code>awareness</code> optimizes for impressions. <code>engagement</code> appears only on campaigns created before it was retired.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "objective", nulls = Nulls.SKIP)
@@ -1032,7 +1032,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when no target is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1048,7 +1048,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when no target is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1058,7 +1058,7 @@ public final class PostAdCampaignUpdatedPayloadData {
         }
 
         /**
-         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. <code>null</code> when no target is set.</p>
+         * <p>The cost per result, in USD, the advertiser wants this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when no target is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)

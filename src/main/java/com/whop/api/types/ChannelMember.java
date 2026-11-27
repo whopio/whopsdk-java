@@ -28,6 +28,8 @@ public final class ChannelMember {
 
     private final Optional<String> createdAt;
 
+    private final Optional<String> deletedAt;
+
     private final Optional<String> id;
 
     private final Optional<ChannelMemberInboxStatus> inboxStatus;
@@ -51,6 +53,7 @@ public final class ChannelMember {
     private ChannelMember(
             String channelId,
             Optional<String> createdAt,
+            Optional<String> deletedAt,
             Optional<String> id,
             Optional<ChannelMemberInboxStatus> inboxStatus,
             Optional<String> lastViewedAt,
@@ -63,6 +66,7 @@ public final class ChannelMember {
             Map<String, Object> additionalProperties) {
         this.channelId = channelId;
         this.createdAt = createdAt;
+        this.deletedAt = deletedAt;
         this.id = id;
         this.inboxStatus = inboxStatus;
         this.lastViewedAt = lastViewedAt;
@@ -89,6 +93,17 @@ public final class ChannelMember {
             return Optional.empty();
         }
         return createdAt;
+    }
+
+    /**
+     * @return When the membership was removed, as an ISO 8601 timestamp. Null for current members and access-derived users.
+     */
+    @JsonIgnore
+    public Optional<String> getDeletedAt() {
+        if (deletedAt == null) {
+            return Optional.empty();
+        }
+        return deletedAt;
     }
 
     /**
@@ -182,6 +197,12 @@ public final class ChannelMember {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("deleted_at")
+    private Optional<String> _getDeletedAt() {
+        return deletedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("id")
     private Optional<String> _getId() {
         return id;
@@ -237,6 +258,7 @@ public final class ChannelMember {
     private boolean equalTo(ChannelMember other) {
         return channelId.equals(other.channelId)
                 && createdAt.equals(other.createdAt)
+                && deletedAt.equals(other.deletedAt)
                 && id.equals(other.id)
                 && inboxStatus.equals(other.inboxStatus)
                 && lastViewedAt.equals(other.lastViewedAt)
@@ -253,6 +275,7 @@ public final class ChannelMember {
         return Objects.hash(
                 this.channelId,
                 this.createdAt,
+                this.deletedAt,
                 this.id,
                 this.inboxStatus,
                 this.lastViewedAt,
@@ -305,6 +328,15 @@ public final class ChannelMember {
         _FinalStage createdAt(String createdAt);
 
         _FinalStage createdAt(Nullable<String> createdAt);
+
+        /**
+         * <p>When the membership was removed, as an ISO 8601 timestamp. Null for current members and access-derived users.</p>
+         */
+        _FinalStage deletedAt(Optional<String> deletedAt);
+
+        _FinalStage deletedAt(String deletedAt);
+
+        _FinalStage deletedAt(Nullable<String> deletedAt);
 
         /**
          * <p>Stored membership ID, or null for access-derived users.</p>
@@ -386,6 +418,8 @@ public final class ChannelMember {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<String> deletedAt = Optional.empty();
+
         private Optional<String> createdAt = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -396,6 +430,7 @@ public final class ChannelMember {
         public Builder from(ChannelMember other) {
             channelId(other.getChannelId());
             createdAt(other.getCreatedAt());
+            deletedAt(other.getDeletedAt());
             id(other.getId());
             inboxStatus(other.getInboxStatus());
             lastViewedAt(other.getLastViewedAt());
@@ -666,6 +701,42 @@ public final class ChannelMember {
         }
 
         /**
+         * <p>When the membership was removed, as an ISO 8601 timestamp. Null for current members and access-derived users.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage deletedAt(Nullable<String> deletedAt) {
+            if (deletedAt.isNull()) {
+                this.deletedAt = null;
+            } else if (deletedAt.isEmpty()) {
+                this.deletedAt = Optional.empty();
+            } else {
+                this.deletedAt = Optional.of(deletedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the membership was removed, as an ISO 8601 timestamp. Null for current members and access-derived users.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage deletedAt(String deletedAt) {
+            this.deletedAt = Optional.ofNullable(deletedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the membership was removed, as an ISO 8601 timestamp. Null for current members and access-derived users.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "deleted_at", nulls = Nulls.SKIP)
+        public _FinalStage deletedAt(Optional<String> deletedAt) {
+            this.deletedAt = deletedAt;
+            return this;
+        }
+
+        /**
          * <p>When the stored channel membership was created, as an ISO 8601 timestamp. Null for users whose access does not have a stored membership.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -706,6 +777,7 @@ public final class ChannelMember {
             return new ChannelMember(
                     channelId,
                     createdAt,
+                    deletedAt,
                     id,
                     inboxStatus,
                     lastViewedAt,
@@ -722,6 +794,7 @@ public final class ChannelMember {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("channel_id")
                     || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("deleted_at")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("inbox_status")
                     || key.equalsIgnoreCase("last_viewed_at")

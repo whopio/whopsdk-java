@@ -96,7 +96,7 @@ public final class AutomationStepSender {
         T _visitUnknown(Object unknownType);
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "object", visible = true, defaultImpl = _UnknownValue.class)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = _UnknownValue.class)
     @JsonSubTypes({@JsonSubTypes.Type(EmailAddressValue.class), @JsonSubTypes.Type(UserValue.class)})
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Value {
@@ -104,10 +104,10 @@ public final class AutomationStepSender {
     }
 
     @JsonTypeName("email_address")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class EmailAddressValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private AutomationStepEmailAddressSender value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -144,10 +144,10 @@ public final class AutomationStepSender {
     }
 
     @JsonTypeName("user")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class UserValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private AutomationStepUserSender value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -183,7 +183,7 @@ public final class AutomationStepSender {
         }
     }
 
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class _UnknownValue implements Value {
         private String type;
 

@@ -49,14 +49,14 @@ public class AsyncRawEconomicIntelligenceClient {
     }
 
     /**
-     * Lists an account's recommendations, newest first by default. <code>status: ready</code> is what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off, but new recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
+     * Deprecated. Use <code>GET /recommended_actions</code> instead. Lists an account's recommendations, newest first by default. <code>status: ready</code> lists what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off. New recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<EconomicIntelligence>>> list() {
         return list(ListEconomicIntelligenceRequest.builder().build());
     }
 
     /**
-     * Lists an account's recommendations, newest first by default. <code>status: ready</code> is what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off, but new recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
+     * Deprecated. Use <code>GET /recommended_actions</code> instead. Lists an account's recommendations, newest first by default. <code>status: ready</code> lists what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off. New recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<EconomicIntelligence>>> list(
             RequestOptions requestOptions) {
@@ -64,7 +64,7 @@ public class AsyncRawEconomicIntelligenceClient {
     }
 
     /**
-     * Lists an account's recommendations, newest first by default. <code>status: ready</code> is what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off, but new recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
+     * Deprecated. Use <code>GET /recommended_actions</code> instead. Lists an account's recommendations, newest first by default. <code>status: ready</code> lists what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off. New recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<EconomicIntelligence>>> list(
             ListEconomicIntelligenceRequest request) {
@@ -72,7 +72,7 @@ public class AsyncRawEconomicIntelligenceClient {
     }
 
     /**
-     * Lists an account's recommendations, newest first by default. <code>status: ready</code> is what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off, but new recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
+     * Deprecated. Use <code>GET /recommended_actions</code> instead. Lists an account's recommendations, newest first by default. <code>status: ready</code> lists what the account can act on now. Any other listing is its history of runs. Executed recommendations and runs stay listed after Economic Intelligence turns off. New recommendations are offered only to businesses it is written for. For visitor countries, page views, ad impressions and clicks, or payment volume over a time range, use <code>GET /stats/time_series/:metric</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<EconomicIntelligence>>> list(
             ListEconomicIntelligenceRequest request, RequestOptions requestOptions) {
@@ -86,10 +86,6 @@ public class AsyncRawEconomicIntelligenceClient {
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), false);
-        }
-        if (request.getInput().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "input", request.getInput().get(), false);
         }
         if (request.getHasRun().isPresent()) {
             QueryStringMapper.addQueryParameter(
@@ -226,22 +222,7 @@ public class AsyncRawEconomicIntelligenceClient {
     }
 
     /**
-     * Updates a recommendation status, records feedback, or both. Send <code>sentiment</code> to rate it. Include <code>status: superseded</code> to retire a ready recommendation. A rating alone leaves its status unchanged. To run a recommendation yourself, send <code>status: running</code> to start. Send <code>status: executed</code> when it is carried out, or <code>status: incomplete</code> if the run ended without carrying it out. With <code>executed</code>, name what changed in <code>result_id</code> or where the run worked in <code>result_page</code>, and the result links there. Whop AI reports its own runs the same way. Send <code>status: acknowledged</code> once an executed run's result has been seen.
-     */
-    public CompletableFuture<WhopApiHttpResponse<EconomicIntelligence>> update(String id) {
-        return update(id, UpdateEconomicIntelligenceRequest.builder().build());
-    }
-
-    /**
-     * Updates a recommendation status, records feedback, or both. Send <code>sentiment</code> to rate it. Include <code>status: superseded</code> to retire a ready recommendation. A rating alone leaves its status unchanged. To run a recommendation yourself, send <code>status: running</code> to start. Send <code>status: executed</code> when it is carried out, or <code>status: incomplete</code> if the run ended without carrying it out. With <code>executed</code>, name what changed in <code>result_id</code> or where the run worked in <code>result_page</code>, and the result links there. Whop AI reports its own runs the same way. Send <code>status: acknowledged</code> once an executed run's result has been seen.
-     */
-    public CompletableFuture<WhopApiHttpResponse<EconomicIntelligence>> update(
-            String id, RequestOptions requestOptions) {
-        return update(id, UpdateEconomicIntelligenceRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Updates a recommendation status, records feedback, or both. Send <code>sentiment</code> to rate it. Include <code>status: superseded</code> to retire a ready recommendation. A rating alone leaves its status unchanged. To run a recommendation yourself, send <code>status: running</code> to start. Send <code>status: executed</code> when it is carried out, or <code>status: incomplete</code> if the run ended without carrying it out. With <code>executed</code>, name what changed in <code>result_id</code> or where the run worked in <code>result_page</code>, and the result links there. Whop AI reports its own runs the same way. Send <code>status: acknowledged</code> once an executed run's result has been seen.
+     * Deprecated. Use <code>POST /recommended_actions/:id/dismiss</code> instead.Dismisses a ready recommendation. Send <code>status: superseded</code>. A recommendation that is already superseded stays unchanged. Other statuses and fields return a <code>400</code> that names <code>/api/v1/recommended_actions</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<EconomicIntelligence>> update(
             String id, UpdateEconomicIntelligenceRequest request) {
@@ -249,7 +230,7 @@ public class AsyncRawEconomicIntelligenceClient {
     }
 
     /**
-     * Updates a recommendation status, records feedback, or both. Send <code>sentiment</code> to rate it. Include <code>status: superseded</code> to retire a ready recommendation. A rating alone leaves its status unchanged. To run a recommendation yourself, send <code>status: running</code> to start. Send <code>status: executed</code> when it is carried out, or <code>status: incomplete</code> if the run ended without carrying it out. With <code>executed</code>, name what changed in <code>result_id</code> or where the run worked in <code>result_page</code>, and the result links there. Whop AI reports its own runs the same way. Send <code>status: acknowledged</code> once an executed run's result has been seen.
+     * Deprecated. Use <code>POST /recommended_actions/:id/dismiss</code> instead.Dismisses a ready recommendation. Send <code>status: superseded</code>. A recommendation that is already superseded stays unchanged. Other statuses and fields return a <code>400</code> that names <code>/api/v1/recommended_actions</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<EconomicIntelligence>> update(
             String id, UpdateEconomicIntelligenceRequest request, RequestOptions requestOptions) {

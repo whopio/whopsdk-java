@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = MemberUser.Builder.class)
 public final class MemberUser {
+    private final List<UserBadge> badges;
+
     private final Optional<String> city;
 
     private final Optional<String> country;
@@ -41,6 +45,7 @@ public final class MemberUser {
     private final Map<String, Object> additionalProperties;
 
     private MemberUser(
+            List<UserBadge> badges,
             Optional<String> city,
             Optional<String> country,
             String id,
@@ -49,6 +54,7 @@ public final class MemberUser {
             Optional<String> state,
             String username,
             Map<String, Object> additionalProperties) {
+        this.badges = badges;
         this.city = city;
         this.country = country;
         this.id = id;
@@ -57,6 +63,11 @@ public final class MemberUser {
         this.state = state;
         this.username = username;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("badges")
+    public List<UserBadge> getBadges() {
+        return badges;
     }
 
     /**
@@ -163,7 +174,8 @@ public final class MemberUser {
     }
 
     private boolean equalTo(MemberUser other) {
-        return city.equals(other.city)
+        return badges.equals(other.badges)
+                && city.equals(other.city)
                 && country.equals(other.country)
                 && id.equals(other.id)
                 && name.equals(other.name)
@@ -175,7 +187,14 @@ public final class MemberUser {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.city, this.country, this.id, this.name, this.profilePicture, this.state, this.username);
+                this.badges,
+                this.city,
+                this.country,
+                this.id,
+                this.name,
+                this.profilePicture,
+                this.state,
+                this.username);
     }
 
     @java.lang.Override
@@ -216,6 +235,12 @@ public final class MemberUser {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage badges(List<UserBadge> badges);
+
+        _FinalStage addBadges(UserBadge badges);
+
+        _FinalStage addAllBadges(List<UserBadge> badges);
 
         /**
          * <p>The user's city, derived from their IP address. <code>null</code> when unknown or the user turned off location sharing.</p>
@@ -270,12 +295,15 @@ public final class MemberUser {
 
         private Optional<String> city = Optional.empty();
 
+        private List<UserBadge> badges = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(MemberUser other) {
+            badges(other.getBadges());
             city(other.getCity());
             country(other.getCountry());
             id(other.getId());
@@ -464,13 +492,39 @@ public final class MemberUser {
         }
 
         @java.lang.Override
+        public _FinalStage addAllBadges(List<UserBadge> badges) {
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addBadges(UserBadge badges) {
+            this.badges.add(badges);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "badges", nulls = Nulls.SKIP)
+        public _FinalStage badges(List<UserBadge> badges) {
+            this.badges.clear();
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public MemberUser build() {
-            return new MemberUser(city, country, id, name, profilePicture, state, username, additionalProperties);
+            return new MemberUser(
+                    badges, city, country, id, name, profilePicture, state, username, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("city")
+            if (key.equalsIgnoreCase("badges")
+                    || key.equalsIgnoreCase("city")
                     || key.equalsIgnoreCase("country")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("name")

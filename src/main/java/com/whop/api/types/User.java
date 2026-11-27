@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
+    private final List<UserBadge> badges;
+
     private final Optional<UserBalance> balance;
 
     private final Optional<UserBalanceHistory> balanceHistory;
@@ -51,9 +53,11 @@ public final class User {
 
     private final Optional<String> email;
 
+    private final int followersCount;
+
     private final String id;
 
-    private final Optional<OwnerLevel> level;
+    private final Optional<UserLevel> level;
 
     private final Optional<String> name;
 
@@ -71,6 +75,8 @@ public final class User {
 
     private final Map<String, Object> verification;
 
+    private final Optional<String> verifiedAt;
+
     private final Optional<String> whopPartnerEnabledAt;
 
     private final Optional<Integer> whopPartnerOnboardedAccountsCount;
@@ -80,6 +86,7 @@ public final class User {
     private final Map<String, Object> additionalProperties;
 
     private User(
+            List<UserBadge> badges,
             Optional<UserBalance> balance,
             Optional<UserBalanceHistory> balanceHistory,
             List<AccountBalanceToken> balances,
@@ -92,8 +99,9 @@ public final class User {
             Optional<String> dateOfBirth,
             Optional<UserEarnings> earningsUsd,
             Optional<String> email,
+            int followersCount,
             String id,
-            Optional<OwnerLevel> level,
+            Optional<UserLevel> level,
             Optional<String> name,
             UserProfilePicture profilePicture,
             List<UserSocialLink> socialLinks,
@@ -102,10 +110,12 @@ public final class User {
             Optional<TradingAccount> trading,
             String username,
             Map<String, Object> verification,
+            Optional<String> verifiedAt,
             Optional<String> whopPartnerEnabledAt,
             Optional<Integer> whopPartnerOnboardedAccountsCount,
             Optional<String> whopPartnerVerifiedAt,
             Map<String, Object> additionalProperties) {
+        this.badges = badges;
         this.balance = balance;
         this.balanceHistory = balanceHistory;
         this.balances = balances;
@@ -118,6 +128,7 @@ public final class User {
         this.dateOfBirth = dateOfBirth;
         this.earningsUsd = earningsUsd;
         this.email = email;
+        this.followersCount = followersCount;
         this.id = id;
         this.level = level;
         this.name = name;
@@ -128,10 +139,16 @@ public final class User {
         this.trading = trading;
         this.username = username;
         this.verification = verification;
+        this.verifiedAt = verifiedAt;
         this.whopPartnerEnabledAt = whopPartnerEnabledAt;
         this.whopPartnerOnboardedAccountsCount = whopPartnerOnboardedAccountsCount;
         this.whopPartnerVerifiedAt = whopPartnerVerifiedAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("badges")
+    public List<UserBadge> getBadges() {
+        return badges;
     }
 
     /**
@@ -258,6 +275,14 @@ public final class User {
     }
 
     /**
+     * @return The number of users who follow this user.
+     */
+    @JsonProperty("followers_count")
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    /**
      * @return User ID, prefixed <code>user_</code>.
      */
     @JsonProperty("id")
@@ -266,10 +291,10 @@ public final class User {
     }
 
     /**
-     * @return The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.
+     * @return The user's Whop Level, counted across every account they own. <code>current</code> is public, and is <code>0</code> for a user with no points yet. The points and spend fields are populated only when you retrieve yourself with the reserved id <code>me</code> and have balance-read scope. <code>null</code> on lists and when the user hides their level.
      */
     @JsonIgnore
-    public Optional<OwnerLevel> getLevel() {
+    public Optional<UserLevel> getLevel() {
         if (level == null) {
             return Optional.empty();
         }
@@ -347,6 +372,17 @@ public final class User {
     @JsonProperty("verification")
     public Map<String, Object> getVerification() {
         return verification;
+    }
+
+    /**
+     * @return When the user received a verified badge, as an ISO 8601 timestamp. <code>null</code> when the user is not verified.
+     */
+    @JsonIgnore
+    public Optional<String> getVerifiedAt() {
+        if (verifiedAt == null) {
+            return Optional.empty();
+        }
+        return verifiedAt;
     }
 
     /**
@@ -444,7 +480,7 @@ public final class User {
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("level")
-    private Optional<OwnerLevel> _getLevel() {
+    private Optional<UserLevel> _getLevel() {
         return level;
     }
 
@@ -470,6 +506,12 @@ public final class User {
     @JsonProperty("trading")
     private Optional<TradingAccount> _getTrading() {
         return trading;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("verified_at")
+    private Optional<String> _getVerifiedAt() {
+        return verifiedAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -502,7 +544,8 @@ public final class User {
     }
 
     private boolean equalTo(User other) {
-        return balance.equals(other.balance)
+        return badges.equals(other.badges)
+                && balance.equals(other.balance)
                 && balanceHistory.equals(other.balanceHistory)
                 && balances.equals(other.balances)
                 && banner.equals(other.banner)
@@ -514,6 +557,7 @@ public final class User {
                 && dateOfBirth.equals(other.dateOfBirth)
                 && earningsUsd.equals(other.earningsUsd)
                 && email.equals(other.email)
+                && followersCount == other.followersCount
                 && id.equals(other.id)
                 && level.equals(other.level)
                 && name.equals(other.name)
@@ -524,6 +568,7 @@ public final class User {
                 && trading.equals(other.trading)
                 && username.equals(other.username)
                 && verification.equals(other.verification)
+                && verifiedAt.equals(other.verifiedAt)
                 && whopPartnerEnabledAt.equals(other.whopPartnerEnabledAt)
                 && whopPartnerOnboardedAccountsCount.equals(other.whopPartnerOnboardedAccountsCount)
                 && whopPartnerVerifiedAt.equals(other.whopPartnerVerifiedAt);
@@ -532,6 +577,7 @@ public final class User {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.badges,
                 this.balance,
                 this.balanceHistory,
                 this.balances,
@@ -544,6 +590,7 @@ public final class User {
                 this.dateOfBirth,
                 this.earningsUsd,
                 this.email,
+                this.followersCount,
                 this.id,
                 this.level,
                 this.name,
@@ -554,6 +601,7 @@ public final class User {
                 this.trading,
                 this.username,
                 this.verification,
+                this.verifiedAt,
                 this.whopPartnerEnabledAt,
                 this.whopPartnerOnboardedAccountsCount,
                 this.whopPartnerVerifiedAt);
@@ -572,9 +620,16 @@ public final class User {
         /**
          * <p>When the user was created, as an ISO 8601 timestamp</p>
          */
-        IdStage createdAt(@NotNull String createdAt);
+        FollowersCountStage createdAt(@NotNull String createdAt);
 
         Builder from(User other);
+    }
+
+    public interface FollowersCountStage {
+        /**
+         * <p>The number of users who follow this user.</p>
+         */
+        IdStage followersCount(int followersCount);
     }
 
     public interface IdStage {
@@ -604,6 +659,12 @@ public final class User {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage badges(List<UserBadge> badges);
+
+        _FinalStage addBadges(UserBadge badges);
+
+        _FinalStage addAllBadges(List<UserBadge> badges);
 
         /**
          * <p>The user's balance: personal cash + other holdings + deposits still in flight, plus account balances for accounts they own. Computed only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, or when <code>include_balance=false</code>.</p>
@@ -702,13 +763,13 @@ public final class User {
         _FinalStage email(Nullable<String> email);
 
         /**
-         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * <p>The user's Whop Level, counted across every account they own. <code>current</code> is public, and is <code>0</code> for a user with no points yet. The points and spend fields are populated only when you retrieve yourself with the reserved id <code>me</code> and have balance-read scope. <code>null</code> on lists and when the user hides their level.</p>
          */
-        _FinalStage level(Optional<OwnerLevel> level);
+        _FinalStage level(Optional<UserLevel> level);
 
-        _FinalStage level(OwnerLevel level);
+        _FinalStage level(UserLevel level);
 
-        _FinalStage level(Nullable<OwnerLevel> level);
+        _FinalStage level(Nullable<UserLevel> level);
 
         /**
          * <p>The user's display name</p>
@@ -762,6 +823,15 @@ public final class User {
         _FinalStage verification(String key, Object value);
 
         /**
+         * <p>When the user received a verified badge, as an ISO 8601 timestamp. <code>null</code> when the user is not verified.</p>
+         */
+        _FinalStage verifiedAt(Optional<String> verifiedAt);
+
+        _FinalStage verifiedAt(String verifiedAt);
+
+        _FinalStage verifiedAt(Nullable<String> verifiedAt);
+
+        /**
          * <p>When the user became an enrolled Whop Partner, as an ISO 8601 timestamp. <code>null</code> if never enrolled.</p>
          */
         _FinalStage whopPartnerEnabledAt(Optional<String> whopPartnerEnabledAt);
@@ -791,8 +861,10 @@ public final class User {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage, IdStage, ProfilePictureStage, UsernameStage, _FinalStage {
+            implements CreatedAtStage, FollowersCountStage, IdStage, ProfilePictureStage, UsernameStage, _FinalStage {
         private String createdAt;
+
+        private int followersCount;
 
         private String id;
 
@@ -806,6 +878,8 @@ public final class User {
 
         private Optional<String> whopPartnerEnabledAt = Optional.empty();
 
+        private Optional<String> verifiedAt = Optional.empty();
+
         private Map<String, Object> verification = new LinkedHashMap<>();
 
         private Optional<TradingAccount> trading = Optional.empty();
@@ -818,7 +892,7 @@ public final class User {
 
         private Optional<String> name = Optional.empty();
 
-        private Optional<OwnerLevel> level = Optional.empty();
+        private Optional<UserLevel> level = Optional.empty();
 
         private Optional<String> email = Optional.empty();
 
@@ -842,12 +916,15 @@ public final class User {
 
         private Optional<UserBalance> balance = Optional.empty();
 
+        private List<UserBadge> badges = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(User other) {
+            badges(other.getBadges());
             balance(other.getBalance());
             balanceHistory(other.getBalanceHistory());
             balances(other.getBalances());
@@ -860,6 +937,7 @@ public final class User {
             dateOfBirth(other.getDateOfBirth());
             earningsUsd(other.getEarningsUsd());
             email(other.getEmail());
+            followersCount(other.getFollowersCount());
             id(other.getId());
             level(other.getLevel());
             name(other.getName());
@@ -870,6 +948,7 @@ public final class User {
             trading(other.getTrading());
             username(other.getUsername());
             verification(other.getVerification());
+            verifiedAt(other.getVerifiedAt());
             whopPartnerEnabledAt(other.getWhopPartnerEnabledAt());
             whopPartnerOnboardedAccountsCount(other.getWhopPartnerOnboardedAccountsCount());
             whopPartnerVerifiedAt(other.getWhopPartnerVerifiedAt());
@@ -882,8 +961,19 @@ public final class User {
          */
         @java.lang.Override
         @JsonSetter("created_at")
-        public IdStage createdAt(@NotNull String createdAt) {
+        public FollowersCountStage createdAt(@NotNull String createdAt) {
             this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The number of users who follow this user.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("followers_count")
+        public IdStage followersCount(int followersCount) {
+            this.followersCount = followersCount;
             return this;
         }
 
@@ -1025,6 +1115,42 @@ public final class User {
         @JsonSetter(value = "whop_partner_enabled_at", nulls = Nulls.SKIP)
         public _FinalStage whopPartnerEnabledAt(Optional<String> whopPartnerEnabledAt) {
             this.whopPartnerEnabledAt = whopPartnerEnabledAt;
+            return this;
+        }
+
+        /**
+         * <p>When the user received a verified badge, as an ISO 8601 timestamp. <code>null</code> when the user is not verified.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage verifiedAt(Nullable<String> verifiedAt) {
+            if (verifiedAt.isNull()) {
+                this.verifiedAt = null;
+            } else if (verifiedAt.isEmpty()) {
+                this.verifiedAt = Optional.empty();
+            } else {
+                this.verifiedAt = Optional.of(verifiedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the user received a verified badge, as an ISO 8601 timestamp. <code>null</code> when the user is not verified.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage verifiedAt(String verifiedAt) {
+            this.verifiedAt = Optional.ofNullable(verifiedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the user received a verified badge, as an ISO 8601 timestamp. <code>null</code> when the user is not verified.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "verified_at", nulls = Nulls.SKIP)
+        public _FinalStage verifiedAt(Optional<String> verifiedAt) {
+            this.verifiedAt = verifiedAt;
             return this;
         }
 
@@ -1232,11 +1358,11 @@ public final class User {
         }
 
         /**
-         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * <p>The user's Whop Level, counted across every account they own. <code>current</code> is public, and is <code>0</code> for a user with no points yet. The points and spend fields are populated only when you retrieve yourself with the reserved id <code>me</code> and have balance-read scope. <code>null</code> on lists and when the user hides their level.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage level(Nullable<OwnerLevel> level) {
+        public _FinalStage level(Nullable<UserLevel> level) {
             if (level.isNull()) {
                 this.level = null;
             } else if (level.isEmpty()) {
@@ -1248,21 +1374,21 @@ public final class User {
         }
 
         /**
-         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * <p>The user's Whop Level, counted across every account they own. <code>current</code> is public, and is <code>0</code> for a user with no points yet. The points and spend fields are populated only when you retrieve yourself with the reserved id <code>me</code> and have balance-read scope. <code>null</code> on lists and when the user hides their level.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage level(OwnerLevel level) {
+        public _FinalStage level(UserLevel level) {
             this.level = Optional.ofNullable(level);
             return this;
         }
 
         /**
-         * <p>The user's Whop Levels progress, counted across every account they own. Populated only on the self view (retrieved with the reserved id <code>me</code>) for callers with balance-read scope; <code>null</code> otherwise, and when none of their accounts are in Whop Levels.</p>
+         * <p>The user's Whop Level, counted across every account they own. <code>current</code> is public, and is <code>0</code> for a user with no points yet. The points and spend fields are populated only when you retrieve yourself with the reserved id <code>me</code> and have balance-read scope. <code>null</code> on lists and when the user hides their level.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "level", nulls = Nulls.SKIP)
-        public _FinalStage level(Optional<OwnerLevel> level) {
+        public _FinalStage level(Optional<UserLevel> level) {
             this.level = level;
             return this;
         }
@@ -1652,8 +1778,33 @@ public final class User {
         }
 
         @java.lang.Override
+        public _FinalStage addAllBadges(List<UserBadge> badges) {
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addBadges(UserBadge badges) {
+            this.badges.add(badges);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "badges", nulls = Nulls.SKIP)
+        public _FinalStage badges(List<UserBadge> badges) {
+            this.badges.clear();
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public User build() {
             return new User(
+                    badges,
                     balance,
                     balanceHistory,
                     balances,
@@ -1666,6 +1817,7 @@ public final class User {
                     dateOfBirth,
                     earningsUsd,
                     email,
+                    followersCount,
                     id,
                     level,
                     name,
@@ -1676,6 +1828,7 @@ public final class User {
                     trading,
                     username,
                     verification,
+                    verifiedAt,
                     whopPartnerEnabledAt,
                     whopPartnerOnboardedAccountsCount,
                     whopPartnerVerifiedAt,
@@ -1684,7 +1837,8 @@ public final class User {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("balance")
+            if (key.equalsIgnoreCase("badges")
+                    || key.equalsIgnoreCase("balance")
                     || key.equalsIgnoreCase("balance_history")
                     || key.equalsIgnoreCase("balances")
                     || key.equalsIgnoreCase("banner")
@@ -1696,6 +1850,7 @@ public final class User {
                     || key.equalsIgnoreCase("date_of_birth")
                     || key.equalsIgnoreCase("earnings_usd")
                     || key.equalsIgnoreCase("email")
+                    || key.equalsIgnoreCase("followers_count")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("level")
                     || key.equalsIgnoreCase("name")
@@ -1706,6 +1861,7 @@ public final class User {
                     || key.equalsIgnoreCase("trading")
                     || key.equalsIgnoreCase("username")
                     || key.equalsIgnoreCase("verification")
+                    || key.equalsIgnoreCase("verified_at")
                     || key.equalsIgnoreCase("whop_partner_enabled_at")
                     || key.equalsIgnoreCase("whop_partner_onboarded_accounts_count")
                     || key.equalsIgnoreCase("whop_partner_verified_at")) {

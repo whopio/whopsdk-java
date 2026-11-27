@@ -34,7 +34,11 @@ public final class PartnerReferralRequest {
 
     private final String createdAt;
 
+    private final Optional<String> expiresAt;
+
     private final String id;
+
+    private final Optional<PartnerReferralRequestLead> lead;
 
     private final Optional<Integer> maxRedemptions;
 
@@ -50,6 +54,8 @@ public final class PartnerReferralRequest {
 
     private final Optional<PartnerReferralRequestStatus> status;
 
+    private final Optional<PartnerReferralRequestStatusReason> statusReason;
+
     private final String updatedAt;
 
     private final Optional<UserSummary> user;
@@ -61,7 +67,9 @@ public final class PartnerReferralRequest {
             Optional<String> authorizedUserId,
             Optional<String> code,
             String createdAt,
+            Optional<String> expiresAt,
             String id,
+            Optional<PartnerReferralRequestLead> lead,
             Optional<Integer> maxRedemptions,
             Optional<String> memberId,
             UserSummary partner,
@@ -69,6 +77,7 @@ public final class PartnerReferralRequest {
             PartnerReferralRequestRequestType requestType,
             List<PartnerReferralReward> rewards,
             Optional<PartnerReferralRequestStatus> status,
+            Optional<PartnerReferralRequestStatusReason> statusReason,
             String updatedAt,
             Optional<UserSummary> user,
             Map<String, Object> additionalProperties) {
@@ -76,7 +85,9 @@ public final class PartnerReferralRequest {
         this.authorizedUserId = authorizedUserId;
         this.code = code;
         this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
         this.id = id;
+        this.lead = lead;
         this.maxRedemptions = maxRedemptions;
         this.memberId = memberId;
         this.partner = partner;
@@ -84,6 +95,7 @@ public final class PartnerReferralRequest {
         this.requestType = requestType;
         this.rewards = rewards;
         this.status = status;
+        this.statusReason = statusReason;
         this.updatedAt = updatedAt;
         this.user = user;
         this.additionalProperties = additionalProperties;
@@ -131,11 +143,33 @@ public final class PartnerReferralRequest {
     }
 
     /**
+     * @return When a lead offer stops taking a response, as an ISO 8601 timestamp. <code>null</code> for other request types.
+     */
+    @JsonIgnore
+    public Optional<String> getExpiresAt() {
+        if (expiresAt == null) {
+            return Optional.empty();
+        }
+        return expiresAt;
+    }
+
+    /**
      * @return Partner referral request ID, prefixed <code>prfr_</code>.
      */
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return The business's signup answers on a lead offer. Only the partner it was offered to sees them. <code>null</code> for anyone else and for other request types.
+     */
+    @JsonIgnore
+    public Optional<PartnerReferralRequestLead> getLead() {
+        if (lead == null) {
+            return Optional.empty();
+        }
+        return lead;
     }
 
     /**
@@ -161,7 +195,7 @@ public final class PartnerReferralRequest {
     }
 
     /**
-     * @return Public profile of the requesting partner.
+     * @return Public profile of the partner associated with this referral request.
      */
     @JsonProperty("partner")
     public UserSummary getPartner() {
@@ -169,7 +203,7 @@ public final class PartnerReferralRequest {
     }
 
     /**
-     * @return Business the partner sent this request on behalf of, when the referral belongs to their team. <code>null</code> for a personal referral.
+     * @return The partner's team account that this referral counts toward. <code>null</code> for a personal referral. A lead offer counts toward the partner-mode team where the partner earned the most in the last 30 days, or the newest on a tie. It is set when the offer is made.
      */
     @JsonIgnore
     public Optional<AccountSummary> getReferringAccount() {
@@ -193,7 +227,7 @@ public final class PartnerReferralRequest {
     }
 
     /**
-     * @return The approval state, or null for requests without an approval process.
+     * @return The approval state, or <code>null</code> for requests without an approval process. A lead offer that gets no answer before <code>expires_at</code> becomes <code>cancelled</code>.
      */
     @JsonIgnore
     public Optional<PartnerReferralRequestStatus> getStatus() {
@@ -201,6 +235,17 @@ public final class PartnerReferralRequest {
             return Optional.empty();
         }
         return status;
+    }
+
+    /**
+     * @return Why the request reached its status. <code>expired</code> means a lead offer got no answer before <code>expires_at</code>. <code>passed</code> means the partner turned down a lead offer. <code>withdrawn</code> means the partner cancelled their own request. <code>null</code> for any other status.
+     */
+    @JsonIgnore
+    public Optional<PartnerReferralRequestStatusReason> getStatusReason() {
+        if (statusReason == null) {
+            return Optional.empty();
+        }
+        return statusReason;
     }
 
     /**
@@ -212,7 +257,8 @@ public final class PartnerReferralRequest {
     }
 
     /**
-     * @return User receiving the attribution request, or null for a business request or referral link.
+     * @return The user an attribution request was sent to. Deprecated: requests to a user have ended. Always <code>null</code>.
+     * DEPRECATED: No longer populated. Always null.
      */
     @JsonIgnore
     public Optional<UserSummary> getUser() {
@@ -241,6 +287,18 @@ public final class PartnerReferralRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("expires_at")
+    private Optional<String> _getExpiresAt() {
+        return expiresAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("lead")
+    private Optional<PartnerReferralRequestLead> _getLead() {
+        return lead;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("max_redemptions")
     private Optional<Integer> _getMaxRedemptions() {
         return maxRedemptions;
@@ -265,6 +323,12 @@ public final class PartnerReferralRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("status_reason")
+    private Optional<PartnerReferralRequestStatusReason> _getStatusReason() {
+        return statusReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("user")
     private Optional<UserSummary> _getUser() {
         return user;
@@ -286,7 +350,9 @@ public final class PartnerReferralRequest {
                 && authorizedUserId.equals(other.authorizedUserId)
                 && code.equals(other.code)
                 && createdAt.equals(other.createdAt)
+                && expiresAt.equals(other.expiresAt)
                 && id.equals(other.id)
+                && lead.equals(other.lead)
                 && maxRedemptions.equals(other.maxRedemptions)
                 && memberId.equals(other.memberId)
                 && partner.equals(other.partner)
@@ -294,6 +360,7 @@ public final class PartnerReferralRequest {
                 && requestType.equals(other.requestType)
                 && rewards.equals(other.rewards)
                 && status.equals(other.status)
+                && statusReason.equals(other.statusReason)
                 && updatedAt.equals(other.updatedAt)
                 && user.equals(other.user);
     }
@@ -305,7 +372,9 @@ public final class PartnerReferralRequest {
                 this.authorizedUserId,
                 this.code,
                 this.createdAt,
+                this.expiresAt,
                 this.id,
+                this.lead,
                 this.maxRedemptions,
                 this.memberId,
                 this.partner,
@@ -313,6 +382,7 @@ public final class PartnerReferralRequest {
                 this.requestType,
                 this.rewards,
                 this.status,
+                this.statusReason,
                 this.updatedAt,
                 this.user);
     }
@@ -344,7 +414,7 @@ public final class PartnerReferralRequest {
 
     public interface PartnerStage {
         /**
-         * <p>Public profile of the requesting partner.</p>
+         * <p>Public profile of the partner associated with this referral request.</p>
          */
         RequestTypeStage partner(@NotNull UserSummary partner);
     }
@@ -398,6 +468,24 @@ public final class PartnerReferralRequest {
         _FinalStage code(Nullable<String> code);
 
         /**
+         * <p>When a lead offer stops taking a response, as an ISO 8601 timestamp. <code>null</code> for other request types.</p>
+         */
+        _FinalStage expiresAt(Optional<String> expiresAt);
+
+        _FinalStage expiresAt(String expiresAt);
+
+        _FinalStage expiresAt(Nullable<String> expiresAt);
+
+        /**
+         * <p>The business's signup answers on a lead offer. Only the partner it was offered to sees them. <code>null</code> for anyone else and for other request types.</p>
+         */
+        _FinalStage lead(Optional<PartnerReferralRequestLead> lead);
+
+        _FinalStage lead(PartnerReferralRequestLead lead);
+
+        _FinalStage lead(Nullable<PartnerReferralRequestLead> lead);
+
+        /**
          * <p>Maximum permitted redemptions, when limited.</p>
          */
         _FinalStage maxRedemptions(Optional<Integer> maxRedemptions);
@@ -416,7 +504,7 @@ public final class PartnerReferralRequest {
         _FinalStage memberId(Nullable<String> memberId);
 
         /**
-         * <p>Business the partner sent this request on behalf of, when the referral belongs to their team. <code>null</code> for a personal referral.</p>
+         * <p>The partner's team account that this referral counts toward. <code>null</code> for a personal referral. A lead offer counts toward the partner-mode team where the partner earned the most in the last 30 days, or the newest on a tie. It is set when the offer is made.</p>
          */
         _FinalStage referringAccount(Optional<AccountSummary> referringAccount);
 
@@ -431,7 +519,7 @@ public final class PartnerReferralRequest {
         _FinalStage addAllRewards(List<PartnerReferralReward> rewards);
 
         /**
-         * <p>The approval state, or null for requests without an approval process.</p>
+         * <p>The approval state, or <code>null</code> for requests without an approval process. A lead offer that gets no answer before <code>expires_at</code> becomes <code>cancelled</code>.</p>
          */
         _FinalStage status(Optional<PartnerReferralRequestStatus> status);
 
@@ -440,7 +528,17 @@ public final class PartnerReferralRequest {
         _FinalStage status(Nullable<PartnerReferralRequestStatus> status);
 
         /**
-         * <p>User receiving the attribution request, or null for a business request or referral link.</p>
+         * <p>Why the request reached its status. <code>expired</code> means a lead offer got no answer before <code>expires_at</code>. <code>passed</code> means the partner turned down a lead offer. <code>withdrawn</code> means the partner cancelled their own request. <code>null</code> for any other status.</p>
+         */
+        _FinalStage statusReason(Optional<PartnerReferralRequestStatusReason> statusReason);
+
+        _FinalStage statusReason(PartnerReferralRequestStatusReason statusReason);
+
+        _FinalStage statusReason(Nullable<PartnerReferralRequestStatusReason> statusReason);
+
+        /**
+         * <p>The user an attribution request was sent to. Deprecated: requests to a user have ended. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         _FinalStage user(Optional<UserSummary> user);
 
@@ -464,6 +562,8 @@ public final class PartnerReferralRequest {
 
         private Optional<UserSummary> user = Optional.empty();
 
+        private Optional<PartnerReferralRequestStatusReason> statusReason = Optional.empty();
+
         private Optional<PartnerReferralRequestStatus> status = Optional.empty();
 
         private List<PartnerReferralReward> rewards = new ArrayList<>();
@@ -473,6 +573,10 @@ public final class PartnerReferralRequest {
         private Optional<String> memberId = Optional.empty();
 
         private Optional<Integer> maxRedemptions = Optional.empty();
+
+        private Optional<PartnerReferralRequestLead> lead = Optional.empty();
+
+        private Optional<String> expiresAt = Optional.empty();
 
         private Optional<String> code = Optional.empty();
 
@@ -490,7 +594,9 @@ public final class PartnerReferralRequest {
             authorizedUserId(other.getAuthorizedUserId());
             code(other.getCode());
             createdAt(other.getCreatedAt());
+            expiresAt(other.getExpiresAt());
             id(other.getId());
+            lead(other.getLead());
             maxRedemptions(other.getMaxRedemptions());
             memberId(other.getMemberId());
             partner(other.getPartner());
@@ -498,6 +604,7 @@ public final class PartnerReferralRequest {
             requestType(other.getRequestType());
             rewards(other.getRewards());
             status(other.getStatus());
+            statusReason(other.getStatusReason());
             updatedAt(other.getUpdatedAt());
             user(other.getUser());
             return this;
@@ -526,7 +633,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>Public profile of the requesting partner.</p>
+         * <p>Public profile of the partner associated with this referral request.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -559,7 +666,8 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>User receiving the attribution request, or null for a business request or referral link.</p>
+         * <p>The user an attribution request was sent to. Deprecated: requests to a user have ended. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -575,7 +683,8 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>User receiving the attribution request, or null for a business request or referral link.</p>
+         * <p>The user an attribution request was sent to. Deprecated: requests to a user have ended. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -585,7 +694,8 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>User receiving the attribution request, or null for a business request or referral link.</p>
+         * <p>The user an attribution request was sent to. Deprecated: requests to a user have ended. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "user", nulls = Nulls.SKIP)
@@ -595,7 +705,43 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>The approval state, or null for requests without an approval process.</p>
+         * <p>Why the request reached its status. <code>expired</code> means a lead offer got no answer before <code>expires_at</code>. <code>passed</code> means the partner turned down a lead offer. <code>withdrawn</code> means the partner cancelled their own request. <code>null</code> for any other status.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statusReason(Nullable<PartnerReferralRequestStatusReason> statusReason) {
+            if (statusReason.isNull()) {
+                this.statusReason = null;
+            } else if (statusReason.isEmpty()) {
+                this.statusReason = Optional.empty();
+            } else {
+                this.statusReason = Optional.of(statusReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why the request reached its status. <code>expired</code> means a lead offer got no answer before <code>expires_at</code>. <code>passed</code> means the partner turned down a lead offer. <code>withdrawn</code> means the partner cancelled their own request. <code>null</code> for any other status.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statusReason(PartnerReferralRequestStatusReason statusReason) {
+            this.statusReason = Optional.ofNullable(statusReason);
+            return this;
+        }
+
+        /**
+         * <p>Why the request reached its status. <code>expired</code> means a lead offer got no answer before <code>expires_at</code>. <code>passed</code> means the partner turned down a lead offer. <code>withdrawn</code> means the partner cancelled their own request. <code>null</code> for any other status.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "status_reason", nulls = Nulls.SKIP)
+        public _FinalStage statusReason(Optional<PartnerReferralRequestStatusReason> statusReason) {
+            this.statusReason = statusReason;
+            return this;
+        }
+
+        /**
+         * <p>The approval state, or <code>null</code> for requests without an approval process. A lead offer that gets no answer before <code>expires_at</code> becomes <code>cancelled</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -611,7 +757,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>The approval state, or null for requests without an approval process.</p>
+         * <p>The approval state, or <code>null</code> for requests without an approval process. A lead offer that gets no answer before <code>expires_at</code> becomes <code>cancelled</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -621,7 +767,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>The approval state, or null for requests without an approval process.</p>
+         * <p>The approval state, or <code>null</code> for requests without an approval process. A lead offer that gets no answer before <code>expires_at</code> becomes <code>cancelled</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
@@ -655,7 +801,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>Business the partner sent this request on behalf of, when the referral belongs to their team. <code>null</code> for a personal referral.</p>
+         * <p>The partner's team account that this referral counts toward. <code>null</code> for a personal referral. A lead offer counts toward the partner-mode team where the partner earned the most in the last 30 days, or the newest on a tie. It is set when the offer is made.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -671,7 +817,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>Business the partner sent this request on behalf of, when the referral belongs to their team. <code>null</code> for a personal referral.</p>
+         * <p>The partner's team account that this referral counts toward. <code>null</code> for a personal referral. A lead offer counts toward the partner-mode team where the partner earned the most in the last 30 days, or the newest on a tie. It is set when the offer is made.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -681,7 +827,7 @@ public final class PartnerReferralRequest {
         }
 
         /**
-         * <p>Business the partner sent this request on behalf of, when the referral belongs to their team. <code>null</code> for a personal referral.</p>
+         * <p>The partner's team account that this referral counts toward. <code>null</code> for a personal referral. A lead offer counts toward the partner-mode team where the partner earned the most in the last 30 days, or the newest on a tie. It is set when the offer is made.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "referring_account", nulls = Nulls.SKIP)
@@ -759,6 +905,78 @@ public final class PartnerReferralRequest {
         @JsonSetter(value = "max_redemptions", nulls = Nulls.SKIP)
         public _FinalStage maxRedemptions(Optional<Integer> maxRedemptions) {
             this.maxRedemptions = maxRedemptions;
+            return this;
+        }
+
+        /**
+         * <p>The business's signup answers on a lead offer. Only the partner it was offered to sees them. <code>null</code> for anyone else and for other request types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lead(Nullable<PartnerReferralRequestLead> lead) {
+            if (lead.isNull()) {
+                this.lead = null;
+            } else if (lead.isEmpty()) {
+                this.lead = Optional.empty();
+            } else {
+                this.lead = Optional.of(lead.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The business's signup answers on a lead offer. Only the partner it was offered to sees them. <code>null</code> for anyone else and for other request types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lead(PartnerReferralRequestLead lead) {
+            this.lead = Optional.ofNullable(lead);
+            return this;
+        }
+
+        /**
+         * <p>The business's signup answers on a lead offer. Only the partner it was offered to sees them. <code>null</code> for anyone else and for other request types.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "lead", nulls = Nulls.SKIP)
+        public _FinalStage lead(Optional<PartnerReferralRequestLead> lead) {
+            this.lead = lead;
+            return this;
+        }
+
+        /**
+         * <p>When a lead offer stops taking a response, as an ISO 8601 timestamp. <code>null</code> for other request types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage expiresAt(Nullable<String> expiresAt) {
+            if (expiresAt.isNull()) {
+                this.expiresAt = null;
+            } else if (expiresAt.isEmpty()) {
+                this.expiresAt = Optional.empty();
+            } else {
+                this.expiresAt = Optional.of(expiresAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When a lead offer stops taking a response, as an ISO 8601 timestamp. <code>null</code> for other request types.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage expiresAt(String expiresAt) {
+            this.expiresAt = Optional.ofNullable(expiresAt);
+            return this;
+        }
+
+        /**
+         * <p>When a lead offer stops taking a response, as an ISO 8601 timestamp. <code>null</code> for other request types.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "expires_at", nulls = Nulls.SKIP)
+        public _FinalStage expiresAt(Optional<String> expiresAt) {
+            this.expiresAt = expiresAt;
             return this;
         }
 
@@ -877,7 +1095,9 @@ public final class PartnerReferralRequest {
                     authorizedUserId,
                     code,
                     createdAt,
+                    expiresAt,
                     id,
+                    lead,
                     maxRedemptions,
                     memberId,
                     partner,
@@ -885,6 +1105,7 @@ public final class PartnerReferralRequest {
                     requestType,
                     rewards,
                     status,
+                    statusReason,
                     updatedAt,
                     user,
                     additionalProperties);
@@ -896,7 +1117,9 @@ public final class PartnerReferralRequest {
                     || key.equalsIgnoreCase("authorized_user_id")
                     || key.equalsIgnoreCase("code")
                     || key.equalsIgnoreCase("created_at")
+                    || key.equalsIgnoreCase("expires_at")
                     || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("lead")
                     || key.equalsIgnoreCase("max_redemptions")
                     || key.equalsIgnoreCase("member_id")
                     || key.equalsIgnoreCase("partner")
@@ -904,6 +1127,7 @@ public final class PartnerReferralRequest {
                     || key.equalsIgnoreCase("request_type")
                     || key.equalsIgnoreCase("rewards")
                     || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("status_reason")
                     || key.equalsIgnoreCase("updated_at")
                     || key.equalsIgnoreCase("user")) {
                 return;

@@ -298,7 +298,7 @@ public class AsyncAdGroupsClient {
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id) {
         CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture = this.rawClient.duplicate(id);
@@ -312,7 +312,7 @@ public class AsyncAdGroupsClient {
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture =
@@ -327,7 +327,7 @@ public class AsyncAdGroupsClient {
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(String id, DuplicateAdGroupsRequest request) {
         CompletableFuture<WhopApiHttpResponse<DuplicateAdGroupsResponse>> rawFuture =
@@ -342,7 +342,7 @@ public class AsyncAdGroupsClient {
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public CompletableFuture<DuplicateAdGroupsResponse> duplicate(
             String id, DuplicateAdGroupsRequest request, RequestOptions requestOptions) {

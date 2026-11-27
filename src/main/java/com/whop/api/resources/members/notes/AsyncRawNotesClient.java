@@ -22,7 +22,9 @@ import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.members.notes.requests.CreateNotesRequest;
+import com.whop.api.resources.members.notes.requests.DeleteNotesRequest;
 import com.whop.api.resources.members.notes.requests.ListNotesRequest;
+import com.whop.api.resources.members.notes.types.DeleteNotesResponse;
 import com.whop.api.resources.members.notes.types.ListNotesResponse;
 import com.whop.api.types.MemberNote;
 import java.io.IOException;
@@ -296,6 +298,126 @@ public class AsyncRawNotesClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> delete(String memberId, String id) {
+        return delete(memberId, id, DeleteNotesRequest.builder().build());
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> delete(
+            String memberId, String id, RequestOptions requestOptions) {
+        return delete(memberId, id, DeleteNotesRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> delete(
+            String memberId, String id, DeleteNotesRequest request) {
+        return delete(memberId, id, request, null);
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> delete(
+            String memberId, String id, DeleteNotesRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("members")
+                .addPathSegment(PathSegments.validate(memberId))
+                .addPathSegments("notes")
+                .addPathSegment(PathSegments.validate(id));
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method(
+                        "DELETE",
+                        BodyProperties.toRequestBody(
+                                requestOptions != null ? requestOptions.getBodyProperties() : null, null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, DeleteNotesResponse.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;

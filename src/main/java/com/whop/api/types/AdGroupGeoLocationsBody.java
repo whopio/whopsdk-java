@@ -53,7 +53,7 @@ public final class AdGroupGeoLocationsBody {
     }
 
     /**
-     * @return Cities, keyed by the location taxonomy.
+     * @return Cities, each keyed by its US state or country and its name.
      */
     @JsonProperty("cities")
     public Optional<List<AdGroupGeoLocationsBodyCitiesItem>> getCities() {
@@ -164,7 +164,7 @@ public final class AdGroupGeoLocationsBody {
         }
 
         /**
-         * <p>Cities, keyed by the location taxonomy.</p>
+         * <p>Cities, each keyed by its US state or country and its name.</p>
          */
         @JsonSetter(value = "cities", nulls = Nulls.SKIP)
         public Builder cities(Optional<List<AdGroupGeoLocationsBodyCitiesItem>> cities) {

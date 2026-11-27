@@ -31,7 +31,6 @@ import com.whop.api.resources.cardtransactions.CardTransactionsClient;
 import com.whop.api.resources.cashbackrules.CashbackRulesClient;
 import com.whop.api.resources.channelmembers.ChannelMembersClient;
 import com.whop.api.resources.channels.ChannelsClient;
-import com.whop.api.resources.chatchannels.ChatChannelsClient;
 import com.whop.api.resources.checkoutconfigurations.CheckoutConfigurationsClient;
 import com.whop.api.resources.claimlinks.ClaimLinksClient;
 import com.whop.api.resources.companytokentransactions.CompanyTokenTransactionsClient;
@@ -44,8 +43,6 @@ import com.whop.api.resources.coursestudents.CourseStudentsClient;
 import com.whop.api.resources.deposits.DepositsClient;
 import com.whop.api.resources.disputealerts.DisputeAlertsClient;
 import com.whop.api.resources.disputes.DisputesClient;
-import com.whop.api.resources.dmchannels.DmChannelsClient;
-import com.whop.api.resources.dmmembers.DmMembersClient;
 import com.whop.api.resources.domains.DomainsClient;
 import com.whop.api.resources.economicintelligence.EconomicIntelligenceClient;
 import com.whop.api.resources.emailaddresses.EmailAddressesClient;
@@ -88,6 +85,7 @@ import com.whop.api.resources.productaffiliates.ProductAffiliatesClient;
 import com.whop.api.resources.products.ProductsClient;
 import com.whop.api.resources.promocodes.PromoCodesClient;
 import com.whop.api.resources.reactions.ReactionsClient;
+import com.whop.api.resources.recommendedactions.RecommendedActionsClient;
 import com.whop.api.resources.refunds.RefundsClient;
 import com.whop.api.resources.resolutioncentercases.ResolutionCenterCasesClient;
 import com.whop.api.resources.reviewreports.ReviewReportsClient;
@@ -97,7 +95,7 @@ import com.whop.api.resources.setupintents.SetupIntentsClient;
 import com.whop.api.resources.shipments.ShipmentsClient;
 import com.whop.api.resources.socialaccounts.SocialAccountsClient;
 import com.whop.api.resources.stats.StatsClient;
-import com.whop.api.resources.supportchannels.SupportChannelsClient;
+import com.whop.api.resources.suspensionappeals.SuspensionAppealsClient;
 import com.whop.api.resources.swaps.SwapsClient;
 import com.whop.api.resources.teammembers.TeamMembersClient;
 import com.whop.api.resources.trades.TradesClient;
@@ -164,8 +162,6 @@ public class WhopApiClient implements AutoCloseable {
 
     protected final Supplier<ChannelsClient> channelsClient;
 
-    protected final Supplier<ChatChannelsClient> chatChannelsClient;
-
     protected final Supplier<CheckoutConfigurationsClient> checkoutConfigurationsClient;
 
     protected final Supplier<ClaimLinksClient> claimLinksClient;
@@ -189,10 +185,6 @@ public class WhopApiClient implements AutoCloseable {
     protected final Supplier<DisputeAlertsClient> disputeAlertsClient;
 
     protected final Supplier<DisputesClient> disputesClient;
-
-    protected final Supplier<DmChannelsClient> dmChannelsClient;
-
-    protected final Supplier<DmMembersClient> dmMembersClient;
 
     protected final Supplier<DomainsClient> domainsClient;
 
@@ -278,6 +270,8 @@ public class WhopApiClient implements AutoCloseable {
 
     protected final Supplier<ReactionsClient> reactionsClient;
 
+    protected final Supplier<RecommendedActionsClient> recommendedActionsClient;
+
     protected final Supplier<RefundsClient> refundsClient;
 
     protected final Supplier<ResolutionCenterCasesClient> resolutionCenterCasesClient;
@@ -296,7 +290,7 @@ public class WhopApiClient implements AutoCloseable {
 
     protected final Supplier<StatsClient> statsClient;
 
-    protected final Supplier<SupportChannelsClient> supportChannelsClient;
+    protected final Supplier<SuspensionAppealsClient> suspensionAppealsClient;
 
     protected final Supplier<SwapsClient> swapsClient;
 
@@ -344,7 +338,6 @@ public class WhopApiClient implements AutoCloseable {
         this.cashbackRulesClient = Suppliers.memoize(() -> new CashbackRulesClient(clientOptions));
         this.channelMembersClient = Suppliers.memoize(() -> new ChannelMembersClient(clientOptions));
         this.channelsClient = Suppliers.memoize(() -> new ChannelsClient(clientOptions));
-        this.chatChannelsClient = Suppliers.memoize(() -> new ChatChannelsClient(clientOptions));
         this.checkoutConfigurationsClient = Suppliers.memoize(() -> new CheckoutConfigurationsClient(clientOptions));
         this.claimLinksClient = Suppliers.memoize(() -> new ClaimLinksClient(clientOptions));
         this.companyTokenTransactionsClient =
@@ -359,8 +352,6 @@ public class WhopApiClient implements AutoCloseable {
         this.depositsClient = Suppliers.memoize(() -> new DepositsClient(clientOptions));
         this.disputeAlertsClient = Suppliers.memoize(() -> new DisputeAlertsClient(clientOptions));
         this.disputesClient = Suppliers.memoize(() -> new DisputesClient(clientOptions));
-        this.dmChannelsClient = Suppliers.memoize(() -> new DmChannelsClient(clientOptions));
-        this.dmMembersClient = Suppliers.memoize(() -> new DmMembersClient(clientOptions));
         this.domainsClient = Suppliers.memoize(() -> new DomainsClient(clientOptions));
         this.economicIntelligenceClient = Suppliers.memoize(() -> new EconomicIntelligenceClient(clientOptions));
         this.emailAddressesClient = Suppliers.memoize(() -> new EmailAddressesClient(clientOptions));
@@ -403,6 +394,7 @@ public class WhopApiClient implements AutoCloseable {
         this.productsClient = Suppliers.memoize(() -> new ProductsClient(clientOptions));
         this.promoCodesClient = Suppliers.memoize(() -> new PromoCodesClient(clientOptions));
         this.reactionsClient = Suppliers.memoize(() -> new ReactionsClient(clientOptions));
+        this.recommendedActionsClient = Suppliers.memoize(() -> new RecommendedActionsClient(clientOptions));
         this.refundsClient = Suppliers.memoize(() -> new RefundsClient(clientOptions));
         this.resolutionCenterCasesClient = Suppliers.memoize(() -> new ResolutionCenterCasesClient(clientOptions));
         this.reviewReportsClient = Suppliers.memoize(() -> new ReviewReportsClient(clientOptions));
@@ -412,7 +404,7 @@ public class WhopApiClient implements AutoCloseable {
         this.shipmentsClient = Suppliers.memoize(() -> new ShipmentsClient(clientOptions));
         this.socialAccountsClient = Suppliers.memoize(() -> new SocialAccountsClient(clientOptions));
         this.statsClient = Suppliers.memoize(() -> new StatsClient(clientOptions));
-        this.supportChannelsClient = Suppliers.memoize(() -> new SupportChannelsClient(clientOptions));
+        this.suspensionAppealsClient = Suppliers.memoize(() -> new SuspensionAppealsClient(clientOptions));
         this.swapsClient = Suppliers.memoize(() -> new SwapsClient(clientOptions));
         this.teamMembersClient = Suppliers.memoize(() -> new TeamMembersClient(clientOptions));
         this.tradesClient = Suppliers.memoize(() -> new TradesClient(clientOptions));
@@ -528,10 +520,6 @@ public class WhopApiClient implements AutoCloseable {
         return this.channelsClient.get();
     }
 
-    public ChatChannelsClient chatChannels() {
-        return this.chatChannelsClient.get();
-    }
-
     public CheckoutConfigurationsClient checkoutConfigurations() {
         return this.checkoutConfigurationsClient.get();
     }
@@ -578,14 +566,6 @@ public class WhopApiClient implements AutoCloseable {
 
     public DisputesClient disputes() {
         return this.disputesClient.get();
-    }
-
-    public DmChannelsClient dmChannels() {
-        return this.dmChannelsClient.get();
-    }
-
-    public DmMembersClient dmMembers() {
-        return this.dmMembersClient.get();
     }
 
     public DomainsClient domains() {
@@ -756,6 +736,10 @@ public class WhopApiClient implements AutoCloseable {
         return this.reactionsClient.get();
     }
 
+    public RecommendedActionsClient recommendedActions() {
+        return this.recommendedActionsClient.get();
+    }
+
     public RefundsClient refunds() {
         return this.refundsClient.get();
     }
@@ -792,8 +776,8 @@ public class WhopApiClient implements AutoCloseable {
         return this.statsClient.get();
     }
 
-    public SupportChannelsClient supportChannels() {
-        return this.supportChannelsClient.get();
+    public SuspensionAppealsClient suspensionAppeals() {
+        return this.suspensionAppealsClient.get();
     }
 
     public SwapsClient swaps() {

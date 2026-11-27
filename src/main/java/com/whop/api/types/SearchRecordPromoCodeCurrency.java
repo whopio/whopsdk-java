@@ -103,6 +103,8 @@ public final class SearchRecordPromoCodeCurrency {
 
     public static final SearchRecordPromoCodeCurrency MUR = new SearchRecordPromoCodeCurrency(Value.MUR, "mur");
 
+    public static final SearchRecordPromoCodeCurrency HNL = new SearchRecordPromoCodeCurrency(Value.HNL, "hnl");
+
     public static final SearchRecordPromoCodeCurrency PEN = new SearchRecordPromoCodeCurrency(Value.PEN, "pen");
 
     public static final SearchRecordPromoCodeCurrency USD = new SearchRecordPromoCodeCurrency(Value.USD, "usd");
@@ -317,6 +319,8 @@ public final class SearchRecordPromoCodeCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -506,6 +510,8 @@ public final class SearchRecordPromoCodeCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -776,6 +782,8 @@ public final class SearchRecordPromoCodeCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -959,6 +967,8 @@ public final class SearchRecordPromoCodeCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

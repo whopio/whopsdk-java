@@ -28,6 +28,8 @@ public final class Member {
 
     private final String accountId;
 
+    private final Optional<String> buyerAccountId;
+
     private final String createdAt;
 
     private final String displayName;
@@ -71,6 +73,7 @@ public final class Member {
     private Member(
             MemberAccessLevel accessLevel,
             String accountId,
+            Optional<String> buyerAccountId,
             String createdAt,
             String displayName,
             Optional<UserEarningsAmount> earningsUsd,
@@ -93,6 +96,7 @@ public final class Member {
             Map<String, Object> additionalProperties) {
         this.accessLevel = accessLevel;
         this.accountId = accountId;
+        this.buyerAccountId = buyerAccountId;
         this.createdAt = createdAt;
         this.displayName = displayName;
         this.earningsUsd = earningsUsd;
@@ -129,6 +133,17 @@ public final class Member {
     @JsonProperty("account_id")
     public String getAccountId() {
         return accountId;
+    }
+
+    /**
+     * @return The business that bought, prefixed <code>biz_</code>. <code>null</code> when the buyer is a person.
+     */
+    @JsonIgnore
+    public Optional<String> getBuyerAccountId() {
+        if (buyerAccountId == null) {
+            return Optional.empty();
+        }
+        return buyerAccountId;
     }
 
     /**
@@ -197,7 +212,7 @@ public final class Member {
     }
 
     /**
-     * @return What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.
+     * @return What happened at <code>last_activity_at</code>: a message in the member's support chat. <code>type</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.
      */
     @JsonIgnore
     public Optional<MemberLastActivityMessage> getLastActivity() {
@@ -320,6 +335,12 @@ public final class Member {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("buyer_account_id")
+    private Optional<String> _getBuyerAccountId() {
+        return buyerAccountId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("earnings_usd")
     private Optional<UserEarningsAmount> _getEarningsUsd() {
         return earningsUsd;
@@ -405,6 +426,7 @@ public final class Member {
     private boolean equalTo(Member other) {
         return accessLevel.equals(other.accessLevel)
                 && accountId.equals(other.accountId)
+                && buyerAccountId.equals(other.buyerAccountId)
                 && createdAt.equals(other.createdAt)
                 && displayName.equals(other.displayName)
                 && earningsUsd.equals(other.earningsUsd)
@@ -431,6 +453,7 @@ public final class Member {
         return Objects.hash(
                 this.accessLevel,
                 this.accountId,
+                this.buyerAccountId,
                 this.createdAt,
                 this.displayName,
                 this.earningsUsd,
@@ -534,6 +557,15 @@ public final class Member {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The business that bought, prefixed <code>biz_</code>. <code>null</code> when the buyer is a person.</p>
+         */
+        _FinalStage buyerAccountId(Optional<String> buyerAccountId);
+
+        _FinalStage buyerAccountId(String buyerAccountId);
+
+        _FinalStage buyerAccountId(Nullable<String> buyerAccountId);
+
+        /**
          * <p>The user's gross income across Whop, in USD, refreshed periodically. <code>null</code> when the user hides their earnings or the buyer is another business.</p>
          */
         _FinalStage earningsUsd(Optional<UserEarningsAmount> earningsUsd);
@@ -561,7 +593,7 @@ public final class Member {
         _FinalStage lastAccessedAt(Nullable<String> lastAccessedAt);
 
         /**
-         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * <p>What happened at <code>last_activity_at</code>: a message in the member's support chat. <code>type</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
          */
         _FinalStage lastActivity(Optional<MemberLastActivityMessage> lastActivity);
 
@@ -696,6 +728,8 @@ public final class Member {
 
         private Optional<UserEarningsAmount> earningsUsd = Optional.empty();
 
+        private Optional<String> buyerAccountId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -704,6 +738,7 @@ public final class Member {
         public Builder from(Member other) {
             accessLevel(other.getAccessLevel());
             accountId(other.getAccountId());
+            buyerAccountId(other.getBuyerAccountId());
             createdAt(other.getCreatedAt());
             displayName(other.getDisplayName());
             earningsUsd(other.getEarningsUsd());
@@ -1114,7 +1149,7 @@ public final class Member {
         }
 
         /**
-         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * <p>What happened at <code>last_activity_at</code>: a message in the member's support chat. <code>type</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1130,7 +1165,7 @@ public final class Member {
         }
 
         /**
-         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * <p>What happened at <code>last_activity_at</code>: a message in the member's support chat. <code>type</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1140,7 +1175,7 @@ public final class Member {
         }
 
         /**
-         * <p>What happened at <code>last_activity_at</code>. <code>object</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
+         * <p>What happened at <code>last_activity_at</code>: a message in the member's support chat. <code>type</code> says which kind of activity it is. <code>null</code> without <code>support_chat:read</code> on the account, or when <code>last_activity_at</code> is <code>null</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "last_activity", nulls = Nulls.SKIP)
@@ -1257,11 +1292,48 @@ public final class Member {
             return this;
         }
 
+        /**
+         * <p>The business that bought, prefixed <code>biz_</code>. <code>null</code> when the buyer is a person.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage buyerAccountId(Nullable<String> buyerAccountId) {
+            if (buyerAccountId.isNull()) {
+                this.buyerAccountId = null;
+            } else if (buyerAccountId.isEmpty()) {
+                this.buyerAccountId = Optional.empty();
+            } else {
+                this.buyerAccountId = Optional.of(buyerAccountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The business that bought, prefixed <code>biz_</code>. <code>null</code> when the buyer is a person.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage buyerAccountId(String buyerAccountId) {
+            this.buyerAccountId = Optional.ofNullable(buyerAccountId);
+            return this;
+        }
+
+        /**
+         * <p>The business that bought, prefixed <code>biz_</code>. <code>null</code> when the buyer is a person.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "buyer_account_id", nulls = Nulls.SKIP)
+        public _FinalStage buyerAccountId(Optional<String> buyerAccountId) {
+            this.buyerAccountId = buyerAccountId;
+            return this;
+        }
+
         @java.lang.Override
         public Member build() {
             return new Member(
                     accessLevel,
                     accountId,
+                    buyerAccountId,
                     createdAt,
                     displayName,
                     earningsUsd,
@@ -1288,6 +1360,7 @@ public final class Member {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("access_level")
                     || key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("buyer_account_id")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("display_name")
                     || key.equalsIgnoreCase("earnings_usd")

@@ -81,7 +81,7 @@ public final class UpdateAdCampaignsRequest {
     }
 
     /**
-     * @return The campaign budget in USD, which is what it is stored and billed in. Interpreted as daily or lifetime per the campaign's budget type, including a budget_type sent in the same request.
+     * @return The campaign budget in USD, which is what it is stored and billed in. Spent per day, or over the campaign's full run when its <code>budget_type</code> is <code>lifetime</code>.
      */
     @JsonProperty("budget_amount")
     public Optional<Double> getBudgetAmount() {
@@ -105,7 +105,7 @@ public final class UpdateAdCampaignsRequest {
     }
 
     /**
-     * @return Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Only changeable while the campaign is a draft; send budget_amount in the same request so the amount lands on the new type.
+     * @return Deprecated: lifetime budgets have ended. A draft campaign with a lifetime budget can switch to <code>daily</code>. Send <code>budget_amount</code> in the same request. A switch to <code>lifetime</code> returns a <code>400</code>.
      */
     @JsonProperty("budget_type")
     public Optional<UpdateAdCampaignsRequestBudgetType> getBudgetType() {
@@ -121,7 +121,7 @@ public final class UpdateAdCampaignsRequest {
     }
 
     /**
-     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. <code>null</code> clears it.
+     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> clears it.
      */
     @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
@@ -271,7 +271,7 @@ public final class UpdateAdCampaignsRequest {
         }
 
         /**
-         * <p>The campaign budget in USD, which is what it is stored and billed in. Interpreted as daily or lifetime per the campaign's budget type, including a budget_type sent in the same request.</p>
+         * <p>The campaign budget in USD, which is what it is stored and billed in. Spent per day, or over the campaign's full run when its <code>budget_type</code> is <code>lifetime</code>.</p>
          */
         @JsonSetter(value = "budget_amount", nulls = Nulls.SKIP)
         public Builder budgetAmount(Optional<Double> budgetAmount) {
@@ -313,7 +313,7 @@ public final class UpdateAdCampaignsRequest {
         }
 
         /**
-         * <p>Whether <code>budget_amount</code> is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Only changeable while the campaign is a draft; send budget_amount in the same request so the amount lands on the new type.</p>
+         * <p>Deprecated: lifetime budgets have ended. A draft campaign with a lifetime budget can switch to <code>daily</code>. Send <code>budget_amount</code> in the same request. A switch to <code>lifetime</code> returns a <code>400</code>.</p>
          */
         @JsonSetter(value = "budget_type", nulls = Nulls.SKIP)
         public Builder budgetType(Optional<UpdateAdCampaignsRequestBudgetType> budgetType) {
@@ -341,7 +341,7 @@ public final class UpdateAdCampaignsRequest {
         }
 
         /**
-         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. <code>null</code> clears it.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> clears it.</p>
          */
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
         public Builder desiredCostPerResult(Optional<Double> desiredCostPerResult) {

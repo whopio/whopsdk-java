@@ -9,9 +9,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
@@ -19,16 +22,40 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdContentReviewTag.Builder.class)
 public final class AdContentReviewTag {
+    private final boolean blocking;
+
+    private final List<AdContentReviewTagLocationsItem> locations;
+
     private final String message;
 
     private final String title;
 
     private final Map<String, Object> additionalProperties;
 
-    private AdContentReviewTag(String message, String title, Map<String, Object> additionalProperties) {
+    private AdContentReviewTag(
+            boolean blocking,
+            List<AdContentReviewTagLocationsItem> locations,
+            String message,
+            String title,
+            Map<String, Object> additionalProperties) {
+        this.blocking = blocking;
+        this.locations = locations;
         this.message = message;
         this.title = title;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Whether this rule keeps the ad from running until it's fixed. <code>false</code> when the ad can still run and fixing it only lets the ad run on more networks.
+     */
+    @JsonProperty("blocking")
+    public boolean getBlocking() {
+        return blocking;
+    }
+
+    @JsonProperty("locations")
+    public List<AdContentReviewTagLocationsItem> getLocations() {
+        return locations;
     }
 
     /**
@@ -59,12 +86,15 @@ public final class AdContentReviewTag {
     }
 
     private boolean equalTo(AdContentReviewTag other) {
-        return message.equals(other.message) && title.equals(other.title);
+        return blocking == other.blocking
+                && locations.equals(other.locations)
+                && message.equals(other.message)
+                && title.equals(other.title);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.message, this.title);
+        return Objects.hash(this.blocking, this.locations, this.message, this.title);
     }
 
     @java.lang.Override
@@ -72,8 +102,17 @@ public final class AdContentReviewTag {
         return ObjectMappers.stringify(this);
     }
 
-    public static MessageStage builder() {
+    public static BlockingStage builder() {
         return new Builder();
+    }
+
+    public interface BlockingStage {
+        /**
+         * <p>Whether this rule keeps the ad from running until it's fixed. <code>false</code> when the ad can still run and fixing it only lets the ad run on more networks.</p>
+         */
+        MessageStage blocking(boolean blocking);
+
+        Builder from(AdContentReviewTag other);
     }
 
     public interface MessageStage {
@@ -81,8 +120,6 @@ public final class AdContentReviewTag {
          * <p>The evidence the review recorded for this rule.</p>
          */
         TitleStage message(@NotNull String message);
-
-        Builder from(AdContentReviewTag other);
     }
 
     public interface TitleStage {
@@ -98,13 +135,23 @@ public final class AdContentReviewTag {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage locations(List<AdContentReviewTagLocationsItem> locations);
+
+        _FinalStage addLocations(AdContentReviewTagLocationsItem locations);
+
+        _FinalStage addAllLocations(List<AdContentReviewTagLocationsItem> locations);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements MessageStage, TitleStage, _FinalStage {
+    public static final class Builder implements BlockingStage, MessageStage, TitleStage, _FinalStage {
+        private boolean blocking;
+
         private String message;
 
         private String title;
+
+        private List<AdContentReviewTagLocationsItem> locations = new ArrayList<>();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -112,8 +159,21 @@ public final class AdContentReviewTag {
 
         @java.lang.Override
         public Builder from(AdContentReviewTag other) {
+            blocking(other.getBlocking());
+            locations(other.getLocations());
             message(other.getMessage());
             title(other.getTitle());
+            return this;
+        }
+
+        /**
+         * <p>Whether this rule keeps the ad from running until it's fixed. <code>false</code> when the ad can still run and fixing it only lets the ad run on more networks.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("blocking")
+        public MessageStage blocking(boolean blocking) {
+            this.blocking = blocking;
             return this;
         }
 
@@ -140,13 +200,40 @@ public final class AdContentReviewTag {
         }
 
         @java.lang.Override
+        public _FinalStage addAllLocations(List<AdContentReviewTagLocationsItem> locations) {
+            if (locations != null) {
+                this.locations.addAll(locations);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addLocations(AdContentReviewTagLocationsItem locations) {
+            this.locations.add(locations);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "locations", nulls = Nulls.SKIP)
+        public _FinalStage locations(List<AdContentReviewTagLocationsItem> locations) {
+            this.locations.clear();
+            if (locations != null) {
+                this.locations.addAll(locations);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public AdContentReviewTag build() {
-            return new AdContentReviewTag(message, title, additionalProperties);
+            return new AdContentReviewTag(blocking, locations, message, title, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("message") || key.equalsIgnoreCase("title")) {
+            if (key.equalsIgnoreCase("blocking")
+                    || key.equalsIgnoreCase("locations")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("title")) {
                 return;
             }
             this.additionalProperties.put(key, value);

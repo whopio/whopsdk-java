@@ -79,6 +79,7 @@ public final class PackageConsumer {
                         .token("package-smoke")
                         .httpClient(transport)
                         .build()) {
+            require(com.whop.api.Whop.of(client) instanceof WhopApiClient, "installed jar is missing the live client");
             client.users().retrieve("me");
             async.users().retrieve("me").get(10, TimeUnit.SECONDS);
             client.stats()

@@ -141,6 +141,9 @@ public final class UpdateWebhooksRequestEventsItem {
     public static final UpdateWebhooksRequestEventsItem PRODUCT_DELETED =
             new UpdateWebhooksRequestEventsItem(Value.PRODUCT_DELETED, "product.deleted");
 
+    public static final UpdateWebhooksRequestEventsItem CAPITAL_CREATED =
+            new UpdateWebhooksRequestEventsItem(Value.CAPITAL_CREATED, "capital.created");
+
     public static final UpdateWebhooksRequestEventsItem PAYMENT_CREATED =
             new UpdateWebhooksRequestEventsItem(Value.PAYMENT_CREATED, "payment.created");
 
@@ -232,6 +235,9 @@ public final class UpdateWebhooksRequestEventsItem {
     public static final UpdateWebhooksRequestEventsItem PAYMENT_FAILED =
             new UpdateWebhooksRequestEventsItem(Value.PAYMENT_FAILED, "payment.failed");
 
+    public static final UpdateWebhooksRequestEventsItem CAPITAL_UPDATED =
+            new UpdateWebhooksRequestEventsItem(Value.CAPITAL_UPDATED, "capital.updated");
+
     public static final UpdateWebhooksRequestEventsItem ACCOUNT_FINANCING_APPROVED =
             new UpdateWebhooksRequestEventsItem(Value.ACCOUNT_FINANCING_APPROVED, "account.financing_approved");
 
@@ -273,6 +279,9 @@ public final class UpdateWebhooksRequestEventsItem {
 
     public static final UpdateWebhooksRequestEventsItem DOMAIN_CREATED =
             new UpdateWebhooksRequestEventsItem(Value.DOMAIN_CREATED, "domain.created");
+
+    public static final UpdateWebhooksRequestEventsItem AD_CAMPAIGN_CLAIM_ENDED =
+            new UpdateWebhooksRequestEventsItem(Value.AD_CAMPAIGN_CLAIM_ENDED, "ad_campaign.claim_ended");
 
     public static final UpdateWebhooksRequestEventsItem PRODUCT_PUBLISHED =
             new UpdateWebhooksRequestEventsItem(Value.PRODUCT_PUBLISHED, "product.published");
@@ -434,6 +443,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return visitor.visitCardApplicationApproved();
             case PRODUCT_DELETED:
                 return visitor.visitProductDeleted();
+            case CAPITAL_CREATED:
+                return visitor.visitCapitalCreated();
             case PAYMENT_CREATED:
                 return visitor.visitPaymentCreated();
             case INVOICE_MARKED_UNCOLLECTIBLE:
@@ -494,6 +505,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return visitor.visitDomainUpdated();
             case PAYMENT_FAILED:
                 return visitor.visitPaymentFailed();
+            case CAPITAL_UPDATED:
+                return visitor.visitCapitalUpdated();
             case ACCOUNT_FINANCING_APPROVED:
                 return visitor.visitAccountFinancingApproved();
             case AD_CAMPAIGN_DELETED:
@@ -522,6 +535,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return visitor.visitResolutionCenterCaseDecided();
             case DOMAIN_CREATED:
                 return visitor.visitDomainCreated();
+            case AD_CAMPAIGN_CLAIM_ENDED:
+                return visitor.visitAdCampaignClaimEnded();
             case PRODUCT_PUBLISHED:
                 return visitor.visitProductPublished();
             case EXPORT_FAILED:
@@ -645,6 +660,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return CARD_APPLICATION_APPROVED;
             case "product.deleted":
                 return PRODUCT_DELETED;
+            case "capital.created":
+                return CAPITAL_CREATED;
             case "payment.created":
                 return PAYMENT_CREATED;
             case "invoice.marked_uncollectible":
@@ -705,6 +722,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return DOMAIN_UPDATED;
             case "payment.failed":
                 return PAYMENT_FAILED;
+            case "capital.updated":
+                return CAPITAL_UPDATED;
             case "account.financing_approved":
                 return ACCOUNT_FINANCING_APPROVED;
             case "ad_campaign.deleted":
@@ -733,6 +752,8 @@ public final class UpdateWebhooksRequestEventsItem {
                 return RESOLUTION_CENTER_CASE_DECIDED;
             case "domain.created":
                 return DOMAIN_CREATED;
+            case "ad_campaign.claim_ended":
+                return AD_CAMPAIGN_CLAIM_ENDED;
             case "product.published":
                 return PRODUCT_PUBLISHED;
             case "export.failed":
@@ -863,6 +884,10 @@ public final class UpdateWebhooksRequestEventsItem {
 
         DOMAIN_DELETED,
 
+        CAPITAL_CREATED,
+
+        CAPITAL_UPDATED,
+
         PAYOUT_METHOD_CREATED,
 
         VERIFICATION_SUCCEEDED,
@@ -920,6 +945,8 @@ public final class UpdateWebhooksRequestEventsItem {
         AD_CAMPAIGN_EVENTS,
 
         AD_CAMPAIGN_DELETED,
+
+        AD_CAMPAIGN_CLAIM_ENDED,
 
         AD_GROUP_CREATED,
 
@@ -1069,6 +1096,10 @@ public final class UpdateWebhooksRequestEventsItem {
 
         T visitDomainDeleted();
 
+        T visitCapitalCreated();
+
+        T visitCapitalUpdated();
+
         T visitPayoutMethodCreated();
 
         T visitVerificationSucceeded();
@@ -1126,6 +1157,8 @@ public final class UpdateWebhooksRequestEventsItem {
         T visitAdCampaignEvents();
 
         T visitAdCampaignDeleted();
+
+        T visitAdCampaignClaimEnded();
 
         T visitAdGroupCreated();
 

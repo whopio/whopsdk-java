@@ -33,7 +33,7 @@ public class AsyncChannelMembersClient {
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public CompletableFuture<SyncPagingIterable<ChannelMember>> list(ListChannelMembersRequest request) {
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChannelMember>>> rawFuture =
@@ -48,7 +48,7 @@ public class AsyncChannelMembersClient {
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public CompletableFuture<SyncPagingIterable<ChannelMember>> list(
             ListChannelMembersRequest request, RequestOptions requestOptions) {

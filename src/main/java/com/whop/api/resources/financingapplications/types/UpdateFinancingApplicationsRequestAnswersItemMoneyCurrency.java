@@ -139,6 +139,9 @@ public final class UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency {
     public static final UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency MUR =
             new UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency(Value.MUR, "mur");
 
+    public static final UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency HNL =
+            new UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency(Value.HNL, "hnl");
+
     public static final UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency PEN =
             new UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency(Value.PEN, "pen");
 
@@ -381,6 +384,8 @@ public final class UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -558,6 +563,8 @@ public final class UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -812,6 +819,8 @@ public final class UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency {
 
         AWG,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -983,6 +992,8 @@ public final class UpdateFinancingApplicationsRequestAnswersItemMoneyCurrency {
         T visitKzt();
 
         T visitAwg();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

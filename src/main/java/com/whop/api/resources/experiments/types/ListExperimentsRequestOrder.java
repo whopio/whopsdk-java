@@ -13,6 +13,8 @@ public final class ListExperimentsRequestOrder {
     public static final ListExperimentsRequestOrder CREATED_AT =
             new ListExperimentsRequestOrder(Value.CREATED_AT, "created_at");
 
+    public static final ListExperimentsRequestOrder LIFT = new ListExperimentsRequestOrder(Value.LIFT, "lift");
+
     private final Value value;
 
     private final String string;
@@ -50,6 +52,8 @@ public final class ListExperimentsRequestOrder {
                 return visitor.visitFlagKey();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
+            case LIFT:
+                return visitor.visitLift();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -63,6 +67,8 @@ public final class ListExperimentsRequestOrder {
                 return FLAG_KEY;
             case "created_at":
                 return CREATED_AT;
+            case "lift":
+                return LIFT;
             default:
                 return new ListExperimentsRequestOrder(Value.UNKNOWN, value);
         }
@@ -73,6 +79,8 @@ public final class ListExperimentsRequestOrder {
 
         FLAG_KEY,
 
+        LIFT,
+
         UNKNOWN
     }
 
@@ -80,6 +88,8 @@ public final class ListExperimentsRequestOrder {
         T visitCreatedAt();
 
         T visitFlagKey();
+
+        T visitLift();
 
         T visitUnknown(String unknownType);
     }

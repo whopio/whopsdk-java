@@ -67,6 +67,9 @@ public final class PaymentLastPaymentErrorDeclineCode {
     public static final PaymentLastPaymentErrorDeclineCode SUSPECTED_FRAUD =
             new PaymentLastPaymentErrorDeclineCode(Value.SUSPECTED_FRAUD, "suspected_fraud");
 
+    public static final PaymentLastPaymentErrorDeclineCode INVALID_BILLING_ADDRESS =
+            new PaymentLastPaymentErrorDeclineCode(Value.INVALID_BILLING_ADDRESS, "invalid_billing_address");
+
     public static final PaymentLastPaymentErrorDeclineCode ISSUER_NOT_FOUND =
             new PaymentLastPaymentErrorDeclineCode(Value.ISSUER_NOT_FOUND, "issuer_not_found");
 
@@ -347,6 +350,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
                 return visitor.visitRestrictedCard();
             case SUSPECTED_FRAUD:
                 return visitor.visitSuspectedFraud();
+            case INVALID_BILLING_ADDRESS:
+                return visitor.visitInvalidBillingAddress();
             case ISSUER_NOT_FOUND:
                 return visitor.visitIssuerNotFound();
             case BANK_AUTHORIZATION_REVOKED:
@@ -530,6 +535,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
                 return RESTRICTED_CARD;
             case "suspected_fraud":
                 return SUSPECTED_FRAUD;
+            case "invalid_billing_address":
+                return INVALID_BILLING_ADDRESS;
             case "issuer_not_found":
                 return ISSUER_NOT_FOUND;
             case "bank_authorization_revoked":
@@ -730,6 +737,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
 
         INVALID_ZIP,
 
+        INVALID_BILLING_ADDRESS,
+
         INVALID_EXPIRY_MONTH,
 
         INVALID_EXPIRY_YEAR,
@@ -907,6 +916,8 @@ public final class PaymentLastPaymentErrorDeclineCode {
         T visitIssuerUnavailable();
 
         T visitInvalidZip();
+
+        T visitInvalidBillingAddress();
 
         T visitInvalidExpiryMonth();
 

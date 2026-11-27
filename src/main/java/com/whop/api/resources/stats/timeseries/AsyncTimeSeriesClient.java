@@ -57,7 +57,7 @@ public class AsyncTimeSeriesClient {
     }
 
     /**
-     * Retrieves a metric as a series of points over a time range for an account or user. For an aggregate that is not bucketed over time, use a report from <code>GET /stats/reports</code>. The <code>market_prices</code> metric is public and requires no authentication. Each metric takes its own scope: most need <code>stats:read</code>, the earnings, markup revenue and <code>platform_markup_amount</code> metrics need <code>company:balance:read</code>, <code>markup_earning_estimate</code> needs <code>company:update_child_fees</code>, and <code>ad_delivery</code>, <code>ad_campaign_score</code>, <code>people</code> and <code>events</code> also accept <code>ad_campaign:read</code>.
+     * Retrieves a metric as a series of points over a time range for an account or user. For an aggregate that is not bucketed over time, use a report from <code>GET /stats/reports</code>. The <code>market_prices</code> metric is public and requires no authentication. Each metric takes its own scope: most need <code>stats:read</code>, the earnings, markup revenue and <code>platform_markup_amount</code> metrics need <code>company:balance:read</code>, <code>markup_earning_estimate</code> needs <code>company:update_child_fees</code>, <code>ad_delivery</code>, <code>ad_campaign_score</code>, <code>people</code> and <code>events</code> also accept <code>ad_campaign:read</code>, and <code>cashback</code> and <code>cashback_qualified_spend</code> also accept <code>payout:account:read</code>.
      */
     public CompletableFuture<RetrieveTimeSeriesResponse> retrieve(String metric, RetrieveTimeSeriesRequest request) {
         CompletableFuture<WhopApiHttpResponse<RetrieveTimeSeriesResponse>> rawFuture =
@@ -72,7 +72,7 @@ public class AsyncTimeSeriesClient {
     }
 
     /**
-     * Retrieves a metric as a series of points over a time range for an account or user. For an aggregate that is not bucketed over time, use a report from <code>GET /stats/reports</code>. The <code>market_prices</code> metric is public and requires no authentication. Each metric takes its own scope: most need <code>stats:read</code>, the earnings, markup revenue and <code>platform_markup_amount</code> metrics need <code>company:balance:read</code>, <code>markup_earning_estimate</code> needs <code>company:update_child_fees</code>, and <code>ad_delivery</code>, <code>ad_campaign_score</code>, <code>people</code> and <code>events</code> also accept <code>ad_campaign:read</code>.
+     * Retrieves a metric as a series of points over a time range for an account or user. For an aggregate that is not bucketed over time, use a report from <code>GET /stats/reports</code>. The <code>market_prices</code> metric is public and requires no authentication. Each metric takes its own scope: most need <code>stats:read</code>, the earnings, markup revenue and <code>platform_markup_amount</code> metrics need <code>company:balance:read</code>, <code>markup_earning_estimate</code> needs <code>company:update_child_fees</code>, <code>ad_delivery</code>, <code>ad_campaign_score</code>, <code>people</code> and <code>events</code> also accept <code>ad_campaign:read</code>, and <code>cashback</code> and <code>cashback_qualified_spend</code> also accept <code>payout:account:read</code>.
      */
     public CompletableFuture<RetrieveTimeSeriesResponse> retrieve(
             String metric, RetrieveTimeSeriesRequest request, RequestOptions requestOptions) {

@@ -10,18 +10,6 @@ public final class UpdateEconomicIntelligenceRequestStatus {
     public static final UpdateEconomicIntelligenceRequestStatus SUPERSEDED =
             new UpdateEconomicIntelligenceRequestStatus(Value.SUPERSEDED, "superseded");
 
-    public static final UpdateEconomicIntelligenceRequestStatus EXECUTED =
-            new UpdateEconomicIntelligenceRequestStatus(Value.EXECUTED, "executed");
-
-    public static final UpdateEconomicIntelligenceRequestStatus ACKNOWLEDGED =
-            new UpdateEconomicIntelligenceRequestStatus(Value.ACKNOWLEDGED, "acknowledged");
-
-    public static final UpdateEconomicIntelligenceRequestStatus INCOMPLETE =
-            new UpdateEconomicIntelligenceRequestStatus(Value.INCOMPLETE, "incomplete");
-
-    public static final UpdateEconomicIntelligenceRequestStatus RUNNING =
-            new UpdateEconomicIntelligenceRequestStatus(Value.RUNNING, "running");
-
     private final Value value;
 
     private final String string;
@@ -57,14 +45,6 @@ public final class UpdateEconomicIntelligenceRequestStatus {
         switch (value) {
             case SUPERSEDED:
                 return visitor.visitSuperseded();
-            case EXECUTED:
-                return visitor.visitExecuted();
-            case ACKNOWLEDGED:
-                return visitor.visitAcknowledged();
-            case INCOMPLETE:
-                return visitor.visitIncomplete();
-            case RUNNING:
-                return visitor.visitRunning();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -76,43 +56,19 @@ public final class UpdateEconomicIntelligenceRequestStatus {
         switch (value) {
             case "superseded":
                 return SUPERSEDED;
-            case "executed":
-                return EXECUTED;
-            case "acknowledged":
-                return ACKNOWLEDGED;
-            case "incomplete":
-                return INCOMPLETE;
-            case "running":
-                return RUNNING;
             default:
                 return new UpdateEconomicIntelligenceRequestStatus(Value.UNKNOWN, value);
         }
     }
 
     public enum Value {
-        RUNNING,
-
-        EXECUTED,
-
-        INCOMPLETE,
-
         SUPERSEDED,
-
-        ACKNOWLEDGED,
 
         UNKNOWN
     }
 
     public interface Visitor<T> {
-        T visitRunning();
-
-        T visitExecuted();
-
-        T visitIncomplete();
-
         T visitSuperseded();
-
-        T visitAcknowledged();
 
         T visitUnknown(String unknownType);
     }

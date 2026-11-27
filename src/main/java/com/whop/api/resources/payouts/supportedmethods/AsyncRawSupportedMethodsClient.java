@@ -118,6 +118,10 @@ public class AsyncRawSupportedMethodsClient {
                     request.getIncludeIndividualBanks().get(),
                     false);
         }
+        if (request.getGenericOnly().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "generic_only", request.getGenericOnly().get(), false);
+        }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);

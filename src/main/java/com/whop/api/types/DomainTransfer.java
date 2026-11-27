@@ -44,7 +44,7 @@ public final class DomainTransfer {
     }
 
     /**
-     * @return The code that takes the domain. For an <code>internal</code> move it starts <code>whop_dt_</code>, and the receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. Returned when the response is a single domain and you can manage it; <code>null</code> otherwise.
+     * @return The code that takes the domain, shown while <code>state</code> is <code>ready</code>. For an <code>internal</code> move it starts <code>whop_dt_</code>. The receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. For an <code>external</code> move it is the registrar's auth code, which you give to the new registrar. Only a single-domain response shows it, and only to a caller who can manage the domain. Otherwise it is <code>null</code>.
      */
     @JsonIgnore
     public Optional<String> getCode() {
@@ -55,7 +55,7 @@ public final class DomainTransfer {
     }
 
     /**
-     * @return Where the domain is moving. <code>internal</code> is another Whop account.
+     * @return Where the domain is moving. <code>internal</code> is another Whop account. <code>external</code> is another registrar.
      */
     @JsonProperty("destination")
     public DomainTransferDestination getDestination() {
@@ -63,7 +63,7 @@ public final class DomainTransfer {
     }
 
     /**
-     * @return <code>ready</code> while the code waits to be used. <code>pending</code> once it has: Whop removes the domain's email, Apple Pay and pixel from this account, then moves the registration and removes the domain from this account.
+     * @return <code>ready</code> while the code waits to be used. For <code>internal</code>, <code>pending</code> once another account uses it. Whop then removes the domain's email, Apple Pay and pixel from this account. Then it moves the registration and removes the domain from this account. For <code>external</code>, <code>pending</code> while Whop unlocks the domain at its registrar and turns off everything Whop runs on it. The domain leaves this account when the transfer completes. <code>releasing</code> while Whop turns the transfer off.
      */
     @JsonProperty("state")
     public DomainTransferState getState() {
@@ -107,7 +107,7 @@ public final class DomainTransfer {
 
     public interface DestinationStage {
         /**
-         * <p>Where the domain is moving. <code>internal</code> is another Whop account.</p>
+         * <p>Where the domain is moving. <code>internal</code> is another Whop account. <code>external</code> is another registrar.</p>
          */
         StateStage destination(@NotNull DomainTransferDestination destination);
 
@@ -116,7 +116,7 @@ public final class DomainTransfer {
 
     public interface StateStage {
         /**
-         * <p><code>ready</code> while the code waits to be used. <code>pending</code> once it has: Whop removes the domain's email, Apple Pay and pixel from this account, then moves the registration and removes the domain from this account.</p>
+         * <p><code>ready</code> while the code waits to be used. For <code>internal</code>, <code>pending</code> once another account uses it. Whop then removes the domain's email, Apple Pay and pixel from this account. Then it moves the registration and removes the domain from this account. For <code>external</code>, <code>pending</code> while Whop unlocks the domain at its registrar and turns off everything Whop runs on it. The domain leaves this account when the transfer completes. <code>releasing</code> while Whop turns the transfer off.</p>
          */
         _FinalStage state(@NotNull DomainTransferState state);
     }
@@ -129,7 +129,7 @@ public final class DomainTransfer {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>The code that takes the domain. For an <code>internal</code> move it starts <code>whop_dt_</code>, and the receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. Returned when the response is a single domain and you can manage it; <code>null</code> otherwise.</p>
+         * <p>The code that takes the domain, shown while <code>state</code> is <code>ready</code>. For an <code>internal</code> move it starts <code>whop_dt_</code>. The receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. For an <code>external</code> move it is the registrar's auth code, which you give to the new registrar. Only a single-domain response shows it, and only to a caller who can manage the domain. Otherwise it is <code>null</code>.</p>
          */
         _FinalStage code(Optional<String> code);
 
@@ -159,7 +159,7 @@ public final class DomainTransfer {
         }
 
         /**
-         * <p>Where the domain is moving. <code>internal</code> is another Whop account.</p>
+         * <p>Where the domain is moving. <code>internal</code> is another Whop account. <code>external</code> is another registrar.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -170,7 +170,7 @@ public final class DomainTransfer {
         }
 
         /**
-         * <p><code>ready</code> while the code waits to be used. <code>pending</code> once it has: Whop removes the domain's email, Apple Pay and pixel from this account, then moves the registration and removes the domain from this account.</p>
+         * <p><code>ready</code> while the code waits to be used. For <code>internal</code>, <code>pending</code> once another account uses it. Whop then removes the domain's email, Apple Pay and pixel from this account. Then it moves the registration and removes the domain from this account. For <code>external</code>, <code>pending</code> while Whop unlocks the domain at its registrar and turns off everything Whop runs on it. The domain leaves this account when the transfer completes. <code>releasing</code> while Whop turns the transfer off.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -181,7 +181,7 @@ public final class DomainTransfer {
         }
 
         /**
-         * <p>The code that takes the domain. For an <code>internal</code> move it starts <code>whop_dt_</code>, and the receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. Returned when the response is a single domain and you can manage it; <code>null</code> otherwise.</p>
+         * <p>The code that takes the domain, shown while <code>state</code> is <code>ready</code>. For an <code>internal</code> move it starts <code>whop_dt_</code>. The receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. For an <code>external</code> move it is the registrar's auth code, which you give to the new registrar. Only a single-domain response shows it, and only to a caller who can manage the domain. Otherwise it is <code>null</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -197,7 +197,7 @@ public final class DomainTransfer {
         }
 
         /**
-         * <p>The code that takes the domain. For an <code>internal</code> move it starts <code>whop_dt_</code>, and the receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. Returned when the response is a single domain and you can manage it; <code>null</code> otherwise.</p>
+         * <p>The code that takes the domain, shown while <code>state</code> is <code>ready</code>. For an <code>internal</code> move it starts <code>whop_dt_</code>. The receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. For an <code>external</code> move it is the registrar's auth code, which you give to the new registrar. Only a single-domain response shows it, and only to a caller who can manage the domain. Otherwise it is <code>null</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -207,7 +207,7 @@ public final class DomainTransfer {
         }
 
         /**
-         * <p>The code that takes the domain. For an <code>internal</code> move it starts <code>whop_dt_</code>, and the receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. Returned when the response is a single domain and you can manage it; <code>null</code> otherwise.</p>
+         * <p>The code that takes the domain, shown while <code>state</code> is <code>ready</code>. For an <code>internal</code> move it starts <code>whop_dt_</code>. The receiving Whop account enters it as <code>registration.auth_code</code> when it creates or updates the domain. For an <code>external</code> move it is the registrar's auth code, which you give to the new registrar. Only a single-domain response shows it, and only to a caller who can manage the domain. Otherwise it is <code>null</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "code", nulls = Nulls.SKIP)

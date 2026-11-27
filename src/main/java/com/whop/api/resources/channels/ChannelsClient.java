@@ -167,28 +167,28 @@ public class ChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public ChannelMember accept(String id) {
         return this.rawClient.accept(id).body();
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public ChannelMember accept(String id, RequestOptions requestOptions) {
         return this.rawClient.accept(id, requestOptions).body();
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public ChannelMember accept(String id, AcceptChannelsRequest request) {
         return this.rawClient.accept(id, request).body();
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public ChannelMember accept(String id, AcceptChannelsRequest request, RequestOptions requestOptions) {
         return this.rawClient.accept(id, request, requestOptions).body();

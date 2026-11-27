@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.AccountAffiliateProgram;
+import com.whop.api.types.CardSurchargePreferences;
 import com.whop.api.types.CustomerTrackingPreferences;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +39,13 @@ public final class RetrievePreferencesResponse {
 
     private final RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration;
 
+    private final AccountAffiliateProgram affiliateProgram;
+
+    private final RetrievePreferencesResponseAppleIapFeePayer appleIapFeePayer;
+
     private final boolean cancellationEmails;
+
+    private final CardSurchargePreferences cardSurcharge;
 
     private final boolean cardsAutoTopUp;
 
@@ -68,6 +76,10 @@ public final class RetrievePreferencesResponse {
 
     private final List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions;
 
+    private final Optional<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord;
+
+    private final boolean offSessionPaymentRules;
+
     private final Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency;
 
     private final Optional<String> preferredSettlementCurrencyChangeableAt;
@@ -90,7 +102,10 @@ public final class RetrievePreferencesResponse {
             String adsReportingCurrency,
             String adsSchedulingTimezone,
             RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration,
+            AccountAffiliateProgram affiliateProgram,
+            RetrievePreferencesResponseAppleIapFeePayer appleIapFeePayer,
             boolean cancellationEmails,
+            CardSurchargePreferences cardSurcharge,
             boolean cardsAutoTopUp,
             boolean cardsNotifications,
             Optional<Boolean> coversSubaccountNegativeBalances,
@@ -105,6 +120,8 @@ public final class RetrievePreferencesResponse {
             Optional<RetrievePreferencesResponseEconomicIntelligencePreviousPeriod> economicIntelligencePreviousPeriod,
             boolean failedPaymentEmails,
             List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions,
+            Optional<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord,
+            boolean offSessionPaymentRules,
             Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency,
             Optional<String> preferredSettlementCurrencyChangeableAt,
             boolean renewalReminderEmails,
@@ -118,7 +135,10 @@ public final class RetrievePreferencesResponse {
         this.adsReportingCurrency = adsReportingCurrency;
         this.adsSchedulingTimezone = adsSchedulingTimezone;
         this.adsTripleWhaleIntegration = adsTripleWhaleIntegration;
+        this.affiliateProgram = affiliateProgram;
+        this.appleIapFeePayer = appleIapFeePayer;
         this.cancellationEmails = cancellationEmails;
+        this.cardSurcharge = cardSurcharge;
         this.cardsAutoTopUp = cardsAutoTopUp;
         this.cardsNotifications = cardsNotifications;
         this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
@@ -133,6 +153,8 @@ public final class RetrievePreferencesResponse {
         this.economicIntelligencePreviousPeriod = economicIntelligencePreviousPeriod;
         this.failedPaymentEmails = failedPaymentEmails;
         this.feedbackOptions = feedbackOptions;
+        this.merchantOfRecord = merchantOfRecord;
+        this.offSessionPaymentRules = offSessionPaymentRules;
         this.preferredSettlementCurrency = preferredSettlementCurrency;
         this.preferredSettlementCurrencyChangeableAt = preferredSettlementCurrencyChangeableAt;
         this.renewalReminderEmails = renewalReminderEmails;
@@ -187,11 +209,35 @@ public final class RetrievePreferencesResponse {
     }
 
     /**
+     * @return The account's affiliate program: its instructions, its application and the product it features for affiliates. <code>GET /accounts/{account_id}/affiliate_program</code> returns the same object without authentication.
+     */
+    @JsonProperty("affiliate_program")
+    public AccountAffiliateProgram getAffiliateProgram() {
+        return affiliateProgram;
+    }
+
+    /**
+     * @return Who pays Apple's 30% fee on one-time purchases made in the Whop iOS app. <code>buyer</code> (the default) adds about 43% to the iOS price, so the buyer pays the fee. <code>company</code> keeps the product's own price, and the fee comes out of the sale.
+     */
+    @JsonProperty("apple_iap_fee_payer")
+    public RetrievePreferencesResponseAppleIapFeePayer getAppleIapFeePayer() {
+        return appleIapFeePayer;
+    }
+
+    /**
      * @return Whether Whop emails members when their membership is canceled or terminated. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.
      */
     @JsonProperty("cancellation_emails")
     public boolean getCancellationEmails() {
         return cancellationEmails;
+    }
+
+    /**
+     * @return The card surcharge a point of sale adds to credit card payments. Debit and prepaid cards never pay it.
+     */
+    @JsonProperty("card_surcharge")
+    public CardSurchargePreferences getCardSurcharge() {
+        return cardSurcharge;
     }
 
     /**
@@ -326,6 +372,25 @@ public final class RetrievePreferencesResponse {
     }
 
     /**
+     * @return The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>account</code> means the account is the merchant of record.
+     */
+    @JsonIgnore
+    public Optional<RetrievePreferencesResponseMerchantOfRecord> getMerchantOfRecord() {
+        if (merchantOfRecord == null) {
+            return Optional.empty();
+        }
+        return merchantOfRecord;
+    }
+
+    /**
+     * @return Whether all active account payment rules apply to future off-session charges, including renewals. Off by default. Requires the payment:manage scope to change.
+     */
+    @JsonProperty("off_session_payment_rules")
+    public boolean getOffSessionPaymentRules() {
+        return offSessionPaymentRules;
+    }
+
+    /**
      * @return Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.
      */
     @JsonIgnore
@@ -437,6 +502,12 @@ public final class RetrievePreferencesResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("merchant_of_record")
+    private Optional<RetrievePreferencesResponseMerchantOfRecord> _getMerchantOfRecord() {
+        return merchantOfRecord;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("preferred_settlement_currency")
     private Optional<RetrievePreferencesResponsePreferredSettlementCurrency> _getPreferredSettlementCurrency() {
         return preferredSettlementCurrency;
@@ -477,7 +548,10 @@ public final class RetrievePreferencesResponse {
                 && adsReportingCurrency.equals(other.adsReportingCurrency)
                 && adsSchedulingTimezone.equals(other.adsSchedulingTimezone)
                 && adsTripleWhaleIntegration.equals(other.adsTripleWhaleIntegration)
+                && affiliateProgram.equals(other.affiliateProgram)
+                && appleIapFeePayer.equals(other.appleIapFeePayer)
                 && cancellationEmails == other.cancellationEmails
+                && cardSurcharge.equals(other.cardSurcharge)
                 && cardsAutoTopUp == other.cardsAutoTopUp
                 && cardsNotifications == other.cardsNotifications
                 && coversSubaccountNegativeBalances.equals(other.coversSubaccountNegativeBalances)
@@ -492,6 +566,8 @@ public final class RetrievePreferencesResponse {
                 && economicIntelligencePreviousPeriod.equals(other.economicIntelligencePreviousPeriod)
                 && failedPaymentEmails == other.failedPaymentEmails
                 && feedbackOptions.equals(other.feedbackOptions)
+                && merchantOfRecord.equals(other.merchantOfRecord)
+                && offSessionPaymentRules == other.offSessionPaymentRules
                 && preferredSettlementCurrency.equals(other.preferredSettlementCurrency)
                 && preferredSettlementCurrencyChangeableAt.equals(other.preferredSettlementCurrencyChangeableAt)
                 && renewalReminderEmails == other.renewalReminderEmails
@@ -509,7 +585,10 @@ public final class RetrievePreferencesResponse {
                 this.adsReportingCurrency,
                 this.adsSchedulingTimezone,
                 this.adsTripleWhaleIntegration,
+                this.affiliateProgram,
+                this.appleIapFeePayer,
                 this.cancellationEmails,
+                this.cardSurcharge,
                 this.cardsAutoTopUp,
                 this.cardsNotifications,
                 this.coversSubaccountNegativeBalances,
@@ -524,6 +603,8 @@ public final class RetrievePreferencesResponse {
                 this.economicIntelligencePreviousPeriod,
                 this.failedPaymentEmails,
                 this.feedbackOptions,
+                this.merchantOfRecord,
+                this.offSessionPaymentRules,
                 this.preferredSettlementCurrency,
                 this.preferredSettlementCurrencyChangeableAt,
                 this.renewalReminderEmails,
@@ -569,15 +650,36 @@ public final class RetrievePreferencesResponse {
         /**
          * <p>The account's Triple Whale integration, which pushes Whop ad spend to Triple Whale's Data-In API so it reports as a <code>whop</code> channel. Available to any Triple Whale customer — Shopify, WooCommerce, or a custom checkout — by setting <code>shop_domain</code>. Requires the <code>ad_campaign:create</code> scope. Once connected, ad click-through URLs Whop serves carry <code>tw_source=whop</code> and <code>tw_adid=&lt;ad id&gt;</code> query parameters so Triple Whale's pixel attributes conversions back to the originating ad — no destination URL changes are needed.</p>
          */
-        CancellationEmailsStage adsTripleWhaleIntegration(
+        AffiliateProgramStage adsTripleWhaleIntegration(
                 @NotNull RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration);
+    }
+
+    public interface AffiliateProgramStage {
+        /**
+         * <p>The account's affiliate program: its instructions, its application and the product it features for affiliates. <code>GET /accounts/{account_id}/affiliate_program</code> returns the same object without authentication.</p>
+         */
+        AppleIapFeePayerStage affiliateProgram(@NotNull AccountAffiliateProgram affiliateProgram);
+    }
+
+    public interface AppleIapFeePayerStage {
+        /**
+         * <p>Who pays Apple's 30% fee on one-time purchases made in the Whop iOS app. <code>buyer</code> (the default) adds about 43% to the iOS price, so the buyer pays the fee. <code>company</code> keeps the product's own price, and the fee comes out of the sale.</p>
+         */
+        CancellationEmailsStage appleIapFeePayer(@NotNull RetrievePreferencesResponseAppleIapFeePayer appleIapFeePayer);
     }
 
     public interface CancellationEmailsStage {
         /**
          * <p>Whether Whop emails members when their membership is canceled or terminated. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. They also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
          */
-        CardsAutoTopUpStage cancellationEmails(boolean cancellationEmails);
+        CardSurchargeStage cancellationEmails(boolean cancellationEmails);
+    }
+
+    public interface CardSurchargeStage {
+        /**
+         * <p>The card surcharge a point of sale adds to credit card payments. Debit and prepaid cards never pay it.</p>
+         */
+        CardsAutoTopUpStage cardSurcharge(@NotNull CardSurchargePreferences cardSurcharge);
     }
 
     public interface CardsAutoTopUpStage {
@@ -619,7 +721,14 @@ public final class RetrievePreferencesResponse {
         /**
          * <p>Whether Whop emails members when a renewal payment fails or needs them to verify it. <code>true</code> by default. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Subscriptions billed by invoice still get the invoice and its past-due reminders, since that is how the member pays. These emails also stop while the account's <code>send_customer_emails</code> is <code>false</code>.</p>
          */
-        RenewalReminderEmailsStage failedPaymentEmails(boolean failedPaymentEmails);
+        OffSessionPaymentRulesStage failedPaymentEmails(boolean failedPaymentEmails);
+    }
+
+    public interface OffSessionPaymentRulesStage {
+        /**
+         * <p>Whether all active account payment rules apply to future off-session charges, including renewals. Off by default. Requires the payment:manage scope to change.</p>
+         */
+        RenewalReminderEmailsStage offSessionPaymentRules(boolean offSessionPaymentRules);
     }
 
     public interface RenewalReminderEmailsStage {
@@ -741,6 +850,15 @@ public final class RetrievePreferencesResponse {
         _FinalStage addAllFeedbackOptions(List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions);
 
         /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>account</code> means the account is the merchant of record.</p>
+         */
+        _FinalStage merchantOfRecord(Optional<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord);
+
+        _FinalStage merchantOfRecord(RetrievePreferencesResponseMerchantOfRecord merchantOfRecord);
+
+        _FinalStage merchantOfRecord(Nullable<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord);
+
+        /**
          * <p>Lowercase ISO currency code every new sale settles into, regardless of the plan's currency or what the buyer paid in. Sales converted this way carry an additional 0.5% FX fee. <code>null</code> when the account settles each sale in its plan's currency.</p>
          */
         _FinalStage preferredSettlementCurrency(
@@ -786,13 +904,17 @@ public final class RetrievePreferencesResponse {
                     AdsReportingCurrencyStage,
                     AdsSchedulingTimezoneStage,
                     AdsTripleWhaleIntegrationStage,
+                    AffiliateProgramStage,
+                    AppleIapFeePayerStage,
                     CancellationEmailsStage,
+                    CardSurchargeStage,
                     CardsAutoTopUpStage,
                     CardsNotificationsStage,
                     DisputeFighterEnabledStage,
                     EconomicIntelligenceStage,
                     EconomicIntelligenceAutoRenewStage,
                     FailedPaymentEmailsStage,
+                    OffSessionPaymentRulesStage,
                     RenewalReminderEmailsStage,
                     ReviewRequestEmailsStage,
                     SubscriptionFailureBehaviorStage,
@@ -805,7 +927,13 @@ public final class RetrievePreferencesResponse {
 
         private RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration;
 
+        private AccountAffiliateProgram affiliateProgram;
+
+        private RetrievePreferencesResponseAppleIapFeePayer appleIapFeePayer;
+
         private boolean cancellationEmails;
+
+        private CardSurchargePreferences cardSurcharge;
 
         private boolean cardsAutoTopUp;
 
@@ -818,6 +946,8 @@ public final class RetrievePreferencesResponse {
         private boolean economicIntelligenceAutoRenew;
 
         private boolean failedPaymentEmails;
+
+        private boolean offSessionPaymentRules;
 
         private boolean renewalReminderEmails;
 
@@ -833,6 +963,8 @@ public final class RetrievePreferencesResponse {
 
         private Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency =
                 Optional.empty();
+
+        private Optional<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord = Optional.empty();
 
         private List<RetrievePreferencesResponseFeedbackOptionsItem> feedbackOptions = new ArrayList<>();
 
@@ -865,7 +997,10 @@ public final class RetrievePreferencesResponse {
             adsReportingCurrency(other.getAdsReportingCurrency());
             adsSchedulingTimezone(other.getAdsSchedulingTimezone());
             adsTripleWhaleIntegration(other.getAdsTripleWhaleIntegration());
+            affiliateProgram(other.getAffiliateProgram());
+            appleIapFeePayer(other.getAppleIapFeePayer());
             cancellationEmails(other.getCancellationEmails());
+            cardSurcharge(other.getCardSurcharge());
             cardsAutoTopUp(other.getCardsAutoTopUp());
             cardsNotifications(other.getCardsNotifications());
             coversSubaccountNegativeBalances(other.getCoversSubaccountNegativeBalances());
@@ -880,6 +1015,8 @@ public final class RetrievePreferencesResponse {
             economicIntelligencePreviousPeriod(other.getEconomicIntelligencePreviousPeriod());
             failedPaymentEmails(other.getFailedPaymentEmails());
             feedbackOptions(other.getFeedbackOptions());
+            merchantOfRecord(other.getMerchantOfRecord());
+            offSessionPaymentRules(other.getOffSessionPaymentRules());
             preferredSettlementCurrency(other.getPreferredSettlementCurrency());
             preferredSettlementCurrencyChangeableAt(other.getPreferredSettlementCurrencyChangeableAt());
             renewalReminderEmails(other.getRenewalReminderEmails());
@@ -931,10 +1068,33 @@ public final class RetrievePreferencesResponse {
          */
         @java.lang.Override
         @JsonSetter("ads_triple_whale_integration")
-        public CancellationEmailsStage adsTripleWhaleIntegration(
+        public AffiliateProgramStage adsTripleWhaleIntegration(
                 @NotNull RetrievePreferencesResponseAdsTripleWhaleIntegration adsTripleWhaleIntegration) {
             this.adsTripleWhaleIntegration =
                     Objects.requireNonNull(adsTripleWhaleIntegration, "adsTripleWhaleIntegration must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The account's affiliate program: its instructions, its application and the product it features for affiliates. <code>GET /accounts/{account_id}/affiliate_program</code> returns the same object without authentication.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("affiliate_program")
+        public AppleIapFeePayerStage affiliateProgram(@NotNull AccountAffiliateProgram affiliateProgram) {
+            this.affiliateProgram = Objects.requireNonNull(affiliateProgram, "affiliateProgram must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Who pays Apple's 30% fee on one-time purchases made in the Whop iOS app. <code>buyer</code> (the default) adds about 43% to the iOS price, so the buyer pays the fee. <code>company</code> keeps the product's own price, and the fee comes out of the sale.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("apple_iap_fee_payer")
+        public CancellationEmailsStage appleIapFeePayer(
+                @NotNull RetrievePreferencesResponseAppleIapFeePayer appleIapFeePayer) {
+            this.appleIapFeePayer = Objects.requireNonNull(appleIapFeePayer, "appleIapFeePayer must not be null");
             return this;
         }
 
@@ -944,8 +1104,19 @@ public final class RetrievePreferencesResponse {
          */
         @java.lang.Override
         @JsonSetter("cancellation_emails")
-        public CardsAutoTopUpStage cancellationEmails(boolean cancellationEmails) {
+        public CardSurchargeStage cancellationEmails(boolean cancellationEmails) {
             this.cancellationEmails = cancellationEmails;
+            return this;
+        }
+
+        /**
+         * <p>The card surcharge a point of sale adds to credit card payments. Debit and prepaid cards never pay it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("card_surcharge")
+        public CardsAutoTopUpStage cardSurcharge(@NotNull CardSurchargePreferences cardSurcharge) {
+            this.cardSurcharge = Objects.requireNonNull(cardSurcharge, "cardSurcharge must not be null");
             return this;
         }
 
@@ -1010,8 +1181,19 @@ public final class RetrievePreferencesResponse {
          */
         @java.lang.Override
         @JsonSetter("failed_payment_emails")
-        public RenewalReminderEmailsStage failedPaymentEmails(boolean failedPaymentEmails) {
+        public OffSessionPaymentRulesStage failedPaymentEmails(boolean failedPaymentEmails) {
             this.failedPaymentEmails = failedPaymentEmails;
+            return this;
+        }
+
+        /**
+         * <p>Whether all active account payment rules apply to future off-session charges, including renewals. Off by default. Requires the payment:manage scope to change.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("off_session_payment_rules")
+        public RenewalReminderEmailsStage offSessionPaymentRules(boolean offSessionPaymentRules) {
+            this.offSessionPaymentRules = offSessionPaymentRules;
             return this;
         }
 
@@ -1197,6 +1379,42 @@ public final class RetrievePreferencesResponse {
         public _FinalStage preferredSettlementCurrency(
                 Optional<RetrievePreferencesResponsePreferredSettlementCurrency> preferredSettlementCurrency) {
             this.preferredSettlementCurrency = preferredSettlementCurrency;
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>account</code> means the account is the merchant of record.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage merchantOfRecord(Nullable<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord) {
+            if (merchantOfRecord.isNull()) {
+                this.merchantOfRecord = null;
+            } else if (merchantOfRecord.isEmpty()) {
+                this.merchantOfRecord = Optional.empty();
+            } else {
+                this.merchantOfRecord = Optional.of(merchantOfRecord.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>account</code> means the account is the merchant of record.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage merchantOfRecord(RetrievePreferencesResponseMerchantOfRecord merchantOfRecord) {
+            this.merchantOfRecord = Optional.ofNullable(merchantOfRecord);
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>account</code> means the account is the merchant of record.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "merchant_of_record", nulls = Nulls.SKIP)
+        public _FinalStage merchantOfRecord(Optional<RetrievePreferencesResponseMerchantOfRecord> merchantOfRecord) {
+            this.merchantOfRecord = merchantOfRecord;
             return this;
         }
 
@@ -1538,7 +1756,10 @@ public final class RetrievePreferencesResponse {
                     adsReportingCurrency,
                     adsSchedulingTimezone,
                     adsTripleWhaleIntegration,
+                    affiliateProgram,
+                    appleIapFeePayer,
                     cancellationEmails,
+                    cardSurcharge,
                     cardsAutoTopUp,
                     cardsNotifications,
                     coversSubaccountNegativeBalances,
@@ -1553,6 +1774,8 @@ public final class RetrievePreferencesResponse {
                     economicIntelligencePreviousPeriod,
                     failedPaymentEmails,
                     feedbackOptions,
+                    merchantOfRecord,
+                    offSessionPaymentRules,
                     preferredSettlementCurrency,
                     preferredSettlementCurrencyChangeableAt,
                     renewalReminderEmails,
@@ -1570,7 +1793,10 @@ public final class RetrievePreferencesResponse {
                     || key.equalsIgnoreCase("ads_reporting_currency")
                     || key.equalsIgnoreCase("ads_scheduling_timezone")
                     || key.equalsIgnoreCase("ads_triple_whale_integration")
+                    || key.equalsIgnoreCase("affiliate_program")
+                    || key.equalsIgnoreCase("apple_iap_fee_payer")
                     || key.equalsIgnoreCase("cancellation_emails")
+                    || key.equalsIgnoreCase("card_surcharge")
                     || key.equalsIgnoreCase("cards_auto_top_up")
                     || key.equalsIgnoreCase("cards_notifications")
                     || key.equalsIgnoreCase("covers_subaccount_negative_balances")
@@ -1585,6 +1811,8 @@ public final class RetrievePreferencesResponse {
                     || key.equalsIgnoreCase("economic_intelligence_previous_period")
                     || key.equalsIgnoreCase("failed_payment_emails")
                     || key.equalsIgnoreCase("feedback_options")
+                    || key.equalsIgnoreCase("merchant_of_record")
+                    || key.equalsIgnoreCase("off_session_payment_rules")
                     || key.equalsIgnoreCase("preferred_settlement_currency")
                     || key.equalsIgnoreCase("preferred_settlement_currency_changeable_at")
                     || key.equalsIgnoreCase("renewal_reminder_emails")

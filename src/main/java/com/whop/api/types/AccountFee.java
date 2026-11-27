@@ -191,7 +191,7 @@ public final class AccountFee {
     }
 
     /**
-     * @return Where the rate in effect comes from: <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by the platform this account is connected to. <code>null</code> when a subaccount's fees are read without access to its parent account.
+     * @return Where the rate in effect comes from. <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by this account's platform. <code>null</code> when a subaccount's fees are read without access to its parent account.
      */
     @JsonIgnore
     public Optional<AccountFeeSource> getSource() {
@@ -415,7 +415,7 @@ public final class AccountFee {
         _FinalStage regions(String key, AccountFeeRegionalRate value);
 
         /**
-         * <p>Where the rate in effect comes from: <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by the platform this account is connected to. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
+         * <p>Where the rate in effect comes from. <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by this account's platform. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
          */
         _FinalStage source(Optional<AccountFeeSource> source);
 
@@ -564,7 +564,7 @@ public final class AccountFee {
         }
 
         /**
-         * <p>Where the rate in effect comes from: <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by the platform this account is connected to. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
+         * <p>Where the rate in effect comes from. <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by this account's platform. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -580,7 +580,7 @@ public final class AccountFee {
         }
 
         /**
-         * <p>Where the rate in effect comes from: <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by the platform this account is connected to. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
+         * <p>Where the rate in effect comes from. <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by this account's platform. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -590,7 +590,7 @@ public final class AccountFee {
         }
 
         /**
-         * <p>Where the rate in effect comes from: <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by the platform this account is connected to. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
+         * <p>Where the rate in effect comes from. <code>default</code> is the platform rate, <code>custom</code> a rate negotiated for this account, and <code>inherited</code> a rate negotiated by this account's platform. <code>null</code> when a subaccount's fees are read without access to its parent account.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source", nulls = Nulls.SKIP)

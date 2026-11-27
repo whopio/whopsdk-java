@@ -99,7 +99,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
     }
 
     /**
-     * @return Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.
+     * @return Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.
      */
     @JsonIgnore
     public Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> getInstantUnavailableReason() {
@@ -255,7 +255,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         _FinalStage instant(Nullable<PostPayoutMethodCreatedPayloadDataQuoteInstant> instant);
 
         /**
-         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
          */
         _FinalStage instantUnavailableReason(
                 Optional<PostPayoutMethodCreatedPayloadDataQuoteInstantUnavailableReason> instantUnavailableReason);
@@ -439,7 +439,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -456,7 +456,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -467,7 +467,7 @@ public final class PostPayoutMethodCreatedPayloadDataQuote {
         }
 
         /**
-         * <p>Why instant delivery is unavailable for this method. <code>minimum_crypto_sales_not_met</code> means the account has not reached the total sales required for instant cryptocurrency payouts. <code>null</code> when this restriction does not apply.</p>
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "instant_unavailable_reason", nulls = Nulls.SKIP)

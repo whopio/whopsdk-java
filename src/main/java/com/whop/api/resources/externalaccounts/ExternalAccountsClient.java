@@ -120,28 +120,28 @@ public class ExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public ExternalAccount refresh(String id) {
         return this.rawClient.refresh(id).body();
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public ExternalAccount refresh(String id, RequestOptions requestOptions) {
         return this.rawClient.refresh(id, requestOptions).body();
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public ExternalAccount refresh(String id, RefreshExternalAccountsRequest request) {
         return this.rawClient.refresh(id, request).body();
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public ExternalAccount refresh(String id, RefreshExternalAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.refresh(id, request, requestOptions).body();

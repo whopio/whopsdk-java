@@ -5,22 +5,15 @@ package com.whop.api.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.whop.api.core.Nullable;
-import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -28,25 +21,11 @@ import org.jetbrains.annotations.NotNull;
 public final class AccountLevel {
     private final int accountLevel;
 
-    private final int appliedLevel;
-
-    private final boolean boosted;
-
-    private final List<AccountProcessingOfferLevel> levels;
-
-    private final Money monthlyAdsSpend;
-
-    private final Money monthlyCardSpend;
-
-    private final Money monthlyQualifyingSpend;
-
-    private final Money monthlyTradingVolume;
+    private final int current;
 
     private final int points;
 
     private final OwnerLevelPoints pointsBySource;
-
-    private final Optional<Integer> pointsToNext;
 
     private final String resetsAt;
 
@@ -54,35 +33,21 @@ public final class AccountLevel {
 
     private AccountLevel(
             int accountLevel,
-            int appliedLevel,
-            boolean boosted,
-            List<AccountProcessingOfferLevel> levels,
-            Money monthlyAdsSpend,
-            Money monthlyCardSpend,
-            Money monthlyQualifyingSpend,
-            Money monthlyTradingVolume,
+            int current,
             int points,
             OwnerLevelPoints pointsBySource,
-            Optional<Integer> pointsToNext,
             String resetsAt,
             Map<String, Object> additionalProperties) {
         this.accountLevel = accountLevel;
-        this.appliedLevel = appliedLevel;
-        this.boosted = boosted;
-        this.levels = levels;
-        this.monthlyAdsSpend = monthlyAdsSpend;
-        this.monthlyCardSpend = monthlyCardSpend;
-        this.monthlyQualifyingSpend = monthlyQualifyingSpend;
-        this.monthlyTradingVolume = monthlyTradingVolume;
+        this.current = current;
         this.points = points;
         this.pointsBySource = pointsBySource;
-        this.pointsToNext = pointsToNext;
         this.resetsAt = resetsAt;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>applied_level</code> is higher when the owner's other accounts lift it.
+     * @return This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>current</code> is higher when the owner's other accounts lift it.
      */
     @JsonProperty("account_level")
     public int getAccountLevel() {
@@ -92,58 +57,13 @@ public final class AccountLevel {
     /**
      * @return The level that applies: the highest the owner reached this month or in the 5 months before, from <code>0</code> up to <code>10</code>.
      */
-    @JsonProperty("applied_level")
-    public int getAppliedLevel() {
-        return appliedLevel;
+    @JsonProperty("current")
+    public int getCurrent() {
+        return current;
     }
 
     /**
-     * @return <code>true</code> when this account's own points this month fall short of <code>applied_level</code>, so the owner's other accounts lift it to that level.
-     */
-    @JsonProperty("boosted")
-    public boolean getBoosted() {
-        return boosted;
-    }
-
-    @JsonProperty("levels")
-    public List<AccountProcessingOfferLevel> getLevels() {
-        return levels;
-    }
-
-    /**
-     * @return Whop Ads charges paid this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.
-     */
-    @JsonProperty("monthly_ads_spend")
-    public Money getMonthlyAdsSpend() {
-        return monthlyAdsSpend;
-    }
-
-    /**
-     * @return Captured Whop Card spend this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.
-     */
-    @JsonProperty("monthly_card_spend")
-    public Money getMonthlyCardSpend() {
-        return monthlyCardSpend;
-    }
-
-    /**
-     * @return Qualifying spend this calendar month across every account the owner owns, plus the owner's personal trading and partner points, in USD: <code>points</code> divided by 10.
-     */
-    @JsonProperty("monthly_qualifying_spend")
-    public Money getMonthlyQualifyingSpend() {
-        return monthlyQualifyingSpend;
-    }
-
-    /**
-     * @return Perpetual trading volume filled through Whop this calendar month across every account the owner owns and their personal wallet, in USD. An account whose month nets to zero or below is left out.
-     */
-    @JsonProperty("monthly_trading_volume")
-    public Money getMonthlyTradingVolume() {
-        return monthlyTradingVolume;
-    }
-
-    /**
-     * @return Points earned this month across every account the owner owns, plus the owner's partner points, rounded down. An account whose month nets below zero counts as zero.
+     * @return Points earned this month by the owner and their accounts, rounded down. An account whose month nets below zero counts as zero.
      */
     @JsonProperty("points")
     public int getPoints() {
@@ -159,28 +79,11 @@ public final class AccountLevel {
     }
 
     /**
-     * @return Points still needed this month to reach the next level, or <code>null</code> at level <code>10</code>.
-     */
-    @JsonIgnore
-    public Optional<Integer> getPointsToNext() {
-        if (pointsToNext == null) {
-            return Optional.empty();
-        }
-        return pointsToNext;
-    }
-
-    /**
      * @return When this month's points reset to zero, as an ISO 8601 timestamp.
      */
     @JsonProperty("resets_at")
     public String getResetsAt() {
         return resetsAt;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("points_to_next")
-    private Optional<Integer> _getPointsToNext() {
-        return pointsToNext;
     }
 
     @java.lang.Override
@@ -196,34 +99,15 @@ public final class AccountLevel {
 
     private boolean equalTo(AccountLevel other) {
         return accountLevel == other.accountLevel
-                && appliedLevel == other.appliedLevel
-                && boosted == other.boosted
-                && levels.equals(other.levels)
-                && monthlyAdsSpend.equals(other.monthlyAdsSpend)
-                && monthlyCardSpend.equals(other.monthlyCardSpend)
-                && monthlyQualifyingSpend.equals(other.monthlyQualifyingSpend)
-                && monthlyTradingVolume.equals(other.monthlyTradingVolume)
+                && current == other.current
                 && points == other.points
                 && pointsBySource.equals(other.pointsBySource)
-                && pointsToNext.equals(other.pointsToNext)
                 && resetsAt.equals(other.resetsAt);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(
-                this.accountLevel,
-                this.appliedLevel,
-                this.boosted,
-                this.levels,
-                this.monthlyAdsSpend,
-                this.monthlyCardSpend,
-                this.monthlyQualifyingSpend,
-                this.monthlyTradingVolume,
-                this.points,
-                this.pointsBySource,
-                this.pointsToNext,
-                this.resetsAt);
+        return Objects.hash(this.accountLevel, this.current, this.points, this.pointsBySource, this.resetsAt);
     }
 
     @java.lang.Override
@@ -237,58 +121,23 @@ public final class AccountLevel {
 
     public interface AccountLevelStage {
         /**
-         * <p>This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>applied_level</code> is higher when the owner's other accounts lift it.</p>
+         * <p>This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>current</code> is higher when the owner's other accounts lift it.</p>
          */
-        AppliedLevelStage accountLevel(int accountLevel);
+        CurrentStage accountLevel(int accountLevel);
 
         Builder from(AccountLevel other);
     }
 
-    public interface AppliedLevelStage {
+    public interface CurrentStage {
         /**
          * <p>The level that applies: the highest the owner reached this month or in the 5 months before, from <code>0</code> up to <code>10</code>.</p>
          */
-        BoostedStage appliedLevel(int appliedLevel);
-    }
-
-    public interface BoostedStage {
-        /**
-         * <p><code>true</code> when this account's own points this month fall short of <code>applied_level</code>, so the owner's other accounts lift it to that level.</p>
-         */
-        MonthlyAdsSpendStage boosted(boolean boosted);
-    }
-
-    public interface MonthlyAdsSpendStage {
-        /**
-         * <p>Whop Ads charges paid this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.</p>
-         */
-        MonthlyCardSpendStage monthlyAdsSpend(@NotNull Money monthlyAdsSpend);
-    }
-
-    public interface MonthlyCardSpendStage {
-        /**
-         * <p>Captured Whop Card spend this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.</p>
-         */
-        MonthlyQualifyingSpendStage monthlyCardSpend(@NotNull Money monthlyCardSpend);
-    }
-
-    public interface MonthlyQualifyingSpendStage {
-        /**
-         * <p>Qualifying spend this calendar month across every account the owner owns, plus the owner's personal trading and partner points, in USD: <code>points</code> divided by 10.</p>
-         */
-        MonthlyTradingVolumeStage monthlyQualifyingSpend(@NotNull Money monthlyQualifyingSpend);
-    }
-
-    public interface MonthlyTradingVolumeStage {
-        /**
-         * <p>Perpetual trading volume filled through Whop this calendar month across every account the owner owns and their personal wallet, in USD. An account whose month nets to zero or below is left out.</p>
-         */
-        PointsStage monthlyTradingVolume(@NotNull Money monthlyTradingVolume);
+        PointsStage current(int current);
     }
 
     public interface PointsStage {
         /**
-         * <p>Points earned this month across every account the owner owns, plus the owner's partner points, rounded down. An account whose month nets below zero counts as zero.</p>
+         * <p>Points earned this month by the owner and their accounts, rounded down. An account whose month nets below zero counts as zero.</p>
          */
         PointsBySourceStage points(int points);
     }
@@ -313,59 +162,20 @@ public final class AccountLevel {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        _FinalStage levels(List<AccountProcessingOfferLevel> levels);
-
-        _FinalStage addLevels(AccountProcessingOfferLevel levels);
-
-        _FinalStage addAllLevels(List<AccountProcessingOfferLevel> levels);
-
-        /**
-         * <p>Points still needed this month to reach the next level, or <code>null</code> at level <code>10</code>.</p>
-         */
-        _FinalStage pointsToNext(Optional<Integer> pointsToNext);
-
-        _FinalStage pointsToNext(Integer pointsToNext);
-
-        _FinalStage pointsToNext(Nullable<Integer> pointsToNext);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AccountLevelStage,
-                    AppliedLevelStage,
-                    BoostedStage,
-                    MonthlyAdsSpendStage,
-                    MonthlyCardSpendStage,
-                    MonthlyQualifyingSpendStage,
-                    MonthlyTradingVolumeStage,
-                    PointsStage,
-                    PointsBySourceStage,
-                    ResetsAtStage,
-                    _FinalStage {
+            implements AccountLevelStage, CurrentStage, PointsStage, PointsBySourceStage, ResetsAtStage, _FinalStage {
         private int accountLevel;
 
-        private int appliedLevel;
-
-        private boolean boosted;
-
-        private Money monthlyAdsSpend;
-
-        private Money monthlyCardSpend;
-
-        private Money monthlyQualifyingSpend;
-
-        private Money monthlyTradingVolume;
+        private int current;
 
         private int points;
 
         private OwnerLevelPoints pointsBySource;
 
         private String resetsAt;
-
-        private Optional<Integer> pointsToNext = Optional.empty();
-
-        private List<AccountProcessingOfferLevel> levels = new ArrayList<>();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -374,27 +184,20 @@ public final class AccountLevel {
         @java.lang.Override
         public Builder from(AccountLevel other) {
             accountLevel(other.getAccountLevel());
-            appliedLevel(other.getAppliedLevel());
-            boosted(other.getBoosted());
-            levels(other.getLevels());
-            monthlyAdsSpend(other.getMonthlyAdsSpend());
-            monthlyCardSpend(other.getMonthlyCardSpend());
-            monthlyQualifyingSpend(other.getMonthlyQualifyingSpend());
-            monthlyTradingVolume(other.getMonthlyTradingVolume());
+            current(other.getCurrent());
             points(other.getPoints());
             pointsBySource(other.getPointsBySource());
-            pointsToNext(other.getPointsToNext());
             resetsAt(other.getResetsAt());
             return this;
         }
 
         /**
-         * <p>This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>applied_level</code> is higher when the owner's other accounts lift it.</p>
+         * <p>This account's own level from its points alone, from <code>0</code> up to <code>10</code>. <code>current</code> is higher when the owner's other accounts lift it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("account_level")
-        public AppliedLevelStage accountLevel(int accountLevel) {
+        public CurrentStage accountLevel(int accountLevel) {
             this.accountLevel = accountLevel;
             return this;
         }
@@ -404,71 +207,14 @@ public final class AccountLevel {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("applied_level")
-        public BoostedStage appliedLevel(int appliedLevel) {
-            this.appliedLevel = appliedLevel;
+        @JsonSetter("current")
+        public PointsStage current(int current) {
+            this.current = current;
             return this;
         }
 
         /**
-         * <p><code>true</code> when this account's own points this month fall short of <code>applied_level</code>, so the owner's other accounts lift it to that level.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("boosted")
-        public MonthlyAdsSpendStage boosted(boolean boosted) {
-            this.boosted = boosted;
-            return this;
-        }
-
-        /**
-         * <p>Whop Ads charges paid this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("monthly_ads_spend")
-        public MonthlyCardSpendStage monthlyAdsSpend(@NotNull Money monthlyAdsSpend) {
-            this.monthlyAdsSpend = Objects.requireNonNull(monthlyAdsSpend, "monthlyAdsSpend must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Captured Whop Card spend this calendar month across every account the owner owns, net of refunds, in USD, so it can be negative. An account whose month nets to zero or below is left out.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("monthly_card_spend")
-        public MonthlyQualifyingSpendStage monthlyCardSpend(@NotNull Money monthlyCardSpend) {
-            this.monthlyCardSpend = Objects.requireNonNull(monthlyCardSpend, "monthlyCardSpend must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Qualifying spend this calendar month across every account the owner owns, plus the owner's personal trading and partner points, in USD: <code>points</code> divided by 10.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("monthly_qualifying_spend")
-        public MonthlyTradingVolumeStage monthlyQualifyingSpend(@NotNull Money monthlyQualifyingSpend) {
-            this.monthlyQualifyingSpend =
-                    Objects.requireNonNull(monthlyQualifyingSpend, "monthlyQualifyingSpend must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Perpetual trading volume filled through Whop this calendar month across every account the owner owns and their personal wallet, in USD. An account whose month nets to zero or below is left out.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("monthly_trading_volume")
-        public PointsStage monthlyTradingVolume(@NotNull Money monthlyTradingVolume) {
-            this.monthlyTradingVolume =
-                    Objects.requireNonNull(monthlyTradingVolume, "monthlyTradingVolume must not be null");
-            return this;
-        }
-
-        /**
-         * <p>Points earned this month across every account the owner owns, plus the owner's partner points, rounded down. An account whose month nets below zero counts as zero.</p>
+         * <p>Points earned this month by the owner and their accounts, rounded down. An account whose month nets below zero counts as zero.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -500,97 +246,17 @@ public final class AccountLevel {
             return this;
         }
 
-        /**
-         * <p>Points still needed this month to reach the next level, or <code>null</code> at level <code>10</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage pointsToNext(Nullable<Integer> pointsToNext) {
-            if (pointsToNext.isNull()) {
-                this.pointsToNext = null;
-            } else if (pointsToNext.isEmpty()) {
-                this.pointsToNext = Optional.empty();
-            } else {
-                this.pointsToNext = Optional.of(pointsToNext.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Points still needed this month to reach the next level, or <code>null</code> at level <code>10</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage pointsToNext(Integer pointsToNext) {
-            this.pointsToNext = Optional.ofNullable(pointsToNext);
-            return this;
-        }
-
-        /**
-         * <p>Points still needed this month to reach the next level, or <code>null</code> at level <code>10</code>.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "points_to_next", nulls = Nulls.SKIP)
-        public _FinalStage pointsToNext(Optional<Integer> pointsToNext) {
-            this.pointsToNext = pointsToNext;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addAllLevels(List<AccountProcessingOfferLevel> levels) {
-            if (levels != null) {
-                this.levels.addAll(levels);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addLevels(AccountProcessingOfferLevel levels) {
-            this.levels.add(levels);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "levels", nulls = Nulls.SKIP)
-        public _FinalStage levels(List<AccountProcessingOfferLevel> levels) {
-            this.levels.clear();
-            if (levels != null) {
-                this.levels.addAll(levels);
-            }
-            return this;
-        }
-
         @java.lang.Override
         public AccountLevel build() {
-            return new AccountLevel(
-                    accountLevel,
-                    appliedLevel,
-                    boosted,
-                    levels,
-                    monthlyAdsSpend,
-                    monthlyCardSpend,
-                    monthlyQualifyingSpend,
-                    monthlyTradingVolume,
-                    points,
-                    pointsBySource,
-                    pointsToNext,
-                    resetsAt,
-                    additionalProperties);
+            return new AccountLevel(accountLevel, current, points, pointsBySource, resetsAt, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account_level")
-                    || key.equalsIgnoreCase("applied_level")
-                    || key.equalsIgnoreCase("boosted")
-                    || key.equalsIgnoreCase("levels")
-                    || key.equalsIgnoreCase("monthly_ads_spend")
-                    || key.equalsIgnoreCase("monthly_card_spend")
-                    || key.equalsIgnoreCase("monthly_qualifying_spend")
-                    || key.equalsIgnoreCase("monthly_trading_volume")
+                    || key.equalsIgnoreCase("current")
                     || key.equalsIgnoreCase("points")
                     || key.equalsIgnoreCase("points_by_source")
-                    || key.equalsIgnoreCase("points_to_next")
                     || key.equalsIgnoreCase("resets_at")) {
                 return;
             }

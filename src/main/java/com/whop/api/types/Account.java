@@ -87,6 +87,8 @@ public final class Account {
 
     private final Optional<String> logoUrl;
 
+    private final Optional<AccountMerchantOfRecord> merchantOfRecord;
+
     private final Map<String, Object> metadata;
 
     private final Optional<AccountOnboardingType> onboardingType;
@@ -140,6 +142,8 @@ public final class Account {
     private final boolean showUserDirectory;
 
     private final List<AccountSocialLink> socialLinks;
+
+    private final Optional<String> statementDescriptor;
 
     private final Optional<String> status;
 
@@ -216,6 +220,7 @@ public final class Account {
             Optional<String> invoicePrefix,
             Optional<AccountLevel> level,
             Optional<String> logoUrl,
+            Optional<AccountMerchantOfRecord> merchantOfRecord,
             Map<String, Object> metadata,
             Optional<AccountOnboardingType> onboardingType,
             Optional<String> opengraphImageUrl,
@@ -243,6 +248,7 @@ public final class Account {
             boolean showReviewsDtc,
             boolean showUserDirectory,
             List<AccountSocialLink> socialLinks,
+            Optional<String> statementDescriptor,
             Optional<String> status,
             Optional<String> statusReason,
             AccountStorePageConfig storePageConfig,
@@ -295,6 +301,7 @@ public final class Account {
         this.invoicePrefix = invoicePrefix;
         this.level = level;
         this.logoUrl = logoUrl;
+        this.merchantOfRecord = merchantOfRecord;
         this.metadata = metadata;
         this.onboardingType = onboardingType;
         this.opengraphImageUrl = opengraphImageUrl;
@@ -322,6 +329,7 @@ public final class Account {
         this.showReviewsDtc = showReviewsDtc;
         this.showUserDirectory = showUserDirectory;
         this.socialLinks = socialLinks;
+        this.statementDescriptor = statementDescriptor;
         this.status = status;
         this.statusReason = statusReason;
         this.storePageConfig = storePageConfig;
@@ -347,7 +355,7 @@ public final class Account {
     }
 
     /**
-     * @return Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.
+     * @return Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.
      */
     @JsonIgnore
     public Optional<Double> getAdsSpendUsd() {
@@ -448,7 +456,7 @@ public final class Account {
     }
 
     /**
-     * @return Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.
+     * @return The account's saved preference for offering optional buyer VAT/tax ID entry. Checkouts where Whop collects and remits tax offer entry automatically, regardless of this preference. Does not require a VAT ID to purchase.
      */
     @JsonProperty("collect_vat_id")
     public boolean getCollectVatId() {
@@ -638,6 +646,17 @@ public final class Account {
             return Optional.empty();
         }
         return logoUrl;
+    }
+
+    /**
+     * @return The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>required_actions</code> lists what the account must answer, or says that it was not approved. <code>account</code> means the account is the merchant of record. Switch with <code>merchant_of_record</code> on <code>PATCH /accounts/{id}/preferences</code>. Whop sends <code>account.updated</code> when this value changes.
+     */
+    @JsonIgnore
+    public Optional<AccountMerchantOfRecord> getMerchantOfRecord() {
+        if (merchantOfRecord == null) {
+            return Optional.empty();
+        }
+        return merchantOfRecord;
     }
 
     /**
@@ -890,6 +909,17 @@ public final class Account {
     }
 
     /**
+     * @return The text on buyers' card statements for this account's payments, up to 22 characters. While Whop is the merchant of record, it starts with <code>WHOP*</code>. Whop drops the <code>WHOP*</code> prefix when the account is its own merchant of record and can take card payments. It keeps the prefix if fewer than five characters or no letters would remain. A product or payment descriptor takes precedence. <code>null</code> uses a descriptor made from the account's title.
+     */
+    @JsonIgnore
+    public Optional<String> getStatementDescriptor() {
+        if (statementDescriptor == null) {
+            return Optional.empty();
+        }
+        return statementDescriptor;
+    }
+
+    /**
      * @return Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.
      */
     @JsonIgnore
@@ -901,7 +931,7 @@ public final class Account {
     }
 
     /**
-     * @return Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.
+     * @return Why the account was suspended, as a label such as <code>Suspended - Fraudulent activity</code>. <code>Suspended</code> when no reason is recorded. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>. <code>null</code> otherwise, or when <code>status</code> is not <code>suspended</code>.
      */
     @JsonIgnore
     public Optional<String> getStatusReason() {
@@ -1042,7 +1072,7 @@ public final class Account {
     }
 
     /**
-     * @return Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.
+     * @return Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.
      */
     @JsonIgnore
     public Optional<Double> getVolumeL30DUsd() {
@@ -1053,7 +1083,7 @@ public final class Account {
     }
 
     /**
-     * @return Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.
+     * @return Lifetime volume through the account (sales plus transfers received), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.
      */
     @JsonIgnore
     public Optional<Double> getVolumeUsd() {
@@ -1217,6 +1247,12 @@ public final class Account {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("merchant_of_record")
+    private Optional<AccountMerchantOfRecord> _getMerchantOfRecord() {
+        return merchantOfRecord;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("onboarding_type")
     private Optional<AccountOnboardingType> _getOnboardingType() {
         return onboardingType;
@@ -1304,6 +1340,12 @@ public final class Account {
     @JsonProperty("shipping_policy")
     private Optional<File> _getShippingPolicy() {
         return shippingPolicy;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("statement_descriptor")
+    private Optional<String> _getStatementDescriptor() {
+        return statementDescriptor;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1438,6 +1480,7 @@ public final class Account {
                 && invoicePrefix.equals(other.invoicePrefix)
                 && level.equals(other.level)
                 && logoUrl.equals(other.logoUrl)
+                && merchantOfRecord.equals(other.merchantOfRecord)
                 && metadata.equals(other.metadata)
                 && onboardingType.equals(other.onboardingType)
                 && opengraphImageUrl.equals(other.opengraphImageUrl)
@@ -1465,6 +1508,7 @@ public final class Account {
                 && showReviewsDtc == other.showReviewsDtc
                 && showUserDirectory == other.showUserDirectory
                 && socialLinks.equals(other.socialLinks)
+                && statementDescriptor.equals(other.statementDescriptor)
                 && status.equals(other.status)
                 && statusReason.equals(other.statusReason)
                 && storePageConfig.equals(other.storePageConfig)
@@ -1521,6 +1565,7 @@ public final class Account {
                 this.invoicePrefix,
                 this.level,
                 this.logoUrl,
+                this.merchantOfRecord,
                 this.metadata,
                 this.onboardingType,
                 this.opengraphImageUrl,
@@ -1548,6 +1593,7 @@ public final class Account {
                 this.showReviewsDtc,
                 this.showUserDirectory,
                 this.socialLinks,
+                this.statementDescriptor,
                 this.status,
                 this.statusReason,
                 this.storePageConfig,
@@ -1591,7 +1637,7 @@ public final class Account {
 
     public interface CollectVatIdStage {
         /**
-         * <p>Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.</p>
+         * <p>The account's saved preference for offering optional buyer VAT/tax ID entry. Checkouts where Whop collects and remits tax offer entry automatically, regardless of this preference. Does not require a VAT ID to purchase.</p>
          */
         CompanyFormationStage collectVatId(boolean collectVatId);
     }
@@ -1716,7 +1762,7 @@ public final class Account {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         _FinalStage adsSpendUsd(Optional<Double> adsSpendUsd);
 
@@ -1915,6 +1961,15 @@ public final class Account {
         _FinalStage logoUrl(Nullable<String> logoUrl);
 
         /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>required_actions</code> lists what the account must answer, or says that it was not approved. <code>account</code> means the account is the merchant of record. Switch with <code>merchant_of_record</code> on <code>PATCH /accounts/{id}/preferences</code>. Whop sends <code>account.updated</code> when this value changes.</p>
+         */
+        _FinalStage merchantOfRecord(Optional<AccountMerchantOfRecord> merchantOfRecord);
+
+        _FinalStage merchantOfRecord(AccountMerchantOfRecord merchantOfRecord);
+
+        _FinalStage merchantOfRecord(Nullable<AccountMerchantOfRecord> merchantOfRecord);
+
+        /**
          * <p>Arbitrary key/value metadata supplied at account creation.</p>
          */
         _FinalStage metadata(Map<String, Object> metadata);
@@ -2074,6 +2129,15 @@ public final class Account {
         _FinalStage addAllSocialLinks(List<AccountSocialLink> socialLinks);
 
         /**
+         * <p>The text on buyers' card statements for this account's payments, up to 22 characters. While Whop is the merchant of record, it starts with <code>WHOP*</code>. Whop drops the <code>WHOP*</code> prefix when the account is its own merchant of record and can take card payments. It keeps the prefix if fewer than five characters or no letters would remain. A product or payment descriptor takes precedence. <code>null</code> uses a descriptor made from the account's title.</p>
+         */
+        _FinalStage statementDescriptor(Optional<String> statementDescriptor);
+
+        _FinalStage statementDescriptor(String statementDescriptor);
+
+        _FinalStage statementDescriptor(Nullable<String> statementDescriptor);
+
+        /**
          * <p>Whether the account can operate on Whop: <code>active</code> or <code>suspended</code>. Computed on <code>list</code>, <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise.</p>
          */
         _FinalStage status(Optional<String> status);
@@ -2083,7 +2147,7 @@ public final class Account {
         _FinalStage status(Nullable<String> status);
 
         /**
-         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as a label such as <code>Suspended - Fraudulent activity</code>. <code>Suspended</code> when no reason is recorded. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>. <code>null</code> otherwise, or when <code>status</code> is not <code>suspended</code>.</p>
          */
         _FinalStage statusReason(Optional<String> statusReason);
 
@@ -2185,7 +2249,7 @@ public final class Account {
         _FinalStage verification(String key, Object value);
 
         /**
-         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         _FinalStage volumeL30DUsd(Optional<Double> volumeL30DUsd);
 
@@ -2194,7 +2258,7 @@ public final class Account {
         _FinalStage volumeL30DUsd(Nullable<Double> volumeL30DUsd);
 
         /**
-         * <p>Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime volume through the account (sales plus transfers received), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         _FinalStage volumeUsd(Optional<Double> volumeUsd);
 
@@ -2323,6 +2387,8 @@ public final class Account {
 
         private Optional<String> status = Optional.empty();
 
+        private Optional<String> statementDescriptor = Optional.empty();
+
         private List<AccountSocialLink> socialLinks = new ArrayList<>();
 
         private Optional<File> shippingPolicy = Optional.empty();
@@ -2360,6 +2426,8 @@ public final class Account {
         private Optional<AccountOnboardingType> onboardingType = Optional.empty();
 
         private Map<String, Object> metadata = new LinkedHashMap<>();
+
+        private Optional<AccountMerchantOfRecord> merchantOfRecord = Optional.empty();
 
         private Optional<String> logoUrl = Optional.empty();
 
@@ -2443,6 +2511,7 @@ public final class Account {
             invoicePrefix(other.getInvoicePrefix());
             level(other.getLevel());
             logoUrl(other.getLogoUrl());
+            merchantOfRecord(other.getMerchantOfRecord());
             metadata(other.getMetadata());
             onboardingType(other.getOnboardingType());
             opengraphImageUrl(other.getOpengraphImageUrl());
@@ -2470,6 +2539,7 @@ public final class Account {
             showReviewsDtc(other.getShowReviewsDtc());
             showUserDirectory(other.getShowUserDirectory());
             socialLinks(other.getSocialLinks());
+            statementDescriptor(other.getStatementDescriptor());
             status(other.getStatus());
             statusReason(other.getStatusReason());
             storePageConfig(other.getStorePageConfig());
@@ -2506,7 +2576,7 @@ public final class Account {
         }
 
         /**
-         * <p>Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.</p>
+         * <p>The account's saved preference for offering optional buyer VAT/tax ID entry. Checkouts where Whop collects and remits tax offer entry automatically, regardless of this preference. Does not require a VAT ID to purchase.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2801,7 +2871,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime volume through the account (sales plus transfers received), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2817,7 +2887,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime volume through the account (sales plus transfers received), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2827,7 +2897,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime volume through the account — sales plus transfers received — normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime volume through the account (sales plus transfers received), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "volume_usd", nulls = Nulls.SKIP)
@@ -2837,7 +2907,7 @@ public final class Account {
         }
 
         /**
-         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2853,7 +2923,7 @@ public final class Account {
         }
 
         /**
-         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2863,7 +2933,7 @@ public final class Account {
         }
 
         /**
-         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Volume through the account in the last 30 days (GMV from paid receipts), normalized to USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "volume_l30d_usd", nulls = Nulls.SKIP)
@@ -3244,7 +3314,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as a label such as <code>Suspended - Fraudulent activity</code>. <code>Suspended</code> when no reason is recorded. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>. <code>null</code> otherwise, or when <code>status</code> is not <code>suspended</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3260,7 +3330,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as a label such as <code>Suspended - Fraudulent activity</code>. <code>Suspended</code> when no reason is recorded. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>. <code>null</code> otherwise, or when <code>status</code> is not <code>suspended</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3270,7 +3340,7 @@ public final class Account {
         }
 
         /**
-         * <p>Why the account was suspended, as the label shown to the account owner, such as <code>Suspended - Fraudulent activity</code>. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>; <code>null</code> otherwise, when <code>status</code> is not <code>suspended</code>, and when the suspension was recorded without a reason.</p>
+         * <p>Why the account was suspended, as a label such as <code>Suspended - Fraudulent activity</code>. <code>Suspended</code> when no reason is recorded. Computed on <code>retrieve</code>, <code>me</code>, and <code>suspend</code>. <code>null</code> otherwise, or when <code>status</code> is not <code>suspended</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "status_reason", nulls = Nulls.SKIP)
@@ -3312,6 +3382,42 @@ public final class Account {
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
         public _FinalStage status(Optional<String> status) {
             this.status = status;
+            return this;
+        }
+
+        /**
+         * <p>The text on buyers' card statements for this account's payments, up to 22 characters. While Whop is the merchant of record, it starts with <code>WHOP*</code>. Whop drops the <code>WHOP*</code> prefix when the account is its own merchant of record and can take card payments. It keeps the prefix if fewer than five characters or no letters would remain. A product or payment descriptor takes precedence. <code>null</code> uses a descriptor made from the account's title.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(Nullable<String> statementDescriptor) {
+            if (statementDescriptor.isNull()) {
+                this.statementDescriptor = null;
+            } else if (statementDescriptor.isEmpty()) {
+                this.statementDescriptor = Optional.empty();
+            } else {
+                this.statementDescriptor = Optional.of(statementDescriptor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The text on buyers' card statements for this account's payments, up to 22 characters. While Whop is the merchant of record, it starts with <code>WHOP*</code>. Whop drops the <code>WHOP*</code> prefix when the account is its own merchant of record and can take card payments. It keeps the prefix if fewer than five characters or no letters would remain. A product or payment descriptor takes precedence. <code>null</code> uses a descriptor made from the account's title.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(String statementDescriptor) {
+            this.statementDescriptor = Optional.ofNullable(statementDescriptor);
+            return this;
+        }
+
+        /**
+         * <p>The text on buyers' card statements for this account's payments, up to 22 characters. While Whop is the merchant of record, it starts with <code>WHOP*</code>. Whop drops the <code>WHOP*</code> prefix when the account is its own merchant of record and can take card payments. It keeps the prefix if fewer than five characters or no letters would remain. A product or payment descriptor takes precedence. <code>null</code> uses a descriptor made from the account's title.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
+        public _FinalStage statementDescriptor(Optional<String> statementDescriptor) {
+            this.statementDescriptor = statementDescriptor;
             return this;
         }
 
@@ -3940,6 +4046,42 @@ public final class Account {
             if (metadata != null) {
                 this.metadata.putAll(metadata);
             }
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>required_actions</code> lists what the account must answer, or says that it was not approved. <code>account</code> means the account is the merchant of record. Switch with <code>merchant_of_record</code> on <code>PATCH /accounts/{id}/preferences</code>. Whop sends <code>account.updated</code> when this value changes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage merchantOfRecord(Nullable<AccountMerchantOfRecord> merchantOfRecord) {
+            if (merchantOfRecord.isNull()) {
+                this.merchantOfRecord = null;
+            } else if (merchantOfRecord.isEmpty()) {
+                this.merchantOfRecord = Optional.empty();
+            } else {
+                this.merchantOfRecord = Optional.of(merchantOfRecord.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>required_actions</code> lists what the account must answer, or says that it was not approved. <code>account</code> means the account is the merchant of record. Switch with <code>merchant_of_record</code> on <code>PATCH /accounts/{id}/preferences</code>. Whop sends <code>account.updated</code> when this value changes.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage merchantOfRecord(AccountMerchantOfRecord merchantOfRecord) {
+            this.merchantOfRecord = Optional.ofNullable(merchantOfRecord);
+            return this;
+        }
+
+        /**
+         * <p>The merchant of record for the account's payments. <code>whop</code> means Whop is the merchant of record and the account can switch. <code>null</code> means Whop is the merchant of record and the account cannot switch. <code>pending</code> means the account switched and waits for approval. Checkout takes no payments until then. <code>required_actions</code> lists what the account must answer, or says that it was not approved. <code>account</code> means the account is the merchant of record. Switch with <code>merchant_of_record</code> on <code>PATCH /accounts/{id}/preferences</code>. Whop sends <code>account.updated</code> when this value changes.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "merchant_of_record", nulls = Nulls.SKIP)
+        public _FinalStage merchantOfRecord(Optional<AccountMerchantOfRecord> merchantOfRecord) {
+            this.merchantOfRecord = merchantOfRecord;
             return this;
         }
 
@@ -4696,7 +4838,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -4712,7 +4854,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -4722,7 +4864,7 @@ public final class Account {
         }
 
         /**
-         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account; <code>null</code> otherwise.</p>
+         * <p>Lifetime charged ad spend for the account, in USD. Computed only on <code>list</code> for callers with <code>stats:read</code> on the account, and <code>null</code> otherwise.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "ads_spend_usd", nulls = Nulls.SKIP)
@@ -4764,6 +4906,7 @@ public final class Account {
                     invoicePrefix,
                     level,
                     logoUrl,
+                    merchantOfRecord,
                     metadata,
                     onboardingType,
                     opengraphImageUrl,
@@ -4791,6 +4934,7 @@ public final class Account {
                     showReviewsDtc,
                     showUserDirectory,
                     socialLinks,
+                    statementDescriptor,
                     status,
                     statusReason,
                     storePageConfig,
@@ -4847,6 +4991,7 @@ public final class Account {
                     || key.equalsIgnoreCase("invoice_prefix")
                     || key.equalsIgnoreCase("level")
                     || key.equalsIgnoreCase("logo_url")
+                    || key.equalsIgnoreCase("merchant_of_record")
                     || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("onboarding_type")
                     || key.equalsIgnoreCase("opengraph_image_url")
@@ -4874,6 +5019,7 @@ public final class Account {
                     || key.equalsIgnoreCase("show_reviews_dtc")
                     || key.equalsIgnoreCase("show_user_directory")
                     || key.equalsIgnoreCase("social_links")
+                    || key.equalsIgnoreCase("statement_descriptor")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("status_reason")
                     || key.equalsIgnoreCase("store_page_config")

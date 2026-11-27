@@ -94,6 +94,13 @@ public class RawWaitlistEntriesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
         }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
+        }
         if (request.getVariantId().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "variant_id", request.getVariantId().get(), false);
@@ -133,6 +140,10 @@ public class RawWaitlistEntriesClient {
         if (request.getDirection().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {

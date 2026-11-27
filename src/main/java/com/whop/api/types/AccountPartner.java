@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AccountPartner.Builder.class)
 public final class AccountPartner {
+    private final List<UserBadge> badges;
+
     private final Optional<String> email;
 
     private final String id;
@@ -41,6 +45,7 @@ public final class AccountPartner {
     private final Map<String, Object> additionalProperties;
 
     private AccountPartner(
+            List<UserBadge> badges,
             Optional<String> email,
             String id,
             Optional<String> name,
@@ -49,6 +54,7 @@ public final class AccountPartner {
             String username,
             Optional<String> whopPartnerVerifiedAt,
             Map<String, Object> additionalProperties) {
+        this.badges = badges;
         this.email = email;
         this.id = id;
         this.name = name;
@@ -57,6 +63,11 @@ public final class AccountPartner {
         this.username = username;
         this.whopPartnerVerifiedAt = whopPartnerVerifiedAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("badges")
+    public List<UserBadge> getBadges() {
+        return badges;
     }
 
     /**
@@ -163,7 +174,8 @@ public final class AccountPartner {
     }
 
     private boolean equalTo(AccountPartner other) {
-        return email.equals(other.email)
+        return badges.equals(other.badges)
+                && email.equals(other.email)
                 && id.equals(other.id)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
@@ -175,6 +187,7 @@ public final class AccountPartner {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.badges,
                 this.email,
                 this.id,
                 this.name,
@@ -222,6 +235,12 @@ public final class AccountPartner {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage badges(List<UserBadge> badges);
+
+        _FinalStage addBadges(UserBadge badges);
+
+        _FinalStage addAllBadges(List<UserBadge> badges);
 
         /**
          * <p>Email address for contacting the partner. Null when the partner has not added their own email address.</p>
@@ -276,12 +295,15 @@ public final class AccountPartner {
 
         private Optional<String> email = Optional.empty();
 
+        private List<UserBadge> badges = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AccountPartner other) {
+            badges(other.getBadges());
             email(other.getEmail());
             id(other.getId());
             name(other.getName());
@@ -470,8 +492,33 @@ public final class AccountPartner {
         }
 
         @java.lang.Override
+        public _FinalStage addAllBadges(List<UserBadge> badges) {
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addBadges(UserBadge badges) {
+            this.badges.add(badges);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "badges", nulls = Nulls.SKIP)
+        public _FinalStage badges(List<UserBadge> badges) {
+            this.badges.clear();
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public AccountPartner build() {
             return new AccountPartner(
+                    badges,
                     email,
                     id,
                     name,
@@ -484,7 +531,8 @@ public final class AccountPartner {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("email")
+            if (key.equalsIgnoreCase("badges")
+                    || key.equalsIgnoreCase("email")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("profile_picture")

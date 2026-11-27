@@ -14,24 +14,18 @@ import com.whop.api.core.RetryInterceptor;
 import com.whop.api.core.WhopApiApiException;
 import com.whop.api.core.WhopApiException;
 import com.whop.api.core.WhopApiHttpResponse;
-import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
-import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
 import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
 import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
-import com.whop.api.resources.partners.types.ReferredUsersPartnersResponse;
-import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
 import com.whop.api.types.Partner;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -255,167 +249,6 @@ public class RawPartnersClient {
                 if (response.code() == 400) {
                     throw new BadRequestError(
                             ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                }
-            } catch (JsonProcessingException ignored) {
-                // unable to map error response, throwing generic error
-            }
-            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
-            throw new WhopApiApiException(
-                    "Error with status code " + response.code(), response.code(), errorBody, response);
-        } catch (JsonProcessingException e) {
-            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new WhopApiException("Network error executing HTTP request", e);
-        }
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers() {
-        return referredUsers(ReferredUsersPartnersRequest.builder().build());
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            RequestOptions requestOptions) {
-        return referredUsers(ReferredUsersPartnersRequest.builder().build(), requestOptions);
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            ReferredUsersPartnersRequest request) {
-        return referredUsers(request, null);
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
-        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
-                .newBuilder()
-                .addPathSegments("partners/referred_users");
-        if (request.getEarningPartnerId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "earning_partner_id", request.getEarningPartnerId().get(), false);
-        }
-        if (request.getEarningPartnerUsername().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl,
-                    "earning_partner_username",
-                    request.getEarningPartnerUsername().get(),
-                    false);
-        }
-        if (request.getReferringAccountId().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl,
-                    "referring_account_id",
-                    request.getReferringAccountId().get(),
-                    false);
-        }
-        if (request.getQuery().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "query", request.getQuery().get(), false);
-        }
-        if (request.getHasBusinesses().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "has_businesses", request.getHasBusinesses().get(), false);
-        }
-        if (request.getHasEarningBusinesses().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl,
-                    "has_earning_businesses",
-                    request.getHasEarningBusinesses().get(),
-                    false);
-        }
-        if (request.getOrder().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "order", request.getOrder().get(), false);
-        }
-        if (request.getDirection().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "direction", request.getDirection().get(), false);
-        }
-        if (request.getFirst().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "first", request.getFirst().get(), false);
-        }
-        if (request.getAfter().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "after", request.getAfter().get(), false);
-        }
-        if (request.getLast().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "last", request.getLast().get(), false);
-        }
-        if (request.getBefore().isPresent()) {
-            QueryStringMapper.addQueryParameter(
-                    httpUrl, "before", request.getBefore().get(), false);
-        }
-        if (requestOptions != null) {
-            requestOptions.getQueryParameters().forEach((_key, _value) -> {
-                httpUrl.addQueryParameter(_key, _value);
-            });
-        }
-        Request.Builder _requestBuilder = new Request.Builder()
-                .url(httpUrl.build())
-                .method("GET", null)
-                .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
-        OkHttpClient client = clientOptions.httpClient();
-        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
-            client = clientOptions.httpClientWithTimeout(requestOptions);
-        }
-        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
-            okhttpRequest = okhttpRequest
-                    .newBuilder()
-                    .tag(
-                            RetryInterceptor.MaxRetriesOverride.class,
-                            new RetryInterceptor.MaxRetriesOverride(
-                                    requestOptions.getMaxRetries().get()))
-                    .build();
-        }
-        try (Response response = client.newCall(okhttpRequest).execute()) {
-            ResponseBody responseBody = response.body();
-            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
-            if (response.isSuccessful()) {
-                ReferredUsersPartnersResponse parsedResponse =
-                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ReferredUsersPartnersResponse.class);
-                Optional<String> startingAfter = parsedResponse.getPageInfo().getEndCursor();
-                ReferredUsersPartnersRequest nextRequest = ReferredUsersPartnersRequest.builder()
-                        .from(request)
-                        .after(startingAfter)
-                        .build();
-                List<ReferredUsersPartnersResponseDataItem> result = parsedResponse.getData();
-                return new WhopApiHttpResponse<>(
-                        new SyncPagingIterable<ReferredUsersPartnersResponseDataItem>(
-                                startingAfter.isPresent()
-                                        && !startingAfter.get().isEmpty(),
-                                result,
-                                parsedResponse,
-                                () -> referredUsers(nextRequest, requestOptions).body()),
-                        response);
-            }
-            try {
-                switch (response.code()) {
-                    case 400:
-                        throw new BadRequestError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 401:
-                        throw new UnauthorizedError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 403:
-                        throw new ForbiddenError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
-                    case 404:
-                        throw new NotFoundError(
-                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error

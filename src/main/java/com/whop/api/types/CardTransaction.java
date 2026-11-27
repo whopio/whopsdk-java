@@ -180,7 +180,7 @@ public final class CardTransaction {
     }
 
     /**
-     * @return Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled or was declined.
+     * @return Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. For a pending transaction, the points it will earn once it settles. Null when it earns none, such as a declined transaction.
      */
     @JsonIgnore
     public Optional<Double> getLevelsPoints() {
@@ -507,7 +507,7 @@ public final class CardTransaction {
         _FinalStage declinedReason(Nullable<String> declinedReason);
 
         /**
-         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled or was declined.</p>
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. For a pending transaction, the points it will earn once it settles. Null when it earns none, such as a declined transaction.</p>
          */
         _FinalStage levelsPoints(Optional<Double> levelsPoints);
 
@@ -970,7 +970,7 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled or was declined.</p>
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. For a pending transaction, the points it will earn once it settles. Null when it earns none, such as a declined transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -986,7 +986,7 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled or was declined.</p>
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. For a pending transaction, the points it will earn once it settles. Null when it earns none, such as a declined transaction.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -996,7 +996,7 @@ public final class CardTransaction {
         }
 
         /**
-         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. Null when it earns none: a transaction that hasn't settled or was declined.</p>
+         * <p>Whop Levels points this transaction earned for the business. Negative for a refund that takes them back. For a pending transaction, the points it will earn once it settles. Null when it earns none, such as a declined transaction.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "levels_points", nulls = Nulls.SKIP)

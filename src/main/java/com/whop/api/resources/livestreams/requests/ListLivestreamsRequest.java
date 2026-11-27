@@ -65,7 +65,7 @@ public final class ListLivestreamsRequest {
     }
 
     /**
-     * @return When <code>true</code>, only pinned livestreams, most recently pinned first. When <code>false</code>, only livestreams that are not pinned.
+     * @return When <code>true</code>, only pinned livestreams, newest <code>pinned_at</code> first. When <code>false</code>, only livestreams that are not pinned.
      */
     @JsonProperty("pinned")
     public Optional<Boolean> getPinned() {
@@ -165,7 +165,7 @@ public final class ListLivestreamsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>When <code>true</code>, only pinned livestreams, most recently pinned first. When <code>false</code>, only livestreams that are not pinned.</p>
+         * <p>When <code>true</code>, only pinned livestreams, newest <code>pinned_at</code> first. When <code>false</code>, only livestreams that are not pinned.</p>
          */
         _FinalStage pinned(Optional<Boolean> pinned);
 
@@ -351,7 +351,7 @@ public final class ListLivestreamsRequest {
         }
 
         /**
-         * <p>When <code>true</code>, only pinned livestreams, most recently pinned first. When <code>false</code>, only livestreams that are not pinned.</p>
+         * <p>When <code>true</code>, only pinned livestreams, newest <code>pinned_at</code> first. When <code>false</code>, only livestreams that are not pinned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -361,7 +361,7 @@ public final class ListLivestreamsRequest {
         }
 
         /**
-         * <p>When <code>true</code>, only pinned livestreams, most recently pinned first. When <code>false</code>, only livestreams that are not pinned.</p>
+         * <p>When <code>true</code>, only pinned livestreams, newest <code>pinned_at</code> first. When <code>false</code>, only livestreams that are not pinned.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "pinned", nulls = Nulls.SKIP)

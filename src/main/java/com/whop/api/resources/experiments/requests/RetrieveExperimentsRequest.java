@@ -30,7 +30,7 @@ public final class RetrieveExperimentsRequest {
     }
 
     /**
-     * @return Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+     * @return Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -80,7 +80,7 @@ public final class RetrieveExperimentsRequest {
         }
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {

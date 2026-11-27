@@ -13,53 +13,28 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
-import com.whop.api.resources.economicintelligence.types.UpdateEconomicIntelligenceRequestResultPage;
-import com.whop.api.resources.economicintelligence.types.UpdateEconomicIntelligenceRequestSentiment;
 import com.whop.api.resources.economicintelligence.types.UpdateEconomicIntelligenceRequestStatus;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateEconomicIntelligenceRequest.Builder.class)
 public final class UpdateEconomicIntelligenceRequest {
     private final Optional<String> accountId;
 
-    private final Optional<String> input;
-
-    private final Optional<String> resultId;
-
-    private final Optional<UpdateEconomicIntelligenceRequestResultPage> resultPage;
-
-    private final Optional<String> resultUrl;
-
-    private final Optional<UpdateEconomicIntelligenceRequestSentiment> sentiment;
-
-    private final Optional<UpdateEconomicIntelligenceRequestStatus> status;
-
-    private final Optional<String> userFeedback;
+    private final UpdateEconomicIntelligenceRequestStatus status;
 
     private final Map<String, Object> additionalProperties;
 
     private UpdateEconomicIntelligenceRequest(
             Optional<String> accountId,
-            Optional<String> input,
-            Optional<String> resultId,
-            Optional<UpdateEconomicIntelligenceRequestResultPage> resultPage,
-            Optional<String> resultUrl,
-            Optional<UpdateEconomicIntelligenceRequestSentiment> sentiment,
-            Optional<UpdateEconomicIntelligenceRequestStatus> status,
-            Optional<String> userFeedback,
+            UpdateEconomicIntelligenceRequestStatus status,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
-        this.input = input;
-        this.resultId = resultId;
-        this.resultPage = resultPage;
-        this.resultUrl = resultUrl;
-        this.sentiment = sentiment;
         this.status = status;
-        this.userFeedback = userFeedback;
         this.additionalProperties = additionalProperties;
     }
 
@@ -72,59 +47,11 @@ public final class UpdateEconomicIntelligenceRequest {
     }
 
     /**
-     * @return No longer read: recommendations are written for the business as it changes. Up to 1000 characters.
-     */
-    @JsonProperty("input")
-    public Optional<String> getInput() {
-        return input;
-    }
-
-    /**
-     * @return With <code>status: executed</code>, the ID of what the run produced or changed, and the recommendation's <code>result_url</code> becomes where to view it: an ad (<code>ad_</code>), ad group (<code>adgrp_</code>) or ad campaign (<code>adcamp_</code>), a website (<code>app_</code>), a product (<code>prod_</code>), a plan (<code>plan_</code>), a checkout link (<code>ch_</code>), a promo code (<code>promo_</code>), or an experience (<code>exp_</code>). Without <code>result_id</code> or <code>result_page</code>, <code>result_url</code> links to the resource the recommendation was about, when it names one. Send only one of <code>result_id</code>, <code>result_page</code> and <code>result_url</code>.
-     */
-    @JsonProperty("result_id")
-    public Optional<String> getResultId() {
-        return resultId;
-    }
-
-    /**
-     * @return With <code>status: executed</code>, the page where the run's result can be seen when it is not one resource, such as the checkout links list. The recommendation's <code>result_url</code> becomes that page on the account's dashboard.
-     */
-    @JsonProperty("result_page")
-    public Optional<UpdateEconomicIntelligenceRequestResultPage> getResultPage() {
-        return resultPage;
-    }
-
-    /**
-     * @return With <code>status: executed</code>, where to view what was produced when it is outside Whop. An http or https URL. Prefer <code>result_id</code> for anything on Whop.
-     */
-    @JsonProperty("result_url")
-    public Optional<String> getResultUrl() {
-        return resultUrl;
-    }
-
-    /**
-     * @return A signed-in user can rate a recommendation as <code>positive</code> or <code>negative</code>. Can be sent alone or together with status.
-     */
-    @JsonProperty("sentiment")
-    public Optional<UpdateEconomicIntelligenceRequestSentiment> getSentiment() {
-        return sentiment;
-    }
-
-    /**
-     * @return Use <code>running</code> to start a run of a ready recommendation, <code>executed</code> to record that it was carried out, <code>incomplete</code> to record that a running recommendation's run ended without carrying it out, <code>superseded</code> to reject a ready recommendation, or <code>acknowledged</code> to mark an executed run as seen; the recommendation stays <code>executed</code> and records <code>acknowledged_at</code>.
+     * @return Use <code>superseded</code> to dismiss a ready recommendation.
      */
     @JsonProperty("status")
-    public Optional<UpdateEconomicIntelligenceRequestStatus> getStatus() {
+    public UpdateEconomicIntelligenceRequestStatus getStatus() {
         return status;
-    }
-
-    /**
-     * @return An optional explanation of the rating or rejection.
-     */
-    @JsonProperty("user_feedback")
-    public Optional<String> getUserFeedback() {
-        return userFeedback;
     }
 
     @java.lang.Override
@@ -139,27 +66,12 @@ public final class UpdateEconomicIntelligenceRequest {
     }
 
     private boolean equalTo(UpdateEconomicIntelligenceRequest other) {
-        return accountId.equals(other.accountId)
-                && input.equals(other.input)
-                && resultId.equals(other.resultId)
-                && resultPage.equals(other.resultPage)
-                && resultUrl.equals(other.resultUrl)
-                && sentiment.equals(other.sentiment)
-                && status.equals(other.status)
-                && userFeedback.equals(other.userFeedback);
+        return accountId.equals(other.accountId) && status.equals(other.status);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(
-                this.accountId,
-                this.input,
-                this.resultId,
-                this.resultPage,
-                this.resultUrl,
-                this.sentiment,
-                this.status,
-                this.userFeedback);
+        return Objects.hash(this.accountId, this.status);
     }
 
     @java.lang.Override
@@ -167,188 +79,102 @@ public final class UpdateEconomicIntelligenceRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static Builder builder() {
+    public static StatusStage builder() {
         return new Builder();
     }
 
+    public interface StatusStage {
+        /**
+         * <p>Use <code>superseded</code> to dismiss a ready recommendation.</p>
+         */
+        _FinalStage status(@NotNull UpdateEconomicIntelligenceRequestStatus status);
+
+        Builder from(UpdateEconomicIntelligenceRequest other);
+    }
+
+    public interface _FinalStage {
+        UpdateEconomicIntelligenceRequest build();
+
+        _FinalStage additionalProperty(String key, Object value);
+
+        _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Account ID, prefixed <code>biz_</code>. Defaults to the API key's own account.</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder {
+    public static final class Builder implements StatusStage, _FinalStage {
+        private UpdateEconomicIntelligenceRequestStatus status;
+
         private Optional<String> accountId = Optional.empty();
-
-        private Optional<String> input = Optional.empty();
-
-        private Optional<String> resultId = Optional.empty();
-
-        private Optional<UpdateEconomicIntelligenceRequestResultPage> resultPage = Optional.empty();
-
-        private Optional<String> resultUrl = Optional.empty();
-
-        private Optional<UpdateEconomicIntelligenceRequestSentiment> sentiment = Optional.empty();
-
-        private Optional<UpdateEconomicIntelligenceRequestStatus> status = Optional.empty();
-
-        private Optional<String> userFeedback = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
+        @java.lang.Override
         public Builder from(UpdateEconomicIntelligenceRequest other) {
             accountId(other.getAccountId());
-            input(other.getInput());
-            resultId(other.getResultId());
-            resultPage(other.getResultPage());
-            resultUrl(other.getResultUrl());
-            sentiment(other.getSentiment());
             status(other.getStatus());
-            userFeedback(other.getUserFeedback());
+            return this;
+        }
+
+        /**
+         * <p>Use <code>superseded</code> to dismiss a ready recommendation.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("status")
+        public _FinalStage status(@NotNull UpdateEconomicIntelligenceRequestStatus status) {
+            this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Account ID, prefixed <code>biz_</code>. Defaults to the API key's own account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
             return this;
         }
 
         /**
          * <p>Account ID, prefixed <code>biz_</code>. Defaults to the API key's own account.</p>
          */
+        @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
-        public Builder accountId(Optional<String> accountId) {
+        public _FinalStage accountId(Optional<String> accountId) {
             this.accountId = accountId;
             return this;
         }
 
-        public Builder accountId(String accountId) {
-            this.accountId = Optional.ofNullable(accountId);
-            return this;
-        }
-
-        /**
-         * <p>No longer read: recommendations are written for the business as it changes. Up to 1000 characters.</p>
-         */
-        @JsonSetter(value = "input", nulls = Nulls.SKIP)
-        public Builder input(Optional<String> input) {
-            this.input = input;
-            return this;
-        }
-
-        public Builder input(String input) {
-            this.input = Optional.ofNullable(input);
-            return this;
-        }
-
-        /**
-         * <p>With <code>status: executed</code>, the ID of what the run produced or changed, and the recommendation's <code>result_url</code> becomes where to view it: an ad (<code>ad_</code>), ad group (<code>adgrp_</code>) or ad campaign (<code>adcamp_</code>), a website (<code>app_</code>), a product (<code>prod_</code>), a plan (<code>plan_</code>), a checkout link (<code>ch_</code>), a promo code (<code>promo_</code>), or an experience (<code>exp_</code>). Without <code>result_id</code> or <code>result_page</code>, <code>result_url</code> links to the resource the recommendation was about, when it names one. Send only one of <code>result_id</code>, <code>result_page</code> and <code>result_url</code>.</p>
-         */
-        @JsonSetter(value = "result_id", nulls = Nulls.SKIP)
-        public Builder resultId(Optional<String> resultId) {
-            this.resultId = resultId;
-            return this;
-        }
-
-        public Builder resultId(String resultId) {
-            this.resultId = Optional.ofNullable(resultId);
-            return this;
-        }
-
-        /**
-         * <p>With <code>status: executed</code>, the page where the run's result can be seen when it is not one resource, such as the checkout links list. The recommendation's <code>result_url</code> becomes that page on the account's dashboard.</p>
-         */
-        @JsonSetter(value = "result_page", nulls = Nulls.SKIP)
-        public Builder resultPage(Optional<UpdateEconomicIntelligenceRequestResultPage> resultPage) {
-            this.resultPage = resultPage;
-            return this;
-        }
-
-        public Builder resultPage(UpdateEconomicIntelligenceRequestResultPage resultPage) {
-            this.resultPage = Optional.ofNullable(resultPage);
-            return this;
-        }
-
-        /**
-         * <p>With <code>status: executed</code>, where to view what was produced when it is outside Whop. An http or https URL. Prefer <code>result_id</code> for anything on Whop.</p>
-         */
-        @JsonSetter(value = "result_url", nulls = Nulls.SKIP)
-        public Builder resultUrl(Optional<String> resultUrl) {
-            this.resultUrl = resultUrl;
-            return this;
-        }
-
-        public Builder resultUrl(String resultUrl) {
-            this.resultUrl = Optional.ofNullable(resultUrl);
-            return this;
-        }
-
-        /**
-         * <p>A signed-in user can rate a recommendation as <code>positive</code> or <code>negative</code>. Can be sent alone or together with status.</p>
-         */
-        @JsonSetter(value = "sentiment", nulls = Nulls.SKIP)
-        public Builder sentiment(Optional<UpdateEconomicIntelligenceRequestSentiment> sentiment) {
-            this.sentiment = sentiment;
-            return this;
-        }
-
-        public Builder sentiment(UpdateEconomicIntelligenceRequestSentiment sentiment) {
-            this.sentiment = Optional.ofNullable(sentiment);
-            return this;
-        }
-
-        /**
-         * <p>Use <code>running</code> to start a run of a ready recommendation, <code>executed</code> to record that it was carried out, <code>incomplete</code> to record that a running recommendation's run ended without carrying it out, <code>superseded</code> to reject a ready recommendation, or <code>acknowledged</code> to mark an executed run as seen; the recommendation stays <code>executed</code> and records <code>acknowledged_at</code>.</p>
-         */
-        @JsonSetter(value = "status", nulls = Nulls.SKIP)
-        public Builder status(Optional<UpdateEconomicIntelligenceRequestStatus> status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder status(UpdateEconomicIntelligenceRequestStatus status) {
-            this.status = Optional.ofNullable(status);
-            return this;
-        }
-
-        /**
-         * <p>An optional explanation of the rating or rejection.</p>
-         */
-        @JsonSetter(value = "user_feedback", nulls = Nulls.SKIP)
-        public Builder userFeedback(Optional<String> userFeedback) {
-            this.userFeedback = userFeedback;
-            return this;
-        }
-
-        public Builder userFeedback(String userFeedback) {
-            this.userFeedback = Optional.ofNullable(userFeedback);
-            return this;
-        }
-
+        @java.lang.Override
         public UpdateEconomicIntelligenceRequest build() {
-            return new UpdateEconomicIntelligenceRequest(
-                    accountId,
-                    input,
-                    resultId,
-                    resultPage,
-                    resultUrl,
-                    sentiment,
-                    status,
-                    userFeedback,
-                    additionalProperties);
+            return new UpdateEconomicIntelligenceRequest(accountId, status, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("input")
-                    || key.equalsIgnoreCase("result_id")
-                    || key.equalsIgnoreCase("result_page")
-                    || key.equalsIgnoreCase("result_url")
-                    || key.equalsIgnoreCase("sentiment")
-                    || key.equalsIgnoreCase("status")
-                    || key.equalsIgnoreCase("user_feedback")) {
+            if (key.equalsIgnoreCase("status")) {
                 return;
             }
             this.additionalProperties.put(key, value);
         }
 
+        @java.lang.Override
         public Builder additionalProperty(String key, Object value) {
             this.additionalProperties.put(key, value);
             return this;
         }
 
+        @java.lang.Override
         public Builder additionalProperties(Map<String, Object> additionalProperties) {
             this.additionalProperties.putAll(additionalProperties);
             return this;

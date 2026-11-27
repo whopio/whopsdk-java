@@ -33,6 +33,8 @@ public final class ListChannelMembersRequest {
 
     private final Optional<String> query;
 
+    private final Optional<Boolean> includeDeleted;
+
     private final Map<String, Object> additionalProperties;
 
     private ListChannelMembersRequest(
@@ -42,6 +44,7 @@ public final class ListChannelMembersRequest {
             Optional<String> before,
             String channelId,
             Optional<String> query,
+            Optional<Boolean> includeDeleted,
             Map<String, Object> additionalProperties) {
         this.first = first;
         this.after = after;
@@ -49,6 +52,7 @@ public final class ListChannelMembersRequest {
         this.before = before;
         this.channelId = channelId;
         this.query = query;
+        this.includeDeleted = includeDeleted;
         this.additionalProperties = additionalProperties;
     }
 
@@ -100,6 +104,14 @@ public final class ListChannelMembersRequest {
         return query;
     }
 
+    /**
+     * @return Include former members with a deleted_at timestamp. Defaults to current members only.
+     */
+    @JsonProperty("include_deleted")
+    public Optional<Boolean> getIncludeDeleted() {
+        return includeDeleted;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -117,12 +129,14 @@ public final class ListChannelMembersRequest {
                 && last.equals(other.last)
                 && before.equals(other.before)
                 && channelId.equals(other.channelId)
-                && query.equals(other.query);
+                && query.equals(other.query)
+                && includeDeleted.equals(other.includeDeleted);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.first, this.after, this.last, this.before, this.channelId, this.query);
+        return Objects.hash(
+                this.first, this.after, this.last, this.before, this.channelId, this.query, this.includeDeleted);
     }
 
     @java.lang.Override
@@ -184,11 +198,20 @@ public final class ListChannelMembersRequest {
         _FinalStage query(Optional<String> query);
 
         _FinalStage query(String query);
+
+        /**
+         * <p>Include former members with a deleted_at timestamp. Defaults to current members only.</p>
+         */
+        _FinalStage includeDeleted(Optional<Boolean> includeDeleted);
+
+        _FinalStage includeDeleted(Boolean includeDeleted);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements ChannelIdStage, _FinalStage {
         private String channelId;
+
+        private Optional<Boolean> includeDeleted = Optional.empty();
 
         private Optional<String> query = Optional.empty();
 
@@ -212,6 +235,7 @@ public final class ListChannelMembersRequest {
             before(other.getBefore());
             channelId(other.getChannelId());
             query(other.getQuery());
+            includeDeleted(other.getIncludeDeleted());
             return this;
         }
 
@@ -223,6 +247,26 @@ public final class ListChannelMembersRequest {
         @JsonSetter("channel_id")
         public _FinalStage channelId(@NotNull String channelId) {
             this.channelId = Objects.requireNonNull(channelId, "channelId must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Include former members with a deleted_at timestamp. Defaults to current members only.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage includeDeleted(Boolean includeDeleted) {
+            this.includeDeleted = Optional.ofNullable(includeDeleted);
+            return this;
+        }
+
+        /**
+         * <p>Include former members with a deleted_at timestamp. Defaults to current members only.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "include_deleted", nulls = Nulls.SKIP)
+        public _FinalStage includeDeleted(Optional<Boolean> includeDeleted) {
+            this.includeDeleted = includeDeleted;
             return this;
         }
 
@@ -328,7 +372,8 @@ public final class ListChannelMembersRequest {
 
         @java.lang.Override
         public ListChannelMembersRequest build() {
-            return new ListChannelMembersRequest(first, after, last, before, channelId, query, additionalProperties);
+            return new ListChannelMembersRequest(
+                    first, after, last, before, channelId, query, includeDeleted, additionalProperties);
         }
 
         @JsonAnySetter
@@ -338,7 +383,8 @@ public final class ListChannelMembersRequest {
                     || key.equalsIgnoreCase("last")
                     || key.equalsIgnoreCase("before")
                     || key.equalsIgnoreCase("channel_id")
-                    || key.equalsIgnoreCase("query")) {
+                    || key.equalsIgnoreCase("query")
+                    || key.equalsIgnoreCase("include_deleted")) {
                 return;
             }
             this.additionalProperties.put(key, value);

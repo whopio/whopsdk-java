@@ -216,7 +216,7 @@ public class AsyncSocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public CompletableFuture<SocialAccount> refresh(String id) {
         CompletableFuture<WhopApiHttpResponse<SocialAccount>> rawFuture = this.rawClient.refresh(id);
@@ -230,7 +230,7 @@ public class AsyncSocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public CompletableFuture<SocialAccount> refresh(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<SocialAccount>> rawFuture = this.rawClient.refresh(id, requestOptions);
@@ -244,7 +244,7 @@ public class AsyncSocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public CompletableFuture<SocialAccount> refresh(String id, RefreshSocialAccountsRequest request) {
         CompletableFuture<WhopApiHttpResponse<SocialAccount>> rawFuture = this.rawClient.refresh(id, request);
@@ -258,7 +258,7 @@ public class AsyncSocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public CompletableFuture<SocialAccount> refresh(
             String id, RefreshSocialAccountsRequest request, RequestOptions requestOptions) {

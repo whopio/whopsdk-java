@@ -22,11 +22,13 @@ import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.verifications.requests.CreateVerificationsRequest;
+import com.whop.api.resources.verifications.requests.GenerateDocumentUrlVerificationsRequest;
 import com.whop.api.resources.verifications.requests.ListVerificationsRequest;
 import com.whop.api.resources.verifications.requests.RetrieveVerificationsRequest;
 import com.whop.api.resources.verifications.requests.UpdateVerificationsRequest;
 import com.whop.api.resources.verifications.types.CreateVerificationsRequestBody;
 import com.whop.api.resources.verifications.types.CreateVerificationsResponse;
+import com.whop.api.resources.verifications.types.GenerateDocumentUrlVerificationsResponse;
 import com.whop.api.resources.verifications.types.ListVerificationsResponse;
 import com.whop.api.resources.verifications.types.ListVerificationsResponseDataItem;
 import com.whop.api.resources.verifications.types.RetrieveVerificationsResponse;
@@ -486,7 +488,7 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates profile details or submits answers for items returned in <code>requested_information</code>. Approved verifications from a supported provider can update names, birth date, phone, country, address, business name, business structure, and tax IDs. The verification returns to review without creating a new verification. Owners, documents, and registration details remain locked after approval. Business verifications can update details, <code>documents</code>, and <code>owners</code> while still collecting information. Call Create Verification again after completing the details to send the business for review. During review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. Owners can still be added, changed, or removed while the review waits on them. Otherwise, only missing owner documents can be sent.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateVerificationsResponse>> update(
             String id, UpdateVerificationsRequest request) {
@@ -494,7 +496,7 @@ public class AsyncRawVerificationsClient {
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates profile details or submits answers for items returned in <code>requested_information</code>. Approved verifications from a supported provider can update names, birth date, phone, country, address, business name, business structure, and tax IDs. The verification returns to review without creating a new verification. Owners, documents, and registration details remain locked after approval. Business verifications can update details, <code>documents</code>, and <code>owners</code> while still collecting information. Call Create Verification again after completing the details to send the business for review. During review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. Owners can still be added, changed, or removed while the review waits on them. Otherwise, only missing owner documents can be sent.
      */
     public CompletableFuture<WhopApiHttpResponse<UpdateVerificationsResponse>> update(
             String id, UpdateVerificationsRequest request, RequestOptions requestOptions) {
@@ -569,6 +571,129 @@ public class AsyncRawVerificationsClient {
                                 return;
                             case 404:
                                 future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Generates a short-lived link to download one image that a person sent for an individual verification. Ask for <code>front</code>, <code>back</code>, or <code>selfie</code>. The link always downloads the document that passed the check, whatever its type.
+     */
+    public CompletableFuture<WhopApiHttpResponse<GenerateDocumentUrlVerificationsResponse>> generateDocumentUrl(
+            String id, GenerateDocumentUrlVerificationsRequest request) {
+        return generateDocumentUrl(id, request, null);
+    }
+
+    /**
+     * Generates a short-lived link to download one image that a person sent for an individual verification. Ask for <code>front</code>, <code>back</code>, or <code>selfie</code>. The link always downloads the document that passed the check, whatever its type.
+     */
+    public CompletableFuture<WhopApiHttpResponse<GenerateDocumentUrlVerificationsResponse>> generateDocumentUrl(
+            String id, GenerateDocumentUrlVerificationsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("verifications")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("generate_document_url");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<GenerateDocumentUrlVerificationsResponse>> future =
+                new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(
+                                        responseBodyString, GenerateDocumentUrlVerificationsResponse.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;

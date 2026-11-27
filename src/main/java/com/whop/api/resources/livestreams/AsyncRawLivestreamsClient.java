@@ -6,6 +6,7 @@ package com.whop.api.resources.livestreams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.whop.api.core.BodyProperties;
 import com.whop.api.core.ClientOptions;
+import com.whop.api.core.MediaTypes;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.core.PathSegments;
 import com.whop.api.core.QueryStringMapper;
@@ -20,12 +21,16 @@ import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.UnauthorizedError;
+import com.whop.api.resources.livestreams.requests.AddCoHostLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.ListLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.PinLivestreamsRequest;
+import com.whop.api.resources.livestreams.requests.RemoveCoHostLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.RetrieveLivestreamsRequest;
+import com.whop.api.resources.livestreams.requests.RetrieveViewershipLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.UnpinLivestreamsRequest;
 import com.whop.api.resources.livestreams.types.ListLivestreamsResponse;
 import com.whop.api.types.Livestream;
+import com.whop.api.types.LivestreamViewership;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -195,28 +200,28 @@ public class AsyncRawLivestreamsClient {
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> retrieve(String id) {
         return retrieve(id, RetrieveLivestreamsRequest.builder().build());
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrieveLivestreamsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> retrieve(String id, RetrieveLivestreamsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> retrieve(
             String id, RetrieveLivestreamsRequest request, RequestOptions requestOptions) {
@@ -307,28 +312,148 @@ public class AsyncRawLivestreamsClient {
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Makes someone in a live livestream a co-host until it ends. Co-hosts can change chat settings, manage the stage, and moderate chat, but can't end the livestream.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Livestream>> addCoHost(
+            String id, AddCoHostLivestreamsRequest request) {
+        return addCoHost(id, request, null);
+    }
+
+    /**
+     * Makes someone in a live livestream a co-host until it ends. Co-hosts can change chat settings, manage the stage, and moderate chat, but can't end the livestream.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Livestream>> addCoHost(
+            String id, AddCoHostLivestreamsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("livestreams")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("add_co_host");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<Livestream>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Livestream.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> pin(String id) {
         return pin(id, PinLivestreamsRequest.builder().build());
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> pin(String id, RequestOptions requestOptions) {
         return pin(id, PinLivestreamsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> pin(String id, PinLivestreamsRequest request) {
         return pin(id, request, null);
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<WhopApiHttpResponse<Livestream>> pin(
             String id, PinLivestreamsRequest request, RequestOptions requestOptions) {
@@ -342,16 +467,142 @@ public class AsyncRawLivestreamsClient {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request.Builder _requestBuilder = new Request.Builder()
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method(
-                        "POST",
-                        BodyProperties.toRequestBody(
-                                requestOptions != null ? requestOptions.getBodyProperties() : null,
-                                RequestBody.create("", null)))
+                .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<Livestream>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Livestream.class), response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 409:
+                                future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Removes a co-host from a live livestream.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Livestream>> removeCoHost(
+            String id, RemoveCoHostLivestreamsRequest request) {
+        return removeCoHost(id, request, null);
+    }
+
+    /**
+     * Removes a co-host from a live livestream.
+     */
+    public CompletableFuture<WhopApiHttpResponse<Livestream>> removeCoHost(
+            String id, RemoveCoHostLivestreamsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("livestreams")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("remove_co_host");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
@@ -523,6 +774,124 @@ public class AsyncRawLivestreamsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new WhopApiApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new WhopApiException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new WhopApiException("Network error executing HTTP request", e));
+            }
+        });
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                okhttpCall.cancel();
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> retrieveViewership(String id) {
+        return retrieveViewership(
+                id, RetrieveViewershipLivestreamsRequest.builder().build());
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> retrieveViewership(
+            String id, RequestOptions requestOptions) {
+        return retrieveViewership(
+                id, RetrieveViewershipLivestreamsRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> retrieveViewership(
+            String id, RetrieveViewershipLivestreamsRequest request) {
+        return retrieveViewership(id, request, null);
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> retrieveViewership(
+            String id, RetrieveViewershipLivestreamsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("livestreams")
+                .addPathSegment(PathSegments.validate(id))
+                .addPathSegments("viewership");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> future = new CompletableFuture<>();
+        RetryInterceptor.AsyncCall okhttpCall = RetryInterceptor.newAsyncCall(client, okhttpRequest);
+        okhttpCall.enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new WhopApiHttpResponse<>(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, LivestreamViewership.class),
+                                response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;

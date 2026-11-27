@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AccountCards.Builder.class)
 public final class AccountCards {
+    private final Optional<AccountCardsDeclineReason> declineReason;
+
     private final Optional<AccountCardsKind> kind;
 
     private final AccountCardsStatus status;
@@ -31,10 +33,25 @@ public final class AccountCards {
     private final Map<String, Object> additionalProperties;
 
     private AccountCards(
-            Optional<AccountCardsKind> kind, AccountCardsStatus status, Map<String, Object> additionalProperties) {
+            Optional<AccountCardsDeclineReason> declineReason,
+            Optional<AccountCardsKind> kind,
+            AccountCardsStatus status,
+            Map<String, Object> additionalProperties) {
+        this.declineReason = declineReason;
         this.kind = kind;
         this.status = status;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Reason the card issuer declined the application. <code>unsupported_state</code> replaces <code>unsupported_region</code> for a verified person or business in the United States. <code>compliance</code> covers sanctions, politically exposed person, and adverse media checks. <code>other</code> covers reasons that are not in this list. <code>null</code> when <code>status</code> is not <code>denied</code>, or when the issuer did not decline the application.
+     */
+    @JsonIgnore
+    public Optional<AccountCardsDeclineReason> getDeclineReason() {
+        if (declineReason == null) {
+            return Optional.empty();
+        }
+        return declineReason;
     }
 
     /**
@@ -49,11 +66,17 @@ public final class AccountCards {
     }
 
     /**
-     * @return Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet; <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.
+     * @return Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet. <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.
      */
     @JsonProperty("status")
     public AccountCardsStatus getStatus() {
         return status;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("decline_reason")
+    private Optional<AccountCardsDeclineReason> _getDeclineReason() {
+        return declineReason;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -74,12 +97,12 @@ public final class AccountCards {
     }
 
     private boolean equalTo(AccountCards other) {
-        return kind.equals(other.kind) && status.equals(other.status);
+        return declineReason.equals(other.declineReason) && kind.equals(other.kind) && status.equals(other.status);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.kind, this.status);
+        return Objects.hash(this.declineReason, this.kind, this.status);
     }
 
     @java.lang.Override
@@ -93,7 +116,7 @@ public final class AccountCards {
 
     public interface StatusStage {
         /**
-         * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet; <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
+         * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet. <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
          */
         _FinalStage status(@NotNull AccountCardsStatus status);
 
@@ -106,6 +129,15 @@ public final class AccountCards {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>Reason the card issuer declined the application. <code>unsupported_state</code> replaces <code>unsupported_region</code> for a verified person or business in the United States. <code>compliance</code> covers sanctions, politically exposed person, and adverse media checks. <code>other</code> covers reasons that are not in this list. <code>null</code> when <code>status</code> is not <code>denied</code>, or when the issuer did not decline the application.</p>
+         */
+        _FinalStage declineReason(Optional<AccountCardsDeclineReason> declineReason);
+
+        _FinalStage declineReason(AccountCardsDeclineReason declineReason);
+
+        _FinalStage declineReason(Nullable<AccountCardsDeclineReason> declineReason);
 
         /**
          * <p>Whether the card application verifies a business (<code>business</code>, KYB) or a person (<code>individual</code>, consumer identity). <code>null</code> when the application is not yet linked to a verification.</p>
@@ -123,19 +155,22 @@ public final class AccountCards {
 
         private Optional<AccountCardsKind> kind = Optional.empty();
 
+        private Optional<AccountCardsDeclineReason> declineReason = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AccountCards other) {
+            declineReason(other.getDeclineReason());
             kind(other.getKind());
             status(other.getStatus());
             return this;
         }
 
         /**
-         * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet; <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
+         * <p>Where the card application stands. <code>approved</code> means cards can be issued. <code>needs_verification</code> means the applicant has not completed identity verification yet. <code>needs_information</code> means they did, but the documents were rejected for a fixable reason and must be resubmitted. <code>pending</code> and <code>manual_review</code> are in flight. <code>denied</code>, <code>locked</code>, and <code>canceled</code> are terminal.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -181,14 +216,52 @@ public final class AccountCards {
             return this;
         }
 
+        /**
+         * <p>Reason the card issuer declined the application. <code>unsupported_state</code> replaces <code>unsupported_region</code> for a verified person or business in the United States. <code>compliance</code> covers sanctions, politically exposed person, and adverse media checks. <code>other</code> covers reasons that are not in this list. <code>null</code> when <code>status</code> is not <code>denied</code>, or when the issuer did not decline the application.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage declineReason(Nullable<AccountCardsDeclineReason> declineReason) {
+            if (declineReason.isNull()) {
+                this.declineReason = null;
+            } else if (declineReason.isEmpty()) {
+                this.declineReason = Optional.empty();
+            } else {
+                this.declineReason = Optional.of(declineReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Reason the card issuer declined the application. <code>unsupported_state</code> replaces <code>unsupported_region</code> for a verified person or business in the United States. <code>compliance</code> covers sanctions, politically exposed person, and adverse media checks. <code>other</code> covers reasons that are not in this list. <code>null</code> when <code>status</code> is not <code>denied</code>, or when the issuer did not decline the application.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage declineReason(AccountCardsDeclineReason declineReason) {
+            this.declineReason = Optional.ofNullable(declineReason);
+            return this;
+        }
+
+        /**
+         * <p>Reason the card issuer declined the application. <code>unsupported_state</code> replaces <code>unsupported_region</code> for a verified person or business in the United States. <code>compliance</code> covers sanctions, politically exposed person, and adverse media checks. <code>other</code> covers reasons that are not in this list. <code>null</code> when <code>status</code> is not <code>denied</code>, or when the issuer did not decline the application.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "decline_reason", nulls = Nulls.SKIP)
+        public _FinalStage declineReason(Optional<AccountCardsDeclineReason> declineReason) {
+            this.declineReason = declineReason;
+            return this;
+        }
+
         @java.lang.Override
         public AccountCards build() {
-            return new AccountCards(kind, status, additionalProperties);
+            return new AccountCards(declineReason, kind, status, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("kind") || key.equalsIgnoreCase("status")) {
+            if (key.equalsIgnoreCase("decline_reason")
+                    || key.equalsIgnoreCase("kind")
+                    || key.equalsIgnoreCase("status")) {
                 return;
             }
             this.additionalProperties.put(key, value);

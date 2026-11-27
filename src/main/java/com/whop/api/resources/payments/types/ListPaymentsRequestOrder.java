@@ -9,10 +9,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public final class ListPaymentsRequestOrder {
     public static final ListPaymentsRequestOrder PAID_AT = new ListPaymentsRequestOrder(Value.PAID_AT, "paid_at");
 
+    public static final ListPaymentsRequestOrder STATUS = new ListPaymentsRequestOrder(Value.STATUS, "status");
+
+    public static final ListPaymentsRequestOrder METHOD = new ListPaymentsRequestOrder(Value.METHOD, "method");
+
     public static final ListPaymentsRequestOrder AMOUNT = new ListPaymentsRequestOrder(Value.AMOUNT, "amount");
+
+    public static final ListPaymentsRequestOrder PLAN = new ListPaymentsRequestOrder(Value.PLAN, "plan");
 
     public static final ListPaymentsRequestOrder CREATED_AT =
             new ListPaymentsRequestOrder(Value.CREATED_AT, "created_at");
+
+    public static final ListPaymentsRequestOrder PRODUCT = new ListPaymentsRequestOrder(Value.PRODUCT, "product");
 
     private final Value value;
 
@@ -49,10 +57,18 @@ public final class ListPaymentsRequestOrder {
         switch (value) {
             case PAID_AT:
                 return visitor.visitPaidAt();
+            case STATUS:
+                return visitor.visitStatus();
+            case METHOD:
+                return visitor.visitMethod();
             case AMOUNT:
                 return visitor.visitAmount();
+            case PLAN:
+                return visitor.visitPlan();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
+            case PRODUCT:
+                return visitor.visitProduct();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -64,10 +80,18 @@ public final class ListPaymentsRequestOrder {
         switch (value) {
             case "paid_at":
                 return PAID_AT;
+            case "status":
+                return STATUS;
+            case "method":
+                return METHOD;
             case "amount":
                 return AMOUNT;
+            case "plan":
+                return PLAN;
             case "created_at":
                 return CREATED_AT;
+            case "product":
+                return PRODUCT;
             default:
                 return new ListPaymentsRequestOrder(Value.UNKNOWN, value);
         }
@@ -80,6 +104,14 @@ public final class ListPaymentsRequestOrder {
 
         AMOUNT,
 
+        STATUS,
+
+        PRODUCT,
+
+        PLAN,
+
+        METHOD,
+
         UNKNOWN
     }
 
@@ -89,6 +121,14 @@ public final class ListPaymentsRequestOrder {
         T visitPaidAt();
 
         T visitAmount();
+
+        T visitStatus();
+
+        T visitProduct();
+
+        T visitPlan();
+
+        T visitMethod();
 
         T visitUnknown(String unknownType);
     }

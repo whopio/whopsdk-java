@@ -39,28 +39,28 @@ public class ResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public SyncPagingIterable<ResolutionCenterCase> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public SyncPagingIterable<ResolutionCenterCase> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public SyncPagingIterable<ResolutionCenterCase> list(ListResolutionCenterCasesRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public SyncPagingIterable<ResolutionCenterCase> list(
             ListResolutionCenterCasesRequest request, RequestOptions requestOptions) {
@@ -68,14 +68,14 @@ public class ResolutionCenterCasesClient {
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public ResolutionCenterCase create(CreateResolutionCenterCasesRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public ResolutionCenterCase create(CreateResolutionCenterCasesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();

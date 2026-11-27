@@ -44,7 +44,7 @@ public final class EndExperimentsRequest {
     }
 
     /**
-     * @return Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+     * @return Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.
      */
     @JsonIgnore
     public Optional<String> getAccountId() {
@@ -124,7 +124,7 @@ public final class EndExperimentsRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          */
         _FinalStage accountId(Optional<String> accountId);
 
@@ -208,7 +208,7 @@ public final class EndExperimentsRequest {
         }
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -218,7 +218,7 @@ public final class EndExperimentsRequest {
         }
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)

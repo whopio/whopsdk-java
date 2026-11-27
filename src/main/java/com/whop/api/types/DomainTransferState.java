@@ -11,6 +11,8 @@ public final class DomainTransferState {
 
     public static final DomainTransferState READY = new DomainTransferState(Value.READY, "ready");
 
+    public static final DomainTransferState RELEASING = new DomainTransferState(Value.RELEASING, "releasing");
+
     private final Value value;
 
     private final String string;
@@ -47,6 +49,8 @@ public final class DomainTransferState {
                 return visitor.visitPending();
             case READY:
                 return visitor.visitReady();
+            case RELEASING:
+                return visitor.visitReleasing();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -60,6 +64,8 @@ public final class DomainTransferState {
                 return PENDING;
             case "ready":
                 return READY;
+            case "releasing":
+                return RELEASING;
             default:
                 return new DomainTransferState(Value.UNKNOWN, value);
         }
@@ -70,6 +76,8 @@ public final class DomainTransferState {
 
         PENDING,
 
+        RELEASING,
+
         UNKNOWN
     }
 
@@ -77,6 +85,8 @@ public final class DomainTransferState {
         T visitReady();
 
         T visitPending();
+
+        T visitReleasing();
 
         T visitUnknown(String unknownType);
     }

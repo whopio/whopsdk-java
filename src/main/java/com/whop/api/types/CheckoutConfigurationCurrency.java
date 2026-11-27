@@ -103,6 +103,8 @@ public final class CheckoutConfigurationCurrency {
 
     public static final CheckoutConfigurationCurrency MUR = new CheckoutConfigurationCurrency(Value.MUR, "mur");
 
+    public static final CheckoutConfigurationCurrency HNL = new CheckoutConfigurationCurrency(Value.HNL, "hnl");
+
     public static final CheckoutConfigurationCurrency PEN = new CheckoutConfigurationCurrency(Value.PEN, "pen");
 
     public static final CheckoutConfigurationCurrency USD = new CheckoutConfigurationCurrency(Value.USD, "usd");
@@ -317,6 +319,8 @@ public final class CheckoutConfigurationCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -506,6 +510,8 @@ public final class CheckoutConfigurationCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -776,6 +782,8 @@ public final class CheckoutConfigurationCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -959,6 +967,8 @@ public final class CheckoutConfigurationCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

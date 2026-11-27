@@ -305,7 +305,7 @@ public class AsyncChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public CompletableFuture<ChannelMember> accept(String id) {
         CompletableFuture<WhopApiHttpResponse<ChannelMember>> rawFuture = this.rawClient.accept(id);
@@ -319,7 +319,7 @@ public class AsyncChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public CompletableFuture<ChannelMember> accept(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<ChannelMember>> rawFuture = this.rawClient.accept(id, requestOptions);
@@ -333,7 +333,7 @@ public class AsyncChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public CompletableFuture<ChannelMember> accept(String id, AcceptChannelsRequest request) {
         CompletableFuture<WhopApiHttpResponse<ChannelMember>> rawFuture = this.rawClient.accept(id, request);
@@ -347,7 +347,7 @@ public class AsyncChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public CompletableFuture<ChannelMember> accept(
             String id, AcceptChannelsRequest request, RequestOptions requestOptions) {

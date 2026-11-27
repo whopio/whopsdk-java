@@ -423,6 +423,10 @@ public class AsyncRawStatsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "breakdown_limit", request.getBreakdownLimit().get(), false);
         }
+        if (request.getMode().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "mode", request.getMode().get(), false);
+        }
         if (request.getAdCampaignIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "ad_campaign_ids", request.getAdCampaignIds().get(), true);
@@ -434,6 +438,14 @@ public class AsyncRawStatsClient {
         if (request.getAdIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "ad_ids", request.getAdIds().get(), true);
+        }
+        if (request.getAccountIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "account_ids", request.getAccountIds().get(), true);
+        }
+        if (request.getRunnerIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "runner_ids", request.getRunnerIds().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {

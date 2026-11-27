@@ -1,0 +1,15 @@
+[
+  {
+    "root": "com.whop.api.Whop",
+    "accessors": [
+      "stats",
+      "timeSeries"
+    ],
+    "client": "com.whop.api.resources.stats.timeseries.TimeSeriesClient",
+    "live": "com.whop.api.resources.stats.timeseries.LiveTimeSeriesClient",
+    "read": "retrieve",
+    "watch": "watch",
+    "waitFor": "waitFor",
+    "answer": "com.whop.api.resources.stats.timeseries.types.RetrieveTimeSeriesResponse"
+  }
+]

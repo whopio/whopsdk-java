@@ -16,7 +16,9 @@ env:
   JAVA_VERSION: "17"
 
 jobs:
-  compile:
+  # Everything the CI runs is scripts/ci.sh, which whop-monorepo's SDK pipeline also runs over every
+  # build before delivering it.
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -32,25 +34,5 @@ jobs:
         with:
           validate-wrappers: true
 
-      - name: Compile
-        run: ./gradlew --no-daemon compileJava
-
-  test:
-    needs: [compile]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
-        with:
-          distribution: temurin
-          java-version: ${{ env.JAVA_VERSION }}
-
-      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb
-        with:
-          validate-wrappers: true
-
-      - name: Test
-        run: ./gradlew --no-daemon test
+      - name: CI
+        run: bash scripts/ci.sh

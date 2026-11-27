@@ -32,8 +32,6 @@ public final class DisputeAlert {
 
     private final Optional<String> cardBrand;
 
-    private final Optional<DisputeAlertCategory> category;
-
     private final String createdAt;
 
     private final String currency;
@@ -49,6 +47,8 @@ public final class DisputeAlert {
     private final Optional<String> paymentId;
 
     private final Optional<String> productId;
+
+    private final Optional<DisputeAlertReason> reason;
 
     private final String reportedAt;
 
@@ -67,7 +67,6 @@ public final class DisputeAlert {
             double amount,
             boolean autoRefunded,
             Optional<String> cardBrand,
-            Optional<DisputeAlertCategory> category,
             String createdAt,
             String currency,
             Optional<Money> fee,
@@ -76,6 +75,7 @@ public final class DisputeAlert {
             Optional<String> issuer,
             Optional<String> paymentId,
             Optional<String> productId,
+            Optional<DisputeAlertReason> reason,
             String reportedAt,
             Optional<DisputeAlertSource> source,
             Optional<String> transactionAt,
@@ -86,7 +86,6 @@ public final class DisputeAlert {
         this.amount = amount;
         this.autoRefunded = autoRefunded;
         this.cardBrand = cardBrand;
-        this.category = category;
         this.createdAt = createdAt;
         this.currency = currency;
         this.fee = fee;
@@ -95,6 +94,7 @@ public final class DisputeAlert {
         this.issuer = issuer;
         this.paymentId = paymentId;
         this.productId = productId;
+        this.reason = reason;
         this.reportedAt = reportedAt;
         this.source = source;
         this.transactionAt = transactionAt;
@@ -139,17 +139,6 @@ public final class DisputeAlert {
             return Optional.empty();
         }
         return cardBrand;
-    }
-
-    /**
-     * @return What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.
-     */
-    @JsonIgnore
-    public Optional<DisputeAlertCategory> getCategory() {
-        if (category == null) {
-            return Optional.empty();
-        }
-        return category;
     }
 
     /**
@@ -230,6 +219,17 @@ public final class DisputeAlert {
     }
 
     /**
+     * @return What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.
+     */
+    @JsonIgnore
+    public Optional<DisputeAlertReason> getReason() {
+        if (reason == null) {
+            return Optional.empty();
+        }
+        return reason;
+    }
+
+    /**
      * @return When the issuer filed the report, as an ISO 8601 timestamp. Earlier than <code>created_at</code>, which is when Whop received it.
      */
     @JsonProperty("reported_at")
@@ -288,12 +288,6 @@ public final class DisputeAlert {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("category")
-    private Optional<DisputeAlertCategory> _getCategory() {
-        return category;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("fee")
     private Optional<Money> _getFee() {
         return fee;
@@ -315,6 +309,12 @@ public final class DisputeAlert {
     @JsonProperty("product_id")
     private Optional<String> _getProductId() {
         return productId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("reason")
+    private Optional<DisputeAlertReason> _getReason() {
+        return reason;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -345,7 +345,6 @@ public final class DisputeAlert {
                 && amount == other.amount
                 && autoRefunded == other.autoRefunded
                 && cardBrand.equals(other.cardBrand)
-                && category.equals(other.category)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && fee.equals(other.fee)
@@ -354,6 +353,7 @@ public final class DisputeAlert {
                 && issuer.equals(other.issuer)
                 && paymentId.equals(other.paymentId)
                 && productId.equals(other.productId)
+                && reason.equals(other.reason)
                 && reportedAt.equals(other.reportedAt)
                 && source.equals(other.source)
                 && transactionAt.equals(other.transactionAt)
@@ -368,7 +368,6 @@ public final class DisputeAlert {
                 this.amount,
                 this.autoRefunded,
                 this.cardBrand,
-                this.category,
                 this.createdAt,
                 this.currency,
                 this.fee,
@@ -377,6 +376,7 @@ public final class DisputeAlert {
                 this.issuer,
                 this.paymentId,
                 this.productId,
+                this.reason,
                 this.reportedAt,
                 this.source,
                 this.transactionAt,
@@ -484,15 +484,6 @@ public final class DisputeAlert {
         _FinalStage cardBrand(Nullable<String> cardBrand);
 
         /**
-         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
-         */
-        _FinalStage category(Optional<DisputeAlertCategory> category);
-
-        _FinalStage category(DisputeAlertCategory category);
-
-        _FinalStage category(Nullable<DisputeAlertCategory> category);
-
-        /**
          * <p>The alert fee charged to the account, in the currency it was collected in. <code>null</code> when <code>fee_charged</code> is false.</p>
          */
         _FinalStage fee(Optional<Money> fee);
@@ -528,6 +519,15 @@ public final class DisputeAlert {
         _FinalStage productId(String productId);
 
         _FinalStage productId(Nullable<String> productId);
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         */
+        _FinalStage reason(Optional<DisputeAlertReason> reason);
+
+        _FinalStage reason(DisputeAlertReason reason);
+
+        _FinalStage reason(Nullable<DisputeAlertReason> reason);
 
         /**
          * <p>The network program that sent the alert, which <code>type</code> alone doesn't tell apart. <code>ethoca</code> for Mastercard Ethoca, <code>cdrn</code> for Visa Verifi CDRN, <code>rdr</code> for Visa RDR, <code>tc40</code> / <code>safe</code> for a Visa / Mastercard fraud report, <code>paypal</code> for a PayPal alert. <code>null</code> when the network didn't say.</p>
@@ -582,6 +582,8 @@ public final class DisputeAlert {
 
         private Optional<DisputeAlertSource> source = Optional.empty();
 
+        private Optional<DisputeAlertReason> reason = Optional.empty();
+
         private Optional<String> productId = Optional.empty();
 
         private Optional<String> paymentId = Optional.empty();
@@ -589,8 +591,6 @@ public final class DisputeAlert {
         private Optional<String> issuer = Optional.empty();
 
         private Optional<Money> fee = Optional.empty();
-
-        private Optional<DisputeAlertCategory> category = Optional.empty();
 
         private Optional<String> cardBrand = Optional.empty();
 
@@ -606,7 +606,6 @@ public final class DisputeAlert {
             amount(other.getAmount());
             autoRefunded(other.getAutoRefunded());
             cardBrand(other.getCardBrand());
-            category(other.getCategory());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             fee(other.getFee());
@@ -615,6 +614,7 @@ public final class DisputeAlert {
             issuer(other.getIssuer());
             paymentId(other.getPaymentId());
             productId(other.getProductId());
+            reason(other.getReason());
             reportedAt(other.getReportedAt());
             source(other.getSource());
             transactionAt(other.getTransactionAt());
@@ -795,6 +795,42 @@ public final class DisputeAlert {
         }
 
         /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reason(Nullable<DisputeAlertReason> reason) {
+            if (reason.isNull()) {
+                this.reason = null;
+            } else if (reason.isEmpty()) {
+                this.reason = Optional.empty();
+            } else {
+                this.reason = Optional.of(reason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage reason(DisputeAlertReason reason) {
+            this.reason = Optional.ofNullable(reason);
+            return this;
+        }
+
+        /**
+         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "reason", nulls = Nulls.SKIP)
+        public _FinalStage reason(Optional<DisputeAlertReason> reason) {
+            this.reason = reason;
+            return this;
+        }
+
+        /**
          * <p>The product the alerted payment was for, prefixed <code>prod_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -942,42 +978,6 @@ public final class DisputeAlert {
         }
 
         /**
-         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage category(Nullable<DisputeAlertCategory> category) {
-            if (category.isNull()) {
-                this.category = null;
-            } else if (category.isEmpty()) {
-                this.category = Optional.empty();
-            } else {
-                this.category = Optional.of(category.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage category(DisputeAlertCategory category) {
-            this.category = Optional.ofNullable(category);
-            return this;
-        }
-
-        /**
-         * <p>What the cardholder claims. <code>fraud</code> when they say they didn't make the payment: always for an <code>early_fraud_warning</code>, and for Ethoca fraud alerts and Visa RDR cases filed under a fraud reason. <code>customer_dispute</code> when they made the payment but dispute it, such as a product not received or a canceled subscription. <code>null</code> when the alert carries no claim, such as an issuer's request for transaction documents.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "category", nulls = Nulls.SKIP)
-        public _FinalStage category(Optional<DisputeAlertCategory> category) {
-            this.category = category;
-            return this;
-        }
-
-        /**
          * <p>The card network as reported by the issuer, lowercased, such as <code>visa</code> or <code>mastercard</code>. <code>unknown</code> when the report carries neither a network nor a recognizable BIN.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1056,7 +1056,6 @@ public final class DisputeAlert {
                     amount,
                     autoRefunded,
                     cardBrand,
-                    category,
                     createdAt,
                     currency,
                     fee,
@@ -1065,6 +1064,7 @@ public final class DisputeAlert {
                     issuer,
                     paymentId,
                     productId,
+                    reason,
                     reportedAt,
                     source,
                     transactionAt,
@@ -1079,7 +1079,6 @@ public final class DisputeAlert {
                     || key.equalsIgnoreCase("amount")
                     || key.equalsIgnoreCase("auto_refunded")
                     || key.equalsIgnoreCase("card_brand")
-                    || key.equalsIgnoreCase("category")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("currency")
                     || key.equalsIgnoreCase("fee")
@@ -1088,6 +1087,7 @@ public final class DisputeAlert {
                     || key.equalsIgnoreCase("issuer")
                     || key.equalsIgnoreCase("payment_id")
                     || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("reason")
                     || key.equalsIgnoreCase("reported_at")
                     || key.equalsIgnoreCase("source")
                     || key.equalsIgnoreCase("transaction_at")

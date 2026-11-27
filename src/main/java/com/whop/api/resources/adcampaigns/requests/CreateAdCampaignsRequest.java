@@ -118,7 +118,7 @@ public final class CreateAdCampaignsRequest {
     }
 
     /**
-     * @return Whether the budget is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Defaults to <code>daily</code>.
+     * @return Deprecated: lifetime budgets have ended. Every new campaign has a daily budget. <code>lifetime</code> returns a <code>400</code>.
      */
     @JsonProperty("budget_type")
     public Optional<CreateAdCampaignsRequestBudgetType> getBudgetType() {
@@ -134,7 +134,7 @@ public final class CreateAdCampaignsRequest {
     }
 
     /**
-     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.
+     * @return The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. Omit or send <code>null</code> for no target.
      */
     @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
@@ -294,7 +294,7 @@ public final class CreateAdCampaignsRequest {
         _FinalStage budgetOptimization(CreateAdCampaignsRequestBudgetOptimization budgetOptimization);
 
         /**
-         * <p>Whether the budget is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Defaults to <code>daily</code>.</p>
+         * <p>Deprecated: lifetime budgets have ended. Every new campaign has a daily budget. <code>lifetime</code> returns a <code>400</code>.</p>
          */
         _FinalStage budgetType(Optional<CreateAdCampaignsRequestBudgetType> budgetType);
 
@@ -308,7 +308,7 @@ public final class CreateAdCampaignsRequest {
         _FinalStage campaignType(CreateAdCampaignsRequestCampaignType campaignType);
 
         /**
-         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. Omit or send <code>null</code> for no target.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
@@ -471,7 +471,7 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. Omit or send <code>null</code> for no target.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -487,7 +487,7 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. Omit or send <code>null</code> for no target.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -497,7 +497,7 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. Ad groups set cost and bid caps with their own <code>desired_cost_per_result</code>. Omit or send <code>null</code> for no target.</p>
+         * <p>The cost per result, in USD, you want this campaign to achieve. A target only: it is not a bid, cost cap, or bid cap, and doesn't change how the campaign's ads bid. An ad group's own <code>desired_cost_per_result</code> overrides it. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. Omit or send <code>null</code> for no target.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
@@ -527,7 +527,7 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>Whether the budget is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Defaults to <code>daily</code>.</p>
+         * <p>Deprecated: lifetime budgets have ended. Every new campaign has a daily budget. <code>lifetime</code> returns a <code>400</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -537,7 +537,7 @@ public final class CreateAdCampaignsRequest {
         }
 
         /**
-         * <p>Whether the budget is spent per day (<code>daily</code>) or over the campaign's full run (<code>lifetime</code>). Defaults to <code>daily</code>.</p>
+         * <p>Deprecated: lifetime budgets have ended. Every new campaign has a daily budget. <code>lifetime</code> returns a <code>400</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_type", nulls = Nulls.SKIP)

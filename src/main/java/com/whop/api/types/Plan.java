@@ -86,6 +86,8 @@ public final class Plan {
 
     private final String purchaseUrl;
 
+    private final Optional<String> redirectUrl;
+
     private final PlanReleaseMethod releaseMethod;
 
     private final double renewalPrice;
@@ -109,6 +111,8 @@ public final class Plan {
     private final Optional<Double> trialPeriodDays;
 
     private final boolean unlimitedStock;
+
+    private final Optional<Integer> unpaidInvoiceCount;
 
     private final String updatedAt;
 
@@ -147,6 +151,7 @@ public final class Plan {
             Optional<Map<String, Object>> paymentMethodConfiguration,
             Optional<Map<String, Object>> product,
             String purchaseUrl,
+            Optional<String> redirectUrl,
             PlanReleaseMethod releaseMethod,
             double renewalPrice,
             Optional<String> sku,
@@ -159,6 +164,7 @@ public final class Plan {
             Optional<String> title,
             Optional<Double> trialPeriodDays,
             boolean unlimitedStock,
+            Optional<Integer> unpaidInvoiceCount,
             String updatedAt,
             PlanVisibility visibility,
             Map<String, Object> additionalProperties) {
@@ -192,6 +198,7 @@ public final class Plan {
         this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.product = product;
         this.purchaseUrl = purchaseUrl;
+        this.redirectUrl = redirectUrl;
         this.releaseMethod = releaseMethod;
         this.renewalPrice = renewalPrice;
         this.sku = sku;
@@ -204,6 +211,7 @@ public final class Plan {
         this.title = title;
         this.trialPeriodDays = trialPeriodDays;
         this.unlimitedStock = unlimitedStock;
+        this.unpaidInvoiceCount = unpaidInvoiceCount;
         this.updatedAt = updatedAt;
         this.visibility = visibility;
         this.additionalProperties = additionalProperties;
@@ -408,7 +416,7 @@ public final class Plan {
     }
 
     /**
-     * @return Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.
+     * @return Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.
      */
     @JsonProperty("initial_price_due")
     public Money getInitialPriceDue() {
@@ -449,7 +457,7 @@ public final class Plan {
     }
 
     /**
-     * @return Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.
+     * @return Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
@@ -498,6 +506,17 @@ public final class Plan {
     @JsonProperty("purchase_url")
     public String getPurchaseUrl() {
         return purchaseUrl;
+    }
+
+    /**
+     * @return Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
+     */
+    @JsonIgnore
+    public Optional<String> getRedirectUrl() {
+        if (redirectUrl == null) {
+            return Optional.empty();
+        }
+        return redirectUrl;
     }
 
     /**
@@ -618,6 +637,17 @@ public final class Plan {
     @JsonProperty("unlimited_stock")
     public boolean getUnlimitedStock() {
         return unlimitedStock;
+    }
+
+    /**
+     * @return Number of issued invoices for this variant that are not paid or void. While it is above <code>0</code>, you can't change the variant's prices, billing period, trial, number of payments, currency or billing type. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
+     */
+    @JsonIgnore
+    public Optional<Integer> getUnpaidInvoiceCount() {
+        if (unpaidInvoiceCount == null) {
+            return Optional.empty();
+        }
+        return unpaidInvoiceCount;
     }
 
     /**
@@ -745,6 +775,12 @@ public final class Plan {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("redirect_url")
+    private Optional<String> _getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("sku")
     private Optional<String> _getSku() {
         return sku;
@@ -792,6 +828,12 @@ public final class Plan {
         return trialPeriodDays;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("unpaid_invoice_count")
+    private Optional<Integer> _getUnpaidInvoiceCount() {
+        return unpaidInvoiceCount;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -834,6 +876,7 @@ public final class Plan {
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && product.equals(other.product)
                 && purchaseUrl.equals(other.purchaseUrl)
+                && redirectUrl.equals(other.redirectUrl)
                 && releaseMethod.equals(other.releaseMethod)
                 && renewalPrice == other.renewalPrice
                 && sku.equals(other.sku)
@@ -846,6 +889,7 @@ public final class Plan {
                 && title.equals(other.title)
                 && trialPeriodDays.equals(other.trialPeriodDays)
                 && unlimitedStock == other.unlimitedStock
+                && unpaidInvoiceCount.equals(other.unpaidInvoiceCount)
                 && updatedAt.equals(other.updatedAt)
                 && visibility.equals(other.visibility);
     }
@@ -883,6 +927,7 @@ public final class Plan {
                 this.paymentMethodConfiguration,
                 this.product,
                 this.purchaseUrl,
+                this.redirectUrl,
                 this.releaseMethod,
                 this.renewalPrice,
                 this.sku,
@@ -895,6 +940,7 @@ public final class Plan {
                 this.title,
                 this.trialPeriodDays,
                 this.unlimitedStock,
+                this.unpaidInvoiceCount,
                 this.updatedAt,
                 this.visibility);
     }
@@ -975,7 +1021,7 @@ public final class Plan {
 
     public interface InitialPriceDueStage {
         /**
-         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          */
         PurchaseUrlStage initialPriceDue(@NotNull Money initialPriceDue);
     }
@@ -1172,7 +1218,7 @@ public final class Plan {
         _FinalStage memberCount(Nullable<Double> memberCount);
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
 
@@ -1206,6 +1252,15 @@ public final class Plan {
         _FinalStage product(Map<String, Object> product);
 
         _FinalStage product(Nullable<Map<String, Object>> product);
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        _FinalStage redirectUrl(Optional<String> redirectUrl);
+
+        _FinalStage redirectUrl(String redirectUrl);
+
+        _FinalStage redirectUrl(Nullable<String> redirectUrl);
 
         /**
          * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
@@ -1278,6 +1333,15 @@ public final class Plan {
         _FinalStage trialPeriodDays(Double trialPeriodDays);
 
         _FinalStage trialPeriodDays(Nullable<Double> trialPeriodDays);
+
+        /**
+         * <p>Number of issued invoices for this variant that are not paid or void. While it is above <code>0</code>, you can't change the variant's prices, billing period, trial, number of payments, currency or billing type. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        _FinalStage unpaidInvoiceCount(Optional<Integer> unpaidInvoiceCount);
+
+        _FinalStage unpaidInvoiceCount(Integer unpaidInvoiceCount);
+
+        _FinalStage unpaidInvoiceCount(Nullable<Integer> unpaidInvoiceCount);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -1334,6 +1398,8 @@ public final class Plan {
 
         private PlanVisibility visibility;
 
+        private Optional<Integer> unpaidInvoiceCount = Optional.empty();
+
         private Optional<Double> trialPeriodDays = Optional.empty();
 
         private Optional<String> title = Optional.empty();
@@ -1349,6 +1415,8 @@ public final class Plan {
         private Optional<Double> splitPayRequiredPayments = Optional.empty();
 
         private Optional<String> sku = Optional.empty();
+
+        private Optional<String> redirectUrl = Optional.empty();
 
         private Optional<Map<String, Object>> product = Optional.empty();
 
@@ -1425,6 +1493,7 @@ public final class Plan {
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             product(other.getProduct());
             purchaseUrl(other.getPurchaseUrl());
+            redirectUrl(other.getRedirectUrl());
             releaseMethod(other.getReleaseMethod());
             renewalPrice(other.getRenewalPrice());
             sku(other.getSku());
@@ -1437,6 +1506,7 @@ public final class Plan {
             title(other.getTitle());
             trialPeriodDays(other.getTrialPeriodDays());
             unlimitedStock(other.getUnlimitedStock());
+            unpaidInvoiceCount(other.getUnpaidInvoiceCount());
             updatedAt(other.getUpdatedAt());
             visibility(other.getVisibility());
             return this;
@@ -1542,7 +1612,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1626,6 +1696,42 @@ public final class Plan {
         @JsonSetter("visibility")
         public _FinalStage visibility(@NotNull PlanVisibility visibility) {
             this.visibility = Objects.requireNonNull(visibility, "visibility must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Number of issued invoices for this variant that are not paid or void. While it is above <code>0</code>, you can't change the variant's prices, billing period, trial, number of payments, currency or billing type. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unpaidInvoiceCount(Nullable<Integer> unpaidInvoiceCount) {
+            if (unpaidInvoiceCount.isNull()) {
+                this.unpaidInvoiceCount = null;
+            } else if (unpaidInvoiceCount.isEmpty()) {
+                this.unpaidInvoiceCount = Optional.empty();
+            } else {
+                this.unpaidInvoiceCount = Optional.of(unpaidInvoiceCount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Number of issued invoices for this variant that are not paid or void. While it is above <code>0</code>, you can't change the variant's prices, billing period, trial, number of payments, currency or billing type. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage unpaidInvoiceCount(Integer unpaidInvoiceCount) {
+            this.unpaidInvoiceCount = Optional.ofNullable(unpaidInvoiceCount);
+            return this;
+        }
+
+        /**
+         * <p>Number of issued invoices for this variant that are not paid or void. While it is above <code>0</code>, you can't change the variant's prices, billing period, trial, number of payments, currency or billing type. <code>null</code> unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "unpaid_invoice_count", nulls = Nulls.SKIP)
+        public _FinalStage unpaidInvoiceCount(Optional<Integer> unpaidInvoiceCount) {
+            this.unpaidInvoiceCount = unpaidInvoiceCount;
             return this;
         }
 
@@ -1918,6 +2024,42 @@ public final class Plan {
         }
 
         /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(Nullable<String> redirectUrl) {
+            if (redirectUrl.isNull()) {
+                this.redirectUrl = null;
+            } else if (redirectUrl.isEmpty()) {
+                this.redirectUrl = Optional.empty();
+            } else {
+                this.redirectUrl = Optional.of(redirectUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(String redirectUrl) {
+            this.redirectUrl = Optional.ofNullable(redirectUrl);
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "redirect_url", nulls = Nulls.SKIP)
+        public _FinalStage redirectUrl(Optional<String> redirectUrl) {
+            this.redirectUrl = redirectUrl;
+            return this;
+        }
+
+        /**
          * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2026,7 +2168,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2042,7 +2184,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2052,7 +2194,7 @@ public final class Plan {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -2625,6 +2767,7 @@ public final class Plan {
                     paymentMethodConfiguration,
                     product,
                     purchaseUrl,
+                    redirectUrl,
                     releaseMethod,
                     renewalPrice,
                     sku,
@@ -2637,6 +2780,7 @@ public final class Plan {
                     title,
                     trialPeriodDays,
                     unlimitedStock,
+                    unpaidInvoiceCount,
                     updatedAt,
                     visibility,
                     additionalProperties);
@@ -2674,6 +2818,7 @@ public final class Plan {
                     || key.equalsIgnoreCase("payment_method_configuration")
                     || key.equalsIgnoreCase("product")
                     || key.equalsIgnoreCase("purchase_url")
+                    || key.equalsIgnoreCase("redirect_url")
                     || key.equalsIgnoreCase("release_method")
                     || key.equalsIgnoreCase("renewal_price")
                     || key.equalsIgnoreCase("sku")
@@ -2686,6 +2831,7 @@ public final class Plan {
                     || key.equalsIgnoreCase("title")
                     || key.equalsIgnoreCase("trial_period_days")
                     || key.equalsIgnoreCase("unlimited_stock")
+                    || key.equalsIgnoreCase("unpaid_invoice_count")
                     || key.equalsIgnoreCase("updated_at")
                     || key.equalsIgnoreCase("visibility")) {
                 return;

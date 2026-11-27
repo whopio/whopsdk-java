@@ -64,7 +64,7 @@ public final class PaymentQr {
     }
 
     /**
-     * @return The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code, so they can pay from the device showing the QR. Only present for methods that accept a pasted code.
+     * @return The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code. This lets them pay from the device showing the QR. Only present for methods that accept a pasted code.
      */
     @JsonProperty("copy_code")
     public Optional<String> getCopyCode() {
@@ -96,7 +96,7 @@ public final class PaymentQr {
     }
 
     /**
-     * @return The QR code's contents, ready to render as a scannable image — <code>qr_format</code> says how it is encoded.
+     * @return The QR code's contents, ready to render as a scannable image. <code>qr_format</code> says how it is encoded.
      */
     @JsonProperty("qr_code")
     public Optional<String> getQrCode() {
@@ -193,7 +193,7 @@ public final class PaymentQr {
         }
 
         /**
-         * <p>The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code, so they can pay from the device showing the QR. Only present for methods that accept a pasted code.</p>
+         * <p>The code the buyer pastes into their payment app instead of scanning, such as Pix's copy-and-paste code. This lets them pay from the device showing the QR. Only present for methods that accept a pasted code.</p>
          */
         @JsonSetter(value = "copy_code", nulls = Nulls.SKIP)
         public Builder copyCode(Optional<String> copyCode) {
@@ -249,7 +249,7 @@ public final class PaymentQr {
         }
 
         /**
-         * <p>The QR code's contents, ready to render as a scannable image — <code>qr_format</code> says how it is encoded.</p>
+         * <p>The QR code's contents, ready to render as a scannable image. <code>qr_format</code> says how it is encoded.</p>
          */
         @JsonSetter(value = "qr_code", nulls = Nulls.SKIP)
         public Builder qrCode(Optional<String> qrCode) {

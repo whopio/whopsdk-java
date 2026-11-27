@@ -409,28 +409,28 @@ public class RawSocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public WhopApiHttpResponse<SocialAccount> refresh(String id) {
         return refresh(id, RefreshSocialAccountsRequest.builder().build());
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public WhopApiHttpResponse<SocialAccount> refresh(String id, RequestOptions requestOptions) {
         return refresh(id, RefreshSocialAccountsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public WhopApiHttpResponse<SocialAccount> refresh(String id, RefreshSocialAccountsRequest request) {
         return refresh(id, request, null);
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public WhopApiHttpResponse<SocialAccount> refresh(
             String id, RefreshSocialAccountsRequest request, RequestOptions requestOptions) {

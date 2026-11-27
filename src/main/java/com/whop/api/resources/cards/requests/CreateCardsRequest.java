@@ -72,7 +72,7 @@ public final class CreateCardsRequest {
     }
 
     /**
-     * @return The owning account ID (a biz_ identifier). Provide this or user_id.
+     * @return The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -80,7 +80,7 @@ public final class CreateCardsRequest {
     }
 
     /**
-     * @return The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity; a company API key that sends neither this nor kind is refused.
+     * @return The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity. An account API key that sends neither this nor kind is refused.
      */
     @JsonProperty("assigned_user_id")
     public Optional<String> getAssignedUserId() {
@@ -88,7 +88,7 @@ public final class CreateCardsRequest {
     }
 
     /**
-     * @return The card's initial billing address. On a company card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.
+     * @return The card's initial billing address. On a business card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.
      */
     @JsonProperty("billing")
     public Optional<CreateCardsRequestBilling> getBilling() {
@@ -96,7 +96,7 @@ public final class CreateCardsRequest {
     }
 
     /**
-     * @return Details for a company card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.
+     * @return Details for a business card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.
      */
     @JsonProperty("cardholder")
     public Optional<CreateCardsRequestCardholder> getCardholder() {
@@ -240,7 +240,7 @@ public final class CreateCardsRequest {
         }
 
         /**
-         * <p>The owning account ID (a biz_ identifier). Provide this or user_id.</p>
+         * <p>The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -254,7 +254,7 @@ public final class CreateCardsRequest {
         }
 
         /**
-         * <p>The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity; a company API key that sends neither this nor kind is refused.</p>
+         * <p>The account member (a user_ identifier) to assign the card to. Required for business card issuing accounts. When this call files the card application, the member applies with their identity. An account API key that sends neither this nor kind is refused.</p>
          */
         @JsonSetter(value = "assigned_user_id", nulls = Nulls.SKIP)
         public Builder assignedUserId(Optional<String> assignedUserId) {
@@ -268,7 +268,7 @@ public final class CreateCardsRequest {
         }
 
         /**
-         * <p>The card's initial billing address. On a company card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.</p>
+         * <p>The card's initial billing address. On a business card it also registers the assigned member as a cardholder if they are not one yet. For an individual card, region is also required.</p>
          */
         @JsonSetter(value = "billing", nulls = Nulls.SKIP)
         public Builder billing(Optional<CreateCardsRequestBilling> billing) {
@@ -282,7 +282,7 @@ public final class CreateCardsRequest {
         }
 
         /**
-         * <p>Details for a company card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.</p>
+         * <p>Details for a business card's assigned member when they are not registered as a cardholder yet. Send with billing to register them and start provisioning in one call instead of sending them an onboarding invitation. The legal name comes from the member's approved identity verification when they have one, and from these fields when they do not.</p>
          */
         @JsonSetter(value = "cardholder", nulls = Nulls.SKIP)
         public Builder cardholder(Optional<CreateCardsRequestCardholder> cardholder) {

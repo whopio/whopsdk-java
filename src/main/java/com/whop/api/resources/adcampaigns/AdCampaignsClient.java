@@ -164,56 +164,56 @@ public class AdCampaignsClient {
     }
 
     /**
-     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it. Returns 429 when the caller already claimed the campaign in the last hour: a runner can claim each campaign once an hour.
      */
     public AdCampaign claim(String id) {
         return this.rawClient.claim(id).body();
     }
 
     /**
-     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it. Returns 429 when the caller already claimed the campaign in the last hour: a runner can claim each campaign once an hour.
      */
     public AdCampaign claim(String id, RequestOptions requestOptions) {
         return this.rawClient.claim(id, requestOptions).body();
     }
 
     /**
-     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it. Returns 429 when the caller already claimed the campaign in the last hour: a runner can claim each campaign once an hour.
      */
     public AdCampaign claim(String id, ClaimAdCampaignsRequest request) {
         return this.rawClient.claim(id, request).body();
     }
 
     /**
-     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 403 when the claim would take the daily budget the caller holds past the limit for their score. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it.
+     * Attributes the whole campaign and its daily budget to the calling user as its runner. One runner holds a campaign at a time. Takes the runner's Whop session, or a user API key with <code>ad_campaign:update</code>. The caller also needs active advertiser-supplier program access. Everyone else gets a 404. Returns 403 until the caller has verified their identity and added a phone number and a social account. Returns 409 when another user holds the campaign. Changes nothing when the caller already holds it. Returns 429 when the caller already claimed the campaign in the last hour: a runner can claim each campaign once an hour.
      */
     public AdCampaign claim(String id, ClaimAdCampaignsRequest request, RequestOptions requestOptions) {
         return this.rawClient.claim(id, request, requestOptions).body();
     }
 
     /**
-     * Creates copies of the campaign in <code>duplicating</code> status and returns them; each copy transitions to <code>draft</code> once duplication completes. Poll each returned campaign until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Creates copies of the campaign in <code>duplicating</code> status and returns them. Each copy moves to <code>draft</code> when duplication completes. Poll each returned campaign until it leaves <code>duplicating</code>. A copy that could not be completed is deleted and returns 404. A campaign with a lifetime budget, or with an ad group on one, can't be duplicated.
      */
     public DuplicateAdCampaignsResponse duplicate(String id) {
         return this.rawClient.duplicate(id).body();
     }
 
     /**
-     * Creates copies of the campaign in <code>duplicating</code> status and returns them; each copy transitions to <code>draft</code> once duplication completes. Poll each returned campaign until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Creates copies of the campaign in <code>duplicating</code> status and returns them. Each copy moves to <code>draft</code> when duplication completes. Poll each returned campaign until it leaves <code>duplicating</code>. A copy that could not be completed is deleted and returns 404. A campaign with a lifetime budget, or with an ad group on one, can't be duplicated.
      */
     public DuplicateAdCampaignsResponse duplicate(String id, RequestOptions requestOptions) {
         return this.rawClient.duplicate(id, requestOptions).body();
     }
 
     /**
-     * Creates copies of the campaign in <code>duplicating</code> status and returns them; each copy transitions to <code>draft</code> once duplication completes. Poll each returned campaign until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Creates copies of the campaign in <code>duplicating</code> status and returns them. Each copy moves to <code>draft</code> when duplication completes. Poll each returned campaign until it leaves <code>duplicating</code>. A copy that could not be completed is deleted and returns 404. A campaign with a lifetime budget, or with an ad group on one, can't be duplicated.
      */
     public DuplicateAdCampaignsResponse duplicate(String id, DuplicateAdCampaignsRequest request) {
         return this.rawClient.duplicate(id, request).body();
     }
 
     /**
-     * Creates copies of the campaign in <code>duplicating</code> status and returns them; each copy transitions to <code>draft</code> once duplication completes. Poll each returned campaign until it leaves <code>duplicating</code> — a copy that could not be completed is deleted and returns 404.
+     * Creates copies of the campaign in <code>duplicating</code> status and returns them. Each copy moves to <code>draft</code> when duplication completes. Poll each returned campaign until it leaves <code>duplicating</code>. A copy that could not be completed is deleted and returns 404. A campaign with a lifetime budget, or with an ad group on one, can't be duplicated.
      */
     public DuplicateAdCampaignsResponse duplicate(
             String id, DuplicateAdCampaignsRequest request, RequestOptions requestOptions) {

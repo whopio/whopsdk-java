@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PaymentRuleField.Builder.class)
 public final class PaymentRuleField {
+    private final List<PaymentRuleFieldActionsItem> actions;
+
     private final PaymentRuleFieldField field;
 
     private final Optional<Integer> maximum;
@@ -36,25 +38,36 @@ public final class PaymentRuleField {
 
     private final Optional<List<PaymentRuleFieldOption>> options;
 
+    private final PaymentRuleFieldStage stage;
+
     private final PaymentRuleFieldType type;
 
     private final Map<String, Object> additionalProperties;
 
     private PaymentRuleField(
+            List<PaymentRuleFieldActionsItem> actions,
             PaymentRuleFieldField field,
             Optional<Integer> maximum,
             Optional<Integer> minimum,
             List<PaymentRuleFieldOperatorsItem> operators,
             Optional<List<PaymentRuleFieldOption>> options,
+            PaymentRuleFieldStage stage,
             PaymentRuleFieldType type,
             Map<String, Object> additionalProperties) {
+        this.actions = actions;
         this.field = field;
         this.maximum = maximum;
         this.minimum = minimum;
         this.operators = operators;
         this.options = options;
+        this.stage = stage;
         this.type = type;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("actions")
+    public List<PaymentRuleFieldActionsItem> getActions() {
+        return actions;
     }
 
     /**
@@ -101,6 +114,14 @@ public final class PaymentRuleField {
     }
 
     /**
+     * @return When a rule on this field runs. An <code>after_authorization</code> field reads the bank's answer, so its rule runs after the bank authorizes the card. A rule cannot mix fields from both stages.
+     */
+    @JsonProperty("stage")
+    public PaymentRuleFieldStage getStage() {
+        return stage;
+    }
+
+    /**
      * @return The type of value this field compares against.
      */
     @JsonProperty("type")
@@ -138,17 +159,27 @@ public final class PaymentRuleField {
     }
 
     private boolean equalTo(PaymentRuleField other) {
-        return field.equals(other.field)
+        return actions.equals(other.actions)
+                && field.equals(other.field)
                 && maximum.equals(other.maximum)
                 && minimum.equals(other.minimum)
                 && operators.equals(other.operators)
                 && options.equals(other.options)
+                && stage.equals(other.stage)
                 && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.field, this.maximum, this.minimum, this.operators, this.options, this.type);
+        return Objects.hash(
+                this.actions,
+                this.field,
+                this.maximum,
+                this.minimum,
+                this.operators,
+                this.options,
+                this.stage,
+                this.type);
     }
 
     @java.lang.Override
@@ -164,9 +195,16 @@ public final class PaymentRuleField {
         /**
          * <p>The payment attribute this condition reads.</p>
          */
-        TypeStage field(@NotNull PaymentRuleFieldField field);
+        StageStage field(@NotNull PaymentRuleFieldField field);
 
         Builder from(PaymentRuleField other);
+    }
+
+    public interface StageStage {
+        /**
+         * <p>When a rule on this field runs. An <code>after_authorization</code> field reads the bank's answer, so its rule runs after the bank authorizes the card. A rule cannot mix fields from both stages.</p>
+         */
+        TypeStage stage(@NotNull PaymentRuleFieldStage stage);
     }
 
     public interface TypeStage {
@@ -182,6 +220,12 @@ public final class PaymentRuleField {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        _FinalStage actions(List<PaymentRuleFieldActionsItem> actions);
+
+        _FinalStage addActions(PaymentRuleFieldActionsItem actions);
+
+        _FinalStage addAllActions(List<PaymentRuleFieldActionsItem> actions);
 
         /**
          * <p>The largest value this field accepts, or <code>null</code> when the field is not numeric.</p>
@@ -215,8 +259,10 @@ public final class PaymentRuleField {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements FieldStage, TypeStage, _FinalStage {
+    public static final class Builder implements FieldStage, StageStage, TypeStage, _FinalStage {
         private PaymentRuleFieldField field;
+
+        private PaymentRuleFieldStage stage;
 
         private PaymentRuleFieldType type;
 
@@ -228,17 +274,21 @@ public final class PaymentRuleField {
 
         private Optional<Integer> maximum = Optional.empty();
 
+        private List<PaymentRuleFieldActionsItem> actions = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(PaymentRuleField other) {
+            actions(other.getActions());
             field(other.getField());
             maximum(other.getMaximum());
             minimum(other.getMinimum());
             operators(other.getOperators());
             options(other.getOptions());
+            stage(other.getStage());
             type(other.getType());
             return this;
         }
@@ -249,8 +299,19 @@ public final class PaymentRuleField {
          */
         @java.lang.Override
         @JsonSetter("field")
-        public TypeStage field(@NotNull PaymentRuleFieldField field) {
+        public StageStage field(@NotNull PaymentRuleFieldField field) {
             this.field = Objects.requireNonNull(field, "field must not be null");
+            return this;
+        }
+
+        /**
+         * <p>When a rule on this field runs. An <code>after_authorization</code> field reads the bank's answer, so its rule runs after the bank authorizes the card. A rule cannot mix fields from both stages.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("stage")
+        public TypeStage stage(@NotNull PaymentRuleFieldStage stage) {
+            this.stage = Objects.requireNonNull(stage, "stage must not be null");
             return this;
         }
 
@@ -387,17 +448,44 @@ public final class PaymentRuleField {
         }
 
         @java.lang.Override
+        public _FinalStage addAllActions(List<PaymentRuleFieldActionsItem> actions) {
+            if (actions != null) {
+                this.actions.addAll(actions);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addActions(PaymentRuleFieldActionsItem actions) {
+            this.actions.add(actions);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "actions", nulls = Nulls.SKIP)
+        public _FinalStage actions(List<PaymentRuleFieldActionsItem> actions) {
+            this.actions.clear();
+            if (actions != null) {
+                this.actions.addAll(actions);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public PaymentRuleField build() {
-            return new PaymentRuleField(field, maximum, minimum, operators, options, type, additionalProperties);
+            return new PaymentRuleField(
+                    actions, field, maximum, minimum, operators, options, stage, type, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("field")
+            if (key.equalsIgnoreCase("actions")
+                    || key.equalsIgnoreCase("field")
                     || key.equalsIgnoreCase("maximum")
                     || key.equalsIgnoreCase("minimum")
                     || key.equalsIgnoreCase("operators")
                     || key.equalsIgnoreCase("options")
+                    || key.equalsIgnoreCase("stage")
                     || key.equalsIgnoreCase("type")) {
                 return;
             }

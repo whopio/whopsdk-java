@@ -29,6 +29,8 @@ public final class ListStatsResponseDataItem {
 
     private final String key;
 
+    private final Optional<List<String>> modes;
+
     private final String name;
 
     private final List<String> properties;
@@ -43,6 +45,7 @@ public final class ListStatsResponseDataItem {
             Optional<List<String>> breakdowns,
             String description,
             String key,
+            Optional<List<String>> modes,
             String name,
             List<String> properties,
             ListStatsResponseDataItemUnit unit,
@@ -51,6 +54,7 @@ public final class ListStatsResponseDataItem {
         this.breakdowns = breakdowns;
         this.description = description;
         this.key = key;
+        this.modes = modes;
         this.name = name;
         this.properties = properties;
         this.unit = unit;
@@ -80,6 +84,14 @@ public final class ListStatsResponseDataItem {
     @JsonProperty("key")
     public String getKey() {
         return key;
+    }
+
+    /**
+     * @return The values of the mode parameter that the metric takes. owner reads the account or user named. global reads all of Whop.
+     */
+    @JsonProperty("modes")
+    public Optional<List<String>> getModes() {
+        return modes;
     }
 
     /**
@@ -129,6 +141,7 @@ public final class ListStatsResponseDataItem {
         return breakdowns.equals(other.breakdowns)
                 && description.equals(other.description)
                 && key.equals(other.key)
+                && modes.equals(other.modes)
                 && name.equals(other.name)
                 && properties.equals(other.properties)
                 && unit.equals(other.unit)
@@ -138,7 +151,14 @@ public final class ListStatsResponseDataItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.breakdowns, this.description, this.key, this.name, this.properties, this.unit, this.windows);
+                this.breakdowns,
+                this.description,
+                this.key,
+                this.modes,
+                this.name,
+                this.properties,
+                this.unit,
+                this.windows);
     }
 
     @java.lang.Override
@@ -195,6 +215,13 @@ public final class ListStatsResponseDataItem {
         _FinalStage breakdowns(List<String> breakdowns);
 
         /**
+         * <p>The values of the mode parameter that the metric takes. owner reads the account or user named. global reads all of Whop.</p>
+         */
+        _FinalStage modes(Optional<List<String>> modes);
+
+        _FinalStage modes(List<String> modes);
+
+        /**
          * <p>The properties you can use with this metric — pass one as a filter (property=value) to narrow the series, or as breakdown_by=property to split it.</p>
          */
         _FinalStage properties(List<String> properties);
@@ -225,6 +252,8 @@ public final class ListStatsResponseDataItem {
 
         private List<String> properties = new ArrayList<>();
 
+        private Optional<List<String>> modes = Optional.empty();
+
         private Optional<List<String>> breakdowns = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -236,6 +265,7 @@ public final class ListStatsResponseDataItem {
             breakdowns(other.getBreakdowns());
             description(other.getDescription());
             key(other.getKey());
+            modes(other.getModes());
             name(other.getName());
             properties(other.getProperties());
             unit(other.getUnit());
@@ -343,6 +373,26 @@ public final class ListStatsResponseDataItem {
         }
 
         /**
+         * <p>The values of the mode parameter that the metric takes. owner reads the account or user named. global reads all of Whop.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage modes(List<String> modes) {
+            this.modes = Optional.ofNullable(modes);
+            return this;
+        }
+
+        /**
+         * <p>The values of the mode parameter that the metric takes. owner reads the account or user named. global reads all of Whop.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "modes", nulls = Nulls.SKIP)
+        public _FinalStage modes(Optional<List<String>> modes) {
+            this.modes = modes;
+            return this;
+        }
+
+        /**
          * <p>Supported breakdown_by values when they differ from the filter properties.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -365,7 +415,7 @@ public final class ListStatsResponseDataItem {
         @java.lang.Override
         public ListStatsResponseDataItem build() {
             return new ListStatsResponseDataItem(
-                    breakdowns, description, key, name, properties, unit, windows, additionalProperties);
+                    breakdowns, description, key, modes, name, properties, unit, windows, additionalProperties);
         }
 
         @JsonAnySetter
@@ -373,6 +423,7 @@ public final class ListStatsResponseDataItem {
             if (key.equalsIgnoreCase("breakdowns")
                     || key.equalsIgnoreCase("description")
                     || key.equalsIgnoreCase("key")
+                    || key.equalsIgnoreCase("modes")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("properties")
                     || key.equalsIgnoreCase("unit")

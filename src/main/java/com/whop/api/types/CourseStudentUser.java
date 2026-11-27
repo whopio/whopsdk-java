@@ -28,14 +28,21 @@ public final class CourseStudentUser {
 
     private final Optional<String> name;
 
+    private final Optional<CourseStudentUserProfilePicture> profilePicture;
+
     private final String username;
 
     private final Map<String, Object> additionalProperties;
 
     private CourseStudentUser(
-            String id, Optional<String> name, String username, Map<String, Object> additionalProperties) {
+            String id,
+            Optional<String> name,
+            Optional<CourseStudentUserProfilePicture> profilePicture,
+            String username,
+            Map<String, Object> additionalProperties) {
         this.id = id;
         this.name = name;
+        this.profilePicture = profilePicture;
         this.username = username;
         this.additionalProperties = additionalProperties;
     }
@@ -60,6 +67,17 @@ public final class CourseStudentUser {
     }
 
     /**
+     * @return The user's profile picture attachment with URL, content type, and file metadata. Null if using a legacy profile picture.
+     */
+    @JsonIgnore
+    public Optional<CourseStudentUserProfilePicture> getProfilePicture() {
+        if (profilePicture == null) {
+            return Optional.empty();
+        }
+        return profilePicture;
+    }
+
+    /**
      * @return The user's unique username shown on their public profile.
      */
     @JsonProperty("username")
@@ -71,6 +89,12 @@ public final class CourseStudentUser {
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("profile_picture")
+    private Optional<CourseStudentUserProfilePicture> _getProfilePicture() {
+        return profilePicture;
     }
 
     @java.lang.Override
@@ -85,12 +109,15 @@ public final class CourseStudentUser {
     }
 
     private boolean equalTo(CourseStudentUser other) {
-        return id.equals(other.id) && name.equals(other.name) && username.equals(other.username);
+        return id.equals(other.id)
+                && name.equals(other.name)
+                && profilePicture.equals(other.profilePicture)
+                && username.equals(other.username);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.username);
+        return Objects.hash(this.id, this.name, this.profilePicture, this.username);
     }
 
     @java.lang.Override
@@ -133,6 +160,15 @@ public final class CourseStudentUser {
         _FinalStage name(String name);
 
         _FinalStage name(Nullable<String> name);
+
+        /**
+         * <p>The user's profile picture attachment with URL, content type, and file metadata. Null if using a legacy profile picture.</p>
+         */
+        _FinalStage profilePicture(Optional<CourseStudentUserProfilePicture> profilePicture);
+
+        _FinalStage profilePicture(CourseStudentUserProfilePicture profilePicture);
+
+        _FinalStage profilePicture(Nullable<CourseStudentUserProfilePicture> profilePicture);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -140,6 +176,8 @@ public final class CourseStudentUser {
         private String id;
 
         private String username;
+
+        private Optional<CourseStudentUserProfilePicture> profilePicture = Optional.empty();
 
         private Optional<String> name = Optional.empty();
 
@@ -151,6 +189,7 @@ public final class CourseStudentUser {
         public Builder from(CourseStudentUser other) {
             id(other.getId());
             name(other.getName());
+            profilePicture(other.getProfilePicture());
             username(other.getUsername());
             return this;
         }
@@ -174,6 +213,42 @@ public final class CourseStudentUser {
         @JsonSetter("username")
         public _FinalStage username(@NotNull String username) {
             this.username = Objects.requireNonNull(username, "username must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The user's profile picture attachment with URL, content type, and file metadata. Null if using a legacy profile picture.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage profilePicture(Nullable<CourseStudentUserProfilePicture> profilePicture) {
+            if (profilePicture.isNull()) {
+                this.profilePicture = null;
+            } else if (profilePicture.isEmpty()) {
+                this.profilePicture = Optional.empty();
+            } else {
+                this.profilePicture = Optional.of(profilePicture.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The user's profile picture attachment with URL, content type, and file metadata. Null if using a legacy profile picture.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage profilePicture(CourseStudentUserProfilePicture profilePicture) {
+            this.profilePicture = Optional.ofNullable(profilePicture);
+            return this;
+        }
+
+        /**
+         * <p>The user's profile picture attachment with URL, content type, and file metadata. Null if using a legacy profile picture.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "profile_picture", nulls = Nulls.SKIP)
+        public _FinalStage profilePicture(Optional<CourseStudentUserProfilePicture> profilePicture) {
+            this.profilePicture = profilePicture;
             return this;
         }
 
@@ -215,12 +290,15 @@ public final class CourseStudentUser {
 
         @java.lang.Override
         public CourseStudentUser build() {
-            return new CourseStudentUser(id, name, username, additionalProperties);
+            return new CourseStudentUser(id, name, profilePicture, username, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name") || key.equalsIgnoreCase("username")) {
+            if (key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("profile_picture")
+                    || key.equalsIgnoreCase("username")) {
                 return;
             }
             this.additionalProperties.put(key, value);

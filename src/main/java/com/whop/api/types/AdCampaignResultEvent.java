@@ -31,6 +31,8 @@ public final class AdCampaignResultEvent {
 
     public static final AdCampaignResultEvent LEAD = new AdCampaignResultEvent(Value.LEAD, "lead");
 
+    public static final AdCampaignResultEvent IMPRESSIONS = new AdCampaignResultEvent(Value.IMPRESSIONS, "impressions");
+
     private final Value value;
 
     private final String string;
@@ -84,6 +86,8 @@ public final class AdCampaignResultEvent {
                 return visitor.visitViewContent();
             case LEAD:
                 return visitor.visitLead();
+            case IMPRESSIONS:
+                return visitor.visitImpressions();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -113,6 +117,8 @@ public final class AdCampaignResultEvent {
                 return VIEW_CONTENT;
             case "lead":
                 return LEAD;
+            case "impressions":
+                return IMPRESSIONS;
             default:
                 return new AdCampaignResultEvent(Value.UNKNOWN, value);
         }
@@ -139,6 +145,8 @@ public final class AdCampaignResultEvent {
 
         MESSAGING_CONVERSATION,
 
+        IMPRESSIONS,
+
         UNKNOWN
     }
 
@@ -162,6 +170,8 @@ public final class AdCampaignResultEvent {
         T visitCustom();
 
         T visitMessagingConversation();
+
+        T visitImpressions();
 
         T visitUnknown(String unknownType);
     }

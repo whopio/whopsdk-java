@@ -16,7 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.experiments.types.UpdateExperimentsRequestControl;
-import com.whop.api.resources.experiments.types.UpdateExperimentsRequestTargetingRulesItem;
+import com.whop.api.resources.experiments.types.UpdateExperimentsRequestDecisionMode;
 import com.whop.api.resources.experiments.types.UpdateExperimentsRequestVariantsItem;
 import com.whop.api.types.ExperimentResourceReference;
 import java.util.HashMap;
@@ -32,11 +32,11 @@ public final class UpdateExperimentsRequest {
 
     private final Optional<UpdateExperimentsRequestControl> control;
 
+    private final Optional<UpdateExperimentsRequestDecisionMode> decisionMode;
+
     private final Optional<String> hypothesis;
 
     private final Optional<ExperimentResourceReference> relatedResource;
-
-    private final Optional<List<UpdateExperimentsRequestTargetingRulesItem>> targetingRules;
 
     private final Optional<List<UpdateExperimentsRequestVariantsItem>> variants;
 
@@ -45,22 +45,22 @@ public final class UpdateExperimentsRequest {
     private UpdateExperimentsRequest(
             Optional<String> accountId,
             Optional<UpdateExperimentsRequestControl> control,
+            Optional<UpdateExperimentsRequestDecisionMode> decisionMode,
             Optional<String> hypothesis,
             Optional<ExperimentResourceReference> relatedResource,
-            Optional<List<UpdateExperimentsRequestTargetingRulesItem>> targetingRules,
             Optional<List<UpdateExperimentsRequestVariantsItem>> variants,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.control = control;
+        this.decisionMode = decisionMode;
         this.hypothesis = hypothesis;
         this.relatedResource = relatedResource;
-        this.targetingRules = targetingRules;
         this.variants = variants;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+     * @return Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.
      */
     @JsonIgnore
     public Optional<String> getAccountId() {
@@ -70,6 +70,17 @@ public final class UpdateExperimentsRequest {
     @JsonProperty("control")
     public Optional<UpdateExperimentsRequestControl> getControl() {
         return control;
+    }
+
+    /**
+     * @return How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Send <code>null</code> to leave it to the owner. Not accepted on feature flags. Omit to leave unchanged.
+     */
+    @JsonIgnore
+    public Optional<UpdateExperimentsRequestDecisionMode> getDecisionMode() {
+        if (decisionMode == null) {
+            return Optional.empty();
+        }
+        return decisionMode;
     }
 
     /**
@@ -92,19 +103,17 @@ public final class UpdateExperimentsRequest {
     }
 
     /**
-     * @return Replace the targeting rules with this set. Omit to leave unchanged.
-     */
-    @JsonProperty("targeting_rules")
-    public Optional<List<UpdateExperimentsRequestTargetingRulesItem>> getTargetingRules() {
-        return targetingRules;
-    }
-
-    /**
      * @return Grow treatment allocation. Pass every existing treatment with an equal-or-higher weight; append new names to add arms. Weights never decrease and arms are never removed. Omit to leave unchanged.
      */
     @JsonProperty("variants")
     public Optional<List<UpdateExperimentsRequestVariantsItem>> getVariants() {
         return variants;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("decision_mode")
+    private Optional<UpdateExperimentsRequestDecisionMode> _getDecisionMode() {
+        return decisionMode;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -127,21 +136,16 @@ public final class UpdateExperimentsRequest {
     private boolean equalTo(UpdateExperimentsRequest other) {
         return accountId.equals(other.accountId)
                 && control.equals(other.control)
+                && decisionMode.equals(other.decisionMode)
                 && hypothesis.equals(other.hypothesis)
                 && relatedResource.equals(other.relatedResource)
-                && targetingRules.equals(other.targetingRules)
                 && variants.equals(other.variants);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.accountId,
-                this.control,
-                this.hypothesis,
-                this.relatedResource,
-                this.targetingRules,
-                this.variants);
+                this.accountId, this.control, this.decisionMode, this.hypothesis, this.relatedResource, this.variants);
     }
 
     @java.lang.Override
@@ -159,11 +163,11 @@ public final class UpdateExperimentsRequest {
 
         private Optional<UpdateExperimentsRequestControl> control = Optional.empty();
 
+        private Optional<UpdateExperimentsRequestDecisionMode> decisionMode = Optional.empty();
+
         private Optional<String> hypothesis = Optional.empty();
 
         private Optional<ExperimentResourceReference> relatedResource = Optional.empty();
-
-        private Optional<List<UpdateExperimentsRequestTargetingRulesItem>> targetingRules = Optional.empty();
 
         private Optional<List<UpdateExperimentsRequestVariantsItem>> variants = Optional.empty();
 
@@ -174,15 +178,15 @@ public final class UpdateExperimentsRequest {
         public Builder from(UpdateExperimentsRequest other) {
             accountId(other.getAccountId());
             control(other.getControl());
+            decisionMode(other.getDecisionMode());
             hypothesis(other.getHypothesis());
             relatedResource(other.getRelatedResource());
-            targetingRules(other.getTargetingRules());
             variants(other.getVariants());
             return this;
         }
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -203,6 +207,31 @@ public final class UpdateExperimentsRequest {
 
         public Builder control(UpdateExperimentsRequestControl control) {
             this.control = Optional.ofNullable(control);
+            return this;
+        }
+
+        /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Send <code>null</code> to leave it to the owner. Not accepted on feature flags. Omit to leave unchanged.</p>
+         */
+        @JsonSetter(value = "decision_mode", nulls = Nulls.SKIP)
+        public Builder decisionMode(Optional<UpdateExperimentsRequestDecisionMode> decisionMode) {
+            this.decisionMode = decisionMode;
+            return this;
+        }
+
+        public Builder decisionMode(UpdateExperimentsRequestDecisionMode decisionMode) {
+            this.decisionMode = Optional.ofNullable(decisionMode);
+            return this;
+        }
+
+        public Builder decisionMode(Nullable<UpdateExperimentsRequestDecisionMode> decisionMode) {
+            if (decisionMode.isNull()) {
+                this.decisionMode = null;
+            } else if (decisionMode.isEmpty()) {
+                this.decisionMode = Optional.empty();
+            } else {
+                this.decisionMode = Optional.of(decisionMode.get());
+            }
             return this;
         }
 
@@ -246,20 +275,6 @@ public final class UpdateExperimentsRequest {
         }
 
         /**
-         * <p>Replace the targeting rules with this set. Omit to leave unchanged.</p>
-         */
-        @JsonSetter(value = "targeting_rules", nulls = Nulls.SKIP)
-        public Builder targetingRules(Optional<List<UpdateExperimentsRequestTargetingRulesItem>> targetingRules) {
-            this.targetingRules = targetingRules;
-            return this;
-        }
-
-        public Builder targetingRules(List<UpdateExperimentsRequestTargetingRulesItem> targetingRules) {
-            this.targetingRules = Optional.ofNullable(targetingRules);
-            return this;
-        }
-
-        /**
          * <p>Grow treatment allocation. Pass every existing treatment with an equal-or-higher weight; append new names to add arms. Weights never decrease and arms are never removed. Omit to leave unchanged.</p>
          */
         @JsonSetter(value = "variants", nulls = Nulls.SKIP)
@@ -275,15 +290,15 @@ public final class UpdateExperimentsRequest {
 
         public UpdateExperimentsRequest build() {
             return new UpdateExperimentsRequest(
-                    accountId, control, hypothesis, relatedResource, targetingRules, variants, additionalProperties);
+                    accountId, control, decisionMode, hypothesis, relatedResource, variants, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("control")
+                    || key.equalsIgnoreCase("decision_mode")
                     || key.equalsIgnoreCase("hypothesis")
                     || key.equalsIgnoreCase("related_resource")
-                    || key.equalsIgnoreCase("targeting_rules")
                     || key.equalsIgnoreCase("variants")) {
                 return;
             }

@@ -28,6 +28,9 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
     public static final CreatePaymentRulesRequestConditionsAllItemField RISK_SCORE =
             new CreatePaymentRulesRequestConditionsAllItemField(Value.RISK_SCORE, "risk_score");
 
+    public static final CreatePaymentRulesRequestConditionsAllItemField CVV_CHECK =
+            new CreatePaymentRulesRequestConditionsAllItemField(Value.CVV_CHECK, "cvv_check");
+
     public static final CreatePaymentRulesRequestConditionsAllItemField CUSTOMER_EMAIL =
             new CreatePaymentRulesRequestConditionsAllItemField(Value.CUSTOMER_EMAIL, "customer_email");
 
@@ -42,6 +45,9 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
 
     public static final CreatePaymentRulesRequestConditionsAllItemField BILLING_CITY =
             new CreatePaymentRulesRequestConditionsAllItemField(Value.BILLING_CITY, "billing_city");
+
+    public static final CreatePaymentRulesRequestConditionsAllItemField AVS_CHECK =
+            new CreatePaymentRulesRequestConditionsAllItemField(Value.AVS_CHECK, "avs_check");
 
     public static final CreatePaymentRulesRequestConditionsAllItemField BILLING_COUNTRY =
             new CreatePaymentRulesRequestConditionsAllItemField(Value.BILLING_COUNTRY, "billing_country");
@@ -93,6 +99,8 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
                 return visitor.visitEmailDomain();
             case RISK_SCORE:
                 return visitor.visitRiskScore();
+            case CVV_CHECK:
+                return visitor.visitCvvCheck();
             case CUSTOMER_EMAIL:
                 return visitor.visitCustomerEmail();
             case CARD_FUNDING:
@@ -103,6 +111,8 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
                 return visitor.visitCardBrand();
             case BILLING_CITY:
                 return visitor.visitBillingCity();
+            case AVS_CHECK:
+                return visitor.visitAvsCheck();
             case BILLING_COUNTRY:
                 return visitor.visitBillingCountry();
             case UNKNOWN:
@@ -128,6 +138,8 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
                 return EMAIL_DOMAIN;
             case "risk_score":
                 return RISK_SCORE;
+            case "cvv_check":
+                return CVV_CHECK;
             case "customer_email":
                 return CUSTOMER_EMAIL;
             case "card_funding":
@@ -138,6 +150,8 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
                 return CARD_BRAND;
             case "billing_city":
                 return BILLING_CITY;
+            case "avs_check":
+                return AVS_CHECK;
             case "billing_country":
                 return BILLING_COUNTRY;
             default:
@@ -172,6 +186,10 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
 
         IP_COUNTRY,
 
+        AVS_CHECK,
+
+        CVV_CHECK,
+
         UNKNOWN
     }
 
@@ -201,6 +219,10 @@ public final class CreatePaymentRulesRequestConditionsAllItemField {
         T visitIpAddress();
 
         T visitIpCountry();
+
+        T visitAvsCheck();
+
+        T visitCvvCheck();
 
         T visitUnknown(String unknownType);
     }

@@ -7,11 +7,13 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.verifications.requests.CreateVerificationsRequest;
+import com.whop.api.resources.verifications.requests.GenerateDocumentUrlVerificationsRequest;
 import com.whop.api.resources.verifications.requests.ListVerificationsRequest;
 import com.whop.api.resources.verifications.requests.RetrieveVerificationsRequest;
 import com.whop.api.resources.verifications.requests.UpdateVerificationsRequest;
 import com.whop.api.resources.verifications.types.CreateVerificationsRequestBody;
 import com.whop.api.resources.verifications.types.CreateVerificationsResponse;
+import com.whop.api.resources.verifications.types.GenerateDocumentUrlVerificationsResponse;
 import com.whop.api.resources.verifications.types.ListVerificationsResponseDataItem;
 import com.whop.api.resources.verifications.types.RetrieveVerificationsResponse;
 import com.whop.api.resources.verifications.types.UpdateVerificationsResponse;
@@ -120,17 +122,33 @@ public class VerificationsClient {
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates profile details or submits answers for items returned in <code>requested_information</code>. Approved verifications from a supported provider can update names, birth date, phone, country, address, business name, business structure, and tax IDs. The verification returns to review without creating a new verification. Owners, documents, and registration details remain locked after approval. Business verifications can update details, <code>documents</code>, and <code>owners</code> while still collecting information. Call Create Verification again after completing the details to send the business for review. During review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. Owners can still be added, changed, or removed while the review waits on them. Otherwise, only missing owner documents can be sent.
      */
     public UpdateVerificationsResponse update(String id, UpdateVerificationsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates editable profile details or submits answers for items returned in <code>requested_information</code>. On a business verification still collecting details, company details, <code>documents</code>, and <code>owners</code> also go to the verification provider; call Create Verification again to send the business for review once everything is in. Under review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. While the review waits on owners, owners can still be added, changed, or removed with <code>remove</code>; otherwise only an owner's missing documents can still be sent. Once a verification is <code>approved</code> its profile details are locked and can no longer be edited.
+     * Updates profile details or submits answers for items returned in <code>requested_information</code>. Approved verifications from a supported provider can update names, birth date, phone, country, address, business name, business structure, and tax IDs. The verification returns to review without creating a new verification. Owners, documents, and registration details remain locked after approval. Business verifications can update details, <code>documents</code>, and <code>owners</code> while still collecting information. Call Create Verification again after completing the details to send the business for review. During review, <code>registration_number</code>, <code>incorporation_date</code>, <code>place_of_incorporation</code>, and <code>documents</code> are refused. Owners can still be added, changed, or removed while the review waits on them. Otherwise, only missing owner documents can be sent.
      */
     public UpdateVerificationsResponse update(
             String id, UpdateVerificationsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Generates a short-lived link to download one image that a person sent for an individual verification. Ask for <code>front</code>, <code>back</code>, or <code>selfie</code>. The link always downloads the document that passed the check, whatever its type.
+     */
+    public GenerateDocumentUrlVerificationsResponse generateDocumentUrl(
+            String id, GenerateDocumentUrlVerificationsRequest request) {
+        return this.rawClient.generateDocumentUrl(id, request).body();
+    }
+
+    /**
+     * Generates a short-lived link to download one image that a person sent for an individual verification. Ask for <code>front</code>, <code>back</code>, or <code>selfie</code>. The link always downloads the document that passed the check, whatever its type.
+     */
+    public GenerateDocumentUrlVerificationsResponse generateDocumentUrl(
+            String id, GenerateDocumentUrlVerificationsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.generateDocumentUrl(id, request, requestOptions).body();
     }
 }

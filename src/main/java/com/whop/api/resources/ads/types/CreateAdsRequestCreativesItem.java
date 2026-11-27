@@ -26,16 +26,20 @@ public final class CreateAdsRequestCreativesItem {
 
     private final Optional<String> id;
 
+    private final Optional<String> sourceId;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateAdsRequestCreativesItem(
             Optional<CreateAdsRequestCreativesItemCrop> crop,
             Optional<CreateAdsRequestCreativesItemFormat> format,
             Optional<String> id,
+            Optional<String> sourceId,
             Map<String, Object> additionalProperties) {
         this.crop = crop;
         this.format = format;
         this.id = id;
+        this.sourceId = sourceId;
         this.additionalProperties = additionalProperties;
     }
 
@@ -60,6 +64,14 @@ public final class CreateAdsRequestCreativesItem {
         return id;
     }
 
+    /**
+     * @return The uploaded file to cut this format out of, prefixed <code>file_</code>. Whop cuts the <code>crop</code> window out of it, in that file's pixels, and makes the slot's file. Omit it to use <code>id</code> as uploaded.
+     */
+    @JsonProperty("source_id")
+    public Optional<String> getSourceId() {
+        return sourceId;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -72,12 +84,15 @@ public final class CreateAdsRequestCreativesItem {
     }
 
     private boolean equalTo(CreateAdsRequestCreativesItem other) {
-        return crop.equals(other.crop) && format.equals(other.format) && id.equals(other.id);
+        return crop.equals(other.crop)
+                && format.equals(other.format)
+                && id.equals(other.id)
+                && sourceId.equals(other.sourceId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.crop, this.format, this.id);
+        return Objects.hash(this.crop, this.format, this.id, this.sourceId);
     }
 
     @java.lang.Override
@@ -97,6 +112,8 @@ public final class CreateAdsRequestCreativesItem {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<String> sourceId = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -105,6 +122,7 @@ public final class CreateAdsRequestCreativesItem {
             crop(other.getCrop());
             format(other.getFormat());
             id(other.getId());
+            sourceId(other.getSourceId());
             return this;
         }
 
@@ -147,13 +165,30 @@ public final class CreateAdsRequestCreativesItem {
             return this;
         }
 
+        /**
+         * <p>The uploaded file to cut this format out of, prefixed <code>file_</code>. Whop cuts the <code>crop</code> window out of it, in that file's pixels, and makes the slot's file. Omit it to use <code>id</code> as uploaded.</p>
+         */
+        @JsonSetter(value = "source_id", nulls = Nulls.SKIP)
+        public Builder sourceId(Optional<String> sourceId) {
+            this.sourceId = sourceId;
+            return this;
+        }
+
+        public Builder sourceId(String sourceId) {
+            this.sourceId = Optional.ofNullable(sourceId);
+            return this;
+        }
+
         public CreateAdsRequestCreativesItem build() {
-            return new CreateAdsRequestCreativesItem(crop, format, id, additionalProperties);
+            return new CreateAdsRequestCreativesItem(crop, format, id, sourceId, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("crop") || key.equalsIgnoreCase("format") || key.equalsIgnoreCase("id")) {
+            if (key.equalsIgnoreCase("crop")
+                    || key.equalsIgnoreCase("format")
+                    || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("source_id")) {
                 return;
             }
             this.additionalProperties.put(key, value);

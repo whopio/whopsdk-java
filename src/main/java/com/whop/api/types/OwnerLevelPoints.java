@@ -18,6 +18,8 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = OwnerLevelPoints.Builder.class)
 public final class OwnerLevelPoints {
+    private final int actions;
+
     private final int ads;
 
     private final int cards;
@@ -28,12 +30,22 @@ public final class OwnerLevelPoints {
 
     private final Map<String, Object> additionalProperties;
 
-    private OwnerLevelPoints(int ads, int cards, int partners, int trading, Map<String, Object> additionalProperties) {
+    private OwnerLevelPoints(
+            int actions, int ads, int cards, int partners, int trading, Map<String, Object> additionalProperties) {
+        this.actions = actions;
         this.ads = ads;
         this.cards = cards;
         this.partners = partners;
         this.trading = trading;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Points earned from eligible actions on Whop, rounded toward zero.
+     */
+    @JsonProperty("actions")
+    public int getActions() {
+        return actions;
     }
 
     /**
@@ -80,12 +92,16 @@ public final class OwnerLevelPoints {
     }
 
     private boolean equalTo(OwnerLevelPoints other) {
-        return ads == other.ads && cards == other.cards && partners == other.partners && trading == other.trading;
+        return actions == other.actions
+                && ads == other.ads
+                && cards == other.cards
+                && partners == other.partners
+                && trading == other.trading;
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.ads, this.cards, this.partners, this.trading);
+        return Objects.hash(this.actions, this.ads, this.cards, this.partners, this.trading);
     }
 
     @java.lang.Override
@@ -93,8 +109,17 @@ public final class OwnerLevelPoints {
         return ObjectMappers.stringify(this);
     }
 
-    public static AdsStage builder() {
+    public static ActionsStage builder() {
         return new Builder();
+    }
+
+    public interface ActionsStage {
+        /**
+         * <p>Points earned from eligible actions on Whop, rounded toward zero.</p>
+         */
+        AdsStage actions(int actions);
+
+        Builder from(OwnerLevelPoints other);
     }
 
     public interface AdsStage {
@@ -102,8 +127,6 @@ public final class OwnerLevelPoints {
          * <p>Points from paid Whop Ads charges, net of refunds: 10 for every dollar, rounded toward zero.</p>
          */
         CardsStage ads(int ads);
-
-        Builder from(OwnerLevelPoints other);
     }
 
     public interface CardsStage {
@@ -136,7 +159,10 @@ public final class OwnerLevelPoints {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements AdsStage, CardsStage, PartnersStage, TradingStage, _FinalStage {
+    public static final class Builder
+            implements ActionsStage, AdsStage, CardsStage, PartnersStage, TradingStage, _FinalStage {
+        private int actions;
+
         private int ads;
 
         private int cards;
@@ -151,10 +177,22 @@ public final class OwnerLevelPoints {
 
         @java.lang.Override
         public Builder from(OwnerLevelPoints other) {
+            actions(other.getActions());
             ads(other.getAds());
             cards(other.getCards());
             partners(other.getPartners());
             trading(other.getTrading());
+            return this;
+        }
+
+        /**
+         * <p>Points earned from eligible actions on Whop, rounded toward zero.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("actions")
+        public AdsStage actions(int actions) {
+            this.actions = actions;
             return this;
         }
 
@@ -204,12 +242,13 @@ public final class OwnerLevelPoints {
 
         @java.lang.Override
         public OwnerLevelPoints build() {
-            return new OwnerLevelPoints(ads, cards, partners, trading, additionalProperties);
+            return new OwnerLevelPoints(actions, ads, cards, partners, trading, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("ads")
+            if (key.equalsIgnoreCase("actions")
+                    || key.equalsIgnoreCase("ads")
                     || key.equalsIgnoreCase("cards")
                     || key.equalsIgnoreCase("partners")
                     || key.equalsIgnoreCase("trading")) {

@@ -103,6 +103,8 @@ public final class CreateEventsRequestCurrency {
 
     public static final CreateEventsRequestCurrency MUR = new CreateEventsRequestCurrency(Value.MUR, "mur");
 
+    public static final CreateEventsRequestCurrency HNL = new CreateEventsRequestCurrency(Value.HNL, "hnl");
+
     public static final CreateEventsRequestCurrency PEN = new CreateEventsRequestCurrency(Value.PEN, "pen");
 
     public static final CreateEventsRequestCurrency USD = new CreateEventsRequestCurrency(Value.USD, "usd");
@@ -317,6 +319,8 @@ public final class CreateEventsRequestCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -506,6 +510,8 @@ public final class CreateEventsRequestCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -776,6 +782,8 @@ public final class CreateEventsRequestCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -959,6 +967,8 @@ public final class CreateEventsRequestCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

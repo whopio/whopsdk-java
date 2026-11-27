@@ -11,6 +11,7 @@ import com.whop.api.resources.paymentrules.requests.ActivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.CreatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeactivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeletePaymentRulesRequest;
+import com.whop.api.resources.paymentrules.requests.ListFieldsPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ListPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ReplacePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.RetrievePaymentRulesRequest;
@@ -97,7 +98,7 @@ public class AsyncPaymentRulesClient {
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public CompletableFuture<PaymentRule> create(CreatePaymentRulesRequest request) {
         CompletableFuture<WhopApiHttpResponse<PaymentRule>> rawFuture = this.rawClient.create(request);
@@ -111,7 +112,7 @@ public class AsyncPaymentRulesClient {
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public CompletableFuture<PaymentRule> create(CreatePaymentRulesRequest request, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<PaymentRule>> rawFuture = this.rawClient.create(request, requestOptions);
@@ -144,6 +145,37 @@ public class AsyncPaymentRulesClient {
     public CompletableFuture<ListFieldsPaymentRulesResponse> listFields(RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<ListFieldsPaymentRulesResponse>> rawFuture =
                 this.rawClient.listFields(requestOptions);
+        CompletableFuture<ListFieldsPaymentRulesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public CompletableFuture<ListFieldsPaymentRulesResponse> listFields(ListFieldsPaymentRulesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<ListFieldsPaymentRulesResponse>> rawFuture =
+                this.rawClient.listFields(request);
+        CompletableFuture<ListFieldsPaymentRulesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public CompletableFuture<ListFieldsPaymentRulesResponse> listFields(
+            ListFieldsPaymentRulesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<ListFieldsPaymentRulesResponse>> rawFuture =
+                this.rawClient.listFields(request, requestOptions);
         CompletableFuture<ListFieldsPaymentRulesResponse> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {

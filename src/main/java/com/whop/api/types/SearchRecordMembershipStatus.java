@@ -19,6 +19,9 @@ public final class SearchRecordMembershipStatus {
     public static final SearchRecordMembershipStatus EXPIRED =
             new SearchRecordMembershipStatus(Value.EXPIRED, "expired");
 
+    public static final SearchRecordMembershipStatus SCHEDULED =
+            new SearchRecordMembershipStatus(Value.SCHEDULED, "scheduled");
+
     public static final SearchRecordMembershipStatus TRIALING =
             new SearchRecordMembershipStatus(Value.TRIALING, "trialing");
 
@@ -68,6 +71,8 @@ public final class SearchRecordMembershipStatus {
                 return visitor.visitCompleted();
             case EXPIRED:
                 return visitor.visitExpired();
+            case SCHEDULED:
+                return visitor.visitScheduled();
             case TRIALING:
                 return visitor.visitTrialing();
             case UNRESOLVED:
@@ -91,6 +96,8 @@ public final class SearchRecordMembershipStatus {
                 return COMPLETED;
             case "expired":
                 return EXPIRED;
+            case "scheduled":
+                return SCHEDULED;
             case "trialing":
                 return TRIALING;
             case "unresolved":
@@ -117,6 +124,8 @@ public final class SearchRecordMembershipStatus {
 
         UNRESOLVED,
 
+        SCHEDULED,
+
         UNKNOWN
     }
 
@@ -134,6 +143,8 @@ public final class SearchRecordMembershipStatus {
         T visitExpired();
 
         T visitUnresolved();
+
+        T visitScheduled();
 
         T visitUnknown(String unknownType);
     }

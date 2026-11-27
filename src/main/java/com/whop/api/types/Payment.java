@@ -28,7 +28,9 @@ import org.jetbrains.annotations.NotNull;
 public final class Payment {
     private final Optional<String> accountId;
 
-    private final Money amountAfterFees;
+    private final Optional<Money> amountAfterFees;
+
+    private final Money amountCharged;
 
     private final Optional<String> autoCaptureAt;
 
@@ -120,6 +122,8 @@ public final class Payment {
 
     private final Optional<String> refundedAt;
 
+    private final Optional<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason;
+
     private final Optional<String> responseDueAt;
 
     private final boolean retryable;
@@ -134,11 +138,15 @@ public final class Payment {
 
     private final Optional<PaymentAddress> shippingAddress;
 
+    private final Optional<String> statementDescriptor;
+
     private final ReceiptStatus status;
 
     private final FriendlyReceiptStatus substatus;
 
     private final Optional<Money> subtotal;
+
+    private final Optional<Money> surcharge;
 
     private final Optional<Money> taxAmount;
 
@@ -170,7 +178,8 @@ public final class Payment {
 
     private Payment(
             Optional<String> accountId,
-            Money amountAfterFees,
+            Optional<Money> amountAfterFees,
+            Money amountCharged,
             Optional<String> autoCaptureAt,
             boolean autoRefunded,
             Optional<PaymentAddress> billingAddress,
@@ -216,6 +225,7 @@ public final class Payment {
             boolean refundable,
             Optional<Money> refundedAmount,
             Optional<String> refundedAt,
+            Optional<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason,
             Optional<String> responseDueAt,
             boolean retryable,
             Optional<Double> riskScore,
@@ -223,9 +233,11 @@ public final class Payment {
             Optional<String> settlementTimeAt,
             Optional<String> shipmentId,
             Optional<PaymentAddress> shippingAddress,
+            Optional<String> statementDescriptor,
             ReceiptStatus status,
             FriendlyReceiptStatus substatus,
             Optional<Money> subtotal,
+            Optional<Money> surcharge,
             Optional<Money> taxAmount,
             Optional<ReceiptTaxBehaviors> taxBehavior,
             Money taxRefundedAmount,
@@ -242,6 +254,7 @@ public final class Payment {
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.amountAfterFees = amountAfterFees;
+        this.amountCharged = amountCharged;
         this.autoCaptureAt = autoCaptureAt;
         this.autoRefunded = autoRefunded;
         this.billingAddress = billingAddress;
@@ -287,6 +300,7 @@ public final class Payment {
         this.refundable = refundable;
         this.refundedAmount = refundedAmount;
         this.refundedAt = refundedAt;
+        this.resolutionCenterIneligibleReason = resolutionCenterIneligibleReason;
         this.responseDueAt = responseDueAt;
         this.retryable = retryable;
         this.riskScore = riskScore;
@@ -294,9 +308,11 @@ public final class Payment {
         this.settlementTimeAt = settlementTimeAt;
         this.shipmentId = shipmentId;
         this.shippingAddress = shippingAddress;
+        this.statementDescriptor = statementDescriptor;
         this.status = status;
         this.substatus = substatus;
         this.subtotal = subtotal;
+        this.surcharge = surcharge;
         this.taxAmount = taxAmount;
         this.taxBehavior = taxBehavior;
         this.taxRefundedAmount = taxRefundedAmount;
@@ -325,11 +341,22 @@ public final class Payment {
     }
 
     /**
-     * @return What the account keeps: the total less Whop's fees.
+     * @return What the account keeps: the total less Whop's fees. Null when you read the payment as its buyer.
      */
-    @JsonProperty("amount_after_fees")
-    public Money getAmountAfterFees() {
+    @JsonIgnore
+    public Optional<Money> getAmountAfterFees() {
+        if (amountAfterFees == null) {
+            return Optional.empty();
+        }
         return amountAfterFees;
+    }
+
+    /**
+     * @return What the buyer is charged for this payment: the total plus any buyer fees, in the currency the buyer pays in. Refunds do not reduce it; <code>presentment_refunded_amount</code> states them in the same currency.
+     */
+    @JsonProperty("amount_charged")
+    public Money getAmountCharged() {
+        return amountCharged;
     }
 
     /**
@@ -418,7 +445,7 @@ public final class Payment {
     }
 
     /**
-     * @return The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, and always null in list responses — retrieve the payment for it.
+     * @return The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, null when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.
      */
     @JsonIgnore
     public Optional<String> getClientSecret() {
@@ -535,7 +562,7 @@ public final class Payment {
     }
 
     /**
-     * @return The buyer's IP address at checkout: the one Whop's fraud screening identified, otherwise the one Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, such as a subscription renewal or a charge made without the buyer present.
+     * @return IP address that Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, for example a subscription renewal or a charge made without the buyer. Also null when you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<String> getIpAddress() {
@@ -562,7 +589,7 @@ public final class Payment {
     }
 
     /**
-     * @return The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission.
+     * @return The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless you are the buyer.
      */
     @JsonIgnore
     public Optional<String> getMemberId() {
@@ -573,7 +600,7 @@ public final class Payment {
     }
 
     /**
-     * @return The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases or without the member:basic:read permission.
+     * @return The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases, or without the member:basic:read permission unless you are the buyer.
      */
     @JsonIgnore
     public Optional<String> getMembershipId() {
@@ -584,7 +611,7 @@ public final class Payment {
     }
 
     /**
-     * @return Your own key-value data attached when the payment was created.
+     * @return Your own key-value data attached when the payment was created. Null when you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
@@ -639,7 +666,7 @@ public final class Payment {
     }
 
     /**
-     * @return The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card.
+     * @return The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card. The network transaction id is null when you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<PaymentInstrument> getPaymentInstrument() {
@@ -792,6 +819,17 @@ public final class Payment {
     }
 
     /**
+     * @return Why the buyer cannot open a Resolution Center case on this payment with <code>POST /resolution_center_cases</code>, or null when they can. <code>already_opened</code>: a case is already open or was decided (a withdrawn case does not count). <code>unsupported_payment_processor</code>: the payment method does not support cases. <code>out_of_date</code>: the window to open a case has passed. <code>not_paid</code>: the payment is not <code>paid</code>. <code>free</code>: nothing was charged. <code>already_refunded</code>: some of it has been refunded.
+     */
+    @JsonIgnore
+    public Optional<PaymentResolutionCenterIneligibleReason> getResolutionCenterIneligibleReason() {
+        if (resolutionCenterIneligibleReason == null) {
+            return Optional.empty();
+        }
+        return resolutionCenterIneligibleReason;
+    }
+
+    /**
      * @return When the earliest response is due on a dispute or Resolution Center case awaiting the account's response, as an ISO 8601 timestamp. Null when nothing awaits a response, or without the permission to read that dispute or case.
      */
     @JsonIgnore
@@ -803,7 +841,7 @@ public final class Payment {
     }
 
     /**
-     * @return True when the payment is <code>open</code> and can be retried by hand with <code>POST /payments/{id}/retry</code>: its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed first payment on a <code>drafted</code> membership), it is not paid through an invoice payment link, and its one manual retry is not used up. A retry can still be refused when the company cannot currently accept payments.
+     * @return True when the payment can be retried by hand with <code>POST /payments/{id}/retry</code>. The payment must be <code>open</code> and not paid through an invoice payment link. Its membership must be <code>active</code>, <code>trialing</code>, or <code>past_due</code>, or the payment must be a failed first payment on a <code>drafted</code> membership. Its one manual retry must not be used up. A retry can still be refused when the account cannot currently accept payments.
      */
     @JsonProperty("retryable")
     public boolean getRetryable() {
@@ -811,7 +849,7 @@ public final class Payment {
     }
 
     /**
-     * @return Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available.
+     * @return Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available or you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<Double> getRiskScore() {
@@ -834,7 +872,7 @@ public final class Payment {
     }
 
     /**
-     * @return When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid, and always null in list responses — retrieve the payment for it.
+     * @return When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid or when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.
      */
     @JsonIgnore
     public Optional<String> getSettlementTimeAt() {
@@ -867,6 +905,17 @@ public final class Payment {
     }
 
     /**
+     * @return The text the buyer's bank or card statement shows for this payment. Null when the processor did not report one.
+     */
+    @JsonIgnore
+    public Optional<String> getStatementDescriptor() {
+        if (statementDescriptor == null) {
+            return Optional.empty();
+        }
+        return statementDescriptor;
+    }
+
+    /**
      * @return The lifecycle state of the charge: <code>open</code> while collection is outstanding, <code>paid</code> once the money moved, <code>pending</code> while a settlement rail clears, <code>void</code>/<code>uncollectible</code> when it ended without collecting.
      */
     @JsonProperty("status")
@@ -891,6 +940,17 @@ public final class Payment {
             return Optional.empty();
         }
         return subtotal;
+    }
+
+    /**
+     * @return The card surcharge the buyer pays for paying by credit card. It is included in <code>total</code> and <code>amount_charged</code>, and appears in <code>line_items</code> as a line of its own. Null when the payment has no surcharge.
+     */
+    @JsonIgnore
+    public Optional<Money> getSurcharge() {
+        if (surcharge == null) {
+            return Optional.empty();
+        }
+        return surcharge;
     }
 
     /**
@@ -932,7 +992,7 @@ public final class Payment {
     }
 
     /**
-     * @return The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows.
+     * @return The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows; <code>amount_charged</code> is what the buyer is charged.
      */
     @JsonIgnore
     public Optional<Money> getTotal() {
@@ -951,7 +1011,7 @@ public final class Payment {
     }
 
     /**
-     * @return The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep.
+     * @return The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep. Null when you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<Money> getUsdTotal() {
@@ -962,7 +1022,7 @@ public final class Payment {
     }
 
     /**
-     * @return The buyer. Null when the payment belongs to a company buyer rather than a user.
+     * @return The buyer. Null when the buyer is an account rather than a user.
      */
     @JsonIgnore
     public Optional<UserSummary> getUser() {
@@ -995,7 +1055,7 @@ public final class Payment {
     }
 
     /**
-     * @return The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none.
+     * @return The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none or you read the payment as its buyer.
      */
     @JsonIgnore
     public Optional<PaymentVerificationChecks> getVerificationChecks() {
@@ -1028,6 +1088,12 @@ public final class Payment {
     @JsonProperty("account_id")
     private Optional<String> _getAccountId() {
         return accountId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("amount_after_fees")
+    private Optional<Money> _getAmountAfterFees() {
+        return amountAfterFees;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1247,6 +1313,12 @@ public final class Payment {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("resolution_center_ineligible_reason")
+    private Optional<PaymentResolutionCenterIneligibleReason> _getResolutionCenterIneligibleReason() {
+        return resolutionCenterIneligibleReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("response_due_at")
     private Optional<String> _getResponseDueAt() {
         return responseDueAt;
@@ -1283,9 +1355,21 @@ public final class Payment {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("statement_descriptor")
+    private Optional<String> _getStatementDescriptor() {
+        return statementDescriptor;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("subtotal")
     private Optional<Money> _getSubtotal() {
         return subtotal;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("surcharge")
+    private Optional<Money> _getSurcharge() {
+        return surcharge;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -1356,6 +1440,7 @@ public final class Payment {
     private boolean equalTo(Payment other) {
         return accountId.equals(other.accountId)
                 && amountAfterFees.equals(other.amountAfterFees)
+                && amountCharged.equals(other.amountCharged)
                 && autoCaptureAt.equals(other.autoCaptureAt)
                 && autoRefunded == other.autoRefunded
                 && billingAddress.equals(other.billingAddress)
@@ -1401,6 +1486,7 @@ public final class Payment {
                 && refundable == other.refundable
                 && refundedAmount.equals(other.refundedAmount)
                 && refundedAt.equals(other.refundedAt)
+                && resolutionCenterIneligibleReason.equals(other.resolutionCenterIneligibleReason)
                 && responseDueAt.equals(other.responseDueAt)
                 && retryable == other.retryable
                 && riskScore.equals(other.riskScore)
@@ -1408,9 +1494,11 @@ public final class Payment {
                 && settlementTimeAt.equals(other.settlementTimeAt)
                 && shipmentId.equals(other.shipmentId)
                 && shippingAddress.equals(other.shippingAddress)
+                && statementDescriptor.equals(other.statementDescriptor)
                 && status.equals(other.status)
                 && substatus.equals(other.substatus)
                 && subtotal.equals(other.subtotal)
+                && surcharge.equals(other.surcharge)
                 && taxAmount.equals(other.taxAmount)
                 && taxBehavior.equals(other.taxBehavior)
                 && taxRefundedAmount.equals(other.taxRefundedAmount)
@@ -1431,6 +1519,7 @@ public final class Payment {
         return Objects.hash(
                 this.accountId,
                 this.amountAfterFees,
+                this.amountCharged,
                 this.autoCaptureAt,
                 this.autoRefunded,
                 this.billingAddress,
@@ -1476,6 +1565,7 @@ public final class Payment {
                 this.refundable,
                 this.refundedAmount,
                 this.refundedAt,
+                this.resolutionCenterIneligibleReason,
                 this.responseDueAt,
                 this.retryable,
                 this.riskScore,
@@ -1483,9 +1573,11 @@ public final class Payment {
                 this.settlementTimeAt,
                 this.shipmentId,
                 this.shippingAddress,
+                this.statementDescriptor,
                 this.status,
                 this.substatus,
                 this.subtotal,
+                this.surcharge,
                 this.taxAmount,
                 this.taxBehavior,
                 this.taxRefundedAmount,
@@ -1506,15 +1598,15 @@ public final class Payment {
         return ObjectMappers.stringify(this);
     }
 
-    public static AmountAfterFeesStage builder() {
+    public static AmountChargedStage builder() {
         return new Builder();
     }
 
-    public interface AmountAfterFeesStage {
+    public interface AmountChargedStage {
         /**
-         * <p>What the account keeps: the total less Whop's fees.</p>
+         * <p>What the buyer is charged for this payment: the total plus any buyer fees, in the currency the buyer pays in. Refunds do not reduce it; <code>presentment_refunded_amount</code> states them in the same currency.</p>
          */
-        AutoRefundedStage amountAfterFees(@NotNull Money amountAfterFees);
+        AutoRefundedStage amountCharged(@NotNull Money amountCharged);
 
         Builder from(Payment other);
     }
@@ -1563,7 +1655,7 @@ public final class Payment {
 
     public interface RetryableStage {
         /**
-         * <p>True when the payment is <code>open</code> and can be retried by hand with <code>POST /payments/{id}/retry</code>: its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed first payment on a <code>drafted</code> membership), it is not paid through an invoice payment link, and its one manual retry is not used up. A retry can still be refused when the company cannot currently accept payments.</p>
+         * <p>True when the payment can be retried by hand with <code>POST /payments/{id}/retry</code>. The payment must be <code>open</code> and not paid through an invoice payment link. Its membership must be <code>active</code>, <code>trialing</code>, or <code>past_due</code>, or the payment must be a failed first payment on a <code>drafted</code> membership. Its one manual retry must not be used up. A retry can still be refused when the account cannot currently accept payments.</p>
          */
         StatusStage retryable(boolean retryable);
     }
@@ -1625,6 +1717,15 @@ public final class Payment {
         _FinalStage accountId(String accountId);
 
         _FinalStage accountId(Nullable<String> accountId);
+
+        /**
+         * <p>What the account keeps: the total less Whop's fees. Null when you read the payment as its buyer.</p>
+         */
+        _FinalStage amountAfterFees(Optional<Money> amountAfterFees);
+
+        _FinalStage amountAfterFees(Money amountAfterFees);
+
+        _FinalStage amountAfterFees(Nullable<Money> amountAfterFees);
 
         /**
          * <p>When Whop will capture this authorized card payment automatically unless it is voided first, as an ISO 8601 timestamp. Null when no automatic capture was requested.</p>
@@ -1690,7 +1791,7 @@ public final class Payment {
         _FinalStage checkoutSurface(Nullable<PaymentCheckoutSurface> checkoutSurface);
 
         /**
-         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, and always null in list responses — retrieve the payment for it.</p>
+         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, null when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          */
         _FinalStage clientSecret(Optional<String> clientSecret);
 
@@ -1768,7 +1869,7 @@ public final class Payment {
         _FinalStage addAllHolds(List<PaymentHold> holds);
 
         /**
-         * <p>The buyer's IP address at checkout: the one Whop's fraud screening identified, otherwise the one Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, such as a subscription renewal or a charge made without the buyer present.</p>
+         * <p>IP address that Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, for example a subscription renewal or a charge made without the buyer. Also null when you read the payment as its buyer.</p>
          */
         _FinalStage ipAddress(Optional<String> ipAddress);
 
@@ -1792,7 +1893,7 @@ public final class Payment {
         _FinalStage addAllLineItems(List<ReceiptLineItem> lineItems);
 
         /**
-         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless you are the buyer.</p>
          */
         _FinalStage memberId(Optional<String> memberId);
 
@@ -1801,7 +1902,7 @@ public final class Payment {
         _FinalStage memberId(Nullable<String> memberId);
 
         /**
-         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases or without the member:basic:read permission.</p>
+         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases, or without the member:basic:read permission unless you are the buyer.</p>
          */
         _FinalStage membershipId(Optional<String> membershipId);
 
@@ -1810,7 +1911,7 @@ public final class Payment {
         _FinalStage membershipId(Nullable<String> membershipId);
 
         /**
-         * <p>Your own key-value data attached when the payment was created.</p>
+         * <p>Your own key-value data attached when the payment was created. Null when you read the payment as its buyer.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
 
@@ -1855,7 +1956,7 @@ public final class Payment {
         _FinalStage paidAt(Nullable<String> paidAt);
 
         /**
-         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card.</p>
+         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card. The network transaction id is null when you read the payment as its buyer.</p>
          */
         _FinalStage paymentInstrument(Optional<PaymentInstrument> paymentInstrument);
 
@@ -1969,6 +2070,18 @@ public final class Payment {
         _FinalStage refundedAt(Nullable<String> refundedAt);
 
         /**
+         * <p>Why the buyer cannot open a Resolution Center case on this payment with <code>POST /resolution_center_cases</code>, or null when they can. <code>already_opened</code>: a case is already open or was decided (a withdrawn case does not count). <code>unsupported_payment_processor</code>: the payment method does not support cases. <code>out_of_date</code>: the window to open a case has passed. <code>not_paid</code>: the payment is not <code>paid</code>. <code>free</code>: nothing was charged. <code>already_refunded</code>: some of it has been refunded.</p>
+         */
+        _FinalStage resolutionCenterIneligibleReason(
+                Optional<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason);
+
+        _FinalStage resolutionCenterIneligibleReason(
+                PaymentResolutionCenterIneligibleReason resolutionCenterIneligibleReason);
+
+        _FinalStage resolutionCenterIneligibleReason(
+                Nullable<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason);
+
+        /**
          * <p>When the earliest response is due on a dispute or Resolution Center case awaiting the account's response, as an ISO 8601 timestamp. Null when nothing awaits a response, or without the permission to read that dispute or case.</p>
          */
         _FinalStage responseDueAt(Optional<String> responseDueAt);
@@ -1978,7 +2091,7 @@ public final class Payment {
         _FinalStage responseDueAt(Nullable<String> responseDueAt);
 
         /**
-         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available.</p>
+         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available or you read the payment as its buyer.</p>
          */
         _FinalStage riskScore(Optional<Double> riskScore);
 
@@ -1997,7 +2110,7 @@ public final class Payment {
         _FinalStage riskSignals(Nullable<Map<String, Object>> riskSignals);
 
         /**
-         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid, and always null in list responses — retrieve the payment for it.</p>
+         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid or when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          */
         _FinalStage settlementTimeAt(Optional<String> settlementTimeAt);
 
@@ -2024,6 +2137,15 @@ public final class Payment {
         _FinalStage shippingAddress(Nullable<PaymentAddress> shippingAddress);
 
         /**
+         * <p>The text the buyer's bank or card statement shows for this payment. Null when the processor did not report one.</p>
+         */
+        _FinalStage statementDescriptor(Optional<String> statementDescriptor);
+
+        _FinalStage statementDescriptor(String statementDescriptor);
+
+        _FinalStage statementDescriptor(Nullable<String> statementDescriptor);
+
+        /**
          * <p>The price before discounts, tax and fees.</p>
          */
         _FinalStage subtotal(Optional<Money> subtotal);
@@ -2031,6 +2153,15 @@ public final class Payment {
         _FinalStage subtotal(Money subtotal);
 
         _FinalStage subtotal(Nullable<Money> subtotal);
+
+        /**
+         * <p>The card surcharge the buyer pays for paying by credit card. It is included in <code>total</code> and <code>amount_charged</code>, and appears in <code>line_items</code> as a line of its own. Null when the payment has no surcharge.</p>
+         */
+        _FinalStage surcharge(Optional<Money> surcharge);
+
+        _FinalStage surcharge(Money surcharge);
+
+        _FinalStage surcharge(Nullable<Money> surcharge);
 
         /**
          * <p>The sales tax or VAT collected. Null when no tax applied.</p>
@@ -2051,7 +2182,7 @@ public final class Payment {
         _FinalStage taxBehavior(Nullable<ReceiptTaxBehaviors> taxBehavior);
 
         /**
-         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows.</p>
+         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows; <code>amount_charged</code> is what the buyer is charged.</p>
          */
         _FinalStage total(Optional<Money> total);
 
@@ -2060,7 +2191,7 @@ public final class Payment {
         _FinalStage total(Nullable<Money> total);
 
         /**
-         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep.</p>
+         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep. Null when you read the payment as its buyer.</p>
          */
         _FinalStage usdTotal(Optional<Money> usdTotal);
 
@@ -2069,7 +2200,7 @@ public final class Payment {
         _FinalStage usdTotal(Nullable<Money> usdTotal);
 
         /**
-         * <p>The buyer. Null when the payment belongs to a company buyer rather than a user.</p>
+         * <p>The buyer. Null when the buyer is an account rather than a user.</p>
          */
         _FinalStage user(Optional<UserSummary> user);
 
@@ -2096,7 +2227,7 @@ public final class Payment {
         _FinalStage variantId(Nullable<String> variantId);
 
         /**
-         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none.</p>
+         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none or you read the payment as its buyer.</p>
          */
         _FinalStage verificationChecks(Optional<PaymentVerificationChecks> verificationChecks);
 
@@ -2116,7 +2247,7 @@ public final class Payment {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AmountAfterFeesStage,
+            implements AmountChargedStage,
                     AutoRefundedStage,
                     CreatedAtStage,
                     CurrencyStage,
@@ -2131,7 +2262,7 @@ public final class Payment {
                     UpdatedAtStage,
                     VoidableStage,
                     _FinalStage {
-        private Money amountAfterFees;
+        private Money amountCharged;
 
         private boolean autoRefunded;
 
@@ -2177,7 +2308,11 @@ public final class Payment {
 
         private Optional<Money> taxAmount = Optional.empty();
 
+        private Optional<Money> surcharge = Optional.empty();
+
         private Optional<Money> subtotal = Optional.empty();
+
+        private Optional<String> statementDescriptor = Optional.empty();
 
         private Optional<PaymentAddress> shippingAddress = Optional.empty();
 
@@ -2190,6 +2325,8 @@ public final class Payment {
         private Optional<Double> riskScore = Optional.empty();
 
         private Optional<String> responseDueAt = Optional.empty();
+
+        private Optional<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason = Optional.empty();
 
         private Optional<String> refundedAt = Optional.empty();
 
@@ -2269,6 +2406,8 @@ public final class Payment {
 
         private Optional<String> autoCaptureAt = Optional.empty();
 
+        private Optional<Money> amountAfterFees = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -2279,6 +2418,7 @@ public final class Payment {
         public Builder from(Payment other) {
             accountId(other.getAccountId());
             amountAfterFees(other.getAmountAfterFees());
+            amountCharged(other.getAmountCharged());
             autoCaptureAt(other.getAutoCaptureAt());
             autoRefunded(other.getAutoRefunded());
             billingAddress(other.getBillingAddress());
@@ -2324,6 +2464,7 @@ public final class Payment {
             refundable(other.getRefundable());
             refundedAmount(other.getRefundedAmount());
             refundedAt(other.getRefundedAt());
+            resolutionCenterIneligibleReason(other.getResolutionCenterIneligibleReason());
             responseDueAt(other.getResponseDueAt());
             retryable(other.getRetryable());
             riskScore(other.getRiskScore());
@@ -2331,9 +2472,11 @@ public final class Payment {
             settlementTimeAt(other.getSettlementTimeAt());
             shipmentId(other.getShipmentId());
             shippingAddress(other.getShippingAddress());
+            statementDescriptor(other.getStatementDescriptor());
             status(other.getStatus());
             substatus(other.getSubstatus());
             subtotal(other.getSubtotal());
+            surcharge(other.getSurcharge());
             taxAmount(other.getTaxAmount());
             taxBehavior(other.getTaxBehavior());
             taxRefundedAmount(other.getTaxRefundedAmount());
@@ -2351,13 +2494,13 @@ public final class Payment {
         }
 
         /**
-         * <p>What the account keeps: the total less Whop's fees.</p>
+         * <p>What the buyer is charged for this payment: the total plus any buyer fees, in the currency the buyer pays in. Refunds do not reduce it; <code>presentment_refunded_amount</code> states them in the same currency.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("amount_after_fees")
-        public AutoRefundedStage amountAfterFees(@NotNull Money amountAfterFees) {
-            this.amountAfterFees = Objects.requireNonNull(amountAfterFees, "amountAfterFees must not be null");
+        @JsonSetter("amount_charged")
+        public AutoRefundedStage amountCharged(@NotNull Money amountCharged) {
+            this.amountCharged = Objects.requireNonNull(amountCharged, "amountCharged must not be null");
             return this;
         }
 
@@ -2428,7 +2571,7 @@ public final class Payment {
         }
 
         /**
-         * <p>True when the payment is <code>open</code> and can be retried by hand with <code>POST /payments/{id}/retry</code>: its membership is <code>active</code>, <code>trialing</code>, or <code>past_due</code> (or it is a failed first payment on a <code>drafted</code> membership), it is not paid through an invoice payment link, and its one manual retry is not used up. A retry can still be refused when the company cannot currently accept payments.</p>
+         * <p>True when the payment can be retried by hand with <code>POST /payments/{id}/retry</code>. The payment must be <code>open</code> and not paid through an invoice payment link. Its membership must be <code>active</code>, <code>trialing</code>, or <code>past_due</code>, or the payment must be a failed first payment on a <code>drafted</code> membership. Its one manual retry must not be used up. A retry can still be refused when the account cannot currently accept payments.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2541,7 +2684,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none.</p>
+         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none or you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2557,7 +2700,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none.</p>
+         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none or you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2567,7 +2710,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none.</p>
+         * <p>The Address Verification Service (AVS), cardholder name, and Card Verification Value (CVV/CVC) results, or null when the processor returned none or you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "verification_checks", nulls = Nulls.SKIP)
@@ -2649,7 +2792,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer. Null when the payment belongs to a company buyer rather than a user.</p>
+         * <p>The buyer. Null when the buyer is an account rather than a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2665,7 +2808,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer. Null when the payment belongs to a company buyer rather than a user.</p>
+         * <p>The buyer. Null when the buyer is an account rather than a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2675,7 +2818,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer. Null when the payment belongs to a company buyer rather than a user.</p>
+         * <p>The buyer. Null when the buyer is an account rather than a user.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "user", nulls = Nulls.SKIP)
@@ -2685,7 +2828,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep.</p>
+         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep. Null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2701,7 +2844,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep.</p>
+         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep. Null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2711,7 +2854,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep.</p>
+         * <p>The total converted to USD at the time of the charge, for reporting across currencies. Excludes the adaptive pricing FX markup, which the account does not keep. Null when you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "usd_total", nulls = Nulls.SKIP)
@@ -2721,7 +2864,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows.</p>
+         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows; <code>amount_charged</code> is what the buyer is charged.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2737,7 +2880,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows.</p>
+         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows; <code>amount_charged</code> is what the buyer is charged.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2747,7 +2890,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows.</p>
+         * <p>The account-facing total: the price after discounts, plus any tax added on top. Excludes buyer fees, which the buyer pays above this amount — so this is not necessarily what the buyer's statement shows; <code>amount_charged</code> is what the buyer is charged.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "total", nulls = Nulls.SKIP)
@@ -2829,6 +2972,42 @@ public final class Payment {
         }
 
         /**
+         * <p>The card surcharge the buyer pays for paying by credit card. It is included in <code>total</code> and <code>amount_charged</code>, and appears in <code>line_items</code> as a line of its own. Null when the payment has no surcharge.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage surcharge(Nullable<Money> surcharge) {
+            if (surcharge.isNull()) {
+                this.surcharge = null;
+            } else if (surcharge.isEmpty()) {
+                this.surcharge = Optional.empty();
+            } else {
+                this.surcharge = Optional.of(surcharge.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The card surcharge the buyer pays for paying by credit card. It is included in <code>total</code> and <code>amount_charged</code>, and appears in <code>line_items</code> as a line of its own. Null when the payment has no surcharge.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage surcharge(Money surcharge) {
+            this.surcharge = Optional.ofNullable(surcharge);
+            return this;
+        }
+
+        /**
+         * <p>The card surcharge the buyer pays for paying by credit card. It is included in <code>total</code> and <code>amount_charged</code>, and appears in <code>line_items</code> as a line of its own. Null when the payment has no surcharge.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "surcharge", nulls = Nulls.SKIP)
+        public _FinalStage surcharge(Optional<Money> surcharge) {
+            this.surcharge = surcharge;
+            return this;
+        }
+
+        /**
          * <p>The price before discounts, tax and fees.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -2861,6 +3040,42 @@ public final class Payment {
         @JsonSetter(value = "subtotal", nulls = Nulls.SKIP)
         public _FinalStage subtotal(Optional<Money> subtotal) {
             this.subtotal = subtotal;
+            return this;
+        }
+
+        /**
+         * <p>The text the buyer's bank or card statement shows for this payment. Null when the processor did not report one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(Nullable<String> statementDescriptor) {
+            if (statementDescriptor.isNull()) {
+                this.statementDescriptor = null;
+            } else if (statementDescriptor.isEmpty()) {
+                this.statementDescriptor = Optional.empty();
+            } else {
+                this.statementDescriptor = Optional.of(statementDescriptor.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The text the buyer's bank or card statement shows for this payment. Null when the processor did not report one.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage statementDescriptor(String statementDescriptor) {
+            this.statementDescriptor = Optional.ofNullable(statementDescriptor);
+            return this;
+        }
+
+        /**
+         * <p>The text the buyer's bank or card statement shows for this payment. Null when the processor did not report one.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
+        public _FinalStage statementDescriptor(Optional<String> statementDescriptor) {
+            this.statementDescriptor = statementDescriptor;
             return this;
         }
 
@@ -2937,7 +3152,7 @@ public final class Payment {
         }
 
         /**
-         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid, and always null in list responses — retrieve the payment for it.</p>
+         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid or when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2953,7 +3168,7 @@ public final class Payment {
         }
 
         /**
-         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid, and always null in list responses — retrieve the payment for it.</p>
+         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid or when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2963,7 +3178,7 @@ public final class Payment {
         }
 
         /**
-         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid, and always null in list responses — retrieve the payment for it.</p>
+         * <p>When the portion not listed in <code>holds</code> posts to the account's available balance, at midnight UTC. The <code>financial_activity.funds_available</code> webhook's <code>posted_at</code> carries the same value when the settlement that clears it posts. Null until the payment is paid or when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "settlement_time_at", nulls = Nulls.SKIP)
@@ -3012,7 +3227,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available.</p>
+         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available or you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3028,7 +3243,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available.</p>
+         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available or you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3038,7 +3253,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available.</p>
+         * <p>Whop's published risk index from 0 (lowest) to 100 (highest), including enforced decision floors. This is not a fraud probability. Null when no score is available or you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "risk_score", nulls = Nulls.SKIP)
@@ -3080,6 +3295,45 @@ public final class Payment {
         @JsonSetter(value = "response_due_at", nulls = Nulls.SKIP)
         public _FinalStage responseDueAt(Optional<String> responseDueAt) {
             this.responseDueAt = responseDueAt;
+            return this;
+        }
+
+        /**
+         * <p>Why the buyer cannot open a Resolution Center case on this payment with <code>POST /resolution_center_cases</code>, or null when they can. <code>already_opened</code>: a case is already open or was decided (a withdrawn case does not count). <code>unsupported_payment_processor</code>: the payment method does not support cases. <code>out_of_date</code>: the window to open a case has passed. <code>not_paid</code>: the payment is not <code>paid</code>. <code>free</code>: nothing was charged. <code>already_refunded</code>: some of it has been refunded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage resolutionCenterIneligibleReason(
+                Nullable<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason) {
+            if (resolutionCenterIneligibleReason.isNull()) {
+                this.resolutionCenterIneligibleReason = null;
+            } else if (resolutionCenterIneligibleReason.isEmpty()) {
+                this.resolutionCenterIneligibleReason = Optional.empty();
+            } else {
+                this.resolutionCenterIneligibleReason = Optional.of(resolutionCenterIneligibleReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why the buyer cannot open a Resolution Center case on this payment with <code>POST /resolution_center_cases</code>, or null when they can. <code>already_opened</code>: a case is already open or was decided (a withdrawn case does not count). <code>unsupported_payment_processor</code>: the payment method does not support cases. <code>out_of_date</code>: the window to open a case has passed. <code>not_paid</code>: the payment is not <code>paid</code>. <code>free</code>: nothing was charged. <code>already_refunded</code>: some of it has been refunded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage resolutionCenterIneligibleReason(
+                PaymentResolutionCenterIneligibleReason resolutionCenterIneligibleReason) {
+            this.resolutionCenterIneligibleReason = Optional.ofNullable(resolutionCenterIneligibleReason);
+            return this;
+        }
+
+        /**
+         * <p>Why the buyer cannot open a Resolution Center case on this payment with <code>POST /resolution_center_cases</code>, or null when they can. <code>already_opened</code>: a case is already open or was decided (a withdrawn case does not count). <code>unsupported_payment_processor</code>: the payment method does not support cases. <code>out_of_date</code>: the window to open a case has passed. <code>not_paid</code>: the payment is not <code>paid</code>. <code>free</code>: nothing was charged. <code>already_refunded</code>: some of it has been refunded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "resolution_center_ineligible_reason", nulls = Nulls.SKIP)
+        public _FinalStage resolutionCenterIneligibleReason(
+                Optional<PaymentResolutionCenterIneligibleReason> resolutionCenterIneligibleReason) {
+            this.resolutionCenterIneligibleReason = resolutionCenterIneligibleReason;
             return this;
         }
 
@@ -3504,7 +3758,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card.</p>
+         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card. The network transaction id is null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3520,7 +3774,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card.</p>
+         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card. The network transaction id is null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3530,7 +3784,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card.</p>
+         * <p>The instrument shaped for display: a buyer-facing name, the standard icon set, and when it was a card, the card's brand, last four, issuer identification number, and the network transaction id the account uses for the card. The network transaction id is null when you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_instrument", nulls = Nulls.SKIP)
@@ -3684,7 +3938,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Your own key-value data attached when the payment was created.</p>
+         * <p>Your own key-value data attached when the payment was created. Null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3700,7 +3954,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Your own key-value data attached when the payment was created.</p>
+         * <p>Your own key-value data attached when the payment was created. Null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3710,7 +3964,7 @@ public final class Payment {
         }
 
         /**
-         * <p>Your own key-value data attached when the payment was created.</p>
+         * <p>Your own key-value data attached when the payment was created. Null when you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -3720,7 +3974,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases or without the member:basic:read permission.</p>
+         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases, or without the member:basic:read permission unless you are the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3736,7 +3990,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases or without the member:basic:read permission.</p>
+         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases, or without the member:basic:read permission unless you are the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3746,7 +4000,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases or without the member:basic:read permission.</p>
+         * <p>The membership this payment is billed against, prefixed <code>mem_</code>. Null for one-off purchases, or without the member:basic:read permission unless you are the buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "membership_id", nulls = Nulls.SKIP)
@@ -3756,7 +4010,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless you are the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3772,7 +4026,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless you are the buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3782,7 +4036,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission.</p>
+         * <p>The buyer's member record on the account, prefixed <code>mber_</code>. Null without the member:basic:read permission, unless you are the buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "member_id", nulls = Nulls.SKIP)
@@ -3852,7 +4106,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's IP address at checkout: the one Whop's fraud screening identified, otherwise the one Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, such as a subscription renewal or a charge made without the buyer present.</p>
+         * <p>IP address that Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, for example a subscription renewal or a charge made without the buyer. Also null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3868,7 +4122,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's IP address at checkout: the one Whop's fraud screening identified, otherwise the one Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, such as a subscription renewal or a charge made without the buyer present.</p>
+         * <p>IP address that Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, for example a subscription renewal or a charge made without the buyer. Also null when you read the payment as its buyer.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3878,7 +4132,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The buyer's IP address at checkout: the one Whop's fraud screening identified, otherwise the one Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, such as a subscription renewal or a charge made without the buyer present.</p>
+         * <p>IP address that Whop captured from the buyer's browser at checkout. Null when the buyer was not present at checkout, for example a subscription renewal or a charge made without the buyer. Also null when you read the payment as its buyer.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "ip_address", nulls = Nulls.SKIP)
@@ -4164,7 +4418,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, and always null in list responses — retrieve the payment for it.</p>
+         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, null when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -4180,7 +4434,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, and always null in list responses — retrieve the payment for it.</p>
+         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, null when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -4190,7 +4444,7 @@ public final class Payment {
         }
 
         /**
-         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, and always null in list responses — retrieve the payment for it.</p>
+         * <p>The credential a buyer's surface presents to poll this payment, set its return URL and resume it when the bank asked the customer to authenticate. Only on payments created from a confirmation token or waiting on that authentication, null when you read the payment as its buyer, and always null in list responses — retrieve the payment for it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "client_secret", nulls = Nulls.SKIP)
@@ -4452,6 +4706,42 @@ public final class Payment {
         }
 
         /**
+         * <p>What the account keeps: the total less Whop's fees. Null when you read the payment as its buyer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amountAfterFees(Nullable<Money> amountAfterFees) {
+            if (amountAfterFees.isNull()) {
+                this.amountAfterFees = null;
+            } else if (amountAfterFees.isEmpty()) {
+                this.amountAfterFees = Optional.empty();
+            } else {
+                this.amountAfterFees = Optional.of(amountAfterFees.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>What the account keeps: the total less Whop's fees. Null when you read the payment as its buyer.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage amountAfterFees(Money amountAfterFees) {
+            this.amountAfterFees = Optional.ofNullable(amountAfterFees);
+            return this;
+        }
+
+        /**
+         * <p>What the account keeps: the total less Whop's fees. Null when you read the payment as its buyer.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "amount_after_fees", nulls = Nulls.SKIP)
+        public _FinalStage amountAfterFees(Optional<Money> amountAfterFees) {
+            this.amountAfterFees = amountAfterFees;
+            return this;
+        }
+
+        /**
          * <p>The account that received the payment, prefixed <code>biz_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -4492,6 +4782,7 @@ public final class Payment {
             return new Payment(
                     accountId,
                     amountAfterFees,
+                    amountCharged,
                     autoCaptureAt,
                     autoRefunded,
                     billingAddress,
@@ -4537,6 +4828,7 @@ public final class Payment {
                     refundable,
                     refundedAmount,
                     refundedAt,
+                    resolutionCenterIneligibleReason,
                     responseDueAt,
                     retryable,
                     riskScore,
@@ -4544,9 +4836,11 @@ public final class Payment {
                     settlementTimeAt,
                     shipmentId,
                     shippingAddress,
+                    statementDescriptor,
                     status,
                     substatus,
                     subtotal,
+                    surcharge,
                     taxAmount,
                     taxBehavior,
                     taxRefundedAmount,
@@ -4567,6 +4861,7 @@ public final class Payment {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("amount_after_fees")
+                    || key.equalsIgnoreCase("amount_charged")
                     || key.equalsIgnoreCase("auto_capture_at")
                     || key.equalsIgnoreCase("auto_refunded")
                     || key.equalsIgnoreCase("billing_address")
@@ -4612,6 +4907,7 @@ public final class Payment {
                     || key.equalsIgnoreCase("refundable")
                     || key.equalsIgnoreCase("refunded_amount")
                     || key.equalsIgnoreCase("refunded_at")
+                    || key.equalsIgnoreCase("resolution_center_ineligible_reason")
                     || key.equalsIgnoreCase("response_due_at")
                     || key.equalsIgnoreCase("retryable")
                     || key.equalsIgnoreCase("risk_score")
@@ -4619,9 +4915,11 @@ public final class Payment {
                     || key.equalsIgnoreCase("settlement_time_at")
                     || key.equalsIgnoreCase("shipment_id")
                     || key.equalsIgnoreCase("shipping_address")
+                    || key.equalsIgnoreCase("statement_descriptor")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("substatus")
                     || key.equalsIgnoreCase("subtotal")
+                    || key.equalsIgnoreCase("surcharge")
                     || key.equalsIgnoreCase("tax_amount")
                     || key.equalsIgnoreCase("tax_behavior")
                     || key.equalsIgnoreCase("tax_refunded_amount")

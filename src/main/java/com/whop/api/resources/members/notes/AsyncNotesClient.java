@@ -8,7 +8,9 @@ import com.whop.api.core.RequestOptions;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.members.notes.requests.CreateNotesRequest;
+import com.whop.api.resources.members.notes.requests.DeleteNotesRequest;
 import com.whop.api.resources.members.notes.requests.ListNotesRequest;
+import com.whop.api.resources.members.notes.types.DeleteNotesResponse;
 import com.whop.api.types.MemberNote;
 import java.util.concurrent.CompletableFuture;
 
@@ -112,6 +114,66 @@ public class AsyncNotesClient {
         CompletableFuture<WhopApiHttpResponse<MemberNote>> rawFuture =
                 this.rawClient.create(memberId, request, requestOptions);
         CompletableFuture<MemberNote> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<DeleteNotesResponse> delete(String memberId, String id) {
+        CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> rawFuture = this.rawClient.delete(memberId, id);
+        CompletableFuture<DeleteNotesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<DeleteNotesResponse> delete(String memberId, String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> rawFuture =
+                this.rawClient.delete(memberId, id, requestOptions);
+        CompletableFuture<DeleteNotesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<DeleteNotesResponse> delete(String memberId, String id, DeleteNotesRequest request) {
+        CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> rawFuture =
+                this.rawClient.delete(memberId, id, request);
+        CompletableFuture<DeleteNotesResponse> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public CompletableFuture<DeleteNotesResponse> delete(
+            String memberId, String id, DeleteNotesRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<DeleteNotesResponse>> rawFuture =
+                this.rawClient.delete(memberId, id, request, requestOptions);
+        CompletableFuture<DeleteNotesResponse> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {
                 rawFuture.cancel(true);

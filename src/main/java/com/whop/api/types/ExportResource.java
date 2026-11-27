@@ -30,8 +30,6 @@ public final class ExportResource {
     public static final ExportResource EXTERNAL_ACCOUNTS =
             new ExportResource(Value.EXTERNAL_ACCOUNTS, "external_accounts");
 
-    public static final ExportResource LEADS = new ExportResource(Value.LEADS, "leads");
-
     public static final ExportResource TRACKING_LINKS = new ExportResource(Value.TRACKING_LINKS, "tracking_links");
 
     public static final ExportResource LEDGER_LINES = new ExportResource(Value.LEDGER_LINES, "ledger_lines");
@@ -147,8 +145,6 @@ public final class ExportResource {
                 return visitor.visitFinancialActivity();
             case EXTERNAL_ACCOUNTS:
                 return visitor.visitExternalAccounts();
-            case LEADS:
-                return visitor.visitLeads();
             case TRACKING_LINKS:
                 return visitor.visitTrackingLinks();
             case LEDGER_LINES:
@@ -234,8 +230,6 @@ public final class ExportResource {
                 return FINANCIAL_ACTIVITY;
             case "external_accounts":
                 return EXTERNAL_ACCOUNTS;
-            case "leads":
-                return LEADS;
             case "tracking_links":
                 return TRACKING_LINKS;
             case "ledger_lines":
@@ -364,8 +358,6 @@ public final class ExportResource {
 
         ENTRIES,
 
-        LEADS,
-
         INVOICES,
 
         CANCELATION_REASONS,
@@ -445,8 +437,6 @@ public final class ExportResource {
         T visitResolutions();
 
         T visitEntries();
-
-        T visitLeads();
 
         T visitInvoices();
 

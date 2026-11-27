@@ -6,6 +6,7 @@ package com.whop.api.resources.ads;
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.ads.requests.AppealAdsRequest;
 import com.whop.api.resources.ads.requests.CreateAdsRequest;
 import com.whop.api.resources.ads.requests.DeleteAdsRequest;
 import com.whop.api.resources.ads.requests.DuplicateAdsRequest;
@@ -205,6 +206,20 @@ public class AdsClient {
      */
     public Ad update(String id, UpdateAdsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();
+    }
+
+    /**
+     * Asks Whop to review the ad again. A <code>website</code> appeal reviews the ad against its website as it is now. It only applies to an ad held back for something found on its website. An ad can be appealed once an hour.
+     */
+    public Ad appeal(String id, AppealAdsRequest request) {
+        return this.rawClient.appeal(id, request).body();
+    }
+
+    /**
+     * Asks Whop to review the ad again. A <code>website</code> appeal reviews the ad against its website as it is now. It only applies to an ad held back for something found on its website. An ad can be appealed once an hour.
+     */
+    public Ad appeal(String id, AppealAdsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.appeal(id, request, requestOptions).body();
     }
 
     /**

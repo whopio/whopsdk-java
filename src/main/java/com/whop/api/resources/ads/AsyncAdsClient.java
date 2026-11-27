@@ -7,6 +7,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.ads.requests.AppealAdsRequest;
 import com.whop.api.resources.ads.requests.CreateAdsRequest;
 import com.whop.api.resources.ads.requests.DeleteAdsRequest;
 import com.whop.api.resources.ads.requests.DuplicateAdsRequest;
@@ -374,6 +375,34 @@ public class AsyncAdsClient {
      */
     public CompletableFuture<Ad> update(String id, UpdateAdsRequest request, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.update(id, request, requestOptions);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Asks Whop to review the ad again. A <code>website</code> appeal reviews the ad against its website as it is now. It only applies to an ad held back for something found on its website. An ad can be appealed once an hour.
+     */
+    public CompletableFuture<Ad> appeal(String id, AppealAdsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.appeal(id, request);
+        CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Asks Whop to review the ad again. A <code>website</code> appeal reviews the ad against its website as it is now. It only applies to an ad held back for something found on its website. An ad can be appealed once an hour.
+     */
+    public CompletableFuture<Ad> appeal(String id, AppealAdsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Ad>> rawFuture = this.rawClient.appeal(id, request, requestOptions);
         CompletableFuture<Ad> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {

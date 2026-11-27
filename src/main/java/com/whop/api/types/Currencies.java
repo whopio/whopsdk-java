@@ -103,6 +103,8 @@ public final class Currencies {
 
     public static final Currencies MUR = new Currencies(Value.MUR, "mur");
 
+    public static final Currencies HNL = new Currencies(Value.HNL, "hnl");
+
     public static final Currencies PEN = new Currencies(Value.PEN, "pen");
 
     public static final Currencies USD = new Currencies(Value.USD, "usd");
@@ -314,6 +316,8 @@ public final class Currencies {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -503,6 +507,8 @@ public final class Currencies {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -773,6 +779,8 @@ public final class Currencies {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -956,6 +964,8 @@ public final class Currencies {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

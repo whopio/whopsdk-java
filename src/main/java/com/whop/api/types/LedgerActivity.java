@@ -269,7 +269,7 @@ public final class LedgerActivity {
     }
 
     /**
-     * @return Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.
+     * @return Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID. Treasury pay-ins use object <code>crypto_offramp</code> and an ID prefixed <code>cofr_</code>. With <code>include_resource=false</code>, a treasury pay-in's source and a deposit's <code>bank_deposit_id</code> can be null.
      */
     @JsonIgnore
     public Optional<LedgerActivitySource> getSource() {
@@ -614,7 +614,7 @@ public final class LedgerActivity {
         _FinalStage resource(Nullable<LedgerActivityResource> resource);
 
         /**
-         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID. Treasury pay-ins use object <code>crypto_offramp</code> and an ID prefixed <code>cofr_</code>. With <code>include_resource=false</code>, a treasury pay-in's source and a deposit's <code>bank_deposit_id</code> can be null.</p>
          */
         _FinalStage source(Optional<LedgerActivitySource> source);
 
@@ -941,7 +941,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID. Treasury pay-ins use object <code>crypto_offramp</code> and an ID prefixed <code>cofr_</code>. With <code>include_resource=false</code>, a treasury pay-in's source and a deposit's <code>bank_deposit_id</code> can be null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -957,7 +957,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID. Treasury pay-ins use object <code>crypto_offramp</code> and an ID prefixed <code>cofr_</code>. With <code>include_resource=false</code>, a treasury pay-in's source and a deposit's <code>bank_deposit_id</code> can be null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -967,7 +967,7 @@ public final class LedgerActivity {
         }
 
         /**
-         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID.</p>
+         * <p>Source of this ledger activity. Platform markup fees use object platform_fee and the ledger activity ID. Treasury pay-ins use object <code>crypto_offramp</code> and an ID prefixed <code>cofr_</code>. With <code>include_resource=false</code>, a treasury pay-in's source and a deposit's <code>bank_deposit_id</code> can be null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "source", nulls = Nulls.SKIP)

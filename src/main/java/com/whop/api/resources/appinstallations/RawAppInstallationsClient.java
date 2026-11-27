@@ -97,6 +97,13 @@ public class RawAppInstallationsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        if (request.getRequestingReauthorization().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "requesting_reauthorization",
+                    request.getRequestingReauthorization().get(),
+                    false);
+        }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);
@@ -112,6 +119,13 @@ public class RawAppInstallationsClient {
         if (request.getBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "before", request.getBefore().get(), false);
+        }
+        if (request.getIncludeTotalCount().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_total_count",
+                    request.getIncludeTotalCount().get(),
+                    false);
         }
         if (request.getOrder().isPresent()) {
             QueryStringMapper.addQueryParameter(

@@ -44,7 +44,7 @@ public final class ProductLegacyProductTaxCode {
     }
 
     /**
-     * @return Human-readable name of this tax classification, such as 'Digital - SaaS'.
+     * @return Human-readable name of this tax classification, such as 'Services'.
      */
     @JsonProperty("name")
     public String getName() {
@@ -99,7 +99,7 @@ public final class ProductLegacyProductTaxCode {
 
     public interface NameStage {
         /**
-         * <p>Human-readable name of this tax classification, such as 'Digital - SaaS'.</p>
+         * <p>Human-readable name of this tax classification, such as 'Services'.</p>
          */
         ProductTypeStage name(@NotNull String name);
     }
@@ -151,7 +151,7 @@ public final class ProductLegacyProductTaxCode {
         }
 
         /**
-         * <p>Human-readable name of this tax classification, such as 'Digital - SaaS'.</p>
+         * <p>Human-readable name of this tax classification, such as 'Services'.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

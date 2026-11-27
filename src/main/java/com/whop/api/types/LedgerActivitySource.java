@@ -25,7 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = LedgerActivitySource.Builder.class)
 public final class LedgerActivitySource {
+    private final Optional<String> accountId;
+
     private final Optional<Double> amountFloat;
+
+    private final Optional<String> bankDepositId;
 
     private final Optional<String> cardBrand;
 
@@ -77,6 +81,8 @@ public final class LedgerActivitySource {
 
     private final Optional<String> status;
 
+    private final Optional<String> title;
+
     private final Optional<String> toAmount;
 
     private final Optional<String> toCurrency;
@@ -88,7 +94,9 @@ public final class LedgerActivitySource {
     private final Map<String, Object> additionalProperties;
 
     private LedgerActivitySource(
+            Optional<String> accountId,
             Optional<Double> amountFloat,
+            Optional<String> bankDepositId,
             Optional<String> cardBrand,
             Optional<String> chain,
             Optional<String> claimUrl,
@@ -114,12 +122,15 @@ public final class LedgerActivitySource {
             Optional<Boolean> riskReviewHold,
             Optional<String> senderAddress,
             Optional<String> status,
+            Optional<String> title,
             Optional<String> toAmount,
             Optional<String> toCurrency,
             Optional<String> traceCode,
             Optional<String> txHash,
             Map<String, Object> additionalProperties) {
+        this.accountId = accountId;
         this.amountFloat = amountFloat;
+        this.bankDepositId = bankDepositId;
         this.cardBrand = cardBrand;
         this.chain = chain;
         this.claimUrl = claimUrl;
@@ -145,6 +156,7 @@ public final class LedgerActivitySource {
         this.riskReviewHold = riskReviewHold;
         this.senderAddress = senderAddress;
         this.status = status;
+        this.title = title;
         this.toAmount = toAmount;
         this.toCurrency = toCurrency;
         this.traceCode = traceCode;
@@ -153,7 +165,18 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).
+     * @return ID of the account that runs the ad campaign (ad_campaign sources only).
+     */
+    @JsonIgnore
+    public Optional<String> getAccountId() {
+        if (accountId == null) {
+            return Optional.empty();
+        }
+        return accountId;
+    }
+
+    /**
+     * @return Payout amount as a decimal number in the destination currency. Present only on <code>withdrawal</code> sources. Requires <code>payout:withdrawal:read</code>.
      */
     @JsonIgnore
     public Optional<Double> getAmountFloat() {
@@ -161,6 +184,14 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return amountFloat;
+    }
+
+    /**
+     * @return ID of the bank deposit that this on-chain deposit delivered, prefixed <code>vbt_</code>. Present only on onchain_transaction sources for bank deposits.
+     */
+    @JsonProperty("bank_deposit_id")
+    public Optional<String> getBankDepositId() {
+        return bankDepositId;
     }
 
     /**
@@ -186,7 +217,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.
+     * @return The airdrop's claim URL. Null unless the caller can manage claim links on the funding account or withdraw from the funding personal balance.
      */
     @JsonIgnore
     public Optional<String> getClaimUrl() {
@@ -427,6 +458,17 @@ public final class LedgerActivitySource {
     }
 
     /**
+     * @return Name of the ad campaign the spend, payout, or funding belongs to (ad_campaign sources only).
+     */
+    @JsonIgnore
+    public Optional<String> getTitle() {
+        if (title == null) {
+            return Optional.empty();
+        }
+        return title;
+    }
+
+    /**
      * @return Amount received in to_currency as a decimal string (swap sources only).
      */
     @JsonIgnore
@@ -460,7 +502,7 @@ public final class LedgerActivitySource {
     }
 
     /**
-     * @return On-chain transaction hash (onchain_transaction and swap sources only).
+     * @return On-chain transaction hash (onchain_transaction, swap, and crypto_offramp sources only). On crypto_offramp sources, this is the wallet send that funded the pay-in.
      */
     @JsonIgnore
     public Optional<String> getTxHash() {
@@ -468,6 +510,12 @@ public final class LedgerActivitySource {
             return Optional.empty();
         }
         return txHash;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("account_id")
+    private Optional<String> _getAccountId() {
+        return accountId;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -615,6 +663,12 @@ public final class LedgerActivitySource {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("title")
+    private Optional<String> _getTitle() {
+        return title;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("to_amount")
     private Optional<String> _getToAmount() {
         return toAmount;
@@ -650,7 +704,9 @@ public final class LedgerActivitySource {
     }
 
     private boolean equalTo(LedgerActivitySource other) {
-        return amountFloat.equals(other.amountFloat)
+        return accountId.equals(other.accountId)
+                && amountFloat.equals(other.amountFloat)
+                && bankDepositId.equals(other.bankDepositId)
                 && cardBrand.equals(other.cardBrand)
                 && chain.equals(other.chain)
                 && claimUrl.equals(other.claimUrl)
@@ -676,6 +732,7 @@ public final class LedgerActivitySource {
                 && riskReviewHold.equals(other.riskReviewHold)
                 && senderAddress.equals(other.senderAddress)
                 && status.equals(other.status)
+                && title.equals(other.title)
                 && toAmount.equals(other.toAmount)
                 && toCurrency.equals(other.toCurrency)
                 && traceCode.equals(other.traceCode)
@@ -685,7 +742,9 @@ public final class LedgerActivitySource {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.accountId,
                 this.amountFloat,
+                this.bankDepositId,
                 this.cardBrand,
                 this.chain,
                 this.claimUrl,
@@ -711,6 +770,7 @@ public final class LedgerActivitySource {
                 this.riskReviewHold,
                 this.senderAddress,
                 this.status,
+                this.title,
                 this.toAmount,
                 this.toCurrency,
                 this.traceCode,
@@ -744,13 +804,29 @@ public final class LedgerActivitySource {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
+         * <p>ID of the account that runs the ad campaign (ad_campaign sources only).</p>
+         */
+        _FinalStage accountId(Optional<String> accountId);
+
+        _FinalStage accountId(String accountId);
+
+        _FinalStage accountId(Nullable<String> accountId);
+
+        /**
+         * <p>Payout amount as a decimal number in the destination currency. Present only on <code>withdrawal</code> sources. Requires <code>payout:withdrawal:read</code>.</p>
          */
         _FinalStage amountFloat(Optional<Double> amountFloat);
 
         _FinalStage amountFloat(Double amountFloat);
 
         _FinalStage amountFloat(Nullable<Double> amountFloat);
+
+        /**
+         * <p>ID of the bank deposit that this on-chain deposit delivered, prefixed <code>vbt_</code>. Present only on onchain_transaction sources for bank deposits.</p>
+         */
+        _FinalStage bankDepositId(Optional<String> bankDepositId);
+
+        _FinalStage bankDepositId(String bankDepositId);
 
         /**
          * <p>Card brand used by the payment source.</p>
@@ -771,7 +847,7 @@ public final class LedgerActivitySource {
         _FinalStage chain(Nullable<String> chain);
 
         /**
-         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding account or withdraw from the funding personal balance.</p>
          */
         _FinalStage claimUrl(Optional<String> claimUrl);
 
@@ -960,6 +1036,15 @@ public final class LedgerActivitySource {
         _FinalStage status(Nullable<String> status);
 
         /**
+         * <p>Name of the ad campaign the spend, payout, or funding belongs to (ad_campaign sources only).</p>
+         */
+        _FinalStage title(Optional<String> title);
+
+        _FinalStage title(String title);
+
+        _FinalStage title(Nullable<String> title);
+
+        /**
          * <p>Amount received in to_currency as a decimal string (swap sources only).</p>
          */
         _FinalStage toAmount(Optional<String> toAmount);
@@ -987,7 +1072,7 @@ public final class LedgerActivitySource {
         _FinalStage traceCode(Nullable<String> traceCode);
 
         /**
-         * <p>On-chain transaction hash (onchain_transaction and swap sources only).</p>
+         * <p>On-chain transaction hash (onchain_transaction, swap, and crypto_offramp sources only). On crypto_offramp sources, this is the wallet send that funded the pay-in.</p>
          */
         _FinalStage txHash(Optional<String> txHash);
 
@@ -1009,6 +1094,8 @@ public final class LedgerActivitySource {
         private Optional<String> toCurrency = Optional.empty();
 
         private Optional<String> toAmount = Optional.empty();
+
+        private Optional<String> title = Optional.empty();
 
         private Optional<String> status = Optional.empty();
 
@@ -1056,7 +1143,11 @@ public final class LedgerActivitySource {
 
         private Optional<String> cardBrand = Optional.empty();
 
+        private Optional<String> bankDepositId = Optional.empty();
+
         private Optional<Double> amountFloat = Optional.empty();
+
+        private Optional<String> accountId = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -1064,7 +1155,9 @@ public final class LedgerActivitySource {
 
         @java.lang.Override
         public Builder from(LedgerActivitySource other) {
+            accountId(other.getAccountId());
             amountFloat(other.getAmountFloat());
+            bankDepositId(other.getBankDepositId());
             cardBrand(other.getCardBrand());
             chain(other.getChain());
             claimUrl(other.getClaimUrl());
@@ -1090,6 +1183,7 @@ public final class LedgerActivitySource {
             riskReviewHold(other.getRiskReviewHold());
             senderAddress(other.getSenderAddress());
             status(other.getStatus());
+            title(other.getTitle());
             toAmount(other.getToAmount());
             toCurrency(other.getToCurrency());
             traceCode(other.getTraceCode());
@@ -1112,7 +1206,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>On-chain transaction hash (onchain_transaction and swap sources only).</p>
+         * <p>On-chain transaction hash (onchain_transaction, swap, and crypto_offramp sources only). On crypto_offramp sources, this is the wallet send that funded the pay-in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1128,7 +1222,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>On-chain transaction hash (onchain_transaction and swap sources only).</p>
+         * <p>On-chain transaction hash (onchain_transaction, swap, and crypto_offramp sources only). On crypto_offramp sources, this is the wallet send that funded the pay-in.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1138,7 +1232,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>On-chain transaction hash (onchain_transaction and swap sources only).</p>
+         * <p>On-chain transaction hash (onchain_transaction, swap, and crypto_offramp sources only). On crypto_offramp sources, this is the wallet send that funded the pay-in.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "tx_hash", nulls = Nulls.SKIP)
@@ -1252,6 +1346,42 @@ public final class LedgerActivitySource {
         @JsonSetter(value = "to_amount", nulls = Nulls.SKIP)
         public _FinalStage toAmount(Optional<String> toAmount) {
             this.toAmount = toAmount;
+            return this;
+        }
+
+        /**
+         * <p>Name of the ad campaign the spend, payout, or funding belongs to (ad_campaign sources only).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(Nullable<String> title) {
+            if (title.isNull()) {
+                this.title = null;
+            } else if (title.isEmpty()) {
+                this.title = Optional.empty();
+            } else {
+                this.title = Optional.of(title.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Name of the ad campaign the spend, payout, or funding belongs to (ad_campaign sources only).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage title(String title) {
+            this.title = Optional.ofNullable(title);
+            return this;
+        }
+
+        /**
+         * <p>Name of the ad campaign the spend, payout, or funding belongs to (ad_campaign sources only).</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "title", nulls = Nulls.SKIP)
+        public _FinalStage title(Optional<String> title) {
+            this.title = title;
             return this;
         }
 
@@ -1976,7 +2106,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding account or withdraw from the funding personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1992,7 +2122,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding account or withdraw from the funding personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2002,7 +2132,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding company or withdraw from the funding personal balance.</p>
+         * <p>The airdrop's claim URL. Null unless the caller can manage claim links on the funding account or withdraw from the funding personal balance.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "claim_url", nulls = Nulls.SKIP)
@@ -2084,7 +2214,27 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
+         * <p>ID of the bank deposit that this on-chain deposit delivered, prefixed <code>vbt_</code>. Present only on onchain_transaction sources for bank deposits.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage bankDepositId(String bankDepositId) {
+            this.bankDepositId = Optional.ofNullable(bankDepositId);
+            return this;
+        }
+
+        /**
+         * <p>ID of the bank deposit that this on-chain deposit delivered, prefixed <code>vbt_</code>. Present only on onchain_transaction sources for bank deposits.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "bank_deposit_id", nulls = Nulls.SKIP)
+        public _FinalStage bankDepositId(Optional<String> bankDepositId) {
+            this.bankDepositId = bankDepositId;
+            return this;
+        }
+
+        /**
+         * <p>Payout amount as a decimal number in the destination currency. Present only on <code>withdrawal</code> sources. Requires <code>payout:withdrawal:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2100,7 +2250,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout amount as a decimal number in the destination currency. Present only on <code>withdrawal</code> sources. Requires <code>payout:withdrawal:read</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2110,7 +2260,7 @@ public final class LedgerActivitySource {
         }
 
         /**
-         * <p>Payout amount as a decimal number in the destination currency (payout sources only; requires payout:withdrawal:read).</p>
+         * <p>Payout amount as a decimal number in the destination currency. Present only on <code>withdrawal</code> sources. Requires <code>payout:withdrawal:read</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "amount_float", nulls = Nulls.SKIP)
@@ -2119,10 +2269,48 @@ public final class LedgerActivitySource {
             return this;
         }
 
+        /**
+         * <p>ID of the account that runs the ad campaign (ad_campaign sources only).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(Nullable<String> accountId) {
+            if (accountId.isNull()) {
+                this.accountId = null;
+            } else if (accountId.isEmpty()) {
+                this.accountId = Optional.empty();
+            } else {
+                this.accountId = Optional.of(accountId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>ID of the account that runs the ad campaign (ad_campaign sources only).</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage accountId(String accountId) {
+            this.accountId = Optional.ofNullable(accountId);
+            return this;
+        }
+
+        /**
+         * <p>ID of the account that runs the ad campaign (ad_campaign sources only).</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
+        public _FinalStage accountId(Optional<String> accountId) {
+            this.accountId = accountId;
+            return this;
+        }
+
         @java.lang.Override
         public LedgerActivitySource build() {
             return new LedgerActivitySource(
+                    accountId,
                     amountFloat,
+                    bankDepositId,
                     cardBrand,
                     chain,
                     claimUrl,
@@ -2148,6 +2336,7 @@ public final class LedgerActivitySource {
                     riskReviewHold,
                     senderAddress,
                     status,
+                    title,
                     toAmount,
                     toCurrency,
                     traceCode,
@@ -2157,7 +2346,9 @@ public final class LedgerActivitySource {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("amount_float")
+            if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("amount_float")
+                    || key.equalsIgnoreCase("bank_deposit_id")
                     || key.equalsIgnoreCase("card_brand")
                     || key.equalsIgnoreCase("chain")
                     || key.equalsIgnoreCase("claim_url")
@@ -2183,6 +2374,7 @@ public final class LedgerActivitySource {
                     || key.equalsIgnoreCase("risk_review_hold")
                     || key.equalsIgnoreCase("sender_address")
                     || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("title")
                     || key.equalsIgnoreCase("to_amount")
                     || key.equalsIgnoreCase("to_currency")
                     || key.equalsIgnoreCase("trace_code")

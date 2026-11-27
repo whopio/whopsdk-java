@@ -28,8 +28,6 @@ public final class CreateAudiencesRequestColumnMapping {
 
     private final Optional<String> lastName;
 
-    private final Optional<String> ltv;
-
     private final Optional<String> phone;
 
     private final Map<String, Object> additionalProperties;
@@ -39,14 +37,12 @@ public final class CreateAudiencesRequestColumnMapping {
             Optional<String> email,
             Optional<String> firstName,
             Optional<String> lastName,
-            Optional<String> ltv,
             Optional<String> phone,
             Map<String, Object> additionalProperties) {
         this.country = country;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.ltv = ltv;
         this.phone = phone;
         this.additionalProperties = additionalProperties;
     }
@@ -84,14 +80,6 @@ public final class CreateAudiencesRequestColumnMapping {
     }
 
     /**
-     * @return CSV header for each customer's lifetime value — a non-negative number, currency symbols allowed. When mapped, Meta creates the audience as value-based, so lookalikes built from it favor people similar to the highest-value customers.
-     */
-    @JsonProperty("ltv")
-    public Optional<String> getLtv() {
-        return ltv;
-    }
-
-    /**
      * @return CSV header for phone numbers.
      */
     @JsonProperty("phone")
@@ -116,13 +104,12 @@ public final class CreateAudiencesRequestColumnMapping {
                 && email.equals(other.email)
                 && firstName.equals(other.firstName)
                 && lastName.equals(other.lastName)
-                && ltv.equals(other.ltv)
                 && phone.equals(other.phone);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.country, this.email, this.firstName, this.lastName, this.ltv, this.phone);
+        return Objects.hash(this.country, this.email, this.firstName, this.lastName, this.phone);
     }
 
     @java.lang.Override
@@ -144,8 +131,6 @@ public final class CreateAudiencesRequestColumnMapping {
 
         private Optional<String> lastName = Optional.empty();
 
-        private Optional<String> ltv = Optional.empty();
-
         private Optional<String> phone = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -157,7 +142,6 @@ public final class CreateAudiencesRequestColumnMapping {
             email(other.getEmail());
             firstName(other.getFirstName());
             lastName(other.getLastName());
-            ltv(other.getLtv());
             phone(other.getPhone());
             return this;
         }
@@ -219,20 +203,6 @@ public final class CreateAudiencesRequestColumnMapping {
         }
 
         /**
-         * <p>CSV header for each customer's lifetime value — a non-negative number, currency symbols allowed. When mapped, Meta creates the audience as value-based, so lookalikes built from it favor people similar to the highest-value customers.</p>
-         */
-        @JsonSetter(value = "ltv", nulls = Nulls.SKIP)
-        public Builder ltv(Optional<String> ltv) {
-            this.ltv = ltv;
-            return this;
-        }
-
-        public Builder ltv(String ltv) {
-            this.ltv = Optional.ofNullable(ltv);
-            return this;
-        }
-
-        /**
          * <p>CSV header for phone numbers.</p>
          */
         @JsonSetter(value = "phone", nulls = Nulls.SKIP)
@@ -248,7 +218,7 @@ public final class CreateAudiencesRequestColumnMapping {
 
         public CreateAudiencesRequestColumnMapping build() {
             return new CreateAudiencesRequestColumnMapping(
-                    country, email, firstName, lastName, ltv, phone, additionalProperties);
+                    country, email, firstName, lastName, phone, additionalProperties);
         }
 
         @JsonAnySetter
@@ -257,7 +227,6 @@ public final class CreateAudiencesRequestColumnMapping {
                     || key.equalsIgnoreCase("email")
                     || key.equalsIgnoreCase("first_name")
                     || key.equalsIgnoreCase("last_name")
-                    || key.equalsIgnoreCase("ltv")
                     || key.equalsIgnoreCase("phone")) {
                 return;
             }

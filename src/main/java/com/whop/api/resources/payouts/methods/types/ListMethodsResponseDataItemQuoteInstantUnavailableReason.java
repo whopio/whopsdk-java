@@ -11,6 +11,10 @@ public final class ListMethodsResponseDataItemQuoteInstantUnavailableReason {
             new ListMethodsResponseDataItemQuoteInstantUnavailableReason(
                     Value.MINIMUM_CRYPTO_SALES_NOT_MET, "minimum_crypto_sales_not_met");
 
+    public static final ListMethodsResponseDataItemQuoteInstantUnavailableReason NEW_PAYOUT_METHOD_HOLD =
+            new ListMethodsResponseDataItemQuoteInstantUnavailableReason(
+                    Value.NEW_PAYOUT_METHOD_HOLD, "new_payout_method_hold");
+
     private final Value value;
 
     private final String string;
@@ -47,6 +51,8 @@ public final class ListMethodsResponseDataItemQuoteInstantUnavailableReason {
         switch (value) {
             case MINIMUM_CRYPTO_SALES_NOT_MET:
                 return visitor.visitMinimumCryptoSalesNotMet();
+            case NEW_PAYOUT_METHOD_HOLD:
+                return visitor.visitNewPayoutMethodHold();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -58,6 +64,8 @@ public final class ListMethodsResponseDataItemQuoteInstantUnavailableReason {
         switch (value) {
             case "minimum_crypto_sales_not_met":
                 return MINIMUM_CRYPTO_SALES_NOT_MET;
+            case "new_payout_method_hold":
+                return NEW_PAYOUT_METHOD_HOLD;
             default:
                 return new ListMethodsResponseDataItemQuoteInstantUnavailableReason(Value.UNKNOWN, value);
         }
@@ -66,11 +74,15 @@ public final class ListMethodsResponseDataItemQuoteInstantUnavailableReason {
     public enum Value {
         MINIMUM_CRYPTO_SALES_NOT_MET,
 
+        NEW_PAYOUT_METHOD_HOLD,
+
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitMinimumCryptoSalesNotMet();
+
+        T visitNewPayoutMethodHold();
 
         T visitUnknown(String unknownType);
     }

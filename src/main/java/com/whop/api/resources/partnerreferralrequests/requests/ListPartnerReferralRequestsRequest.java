@@ -100,7 +100,7 @@ public final class ListPartnerReferralRequestsRequest {
     }
 
     /**
-     * @return Only requests received by this user ID, prefixed <code>user_</code>.
+     * @return Deprecated: requests to a user have ended. Returns no requests.
      */
     @JsonProperty("target_user_id")
     public Optional<String> getTargetUserId() {
@@ -116,7 +116,7 @@ public final class ListPartnerReferralRequestsRequest {
     }
 
     /**
-     * @return Only the referral links created for memberships on this business's team, prefixed <code>biz_</code>. Needs read access to the business: its owner sees every member's links, a manager the links of the people reporting to them, and other members only their own.
+     * @return Only the referral links created for memberships on this business's team, prefixed <code>biz_</code>. Needs read access to the business: its owner sees every member's links, a manager the links of the people reporting to them, and other members only their own. With <code>request_type=lead</code>, it lists your lead offers that count toward this team, plus your personal lead offers.
      */
     @JsonProperty("referring_account_id")
     public Optional<String> getReferringAccountId() {
@@ -340,7 +340,7 @@ public final class ListPartnerReferralRequestsRequest {
         }
 
         /**
-         * <p>Only requests received by this user ID, prefixed <code>user_</code>.</p>
+         * <p>Deprecated: requests to a user have ended. Returns no requests.</p>
          */
         @JsonSetter(value = "target_user_id", nulls = Nulls.SKIP)
         public Builder targetUserId(Optional<String> targetUserId) {
@@ -368,7 +368,7 @@ public final class ListPartnerReferralRequestsRequest {
         }
 
         /**
-         * <p>Only the referral links created for memberships on this business's team, prefixed <code>biz_</code>. Needs read access to the business: its owner sees every member's links, a manager the links of the people reporting to them, and other members only their own.</p>
+         * <p>Only the referral links created for memberships on this business's team, prefixed <code>biz_</code>. Needs read access to the business: its owner sees every member's links, a manager the links of the people reporting to them, and other members only their own. With <code>request_type=lead</code>, it lists your lead offers that count toward this team, plus your personal lead offers.</p>
          */
         @JsonSetter(value = "referring_account_id", nulls = Nulls.SKIP)
         public Builder referringAccountId(Optional<String> referringAccountId) {

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.media.types.GenerateMediaRequestAdVideo;
 import com.whop.api.resources.media.types.GenerateMediaRequestResolution;
 import com.whop.api.resources.media.types.GenerateMediaRequestType;
 import java.util.HashMap;
@@ -26,9 +27,11 @@ import org.jetbrains.annotations.NotNull;
 public final class GenerateMediaRequest {
     private final Optional<String> accountId;
 
+    private final Optional<GenerateMediaRequestAdVideo> adVideo;
+
     private final Optional<Integer> durationSeconds;
 
-    private final String prompt;
+    private final Optional<String> prompt;
 
     private final Optional<List<String>> referenceMedia;
 
@@ -40,13 +43,15 @@ public final class GenerateMediaRequest {
 
     private GenerateMediaRequest(
             Optional<String> accountId,
+            Optional<GenerateMediaRequestAdVideo> adVideo,
             Optional<Integer> durationSeconds,
-            String prompt,
+            Optional<String> prompt,
             Optional<List<String>> referenceMedia,
             Optional<GenerateMediaRequestResolution> resolution,
             GenerateMediaRequestType type,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
+        this.adVideo = adVideo;
         this.durationSeconds = durationSeconds;
         this.prompt = prompt;
         this.referenceMedia = referenceMedia;
@@ -64,6 +69,14 @@ public final class GenerateMediaRequest {
     }
 
     /**
+     * @return Makes a video ad: Whop writes the prompt, picks product photos, and adds a voiceover with captions. The video is 15 seconds at <code>720p</code> in 9:16. Video only. Can't be combined with <code>prompt</code>, <code>reference_media</code>, <code>duration_seconds</code> or <code>resolution</code>.
+     */
+    @JsonProperty("ad_video")
+    public Optional<GenerateMediaRequestAdVideo> getAdVideo() {
+        return adVideo;
+    }
+
+    /**
      * @return Video length in seconds. Video only; defaults to 5.
      */
     @JsonProperty("duration_seconds")
@@ -72,10 +85,10 @@ public final class GenerateMediaRequest {
     }
 
     /**
-     * @return What to generate. Up to 2,000 characters.
+     * @return What to generate. Up to 2,000 characters. Required unless <code>ad_video</code> is set.
      */
     @JsonProperty("prompt")
-    public String getPrompt() {
+    public Optional<String> getPrompt() {
         return prompt;
     }
 
@@ -116,6 +129,7 @@ public final class GenerateMediaRequest {
 
     private boolean equalTo(GenerateMediaRequest other) {
         return accountId.equals(other.accountId)
+                && adVideo.equals(other.adVideo)
                 && durationSeconds.equals(other.durationSeconds)
                 && prompt.equals(other.prompt)
                 && referenceMedia.equals(other.referenceMedia)
@@ -126,7 +140,13 @@ public final class GenerateMediaRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.accountId, this.durationSeconds, this.prompt, this.referenceMedia, this.resolution, this.type);
+                this.accountId,
+                this.adVideo,
+                this.durationSeconds,
+                this.prompt,
+                this.referenceMedia,
+                this.resolution,
+                this.type);
     }
 
     @java.lang.Override
@@ -134,17 +154,8 @@ public final class GenerateMediaRequest {
         return ObjectMappers.stringify(this);
     }
 
-    public static PromptStage builder() {
+    public static TypeStage builder() {
         return new Builder();
-    }
-
-    public interface PromptStage {
-        /**
-         * <p>What to generate. Up to 2,000 characters.</p>
-         */
-        TypeStage prompt(@NotNull String prompt);
-
-        Builder from(GenerateMediaRequest other);
     }
 
     public interface TypeStage {
@@ -152,6 +163,8 @@ public final class GenerateMediaRequest {
          * <p>The kind of media to generate.</p>
          */
         _FinalStage type(@NotNull GenerateMediaRequestType type);
+
+        Builder from(GenerateMediaRequest other);
     }
 
     public interface _FinalStage {
@@ -169,11 +182,25 @@ public final class GenerateMediaRequest {
         _FinalStage accountId(String accountId);
 
         /**
+         * <p>Makes a video ad: Whop writes the prompt, picks product photos, and adds a voiceover with captions. The video is 15 seconds at <code>720p</code> in 9:16. Video only. Can't be combined with <code>prompt</code>, <code>reference_media</code>, <code>duration_seconds</code> or <code>resolution</code>.</p>
+         */
+        _FinalStage adVideo(Optional<GenerateMediaRequestAdVideo> adVideo);
+
+        _FinalStage adVideo(GenerateMediaRequestAdVideo adVideo);
+
+        /**
          * <p>Video length in seconds. Video only; defaults to 5.</p>
          */
         _FinalStage durationSeconds(Optional<Integer> durationSeconds);
 
         _FinalStage durationSeconds(Integer durationSeconds);
+
+        /**
+         * <p>What to generate. Up to 2,000 characters. Required unless <code>ad_video</code> is set.</p>
+         */
+        _FinalStage prompt(Optional<String> prompt);
+
+        _FinalStage prompt(String prompt);
 
         /**
          * <p>Optional reference file IDs (<code>file_</code> prefixed), up to 4. Images guide the output: for video, a single image seeds the opening frame; multiple images guide subject and style instead. Include one video to remake it: its motion and scene are kept and the images are swapped in. Video only; needs an image and can't be combined with <code>duration_seconds</code>. The output matches the video's length, up to 30 seconds, and is billed on it.</p>
@@ -191,16 +218,18 @@ public final class GenerateMediaRequest {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements PromptStage, TypeStage, _FinalStage {
-        private String prompt;
-
+    public static final class Builder implements TypeStage, _FinalStage {
         private GenerateMediaRequestType type;
 
         private Optional<GenerateMediaRequestResolution> resolution = Optional.empty();
 
         private Optional<List<String>> referenceMedia = Optional.empty();
 
+        private Optional<String> prompt = Optional.empty();
+
         private Optional<Integer> durationSeconds = Optional.empty();
+
+        private Optional<GenerateMediaRequestAdVideo> adVideo = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
@@ -211,22 +240,12 @@ public final class GenerateMediaRequest {
         @java.lang.Override
         public Builder from(GenerateMediaRequest other) {
             accountId(other.getAccountId());
+            adVideo(other.getAdVideo());
             durationSeconds(other.getDurationSeconds());
             prompt(other.getPrompt());
             referenceMedia(other.getReferenceMedia());
             resolution(other.getResolution());
             type(other.getType());
-            return this;
-        }
-
-        /**
-         * <p>What to generate. Up to 2,000 characters.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("prompt")
-        public TypeStage prompt(@NotNull String prompt) {
-            this.prompt = Objects.requireNonNull(prompt, "prompt must not be null");
             return this;
         }
 
@@ -282,6 +301,26 @@ public final class GenerateMediaRequest {
         }
 
         /**
+         * <p>What to generate. Up to 2,000 characters. Required unless <code>ad_video</code> is set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage prompt(String prompt) {
+            this.prompt = Optional.ofNullable(prompt);
+            return this;
+        }
+
+        /**
+         * <p>What to generate. Up to 2,000 characters. Required unless <code>ad_video</code> is set.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "prompt", nulls = Nulls.SKIP)
+        public _FinalStage prompt(Optional<String> prompt) {
+            this.prompt = prompt;
+            return this;
+        }
+
+        /**
          * <p>Video length in seconds. Video only; defaults to 5.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -298,6 +337,26 @@ public final class GenerateMediaRequest {
         @JsonSetter(value = "duration_seconds", nulls = Nulls.SKIP)
         public _FinalStage durationSeconds(Optional<Integer> durationSeconds) {
             this.durationSeconds = durationSeconds;
+            return this;
+        }
+
+        /**
+         * <p>Makes a video ad: Whop writes the prompt, picks product photos, and adds a voiceover with captions. The video is 15 seconds at <code>720p</code> in 9:16. Video only. Can't be combined with <code>prompt</code>, <code>reference_media</code>, <code>duration_seconds</code> or <code>resolution</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage adVideo(GenerateMediaRequestAdVideo adVideo) {
+            this.adVideo = Optional.ofNullable(adVideo);
+            return this;
+        }
+
+        /**
+         * <p>Makes a video ad: Whop writes the prompt, picks product photos, and adds a voiceover with captions. The video is 15 seconds at <code>720p</code> in 9:16. Video only. Can't be combined with <code>prompt</code>, <code>reference_media</code>, <code>duration_seconds</code> or <code>resolution</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ad_video", nulls = Nulls.SKIP)
+        public _FinalStage adVideo(Optional<GenerateMediaRequestAdVideo> adVideo) {
+            this.adVideo = adVideo;
             return this;
         }
 
@@ -324,12 +383,20 @@ public final class GenerateMediaRequest {
         @java.lang.Override
         public GenerateMediaRequest build() {
             return new GenerateMediaRequest(
-                    accountId, durationSeconds, prompt, referenceMedia, resolution, type, additionalProperties);
+                    accountId,
+                    adVideo,
+                    durationSeconds,
+                    prompt,
+                    referenceMedia,
+                    resolution,
+                    type,
+                    additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account_id")
+                    || key.equalsIgnoreCase("ad_video")
                     || key.equalsIgnoreCase("duration_seconds")
                     || key.equalsIgnoreCase("prompt")
                     || key.equalsIgnoreCase("reference_media")

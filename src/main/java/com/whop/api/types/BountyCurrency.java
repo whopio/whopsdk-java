@@ -95,6 +95,8 @@ public final class BountyCurrency {
 
     public static final BountyCurrency MUR = new BountyCurrency(Value.MUR, "mur");
 
+    public static final BountyCurrency HNL = new BountyCurrency(Value.HNL, "hnl");
+
     public static final BountyCurrency PEN = new BountyCurrency(Value.PEN, "pen");
 
     public static final BountyCurrency USD = new BountyCurrency(Value.USD, "usd");
@@ -295,6 +297,8 @@ public final class BountyCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -472,6 +476,8 @@ public final class BountyCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -726,6 +732,8 @@ public final class BountyCurrency {
 
         AWG,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -897,6 +905,8 @@ public final class BountyCurrency {
         T visitKzt();
 
         T visitAwg();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

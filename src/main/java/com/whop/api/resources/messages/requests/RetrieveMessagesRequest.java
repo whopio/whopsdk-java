@@ -7,29 +7,55 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveMessagesRequest.Builder.class)
 public final class RetrieveMessagesRequest {
+    private final Optional<Boolean> includeReplyingToMessage;
+
     private final Map<String, Object> additionalProperties;
 
-    private RetrieveMessagesRequest(Map<String, Object> additionalProperties) {
+    private RetrieveMessagesRequest(
+            Optional<Boolean> includeReplyingToMessage, Map<String, Object> additionalProperties) {
+        this.includeReplyingToMessage = includeReplyingToMessage;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Include the full replied-to message. Nested replies are not included.
+     */
+    @JsonProperty("include_replying_to_message")
+    public Optional<Boolean> getIncludeReplyingToMessage() {
+        return includeReplyingToMessage;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof RetrieveMessagesRequest;
+        return other instanceof RetrieveMessagesRequest && equalTo((RetrieveMessagesRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(RetrieveMessagesRequest other) {
+        return includeReplyingToMessage.equals(other.includeReplyingToMessage);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.includeReplyingToMessage);
     }
 
     @java.lang.Override
@@ -43,20 +69,40 @@ public final class RetrieveMessagesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Boolean> includeReplyingToMessage = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(RetrieveMessagesRequest other) {
+            includeReplyingToMessage(other.getIncludeReplyingToMessage());
+            return this;
+        }
+
+        /**
+         * <p>Include the full replied-to message. Nested replies are not included.</p>
+         */
+        @JsonSetter(value = "include_replying_to_message", nulls = Nulls.SKIP)
+        public Builder includeReplyingToMessage(Optional<Boolean> includeReplyingToMessage) {
+            this.includeReplyingToMessage = includeReplyingToMessage;
+            return this;
+        }
+
+        public Builder includeReplyingToMessage(Boolean includeReplyingToMessage) {
+            this.includeReplyingToMessage = Optional.ofNullable(includeReplyingToMessage);
             return this;
         }
 
         public RetrieveMessagesRequest build() {
-            return new RetrieveMessagesRequest(additionalProperties);
+            return new RetrieveMessagesRequest(includeReplyingToMessage, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("include_replying_to_message")) {
+                return;
+            }
             this.additionalProperties.put(key, value);
         }
 

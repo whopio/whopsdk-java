@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdPixel.Builder.class)
 public final class AdPixel {
+    private final StorefrontAccount account;
+
     private final String accountId;
 
     private final String createdAt;
@@ -45,6 +47,7 @@ public final class AdPixel {
     private final Map<String, Object> additionalProperties;
 
     private AdPixel(
+            StorefrontAccount account,
             String accountId,
             String createdAt,
             Optional<String> errorMessage,
@@ -55,6 +58,7 @@ public final class AdPixel {
             AdPixelStatus status,
             String updatedAt,
             Map<String, Object> additionalProperties) {
+        this.account = account;
         this.accountId = accountId;
         this.createdAt = createdAt;
         this.errorMessage = errorMessage;
@@ -65,6 +69,14 @@ public final class AdPixel {
         this.status = status;
         this.updatedAt = updatedAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The business whose claimed campaigns send conversions to this pixel, with its name and logo.
+     */
+    @JsonProperty("account")
+    public StorefrontAccount getAccount() {
+        return account;
     }
 
     /**
@@ -169,7 +181,8 @@ public final class AdPixel {
     }
 
     private boolean equalTo(AdPixel other) {
-        return accountId.equals(other.accountId)
+        return account.equals(other.account)
+                && accountId.equals(other.accountId)
                 && createdAt.equals(other.createdAt)
                 && errorMessage.equals(other.errorMessage)
                 && externalId.equals(other.externalId)
@@ -183,6 +196,7 @@ public final class AdPixel {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
                 this.accountId,
                 this.createdAt,
                 this.errorMessage,
@@ -199,8 +213,17 @@ public final class AdPixel {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static AccountStage builder() {
         return new Builder();
+    }
+
+    public interface AccountStage {
+        /**
+         * <p>The business whose claimed campaigns send conversions to this pixel, with its name and logo.</p>
+         */
+        AccountIdStage account(@NotNull StorefrontAccount account);
+
+        Builder from(AdPixel other);
     }
 
     public interface AccountIdStage {
@@ -208,8 +231,6 @@ public final class AdPixel {
          * <p>The business whose claimed campaigns send conversions to this pixel, prefixed <code>biz_</code>.</p>
          */
         CreatedAtStage accountId(@NotNull String accountId);
-
-        Builder from(AdPixel other);
     }
 
     public interface CreatedAtStage {
@@ -282,7 +303,8 @@ public final class AdPixel {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AccountIdStage,
+            implements AccountStage,
+                    AccountIdStage,
                     CreatedAtStage,
                     ExternalIdStage,
                     IdStage,
@@ -290,6 +312,8 @@ public final class AdPixel {
                     StatusStage,
                     UpdatedAtStage,
                     _FinalStage {
+        private StorefrontAccount account;
+
         private String accountId;
 
         private String createdAt;
@@ -314,6 +338,7 @@ public final class AdPixel {
 
         @java.lang.Override
         public Builder from(AdPixel other) {
+            account(other.getAccount());
             accountId(other.getAccountId());
             createdAt(other.getCreatedAt());
             errorMessage(other.getErrorMessage());
@@ -323,6 +348,17 @@ public final class AdPixel {
             platform(other.getPlatform());
             status(other.getStatus());
             updatedAt(other.getUpdatedAt());
+            return this;
+        }
+
+        /**
+         * <p>The business whose claimed campaigns send conversions to this pixel, with its name and logo.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account")
+        public AccountIdStage account(@NotNull StorefrontAccount account) {
+            this.account = Objects.requireNonNull(account, "account must not be null");
             return this;
         }
 
@@ -478,6 +514,7 @@ public final class AdPixel {
         @java.lang.Override
         public AdPixel build() {
             return new AdPixel(
+                    account,
                     accountId,
                     createdAt,
                     errorMessage,
@@ -492,7 +529,8 @@ public final class AdPixel {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("account_id")
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("error_message")
                     || key.equalsIgnoreCase("external_id")

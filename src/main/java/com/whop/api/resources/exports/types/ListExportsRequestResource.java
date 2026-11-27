@@ -34,8 +34,6 @@ public final class ListExportsRequestResource {
     public static final ListExportsRequestResource EXTERNAL_ACCOUNTS =
             new ListExportsRequestResource(Value.EXTERNAL_ACCOUNTS, "external_accounts");
 
-    public static final ListExportsRequestResource LEADS = new ListExportsRequestResource(Value.LEADS, "leads");
-
     public static final ListExportsRequestResource TRACKING_LINKS =
             new ListExportsRequestResource(Value.TRACKING_LINKS, "tracking_links");
 
@@ -168,8 +166,6 @@ public final class ListExportsRequestResource {
                 return visitor.visitFinancialActivity();
             case EXTERNAL_ACCOUNTS:
                 return visitor.visitExternalAccounts();
-            case LEADS:
-                return visitor.visitLeads();
             case TRACKING_LINKS:
                 return visitor.visitTrackingLinks();
             case LEDGER_LINES:
@@ -255,8 +251,6 @@ public final class ListExportsRequestResource {
                 return FINANCIAL_ACTIVITY;
             case "external_accounts":
                 return EXTERNAL_ACCOUNTS;
-            case "leads":
-                return LEADS;
             case "tracking_links":
                 return TRACKING_LINKS;
             case "ledger_lines":
@@ -385,8 +379,6 @@ public final class ListExportsRequestResource {
 
         ENTRIES,
 
-        LEADS,
-
         INVOICES,
 
         CANCELATION_REASONS,
@@ -466,8 +458,6 @@ public final class ListExportsRequestResource {
         T visitResolutions();
 
         T visitEntries();
-
-        T visitLeads();
 
         T visitInvoices();
 

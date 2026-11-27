@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class SetNotificationsRequestPreferencesItemScopeChannel {
+    public static final SetNotificationsRequestPreferencesItemScopeChannel EMAIL =
+            new SetNotificationsRequestPreferencesItemScopeChannel(Value.EMAIL, "email");
+
     public static final SetNotificationsRequestPreferencesItemScopeChannel MOBILE =
             new SetNotificationsRequestPreferencesItemScopeChannel(Value.MOBILE, "mobile");
 
@@ -46,6 +49,8 @@ public final class SetNotificationsRequestPreferencesItemScopeChannel {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case EMAIL:
+                return visitor.visitEmail();
             case MOBILE:
                 return visitor.visitMobile();
             case IN_APP:
@@ -59,6 +64,8 @@ public final class SetNotificationsRequestPreferencesItemScopeChannel {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static SetNotificationsRequestPreferencesItemScopeChannel valueOf(String value) {
         switch (value) {
+            case "email":
+                return EMAIL;
             case "mobile":
                 return MOBILE;
             case "in_app":
@@ -73,6 +80,8 @@ public final class SetNotificationsRequestPreferencesItemScopeChannel {
 
         MOBILE,
 
+        EMAIL,
+
         UNKNOWN
     }
 
@@ -80,6 +89,8 @@ public final class SetNotificationsRequestPreferencesItemScopeChannel {
         T visitInApp();
 
         T visitMobile();
+
+        T visitEmail();
 
         T visitUnknown(String unknownType);
     }

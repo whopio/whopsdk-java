@@ -7,6 +7,7 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.accounts.affiliateprogram.AffiliateProgramClient;
 import com.whop.api.resources.accounts.customertracking.CustomerTrackingClient;
 import com.whop.api.resources.accounts.fees.FeesClient;
 import com.whop.api.resources.accounts.financingproviders.FinancingProvidersClient;
@@ -36,6 +37,8 @@ public class AccountsClient {
 
     private final RawAccountsClient rawClient;
 
+    protected final Supplier<AffiliateProgramClient> affiliateProgramClient;
+
     protected final Supplier<CustomerTrackingClient> customerTrackingClient;
 
     protected final Supplier<FeesClient> feesClient;
@@ -49,6 +52,7 @@ public class AccountsClient {
     public AccountsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
         this.rawClient = new RawAccountsClient(clientOptions);
+        this.affiliateProgramClient = Suppliers.memoize(() -> new AffiliateProgramClient(clientOptions));
         this.customerTrackingClient = Suppliers.memoize(() -> new CustomerTrackingClient(clientOptions));
         this.feesClient = Suppliers.memoize(() -> new FeesClient(clientOptions));
         this.financingProvidersClient = Suppliers.memoize(() -> new FinancingProvidersClient(clientOptions));
@@ -148,14 +152,14 @@ public class AccountsClient {
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public SyncPagingIterable<AccountSearchResult> search(SearchAccountsRequest request) {
         return this.rawClient.search(request).body();
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public SyncPagingIterable<AccountSearchResult> search(
             SearchAccountsRequest request, RequestOptions requestOptions) {
@@ -331,6 +335,10 @@ public class AccountsClient {
     public TransferOwnershipAccountsResponse transferOwnership(
             String id, TransferOwnershipAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.transferOwnership(id, request, requestOptions).body();
+    }
+
+    public AffiliateProgramClient affiliateProgram() {
+        return this.affiliateProgramClient.get();
     }
 
     public CustomerTrackingClient customerTracking() {

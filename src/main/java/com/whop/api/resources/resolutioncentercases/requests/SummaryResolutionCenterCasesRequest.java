@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.resolutioncentercases.types.SummaryResolutionCenterCasesRequestGroupsItem;
 import com.whop.api.resources.resolutioncentercases.types.SummaryResolutionCenterCasesRequestOutcomeItem;
+import com.whop.api.resources.resolutioncentercases.types.SummaryResolutionCenterCasesRequestPaymentMethodsItem;
 import com.whop.api.resources.resolutioncentercases.types.SummaryResolutionCenterCasesRequestReasonItem;
 import com.whop.api.resources.resolutioncentercases.types.SummaryResolutionCenterCasesRequestStatusItem;
 import java.util.Collections;
@@ -34,6 +35,12 @@ public final class SummaryResolutionCenterCasesRequest {
 
     private final Optional<List<SummaryResolutionCenterCasesRequestOutcomeItem>> outcome;
 
+    private final Optional<List<String>> productIds;
+
+    private final Optional<List<String>> paymentId;
+
+    private final Optional<List<SummaryResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods;
+
     private final Optional<String> accountId;
 
     private final Optional<String> userId;
@@ -42,6 +49,8 @@ public final class SummaryResolutionCenterCasesRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<String> query;
+
     private final Map<String, Object> additionalProperties;
 
     private SummaryResolutionCenterCasesRequest(
@@ -49,19 +58,27 @@ public final class SummaryResolutionCenterCasesRequest {
             Optional<List<SummaryResolutionCenterCasesRequestStatusItem>> status,
             Optional<List<SummaryResolutionCenterCasesRequestReasonItem>> reason,
             Optional<List<SummaryResolutionCenterCasesRequestOutcomeItem>> outcome,
+            Optional<List<String>> productIds,
+            Optional<List<String>> paymentId,
+            Optional<List<SummaryResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods,
             Optional<String> accountId,
             Optional<String> userId,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<String> query,
             Map<String, Object> additionalProperties) {
         this.groups = groups;
         this.status = status;
         this.reason = reason;
         this.outcome = outcome;
+        this.productIds = productIds;
+        this.paymentId = paymentId;
+        this.paymentMethods = paymentMethods;
         this.accountId = accountId;
         this.userId = userId;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.query = query;
         this.additionalProperties = additionalProperties;
     }
 
@@ -98,6 +115,30 @@ public final class SummaryResolutionCenterCasesRequest {
     }
 
     /**
+     * @return Only count cases about a payment for these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("product_ids")
+    public Optional<List<String>> getProductIds() {
+        return productIds;
+    }
+
+    /**
+     * @return Only count cases opened on these payments, each prefixed <code>pay_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("payment_id")
+    public Optional<List<String>> getPaymentId() {
+        return paymentId;
+    }
+
+    /**
+     * @return Only count cases about a payment paid with any of these methods. Repeat the parameter to pass several.
+     */
+    @JsonProperty("payment_methods")
+    public Optional<List<SummaryResolutionCenterCasesRequestPaymentMethodsItem>> getPaymentMethods() {
+        return paymentMethods;
+    }
+
+    /**
      * @return The account to summarize cases for (<code>biz_</code> tag).
      */
     @JsonProperty("account_id")
@@ -106,7 +147,7 @@ public final class SummaryResolutionCenterCasesRequest {
     }
 
     /**
-     * @return Only cases opened by this customer — a <code>user_</code> tag, or <code>me</code> for the calling user.
+     * @return Only cases opened by this customer: a <code>user_</code> tag, or <code>me</code> for the calling user.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
@@ -129,6 +170,14 @@ public final class SummaryResolutionCenterCasesRequest {
         return createdAfter;
     }
 
+    /**
+     * @return Only count cases that match this search, as on the list.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -146,10 +195,14 @@ public final class SummaryResolutionCenterCasesRequest {
                 && status.equals(other.status)
                 && reason.equals(other.reason)
                 && outcome.equals(other.outcome)
+                && productIds.equals(other.productIds)
+                && paymentId.equals(other.paymentId)
+                && paymentMethods.equals(other.paymentMethods)
                 && accountId.equals(other.accountId)
                 && userId.equals(other.userId)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && query.equals(other.query);
     }
 
     @java.lang.Override
@@ -159,10 +212,14 @@ public final class SummaryResolutionCenterCasesRequest {
                 this.status,
                 this.reason,
                 this.outcome,
+                this.productIds,
+                this.paymentId,
+                this.paymentMethods,
                 this.accountId,
                 this.userId,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.query);
     }
 
     @java.lang.Override
@@ -184,6 +241,12 @@ public final class SummaryResolutionCenterCasesRequest {
 
         private Optional<List<SummaryResolutionCenterCasesRequestOutcomeItem>> outcome = Optional.empty();
 
+        private Optional<List<String>> productIds = Optional.empty();
+
+        private Optional<List<String>> paymentId = Optional.empty();
+
+        private Optional<List<SummaryResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Optional<String> userId = Optional.empty();
@@ -191,6 +254,8 @@ public final class SummaryResolutionCenterCasesRequest {
         private Optional<String> createdBefore = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
+
+        private Optional<String> query = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -201,10 +266,14 @@ public final class SummaryResolutionCenterCasesRequest {
             status(other.getStatus());
             reason(other.getReason());
             outcome(other.getOutcome());
+            productIds(other.getProductIds());
+            paymentId(other.getPaymentId());
+            paymentMethods(other.getPaymentMethods());
             accountId(other.getAccountId());
             userId(other.getUserId());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            query(other.getQuery());
             return this;
         }
 
@@ -285,6 +354,64 @@ public final class SummaryResolutionCenterCasesRequest {
         }
 
         /**
+         * <p>Only count cases about a payment for these products, each prefixed <code>prod_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
+            return this;
+        }
+
+        /**
+         * <p>Only count cases opened on these payments, each prefixed <code>pay_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "payment_id", nulls = Nulls.SKIP)
+        public Builder paymentId(Optional<List<String>> paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        public Builder paymentId(List<String> paymentId) {
+            this.paymentId = Optional.ofNullable(paymentId);
+            return this;
+        }
+
+        public Builder paymentId(String paymentId) {
+            this.paymentId = Optional.of(Collections.singletonList(paymentId));
+            return this;
+        }
+
+        /**
+         * <p>Only count cases about a payment paid with any of these methods. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "payment_methods", nulls = Nulls.SKIP)
+        public Builder paymentMethods(
+                Optional<List<SummaryResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods) {
+            this.paymentMethods = paymentMethods;
+            return this;
+        }
+
+        public Builder paymentMethods(List<SummaryResolutionCenterCasesRequestPaymentMethodsItem> paymentMethods) {
+            this.paymentMethods = Optional.ofNullable(paymentMethods);
+            return this;
+        }
+
+        public Builder paymentMethods(SummaryResolutionCenterCasesRequestPaymentMethodsItem paymentMethods) {
+            this.paymentMethods = Optional.of(Collections.singletonList(paymentMethods));
+            return this;
+        }
+
+        /**
          * <p>The account to summarize cases for (<code>biz_</code> tag).</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -299,7 +426,7 @@ public final class SummaryResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>Only cases opened by this customer — a <code>user_</code> tag, or <code>me</code> for the calling user.</p>
+         * <p>Only cases opened by this customer: a <code>user_</code> tag, or <code>me</code> for the calling user.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -340,16 +467,34 @@ public final class SummaryResolutionCenterCasesRequest {
             return this;
         }
 
+        /**
+         * <p>Only count cases that match this search, as on the list.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
         public SummaryResolutionCenterCasesRequest build() {
             return new SummaryResolutionCenterCasesRequest(
                     groups,
                     status,
                     reason,
                     outcome,
+                    productIds,
+                    paymentId,
+                    paymentMethods,
                     accountId,
                     userId,
                     createdBefore,
                     createdAfter,
+                    query,
                     additionalProperties);
         }
 
@@ -359,10 +504,14 @@ public final class SummaryResolutionCenterCasesRequest {
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("reason")
                     || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("payment_methods")
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("user_id")
                     || key.equalsIgnoreCase("created_before")
-                    || key.equalsIgnoreCase("created_after")) {
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("query")) {
                 return;
             }
             this.additionalProperties.put(key, value);

@@ -10,6 +10,9 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItemRailsItem {
     public static final CreateDepositsResponseMethodsBankCurrenciesItemRailsItem ACH =
             new CreateDepositsResponseMethodsBankCurrenciesItemRailsItem(Value.ACH, "ach");
 
+    public static final CreateDepositsResponseMethodsBankCurrenciesItemRailsItem SWIFT =
+            new CreateDepositsResponseMethodsBankCurrenciesItemRailsItem(Value.SWIFT, "swift");
+
     public static final CreateDepositsResponseMethodsBankCurrenciesItemRailsItem FPS =
             new CreateDepositsResponseMethodsBankCurrenciesItemRailsItem(Value.FPS, "fps");
 
@@ -58,6 +61,8 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItemRailsItem {
         switch (value) {
             case ACH:
                 return visitor.visitAch();
+            case SWIFT:
+                return visitor.visitSwift();
             case FPS:
                 return visitor.visitFps();
             case WIRE:
@@ -77,6 +82,8 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItemRailsItem {
         switch (value) {
             case "ach":
                 return ACH;
+            case "swift":
+                return SWIFT;
             case "fps":
                 return FPS;
             case "wire":
@@ -101,6 +108,8 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItemRailsItem {
 
         CHAPS,
 
+        SWIFT,
+
         UNKNOWN
     }
 
@@ -114,6 +123,8 @@ public final class CreateDepositsResponseMethodsBankCurrenciesItemRailsItem {
         T visitFps();
 
         T visitChaps();
+
+        T visitSwift();
 
         T visitUnknown(String unknownType);
     }

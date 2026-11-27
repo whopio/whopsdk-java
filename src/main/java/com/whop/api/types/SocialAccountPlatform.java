@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class SocialAccountPlatform {
-    public static final SocialAccountPlatform INSTAGRAM = new SocialAccountPlatform(Value.INSTAGRAM, "instagram");
-
     public static final SocialAccountPlatform FACEBOOK = new SocialAccountPlatform(Value.FACEBOOK, "facebook");
 
     public static final SocialAccountPlatform YOUTUBE = new SocialAccountPlatform(Value.YOUTUBE, "youtube");
@@ -19,17 +17,21 @@ public final class SocialAccountPlatform {
 
     public static final SocialAccountPlatform KLAVIYO = new SocialAccountPlatform(Value.KLAVIYO, "klaviyo");
 
-    public static final SocialAccountPlatform AIMERCE = new SocialAccountPlatform(Value.AIMERCE, "aimerce");
-
     public static final SocialAccountPlatform TELEGRAM = new SocialAccountPlatform(Value.TELEGRAM, "telegram");
+
+    public static final SocialAccountPlatform X = new SocialAccountPlatform(Value.X, "x");
+
+    public static final SocialAccountPlatform INSTAGRAM = new SocialAccountPlatform(Value.INSTAGRAM, "instagram");
+
+    public static final SocialAccountPlatform AIMERCE = new SocialAccountPlatform(Value.AIMERCE, "aimerce");
 
     public static final SocialAccountPlatform QUICKBOOKS = new SocialAccountPlatform(Value.QUICKBOOKS, "quickbooks");
 
     public static final SocialAccountPlatform LINKEDIN = new SocialAccountPlatform(Value.LINKEDIN, "linkedin");
 
-    public static final SocialAccountPlatform X = new SocialAccountPlatform(Value.X, "x");
-
     public static final SocialAccountPlatform TIKTOK = new SocialAccountPlatform(Value.TIKTOK, "tiktok");
+
+    public static final SocialAccountPlatform STRIPE = new SocialAccountPlatform(Value.STRIPE, "stripe");
 
     private final Value value;
 
@@ -64,8 +66,6 @@ public final class SocialAccountPlatform {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case INSTAGRAM:
-                return visitor.visitInstagram();
             case FACEBOOK:
                 return visitor.visitFacebook();
             case YOUTUBE:
@@ -76,18 +76,22 @@ public final class SocialAccountPlatform {
                 return visitor.visitSnapchat();
             case KLAVIYO:
                 return visitor.visitKlaviyo();
-            case AIMERCE:
-                return visitor.visitAimerce();
             case TELEGRAM:
                 return visitor.visitTelegram();
+            case X:
+                return visitor.visitX();
+            case INSTAGRAM:
+                return visitor.visitInstagram();
+            case AIMERCE:
+                return visitor.visitAimerce();
             case QUICKBOOKS:
                 return visitor.visitQuickbooks();
             case LINKEDIN:
                 return visitor.visitLinkedin();
-            case X:
-                return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -97,8 +101,6 @@ public final class SocialAccountPlatform {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static SocialAccountPlatform valueOf(String value) {
         switch (value) {
-            case "instagram":
-                return INSTAGRAM;
             case "facebook":
                 return FACEBOOK;
             case "youtube":
@@ -109,18 +111,22 @@ public final class SocialAccountPlatform {
                 return SNAPCHAT;
             case "klaviyo":
                 return KLAVIYO;
-            case "aimerce":
-                return AIMERCE;
             case "telegram":
                 return TELEGRAM;
+            case "x":
+                return X;
+            case "instagram":
+                return INSTAGRAM;
+            case "aimerce":
+                return AIMERCE;
             case "quickbooks":
                 return QUICKBOOKS;
             case "linkedin":
                 return LINKEDIN;
-            case "x":
-                return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new SocialAccountPlatform(Value.UNKNOWN, value);
         }
@@ -151,6 +157,8 @@ public final class SocialAccountPlatform {
 
         AIMERCE,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -178,6 +186,8 @@ public final class SocialAccountPlatform {
         T visitQuickbooks();
 
         T visitAimerce();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

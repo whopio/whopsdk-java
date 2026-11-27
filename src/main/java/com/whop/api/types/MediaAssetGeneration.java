@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = MediaAssetGeneration.Builder.class)
 public final class MediaAssetGeneration {
+    private final Optional<MediaAssetsAdVideo> adVideo;
+
     private final Optional<Double> durationSeconds;
 
     private final String prompt;
@@ -37,16 +39,29 @@ public final class MediaAssetGeneration {
     private final Map<String, Object> additionalProperties;
 
     private MediaAssetGeneration(
+            Optional<MediaAssetsAdVideo> adVideo,
             Optional<Double> durationSeconds,
             String prompt,
             List<String> referenceMedia,
             Optional<MediaAssetGenerationResolution> resolution,
             Map<String, Object> additionalProperties) {
+        this.adVideo = adVideo;
         this.durationSeconds = durationSeconds;
         this.prompt = prompt;
         this.referenceMedia = referenceMedia;
         this.resolution = resolution;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The video ad request. <code>null</code> unless the asset was generated with <code>ad_video</code>.
+     */
+    @JsonIgnore
+    public Optional<MediaAssetsAdVideo> getAdVideo() {
+        if (adVideo == null) {
+            return Optional.empty();
+        }
+        return adVideo;
     }
 
     /**
@@ -61,7 +76,7 @@ public final class MediaAssetGeneration {
     }
 
     /**
-     * @return What the asset was generated from.
+     * @return What the asset was generated from. For a video ad, this is the prompt Whop wrote. It is empty until Whop writes it.
      */
     @JsonProperty("prompt")
     public String getPrompt() {
@@ -82,6 +97,12 @@ public final class MediaAssetGeneration {
             return Optional.empty();
         }
         return resolution;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("ad_video")
+    private Optional<MediaAssetsAdVideo> _getAdVideo() {
+        return adVideo;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -108,7 +129,8 @@ public final class MediaAssetGeneration {
     }
 
     private boolean equalTo(MediaAssetGeneration other) {
-        return durationSeconds.equals(other.durationSeconds)
+        return adVideo.equals(other.adVideo)
+                && durationSeconds.equals(other.durationSeconds)
                 && prompt.equals(other.prompt)
                 && referenceMedia.equals(other.referenceMedia)
                 && resolution.equals(other.resolution);
@@ -116,7 +138,7 @@ public final class MediaAssetGeneration {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.durationSeconds, this.prompt, this.referenceMedia, this.resolution);
+        return Objects.hash(this.adVideo, this.durationSeconds, this.prompt, this.referenceMedia, this.resolution);
     }
 
     @java.lang.Override
@@ -130,7 +152,7 @@ public final class MediaAssetGeneration {
 
     public interface PromptStage {
         /**
-         * <p>What the asset was generated from.</p>
+         * <p>What the asset was generated from. For a video ad, this is the prompt Whop wrote. It is empty until Whop writes it.</p>
          */
         _FinalStage prompt(@NotNull String prompt);
 
@@ -143,6 +165,15 @@ public final class MediaAssetGeneration {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The video ad request. <code>null</code> unless the asset was generated with <code>ad_video</code>.</p>
+         */
+        _FinalStage adVideo(Optional<MediaAssetsAdVideo> adVideo);
+
+        _FinalStage adVideo(MediaAssetsAdVideo adVideo);
+
+        _FinalStage adVideo(Nullable<MediaAssetsAdVideo> adVideo);
 
         /**
          * <p>Requested video length in seconds. <code>null</code> for images.</p>
@@ -179,12 +210,15 @@ public final class MediaAssetGeneration {
 
         private Optional<Double> durationSeconds = Optional.empty();
 
+        private Optional<MediaAssetsAdVideo> adVideo = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(MediaAssetGeneration other) {
+            adVideo(other.getAdVideo());
             durationSeconds(other.getDurationSeconds());
             prompt(other.getPrompt());
             referenceMedia(other.getReferenceMedia());
@@ -193,7 +227,7 @@ public final class MediaAssetGeneration {
         }
 
         /**
-         * <p>What the asset was generated from.</p>
+         * <p>What the asset was generated from. For a video ad, this is the prompt Whop wrote. It is empty until Whop writes it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -299,14 +333,52 @@ public final class MediaAssetGeneration {
             return this;
         }
 
+        /**
+         * <p>The video ad request. <code>null</code> unless the asset was generated with <code>ad_video</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage adVideo(Nullable<MediaAssetsAdVideo> adVideo) {
+            if (adVideo.isNull()) {
+                this.adVideo = null;
+            } else if (adVideo.isEmpty()) {
+                this.adVideo = Optional.empty();
+            } else {
+                this.adVideo = Optional.of(adVideo.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The video ad request. <code>null</code> unless the asset was generated with <code>ad_video</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage adVideo(MediaAssetsAdVideo adVideo) {
+            this.adVideo = Optional.ofNullable(adVideo);
+            return this;
+        }
+
+        /**
+         * <p>The video ad request. <code>null</code> unless the asset was generated with <code>ad_video</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "ad_video", nulls = Nulls.SKIP)
+        public _FinalStage adVideo(Optional<MediaAssetsAdVideo> adVideo) {
+            this.adVideo = adVideo;
+            return this;
+        }
+
         @java.lang.Override
         public MediaAssetGeneration build() {
-            return new MediaAssetGeneration(durationSeconds, prompt, referenceMedia, resolution, additionalProperties);
+            return new MediaAssetGeneration(
+                    adVideo, durationSeconds, prompt, referenceMedia, resolution, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("duration_seconds")
+            if (key.equalsIgnoreCase("ad_video")
+                    || key.equalsIgnoreCase("duration_seconds")
                     || key.equalsIgnoreCase("prompt")
                     || key.equalsIgnoreCase("reference_media")
                     || key.equalsIgnoreCase("resolution")) {

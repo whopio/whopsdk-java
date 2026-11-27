@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AdContentReview.Builder.class)
 public final class AdContentReview {
-    private final List<AdContentReviewNetwork> networks;
+    private final boolean blockedByWebsite;
 
     private final AdContentReviewStatus status;
 
@@ -31,19 +31,22 @@ public final class AdContentReview {
     private final Map<String, Object> additionalProperties;
 
     private AdContentReview(
-            List<AdContentReviewNetwork> networks,
+            boolean blockedByWebsite,
             AdContentReviewStatus status,
             List<AdContentReviewTag> tags,
             Map<String, Object> additionalProperties) {
-        this.networks = networks;
+        this.blockedByWebsite = blockedByWebsite;
         this.status = status;
         this.tags = tags;
         this.additionalProperties = additionalProperties;
     }
 
-    @JsonProperty("networks")
-    public List<AdContentReviewNetwork> getNetworks() {
-        return networks;
+    /**
+     * @return Whether the ad is held back for a rule the review found on its website. Changing the website and rechecking it can clear the ad.
+     */
+    @JsonProperty("blocked_by_website")
+    public boolean getBlockedByWebsite() {
+        return blockedByWebsite;
     }
 
     /**
@@ -71,12 +74,12 @@ public final class AdContentReview {
     }
 
     private boolean equalTo(AdContentReview other) {
-        return networks.equals(other.networks) && status.equals(other.status) && tags.equals(other.tags);
+        return blockedByWebsite == other.blockedByWebsite && status.equals(other.status) && tags.equals(other.tags);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.networks, this.status, this.tags);
+        return Objects.hash(this.blockedByWebsite, this.status, this.tags);
     }
 
     @java.lang.Override
@@ -84,8 +87,17 @@ public final class AdContentReview {
         return ObjectMappers.stringify(this);
     }
 
-    public static StatusStage builder() {
+    public static BlockedByWebsiteStage builder() {
         return new Builder();
+    }
+
+    public interface BlockedByWebsiteStage {
+        /**
+         * <p>Whether the ad is held back for a rule the review found on its website. Changing the website and rechecking it can clear the ad.</p>
+         */
+        StatusStage blockedByWebsite(boolean blockedByWebsite);
+
+        Builder from(AdContentReview other);
     }
 
     public interface StatusStage {
@@ -93,8 +105,6 @@ public final class AdContentReview {
          * <p><code>reviewed</code> once Whop content review finishes, <code>in_review</code> while it runs, <code>not_reviewed</code> when it never ran.</p>
          */
         _FinalStage status(@NotNull AdContentReviewStatus status);
-
-        Builder from(AdContentReview other);
     }
 
     public interface _FinalStage {
@@ -104,12 +114,6 @@ public final class AdContentReview {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
-        _FinalStage networks(List<AdContentReviewNetwork> networks);
-
-        _FinalStage addNetworks(AdContentReviewNetwork networks);
-
-        _FinalStage addAllNetworks(List<AdContentReviewNetwork> networks);
-
         _FinalStage tags(List<AdContentReviewTag> tags);
 
         _FinalStage addTags(AdContentReviewTag tags);
@@ -118,12 +122,12 @@ public final class AdContentReview {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements StatusStage, _FinalStage {
+    public static final class Builder implements BlockedByWebsiteStage, StatusStage, _FinalStage {
+        private boolean blockedByWebsite;
+
         private AdContentReviewStatus status;
 
         private List<AdContentReviewTag> tags = new ArrayList<>();
-
-        private List<AdContentReviewNetwork> networks = new ArrayList<>();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -131,9 +135,20 @@ public final class AdContentReview {
 
         @java.lang.Override
         public Builder from(AdContentReview other) {
-            networks(other.getNetworks());
+            blockedByWebsite(other.getBlockedByWebsite());
             status(other.getStatus());
             tags(other.getTags());
+            return this;
+        }
+
+        /**
+         * <p>Whether the ad is held back for a rule the review found on its website. Changing the website and rechecking it can clear the ad.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("blocked_by_website")
+        public StatusStage blockedByWebsite(boolean blockedByWebsite) {
+            this.blockedByWebsite = blockedByWebsite;
             return this;
         }
 
@@ -173,37 +188,15 @@ public final class AdContentReview {
         }
 
         @java.lang.Override
-        public _FinalStage addAllNetworks(List<AdContentReviewNetwork> networks) {
-            if (networks != null) {
-                this.networks.addAll(networks);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addNetworks(AdContentReviewNetwork networks) {
-            this.networks.add(networks);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "networks", nulls = Nulls.SKIP)
-        public _FinalStage networks(List<AdContentReviewNetwork> networks) {
-            this.networks.clear();
-            if (networks != null) {
-                this.networks.addAll(networks);
-            }
-            return this;
-        }
-
-        @java.lang.Override
         public AdContentReview build() {
-            return new AdContentReview(networks, status, tags, additionalProperties);
+            return new AdContentReview(blockedByWebsite, status, tags, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("networks") || key.equalsIgnoreCase("status") || key.equalsIgnoreCase("tags")) {
+            if (key.equalsIgnoreCase("blocked_by_website")
+                    || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("tags")) {
                 return;
             }
             this.additionalProperties.put(key, value);

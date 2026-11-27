@@ -32,6 +32,10 @@ public final class Partner {
 
     private final Optional<String> joinedAt;
 
+    private final int leadSlotLimit;
+
+    private final int leadSlotsUsed;
+
     private final List<PartnerPayoutTier> payoutRates;
 
     private final int referredBusinessesCount;
@@ -50,6 +54,8 @@ public final class Partner {
             Optional<String> accountId,
             boolean certificationComplete,
             Optional<String> joinedAt,
+            int leadSlotLimit,
+            int leadSlotsUsed,
             List<PartnerPayoutTier> payoutRates,
             int referredBusinessesCount,
             Optional<UserSummary> referringPartner,
@@ -60,6 +66,8 @@ public final class Partner {
         this.accountId = accountId;
         this.certificationComplete = certificationComplete;
         this.joinedAt = joinedAt;
+        this.leadSlotLimit = leadSlotLimit;
+        this.leadSlotsUsed = leadSlotsUsed;
         this.payoutRates = payoutRates;
         this.referredBusinessesCount = referredBusinessesCount;
         this.referringPartner = referringPartner;
@@ -99,6 +107,22 @@ public final class Partner {
         return joinedAt;
     }
 
+    /**
+     * @return How many leads the partner can hold at once. A waiting lead offer takes a slot, and so does a lead accepted in the last 30 days whose business has made $1 or less.
+     */
+    @JsonProperty("lead_slot_limit")
+    public int getLeadSlotLimit() {
+        return leadSlotLimit;
+    }
+
+    /**
+     * @return How many of the partner's lead slots are taken now.
+     */
+    @JsonProperty("lead_slots_used")
+    public int getLeadSlotsUsed() {
+        return leadSlotsUsed;
+    }
+
     @JsonProperty("payout_rates")
     public List<PartnerPayoutTier> getPayoutRates() {
         return payoutRates;
@@ -113,7 +137,8 @@ public final class Partner {
     }
 
     /**
-     * @return The user currently attributed as this user's primary referrer. Null when there is no active primary referral.
+     * @return The user who referred this user. Deprecated: no longer populated. Always <code>null</code>.
+     * DEPRECATED: No longer populated. Always null.
      */
     @JsonIgnore
     public Optional<UserSummary> getReferringPartner() {
@@ -189,6 +214,8 @@ public final class Partner {
         return accountId.equals(other.accountId)
                 && certificationComplete == other.certificationComplete
                 && joinedAt.equals(other.joinedAt)
+                && leadSlotLimit == other.leadSlotLimit
+                && leadSlotsUsed == other.leadSlotsUsed
                 && payoutRates.equals(other.payoutRates)
                 && referredBusinessesCount == other.referredBusinessesCount
                 && referringPartner.equals(other.referringPartner)
@@ -203,6 +230,8 @@ public final class Partner {
                 this.accountId,
                 this.certificationComplete,
                 this.joinedAt,
+                this.leadSlotLimit,
+                this.leadSlotsUsed,
                 this.payoutRates,
                 this.referredBusinessesCount,
                 this.referringPartner,
@@ -224,9 +253,23 @@ public final class Partner {
         /**
          * <p>Whether the user finished the partner certification course: every visible quiz and knowledge check has a passing result, or, when the course has none, every visible lesson is marked completed.</p>
          */
-        ReferredBusinessesCountStage certificationComplete(boolean certificationComplete);
+        LeadSlotLimitStage certificationComplete(boolean certificationComplete);
 
         Builder from(Partner other);
+    }
+
+    public interface LeadSlotLimitStage {
+        /**
+         * <p>How many leads the partner can hold at once. A waiting lead offer takes a slot, and so does a lead accepted in the last 30 days whose business has made $1 or less.</p>
+         */
+        LeadSlotsUsedStage leadSlotLimit(int leadSlotLimit);
+    }
+
+    public interface LeadSlotsUsedStage {
+        /**
+         * <p>How many of the partner's lead slots are taken now.</p>
+         */
+        ReferredBusinessesCountStage leadSlotsUsed(int leadSlotsUsed);
     }
 
     public interface ReferredBusinessesCountStage {
@@ -282,7 +325,8 @@ public final class Partner {
         _FinalStage addAllPayoutRates(List<PartnerPayoutTier> payoutRates);
 
         /**
-         * <p>The user currently attributed as this user's primary referrer. Null when there is no active primary referral.</p>
+         * <p>The user who referred this user. Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         _FinalStage referringPartner(Optional<UserSummary> referringPartner);
 
@@ -303,11 +347,17 @@ public final class Partner {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements CertificationCompleteStage,
+                    LeadSlotLimitStage,
+                    LeadSlotsUsedStage,
                     ReferredBusinessesCountStage,
                     UserStage,
                     VerificationWaitlistJoinedStage,
                     _FinalStage {
         private boolean certificationComplete;
+
+        private int leadSlotLimit;
+
+        private int leadSlotsUsed;
 
         private int referredBusinessesCount;
 
@@ -334,6 +384,8 @@ public final class Partner {
             accountId(other.getAccountId());
             certificationComplete(other.getCertificationComplete());
             joinedAt(other.getJoinedAt());
+            leadSlotLimit(other.getLeadSlotLimit());
+            leadSlotsUsed(other.getLeadSlotsUsed());
             payoutRates(other.getPayoutRates());
             referredBusinessesCount(other.getReferredBusinessesCount());
             referringPartner(other.getReferringPartner());
@@ -349,8 +401,30 @@ public final class Partner {
          */
         @java.lang.Override
         @JsonSetter("certification_complete")
-        public ReferredBusinessesCountStage certificationComplete(boolean certificationComplete) {
+        public LeadSlotLimitStage certificationComplete(boolean certificationComplete) {
             this.certificationComplete = certificationComplete;
+            return this;
+        }
+
+        /**
+         * <p>How many leads the partner can hold at once. A waiting lead offer takes a slot, and so does a lead accepted in the last 30 days whose business has made $1 or less.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("lead_slot_limit")
+        public LeadSlotsUsedStage leadSlotLimit(int leadSlotLimit) {
+            this.leadSlotLimit = leadSlotLimit;
+            return this;
+        }
+
+        /**
+         * <p>How many of the partner's lead slots are taken now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("lead_slots_used")
+        public ReferredBusinessesCountStage leadSlotsUsed(int leadSlotsUsed) {
+            this.leadSlotsUsed = leadSlotsUsed;
             return this;
         }
 
@@ -424,7 +498,8 @@ public final class Partner {
         }
 
         /**
-         * <p>The user currently attributed as this user's primary referrer. Null when there is no active primary referral.</p>
+         * <p>The user who referred this user. Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -440,7 +515,8 @@ public final class Partner {
         }
 
         /**
-         * <p>The user currently attributed as this user's primary referrer. Null when there is no active primary referral.</p>
+         * <p>The user who referred this user. Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -450,7 +526,8 @@ public final class Partner {
         }
 
         /**
-         * <p>The user currently attributed as this user's primary referrer. Null when there is no active primary referral.</p>
+         * <p>The user who referred this user. Deprecated: no longer populated. Always <code>null</code>.
+         * DEPRECATED: No longer populated. Always null.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "referring_partner", nulls = Nulls.SKIP)
@@ -561,6 +638,8 @@ public final class Partner {
                     accountId,
                     certificationComplete,
                     joinedAt,
+                    leadSlotLimit,
+                    leadSlotsUsed,
                     payoutRates,
                     referredBusinessesCount,
                     referringPartner,
@@ -575,6 +654,8 @@ public final class Partner {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("certification_complete")
                     || key.equalsIgnoreCase("joined_at")
+                    || key.equalsIgnoreCase("lead_slot_limit")
+                    || key.equalsIgnoreCase("lead_slots_used")
                     || key.equalsIgnoreCase("payout_rates")
                     || key.equalsIgnoreCase("referred_businesses_count")
                     || key.equalsIgnoreCase("referring_partner")

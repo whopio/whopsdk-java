@@ -261,7 +261,7 @@ public final class SetupIntent {
     }
 
     /**
-     * @return The user saving the payment method. Null when the buyer is a company rather than a user.
+     * @return The user saving the payment method. Null when the buyer is an account rather than a user.
      */
     @JsonIgnore
     public Optional<UserSummary> getUser() {
@@ -549,7 +549,7 @@ public final class SetupIntent {
         _FinalStage threeDsLevel(Nullable<SetupIntentThreeDsLevel> threeDsLevel);
 
         /**
-         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         * <p>The user saving the payment method. Null when the buyer is an account rather than a user.</p>
          */
         _FinalStage user(Optional<UserSummary> user);
 
@@ -677,7 +677,7 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         * <p>The user saving the payment method. Null when the buyer is an account rather than a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -693,7 +693,7 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         * <p>The user saving the payment method. Null when the buyer is an account rather than a user.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -703,7 +703,7 @@ public final class SetupIntent {
         }
 
         /**
-         * <p>The user saving the payment method. Null when the buyer is a company rather than a user.</p>
+         * <p>The user saving the payment method. Null when the buyer is an account rather than a user.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "user", nulls = Nulls.SKIP)

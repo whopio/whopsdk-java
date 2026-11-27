@@ -10,6 +10,7 @@ import com.whop.api.resources.paymentrules.requests.ActivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.CreatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeactivatePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.DeletePaymentRulesRequest;
+import com.whop.api.resources.paymentrules.requests.ListFieldsPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ListPaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.ReplacePaymentRulesRequest;
 import com.whop.api.resources.paymentrules.requests.RetrievePaymentRulesRequest;
@@ -63,14 +64,14 @@ public class PaymentRulesClient {
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public PaymentRule create(CreatePaymentRulesRequest request) {
         return this.rawClient.create(request).body();
     }
 
     /**
-     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>.
+     * Creates a payment rule. It is created <code>active</code> and applies its <code>action</code> to new payments that match all of its <code>conditions</code>. A rule on a bank check field applies after the bank authorizes the card.
      */
     public PaymentRule create(CreatePaymentRulesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(request, requestOptions).body();
@@ -88,6 +89,21 @@ public class PaymentRulesClient {
      */
     public ListFieldsPaymentRulesResponse listFields(RequestOptions requestOptions) {
         return this.rawClient.listFields(requestOptions).body();
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public ListFieldsPaymentRulesResponse listFields(ListFieldsPaymentRulesRequest request) {
+        return this.rawClient.listFields(request).body();
+    }
+
+    /**
+     * Lists the payment attributes a rule condition can read, with the operators and values each one accepts. Small and returned in full on one page.
+     */
+    public ListFieldsPaymentRulesResponse listFields(
+            ListFieldsPaymentRulesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.listFields(request, requestOptions).body();
     }
 
     /**

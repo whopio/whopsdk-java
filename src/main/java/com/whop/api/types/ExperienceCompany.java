@@ -43,7 +43,7 @@ public final class ExperienceCompany {
     }
 
     /**
-     * @return URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.
+     * @return URL slug for the account's store page. For example, <code>shine-time-auto-detailing</code> in whop.com/shine-time-auto-detailing.
      */
     @JsonProperty("route")
     public String getRoute() {
@@ -98,7 +98,7 @@ public final class ExperienceCompany {
 
     public interface RouteStage {
         /**
-         * <p>URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.</p>
+         * <p>URL slug for the account's store page. For example, <code>shine-time-auto-detailing</code> in whop.com/shine-time-auto-detailing.</p>
          */
         TitleStage route(@NotNull String route);
     }
@@ -150,7 +150,7 @@ public final class ExperienceCompany {
         }
 
         /**
-         * <p>URL slug for the account's store page. For example, <code>pickaxe</code> in whop.com/pickaxe.</p>
+         * <p>URL slug for the account's store page. For example, <code>shine-time-auto-detailing</code> in whop.com/shine-time-auto-detailing.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

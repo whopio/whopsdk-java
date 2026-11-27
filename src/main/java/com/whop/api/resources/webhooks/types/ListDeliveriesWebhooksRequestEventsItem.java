@@ -168,6 +168,9 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
     public static final ListDeliveriesWebhooksRequestEventsItem PRODUCT_DELETED =
             new ListDeliveriesWebhooksRequestEventsItem(Value.PRODUCT_DELETED, "product.deleted");
 
+    public static final ListDeliveriesWebhooksRequestEventsItem CAPITAL_CREATED =
+            new ListDeliveriesWebhooksRequestEventsItem(Value.CAPITAL_CREATED, "capital.created");
+
     public static final ListDeliveriesWebhooksRequestEventsItem PAYMENT_CREATED =
             new ListDeliveriesWebhooksRequestEventsItem(Value.PAYMENT_CREATED, "payment.created");
 
@@ -286,6 +289,9 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
     public static final ListDeliveriesWebhooksRequestEventsItem PAYMENT_FAILED =
             new ListDeliveriesWebhooksRequestEventsItem(Value.PAYMENT_FAILED, "payment.failed");
 
+    public static final ListDeliveriesWebhooksRequestEventsItem CAPITAL_UPDATED =
+            new ListDeliveriesWebhooksRequestEventsItem(Value.CAPITAL_UPDATED, "capital.updated");
+
     public static final ListDeliveriesWebhooksRequestEventsItem ACCOUNT_FINANCING_APPROVED =
             new ListDeliveriesWebhooksRequestEventsItem(Value.ACCOUNT_FINANCING_APPROVED, "account.financing_approved");
 
@@ -333,6 +339,9 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
 
     public static final ListDeliveriesWebhooksRequestEventsItem DOMAIN_CREATED =
             new ListDeliveriesWebhooksRequestEventsItem(Value.DOMAIN_CREATED, "domain.created");
+
+    public static final ListDeliveriesWebhooksRequestEventsItem AD_CAMPAIGN_CLAIM_ENDED =
+            new ListDeliveriesWebhooksRequestEventsItem(Value.AD_CAMPAIGN_CLAIM_ENDED, "ad_campaign.claim_ended");
 
     public static final ListDeliveriesWebhooksRequestEventsItem MEMBERSHIP_EXPERIENCE_CLAIMED =
             new ListDeliveriesWebhooksRequestEventsItem(
@@ -522,6 +531,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return visitor.visitCardApplicationApproved();
             case PRODUCT_DELETED:
                 return visitor.visitProductDeleted();
+            case CAPITAL_CREATED:
+                return visitor.visitCapitalCreated();
             case PAYMENT_CREATED:
                 return visitor.visitPaymentCreated();
             case INVOICE_MARKED_UNCOLLECTIBLE:
@@ -596,6 +607,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return visitor.visitDomainUpdated();
             case PAYMENT_FAILED:
                 return visitor.visitPaymentFailed();
+            case CAPITAL_UPDATED:
+                return visitor.visitCapitalUpdated();
             case ACCOUNT_FINANCING_APPROVED:
                 return visitor.visitAccountFinancingApproved();
             case RESOLUTION_DECIDED:
@@ -626,6 +639,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return visitor.visitResolutionCenterCaseDecided();
             case DOMAIN_CREATED:
                 return visitor.visitDomainCreated();
+            case AD_CAMPAIGN_CLAIM_ENDED:
+                return visitor.visitAdCampaignClaimEnded();
             case MEMBERSHIP_EXPERIENCE_CLAIMED:
                 return visitor.visitMembershipExperienceClaimed();
             case PRODUCT_PUBLISHED:
@@ -771,6 +786,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return CARD_APPLICATION_APPROVED;
             case "product.deleted":
                 return PRODUCT_DELETED;
+            case "capital.created":
+                return CAPITAL_CREATED;
             case "payment.created":
                 return PAYMENT_CREATED;
             case "invoice.marked_uncollectible":
@@ -845,6 +862,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return DOMAIN_UPDATED;
             case "payment.failed":
                 return PAYMENT_FAILED;
+            case "capital.updated":
+                return CAPITAL_UPDATED;
             case "account.financing_approved":
                 return ACCOUNT_FINANCING_APPROVED;
             case "resolution.decided":
@@ -875,6 +894,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
                 return RESOLUTION_CENTER_CASE_DECIDED;
             case "domain.created":
                 return DOMAIN_CREATED;
+            case "ad_campaign.claim_ended":
+                return AD_CAMPAIGN_CLAIM_ENDED;
             case "membership.experience_claimed":
                 return MEMBERSHIP_EXPERIENCE_CLAIMED;
             case "product.published":
@@ -1017,6 +1038,10 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
 
         DOMAIN_DELETED,
 
+        CAPITAL_CREATED,
+
+        CAPITAL_UPDATED,
+
         PAYOUT_METHOD_CREATED,
 
         VERIFICATION_SUCCEEDED,
@@ -1074,6 +1099,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
         AD_CAMPAIGN_EVENTS,
 
         AD_CAMPAIGN_DELETED,
+
+        AD_CAMPAIGN_CLAIM_ENDED,
 
         AD_GROUP_CREATED,
 
@@ -1261,6 +1288,10 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
 
         T visitDomainDeleted();
 
+        T visitCapitalCreated();
+
+        T visitCapitalUpdated();
+
         T visitPayoutMethodCreated();
 
         T visitVerificationSucceeded();
@@ -1318,6 +1349,8 @@ public final class ListDeliveriesWebhooksRequestEventsItem {
         T visitAdCampaignEvents();
 
         T visitAdCampaignDeleted();
+
+        T visitAdCampaignClaimEnded();
 
         T visitAdGroupCreated();
 

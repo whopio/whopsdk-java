@@ -32,6 +32,10 @@ public final class ListAutomationsRequestTriggerEvent {
     public static final ListAutomationsRequestTriggerEvent INVOICE_PAID =
             new ListAutomationsRequestTriggerEvent(Value.INVOICE_PAID, "invoice.paid");
 
+    public static final ListAutomationsRequestTriggerEvent MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED =
+            new ListAutomationsRequestTriggerEvent(
+                    Value.MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED, "membership.cancel_at_period_end_changed");
+
     public static final ListAutomationsRequestTriggerEvent MEMBERSHIP_TRIAL_ENDING_SOON =
             new ListAutomationsRequestTriggerEvent(Value.MEMBERSHIP_TRIAL_ENDING_SOON, "membership.trial_ending_soon");
 
@@ -98,6 +102,8 @@ public final class ListAutomationsRequestTriggerEvent {
                 return visitor.visitMembershipActivated();
             case INVOICE_PAID:
                 return visitor.visitInvoicePaid();
+            case MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED:
+                return visitor.visitMembershipCancelAtPeriodEndChanged();
             case MEMBERSHIP_TRIAL_ENDING_SOON:
                 return visitor.visitMembershipTrialEndingSoon();
             case REFUND_CREATED:
@@ -133,6 +139,8 @@ public final class ListAutomationsRequestTriggerEvent {
                 return MEMBERSHIP_ACTIVATED;
             case "invoice.paid":
                 return INVOICE_PAID;
+            case "membership.cancel_at_period_end_changed":
+                return MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED;
             case "membership.trial_ending_soon":
                 return MEMBERSHIP_TRIAL_ENDING_SOON;
             case "refund.created":
@@ -156,6 +164,8 @@ public final class ListAutomationsRequestTriggerEvent {
         MEMBERSHIP_ACTIVATED,
 
         MEMBERSHIP_TRIAL_ENDING_SOON,
+
+        MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED,
 
         MEMBER_CREATED,
 
@@ -186,6 +196,8 @@ public final class ListAutomationsRequestTriggerEvent {
         T visitMembershipActivated();
 
         T visitMembershipTrialEndingSoon();
+
+        T visitMembershipCancelAtPeriodEndChanged();
 
         T visitMemberCreated();
 

@@ -48,28 +48,28 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list() {
         return list(ListPaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(RequestOptions requestOptions) {
         return list(ListPaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(ListPaymentMethodDomainsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead.
+     * Lists the payment method domains registered for your account and its subaccounts. Deprecated: list domains with <code>GET /domains</code> and the <code>apple_pay</code> filter instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<SyncPagingIterable<PaymentMethodDomain>> list(
             ListPaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -198,14 +198,14 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> create(CreatePaymentMethodDomainsRequest request) {
         return create(request, null);
     }
 
     /**
-     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead.
+     * Registers a hostname with the wallet provider and attempts verification inline. Returns <code>verified</code> when the provider fetched the domain-association file (for Apple Pay, <code>/.well-known/apple-developer-merchantid-domain-association</code>), or <code>pending</code> when it could not: host the file, then retry with <code>POST /payment_method_domains/:id/verify</code>. Deprecated: add Apple Pay with <code>POST /domains</code> and <code>apple_pay: {}</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> create(
             CreatePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -285,28 +285,28 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id) {
         return retrieve(id, RetrievePaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(String id, RetrievePaymentMethodDomainsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID.
+     * Retrieves a payment method domain to check its verification status. Deprecated: retrieve the domain with <code>GET /domains/{id}</code> instead, using the same ID. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> retrieve(
             String id, RetrievePaymentMethodDomainsRequest request, RequestOptions requestOptions) {
@@ -463,28 +463,28 @@ public class RawPaymentMethodDomainsClient {
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id) {
         return verify(id, VerifyPaymentMethodDomainsRequest.builder().build());
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id, RequestOptions requestOptions) {
         return verify(id, VerifyPaymentMethodDomainsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(String id, VerifyPaymentMethodDomainsRequest request) {
         return verify(id, request, null);
     }
 
     /**
-     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead.
+     * Re-attempts provider verification of a pending domain once the association file is hosted. Fails with a <code>bad_request</code> explaining what to fix; verifying an already <code>verified</code> domain is a no-op. Deprecated: check the domain with <code>POST /domains/{id}/check</code> instead. Stops responding after 2026-12-23.
      */
     public WhopApiHttpResponse<PaymentMethodDomain> verify(
             String id, VerifyPaymentMethodDomainsRequest request, RequestOptions requestOptions) {

@@ -37,6 +37,9 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
     public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName HYPE =
             new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.HYPE, "HYPE");
 
+    public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName TRX =
+            new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.TRX, "TRX");
+
     public static final CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName SOL =
             new CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesItemName(Value.SOL, "SOL");
 
@@ -121,6 +124,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
                 return visitor.visitXpl();
             case HYPE:
                 return visitor.visitHype();
+            case TRX:
+                return visitor.visitTrx();
             case SOL:
                 return visitor.visitSol();
             case USDG:
@@ -170,6 +175,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
                 return XPL;
             case "HYPE":
                 return HYPE;
+            case "TRX":
+                return TRX;
             case "SOL":
                 return SOL;
             case "USDG":
@@ -211,6 +218,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         PYUSD,
 
         SOL,
+
+        TRX,
 
         USD1,
 
@@ -255,6 +264,8 @@ public final class CreateDepositsResponseMethodsCryptoItemSupportedCurrenciesIte
         T visitPyusd();
 
         T visitSol();
+
+        T visitTrx();
 
         T visitUsd1();
 

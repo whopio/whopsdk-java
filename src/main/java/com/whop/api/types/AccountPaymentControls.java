@@ -158,7 +158,7 @@ public final class AccountPaymentControls {
     }
 
     /**
-     * @return Automatic refund settings for resolution center cases.
+     * @return Settings for automatic refunds of Resolution Center cases. You can change them with <code>PATCH /accounts/{id}</code>.
      */
     @JsonProperty("resolution_center_auto_refund")
     public AccountResolutionCenterAutoRefundControl getResolutionCenterAutoRefund() {
@@ -308,7 +308,7 @@ public final class AccountPaymentControls {
 
     public interface ResolutionCenterAutoRefundStage {
         /**
-         * <p>Automatic refund settings for resolution center cases.</p>
+         * <p>Settings for automatic refunds of Resolution Center cases. You can change them with <code>PATCH /accounts/{id}</code>.</p>
          */
         WithdrawalScheduleStage resolutionCenterAutoRefund(
                 @NotNull AccountResolutionCenterAutoRefundControl resolutionCenterAutoRefund);
@@ -503,7 +503,7 @@ public final class AccountPaymentControls {
         }
 
         /**
-         * <p>Automatic refund settings for resolution center cases.</p>
+         * <p>Settings for automatic refunds of Resolution Center cases. You can change them with <code>PATCH /accounts/{id}</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = Invoice.Builder.class)
 public final class Invoice {
+    private final AccountSummary account;
+
     private final String accountId;
 
     private final Money amountDue;
@@ -36,6 +38,8 @@ public final class Invoice {
     private final Money buyerFeeAmount;
 
     private final double buyerFeePercentage;
+
+    private final boolean chargeAtSubscriptionStart;
 
     private final Optional<String> checkoutLink;
 
@@ -52,6 +56,8 @@ public final class Invoice {
     private final String id;
 
     private final Optional<String> invoicePrefix;
+
+    private final Optional<String> issuedAt;
 
     private final List<InvoiceLineItem> lineItems;
 
@@ -77,6 +83,28 @@ public final class Invoice {
 
     private final Optional<String> paymentMethodId;
 
+    private final Optional<String> quoteAcceptedAt;
+
+    private final Optional<Money> quoteAmountPaid;
+
+    private final Optional<Money> quoteAmountRemaining;
+
+    private final Optional<Money> quoteDepositAmount;
+
+    private final Optional<Double> quoteDepositPercentage;
+
+    private final List<String> quoteInvoiceIds;
+
+    private final Optional<String> quotePaymentUrl;
+
+    private final Optional<String> quoteSentAt;
+
+    private final Optional<String> quoteSignatureUrl;
+
+    private final Optional<String> quoteSignerEmail;
+
+    private final Optional<String> quoteSignerName;
+
     private final List<String> recipientEmails;
 
     private final Optional<String> scheduledChargeAt;
@@ -89,9 +117,13 @@ public final class Invoice {
 
     private final InvoiceStatus status;
 
+    private final Optional<String> subscriptionStartsAt;
+
     private final Money subtotal;
 
     private final Optional<Money> taxAmount;
+
+    private final String timeZone;
 
     private final Money total;
 
@@ -102,11 +134,13 @@ public final class Invoice {
     private final Map<String, Object> additionalProperties;
 
     private Invoice(
+            AccountSummary account,
             String accountId,
             Money amountDue,
             Optional<PaymentAddress> billingAddress,
             Money buyerFeeAmount,
             double buyerFeePercentage,
+            boolean chargeAtSubscriptionStart,
             Optional<String> checkoutLink,
             String createdAt,
             Optional<String> customerName,
@@ -115,6 +149,7 @@ public final class Invoice {
             Optional<String> emailAddress,
             String id,
             Optional<String> invoicePrefix,
+            Optional<String> issuedAt,
             List<InvoiceLineItem> lineItems,
             Optional<String> mailingAddressId,
             Optional<String> memberId,
@@ -127,23 +162,38 @@ public final class Invoice {
             Optional<String> paidAt,
             Optional<CheckoutSessionPaymentMethodConfiguration> paymentMethodConfiguration,
             Optional<String> paymentMethodId,
+            Optional<String> quoteAcceptedAt,
+            Optional<Money> quoteAmountPaid,
+            Optional<Money> quoteAmountRemaining,
+            Optional<Money> quoteDepositAmount,
+            Optional<Double> quoteDepositPercentage,
+            List<String> quoteInvoiceIds,
+            Optional<String> quotePaymentUrl,
+            Optional<String> quoteSentAt,
+            Optional<String> quoteSignatureUrl,
+            Optional<String> quoteSignerEmail,
+            Optional<String> quoteSignerName,
             List<String> recipientEmails,
             Optional<String> scheduledChargeAt,
             Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod,
             Optional<String> scheduledSendAt,
             boolean sendsOnDueDate,
             InvoiceStatus status,
+            Optional<String> subscriptionStartsAt,
             Money subtotal,
             Optional<Money> taxAmount,
+            String timeZone,
             Money total,
             InvoiceTotalsStatus totalsStatus,
             String updatedAt,
             Map<String, Object> additionalProperties) {
+        this.account = account;
         this.accountId = accountId;
         this.amountDue = amountDue;
         this.billingAddress = billingAddress;
         this.buyerFeeAmount = buyerFeeAmount;
         this.buyerFeePercentage = buyerFeePercentage;
+        this.chargeAtSubscriptionStart = chargeAtSubscriptionStart;
         this.checkoutLink = checkoutLink;
         this.createdAt = createdAt;
         this.customerName = customerName;
@@ -152,6 +202,7 @@ public final class Invoice {
         this.emailAddress = emailAddress;
         this.id = id;
         this.invoicePrefix = invoicePrefix;
+        this.issuedAt = issuedAt;
         this.lineItems = lineItems;
         this.mailingAddressId = mailingAddressId;
         this.memberId = memberId;
@@ -164,18 +215,39 @@ public final class Invoice {
         this.paidAt = paidAt;
         this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.paymentMethodId = paymentMethodId;
+        this.quoteAcceptedAt = quoteAcceptedAt;
+        this.quoteAmountPaid = quoteAmountPaid;
+        this.quoteAmountRemaining = quoteAmountRemaining;
+        this.quoteDepositAmount = quoteDepositAmount;
+        this.quoteDepositPercentage = quoteDepositPercentage;
+        this.quoteInvoiceIds = quoteInvoiceIds;
+        this.quotePaymentUrl = quotePaymentUrl;
+        this.quoteSentAt = quoteSentAt;
+        this.quoteSignatureUrl = quoteSignatureUrl;
+        this.quoteSignerEmail = quoteSignerEmail;
+        this.quoteSignerName = quoteSignerName;
         this.recipientEmails = recipientEmails;
         this.scheduledChargeAt = scheduledChargeAt;
         this.scheduledCollectionMethod = scheduledCollectionMethod;
         this.scheduledSendAt = scheduledSendAt;
         this.sendsOnDueDate = sendsOnDueDate;
         this.status = status;
+        this.subscriptionStartsAt = subscriptionStartsAt;
         this.subtotal = subtotal;
         this.taxAmount = taxAmount;
+        this.timeZone = timeZone;
         this.total = total;
         this.totalsStatus = totalsStatus;
         this.updatedAt = updatedAt;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The account that sent the invoice.
+     */
+    @JsonProperty("account")
+    public AccountSummary getAccount() {
+        return account;
     }
 
     @JsonProperty("account_id")
@@ -204,6 +276,14 @@ public final class Invoice {
     @JsonProperty("buyer_fee_percentage")
     public double getBuyerFeePercentage() {
         return buyerFeePercentage;
+    }
+
+    /**
+     * @return True when the customer pays only the initial fee of each item now and is first charged the renewal price at <code>subscription_starts_at</code>. Until then the membership is <code>scheduled</code> and has no access.
+     */
+    @JsonProperty("charge_at_subscription_start")
+    public boolean getChargeAtSubscriptionStart() {
+        return chargeAtSubscriptionStart;
     }
 
     /**
@@ -267,6 +347,17 @@ public final class Invoice {
         return invoicePrefix;
     }
 
+    /**
+     * @return When the invoice was issued, as an ISO 8601 timestamp. This is when it left draft, which can be after <code>created_at</code> for an invoice drafted or scheduled ahead. <code>null</code> while the invoice is a draft, and for invoices issued before this field was introduced.
+     */
+    @JsonIgnore
+    public Optional<String> getIssuedAt() {
+        if (issuedAt == null) {
+            return Optional.empty();
+        }
+        return issuedAt;
+    }
+
     @JsonProperty("line_items")
     public List<InvoiceLineItem> getLineItems() {
         return lineItems;
@@ -310,6 +401,9 @@ public final class Invoice {
         return memo;
     }
 
+    /**
+     * @return Key-value pairs the seller stored on the invoice. Empty when the invoice is read without a credential.
+     */
     @JsonProperty("metadata")
     public Map<String, String> getMetadata() {
         return metadata;
@@ -357,6 +451,121 @@ public final class Invoice {
         return paymentMethodId;
     }
 
+    /**
+     * @return When the customer accepted and signed the quote, as an ISO 8601 timestamp. An edit to the draft clears it, unless the edit changes only <code>recipient_emails</code>. <code>null</code> when the quote was not accepted.
+     */
+    @JsonIgnore
+    public Optional<String> getQuoteAcceptedAt() {
+        if (quoteAcceptedAt == null) {
+            return Optional.empty();
+        }
+        return quoteAcceptedAt;
+    }
+
+    /**
+     * @return How much of the quote its paid invoices in <code>quote_invoice_ids</code> cover, before tax. <code>null</code> when the invoice was never sent as a quote.
+     */
+    @JsonIgnore
+    public Optional<Money> getQuoteAmountPaid() {
+        if (quoteAmountPaid == null) {
+            return Optional.empty();
+        }
+        return quoteAmountPaid;
+    }
+
+    /**
+     * @return How much of the quote is not yet billed: its line items before tax, minus every invoice in <code>quote_invoice_ids</code>. <code>null</code> when the invoice was never sent as a quote.
+     */
+    @JsonIgnore
+    public Optional<Money> getQuoteAmountRemaining() {
+        if (quoteAmountRemaining == null) {
+            return Optional.empty();
+        }
+        return quoteAmountRemaining;
+    }
+
+    /**
+     * @return How much is billed as a deposit when the customer signs, before tax. <code>null</code> when the quote has no deposit.
+     */
+    @JsonIgnore
+    public Optional<Money> getQuoteDepositAmount() {
+        if (quoteDepositAmount == null) {
+            return Optional.empty();
+        }
+        return quoteDepositAmount;
+    }
+
+    /**
+     * @return The share of the quote billed as a deposit when the customer signs, such as <code>30</code> for 30%. <code>null</code> when the deposit is a fixed amount or there is none.
+     */
+    @JsonIgnore
+    public Optional<Double> getQuoteDepositPercentage() {
+        if (quoteDepositPercentage == null) {
+            return Optional.empty();
+        }
+        return quoteDepositPercentage;
+    }
+
+    @JsonProperty("quote_invoice_ids")
+    public List<String> getQuoteInvoiceIds() {
+        return quoteInvoiceIds;
+    }
+
+    /**
+     * @return Where the customer pays the next unpaid invoice in <code>quote_invoice_ids</code>. Only returned when the quote is read with its customer <code>token</code>. <code>null</code> otherwise, and when nothing is waiting to be paid.
+     */
+    @JsonIgnore
+    public Optional<String> getQuotePaymentUrl() {
+        if (quotePaymentUrl == null) {
+            return Optional.empty();
+        }
+        return quotePaymentUrl;
+    }
+
+    /**
+     * @return When the draft was last emailed to its recipients as a quote, as an ISO 8601 timestamp. A quote stays a draft and cannot be paid. It is not issued on its <code>due_at</code>. <code>null</code> when the invoice was never sent as a quote.
+     */
+    @JsonIgnore
+    public Optional<String> getQuoteSentAt() {
+        if (quoteSentAt == null) {
+            return Optional.empty();
+        }
+        return quoteSentAt;
+    }
+
+    /**
+     * @return A link to the signature the customer drew, as a PNG image with a transparent background. The link expires after a short time. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.
+     */
+    @JsonIgnore
+    public Optional<String> getQuoteSignatureUrl() {
+        if (quoteSignatureUrl == null) {
+            return Optional.empty();
+        }
+        return quoteSignatureUrl;
+    }
+
+    /**
+     * @return The email address of the Whop user who signed the quote. <code>null</code> when the quote was not accepted, when the signer was not signed in to Whop, and without the member:email:read permission.
+     */
+    @JsonIgnore
+    public Optional<String> getQuoteSignerEmail() {
+        if (quoteSignerEmail == null) {
+            return Optional.empty();
+        }
+        return quoteSignerEmail;
+    }
+
+    /**
+     * @return The full name the customer typed to sign the quote. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.
+     */
+    @JsonIgnore
+    public Optional<String> getQuoteSignerName() {
+        if (quoteSignerName == null) {
+            return Optional.empty();
+        }
+        return quoteSignerName;
+    }
+
     @JsonProperty("recipient_emails")
     public List<String> getRecipientEmails() {
         return recipientEmails;
@@ -393,7 +602,7 @@ public final class Invoice {
     }
 
     /**
-     * @return Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.
+     * @return Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft, for a draft with a scheduled send, and for a draft sent as a quote. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.
      */
     @JsonProperty("sends_on_due_date")
     public boolean getSendsOnDueDate() {
@@ -405,11 +614,25 @@ public final class Invoice {
         return status;
     }
 
+    /**
+     * @return When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid, and so does a time that has passed by then. An invoice with a start date skips its variants' free trial. With <code>charge_at_subscription_start</code>, the subscription and its access begin at this moment instead.
+     */
+    @JsonIgnore
+    public Optional<String> getSubscriptionStartsAt() {
+        if (subscriptionStartsAt == null) {
+            return Optional.empty();
+        }
+        return subscriptionStartsAt;
+    }
+
     @JsonProperty("subtotal")
     public Money getSubtotal() {
         return subtotal;
     }
 
+    /**
+     * @return The tax charged on the invoice. On a draft, it is an estimate once the draft has a complete billing address, calculated as if it were issued now. Issuing calculates it again, so the final tax can differ. <code>null</code> on a draft without a complete billing address, and when tax could not be estimated.
+     */
     @JsonIgnore
     public Optional<Money> getTaxAmount() {
         if (taxAmount == null) {
@@ -418,6 +641,17 @@ public final class Invoice {
         return taxAmount;
     }
 
+    /**
+     * @return The IANA time zone for the dates on the invoice's email and PDF, such as <code>America/New_York</code>. <code>UTC</code> unless one was set.
+     */
+    @JsonProperty("time_zone")
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    /**
+     * @return The amount the invoice charges, including tax. On a draft, it includes the estimated <code>tax_amount</code>, if any.
+     */
     @JsonProperty("total")
     public Money getTotal() {
         return total;
@@ -470,6 +704,12 @@ public final class Invoice {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("issued_at")
+    private Optional<String> _getIssuedAt() {
+        return issuedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("mailing_address_id")
     private Optional<String> _getMailingAddressId() {
         return mailingAddressId;
@@ -512,6 +752,66 @@ public final class Invoice {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_accepted_at")
+    private Optional<String> _getQuoteAcceptedAt() {
+        return quoteAcceptedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_amount_paid")
+    private Optional<Money> _getQuoteAmountPaid() {
+        return quoteAmountPaid;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_amount_remaining")
+    private Optional<Money> _getQuoteAmountRemaining() {
+        return quoteAmountRemaining;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_deposit_amount")
+    private Optional<Money> _getQuoteDepositAmount() {
+        return quoteDepositAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_deposit_percentage")
+    private Optional<Double> _getQuoteDepositPercentage() {
+        return quoteDepositPercentage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_payment_url")
+    private Optional<String> _getQuotePaymentUrl() {
+        return quotePaymentUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_sent_at")
+    private Optional<String> _getQuoteSentAt() {
+        return quoteSentAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_signature_url")
+    private Optional<String> _getQuoteSignatureUrl() {
+        return quoteSignatureUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_signer_email")
+    private Optional<String> _getQuoteSignerEmail() {
+        return quoteSignerEmail;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_signer_name")
+    private Optional<String> _getQuoteSignerName() {
+        return quoteSignerName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("scheduled_charge_at")
     private Optional<String> _getScheduledChargeAt() {
         return scheduledChargeAt;
@@ -527,6 +827,12 @@ public final class Invoice {
     @JsonProperty("scheduled_send_at")
     private Optional<String> _getScheduledSendAt() {
         return scheduledSendAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("subscription_starts_at")
+    private Optional<String> _getSubscriptionStartsAt() {
+        return subscriptionStartsAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -547,11 +853,13 @@ public final class Invoice {
     }
 
     private boolean equalTo(Invoice other) {
-        return accountId.equals(other.accountId)
+        return account.equals(other.account)
+                && accountId.equals(other.accountId)
                 && amountDue.equals(other.amountDue)
                 && billingAddress.equals(other.billingAddress)
                 && buyerFeeAmount.equals(other.buyerFeeAmount)
                 && buyerFeePercentage == other.buyerFeePercentage
+                && chargeAtSubscriptionStart == other.chargeAtSubscriptionStart
                 && checkoutLink.equals(other.checkoutLink)
                 && createdAt.equals(other.createdAt)
                 && customerName.equals(other.customerName)
@@ -560,6 +868,7 @@ public final class Invoice {
                 && emailAddress.equals(other.emailAddress)
                 && id.equals(other.id)
                 && invoicePrefix.equals(other.invoicePrefix)
+                && issuedAt.equals(other.issuedAt)
                 && lineItems.equals(other.lineItems)
                 && mailingAddressId.equals(other.mailingAddressId)
                 && memberId.equals(other.memberId)
@@ -572,14 +881,27 @@ public final class Invoice {
                 && paidAt.equals(other.paidAt)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && paymentMethodId.equals(other.paymentMethodId)
+                && quoteAcceptedAt.equals(other.quoteAcceptedAt)
+                && quoteAmountPaid.equals(other.quoteAmountPaid)
+                && quoteAmountRemaining.equals(other.quoteAmountRemaining)
+                && quoteDepositAmount.equals(other.quoteDepositAmount)
+                && quoteDepositPercentage.equals(other.quoteDepositPercentage)
+                && quoteInvoiceIds.equals(other.quoteInvoiceIds)
+                && quotePaymentUrl.equals(other.quotePaymentUrl)
+                && quoteSentAt.equals(other.quoteSentAt)
+                && quoteSignatureUrl.equals(other.quoteSignatureUrl)
+                && quoteSignerEmail.equals(other.quoteSignerEmail)
+                && quoteSignerName.equals(other.quoteSignerName)
                 && recipientEmails.equals(other.recipientEmails)
                 && scheduledChargeAt.equals(other.scheduledChargeAt)
                 && scheduledCollectionMethod.equals(other.scheduledCollectionMethod)
                 && scheduledSendAt.equals(other.scheduledSendAt)
                 && sendsOnDueDate == other.sendsOnDueDate
                 && status.equals(other.status)
+                && subscriptionStartsAt.equals(other.subscriptionStartsAt)
                 && subtotal.equals(other.subtotal)
                 && taxAmount.equals(other.taxAmount)
+                && timeZone.equals(other.timeZone)
                 && total.equals(other.total)
                 && totalsStatus.equals(other.totalsStatus)
                 && updatedAt.equals(other.updatedAt);
@@ -588,11 +910,13 @@ public final class Invoice {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.account,
                 this.accountId,
                 this.amountDue,
                 this.billingAddress,
                 this.buyerFeeAmount,
                 this.buyerFeePercentage,
+                this.chargeAtSubscriptionStart,
                 this.checkoutLink,
                 this.createdAt,
                 this.customerName,
@@ -601,6 +925,7 @@ public final class Invoice {
                 this.emailAddress,
                 this.id,
                 this.invoicePrefix,
+                this.issuedAt,
                 this.lineItems,
                 this.mailingAddressId,
                 this.memberId,
@@ -613,14 +938,27 @@ public final class Invoice {
                 this.paidAt,
                 this.paymentMethodConfiguration,
                 this.paymentMethodId,
+                this.quoteAcceptedAt,
+                this.quoteAmountPaid,
+                this.quoteAmountRemaining,
+                this.quoteDepositAmount,
+                this.quoteDepositPercentage,
+                this.quoteInvoiceIds,
+                this.quotePaymentUrl,
+                this.quoteSentAt,
+                this.quoteSignatureUrl,
+                this.quoteSignerEmail,
+                this.quoteSignerName,
                 this.recipientEmails,
                 this.scheduledChargeAt,
                 this.scheduledCollectionMethod,
                 this.scheduledSendAt,
                 this.sendsOnDueDate,
                 this.status,
+                this.subscriptionStartsAt,
                 this.subtotal,
                 this.taxAmount,
+                this.timeZone,
                 this.total,
                 this.totalsStatus,
                 this.updatedAt);
@@ -631,14 +969,21 @@ public final class Invoice {
         return ObjectMappers.stringify(this);
     }
 
-    public static AccountIdStage builder() {
+    public static AccountStage builder() {
         return new Builder();
+    }
+
+    public interface AccountStage {
+        /**
+         * <p>The account that sent the invoice.</p>
+         */
+        AccountIdStage account(@NotNull AccountSummary account);
+
+        Builder from(Invoice other);
     }
 
     public interface AccountIdStage {
         AmountDueStage accountId(@NotNull String accountId);
-
-        Builder from(Invoice other);
     }
 
     public interface AmountDueStage {
@@ -650,7 +995,14 @@ public final class Invoice {
     }
 
     public interface BuyerFeePercentageStage {
-        CreatedAtStage buyerFeePercentage(double buyerFeePercentage);
+        ChargeAtSubscriptionStartStage buyerFeePercentage(double buyerFeePercentage);
+    }
+
+    public interface ChargeAtSubscriptionStartStage {
+        /**
+         * <p>True when the customer pays only the initial fee of each item now and is first charged the renewal price at <code>subscription_starts_at</code>. Until then the membership is <code>scheduled</code> and has no access.</p>
+         */
+        CreatedAtStage chargeAtSubscriptionStart(boolean chargeAtSubscriptionStart);
     }
 
     public interface CreatedAtStage {
@@ -682,7 +1034,7 @@ public final class Invoice {
 
     public interface SendsOnDueDateStage {
         /**
-         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
+         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft, for a draft with a scheduled send, and for a draft sent as a quote. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
          */
         StatusStage sendsOnDueDate(boolean sendsOnDueDate);
     }
@@ -692,10 +1044,20 @@ public final class Invoice {
     }
 
     public interface SubtotalStage {
-        TotalStage subtotal(@NotNull Money subtotal);
+        TimeZoneStage subtotal(@NotNull Money subtotal);
+    }
+
+    public interface TimeZoneStage {
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF, such as <code>America/New_York</code>. <code>UTC</code> unless one was set.</p>
+         */
+        TotalStage timeZone(@NotNull String timeZone);
     }
 
     public interface TotalStage {
+        /**
+         * <p>The amount the invoice charges, including tax. On a draft, it includes the estimated <code>tax_amount</code>, if any.</p>
+         */
         TotalsStatusStage total(@NotNull Money total);
     }
 
@@ -753,6 +1115,15 @@ public final class Invoice {
 
         _FinalStage invoicePrefix(Nullable<String> invoicePrefix);
 
+        /**
+         * <p>When the invoice was issued, as an ISO 8601 timestamp. This is when it left draft, which can be after <code>created_at</code> for an invoice drafted or scheduled ahead. <code>null</code> while the invoice is a draft, and for invoices issued before this field was introduced.</p>
+         */
+        _FinalStage issuedAt(Optional<String> issuedAt);
+
+        _FinalStage issuedAt(String issuedAt);
+
+        _FinalStage issuedAt(Nullable<String> issuedAt);
+
         _FinalStage lineItems(List<InvoiceLineItem> lineItems);
 
         _FinalStage addLineItems(InvoiceLineItem lineItems);
@@ -789,6 +1160,9 @@ public final class Invoice {
 
         _FinalStage memo(Nullable<String> memo);
 
+        /**
+         * <p>Key-value pairs the seller stored on the invoice. Empty when the invoice is read without a credential.</p>
+         */
         _FinalStage metadata(Map<String, String> metadata);
 
         _FinalStage putAllMetadata(Map<String, String> metadata);
@@ -817,6 +1191,102 @@ public final class Invoice {
         _FinalStage paymentMethodId(String paymentMethodId);
 
         _FinalStage paymentMethodId(Nullable<String> paymentMethodId);
+
+        /**
+         * <p>When the customer accepted and signed the quote, as an ISO 8601 timestamp. An edit to the draft clears it, unless the edit changes only <code>recipient_emails</code>. <code>null</code> when the quote was not accepted.</p>
+         */
+        _FinalStage quoteAcceptedAt(Optional<String> quoteAcceptedAt);
+
+        _FinalStage quoteAcceptedAt(String quoteAcceptedAt);
+
+        _FinalStage quoteAcceptedAt(Nullable<String> quoteAcceptedAt);
+
+        /**
+         * <p>How much of the quote its paid invoices in <code>quote_invoice_ids</code> cover, before tax. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        _FinalStage quoteAmountPaid(Optional<Money> quoteAmountPaid);
+
+        _FinalStage quoteAmountPaid(Money quoteAmountPaid);
+
+        _FinalStage quoteAmountPaid(Nullable<Money> quoteAmountPaid);
+
+        /**
+         * <p>How much of the quote is not yet billed: its line items before tax, minus every invoice in <code>quote_invoice_ids</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        _FinalStage quoteAmountRemaining(Optional<Money> quoteAmountRemaining);
+
+        _FinalStage quoteAmountRemaining(Money quoteAmountRemaining);
+
+        _FinalStage quoteAmountRemaining(Nullable<Money> quoteAmountRemaining);
+
+        /**
+         * <p>How much is billed as a deposit when the customer signs, before tax. <code>null</code> when the quote has no deposit.</p>
+         */
+        _FinalStage quoteDepositAmount(Optional<Money> quoteDepositAmount);
+
+        _FinalStage quoteDepositAmount(Money quoteDepositAmount);
+
+        _FinalStage quoteDepositAmount(Nullable<Money> quoteDepositAmount);
+
+        /**
+         * <p>The share of the quote billed as a deposit when the customer signs, such as <code>30</code> for 30%. <code>null</code> when the deposit is a fixed amount or there is none.</p>
+         */
+        _FinalStage quoteDepositPercentage(Optional<Double> quoteDepositPercentage);
+
+        _FinalStage quoteDepositPercentage(Double quoteDepositPercentage);
+
+        _FinalStage quoteDepositPercentage(Nullable<Double> quoteDepositPercentage);
+
+        _FinalStage quoteInvoiceIds(List<String> quoteInvoiceIds);
+
+        _FinalStage addQuoteInvoiceIds(String quoteInvoiceIds);
+
+        _FinalStage addAllQuoteInvoiceIds(List<String> quoteInvoiceIds);
+
+        /**
+         * <p>Where the customer pays the next unpaid invoice in <code>quote_invoice_ids</code>. Only returned when the quote is read with its customer <code>token</code>. <code>null</code> otherwise, and when nothing is waiting to be paid.</p>
+         */
+        _FinalStage quotePaymentUrl(Optional<String> quotePaymentUrl);
+
+        _FinalStage quotePaymentUrl(String quotePaymentUrl);
+
+        _FinalStage quotePaymentUrl(Nullable<String> quotePaymentUrl);
+
+        /**
+         * <p>When the draft was last emailed to its recipients as a quote, as an ISO 8601 timestamp. A quote stays a draft and cannot be paid. It is not issued on its <code>due_at</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        _FinalStage quoteSentAt(Optional<String> quoteSentAt);
+
+        _FinalStage quoteSentAt(String quoteSentAt);
+
+        _FinalStage quoteSentAt(Nullable<String> quoteSentAt);
+
+        /**
+         * <p>A link to the signature the customer drew, as a PNG image with a transparent background. The link expires after a short time. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         */
+        _FinalStage quoteSignatureUrl(Optional<String> quoteSignatureUrl);
+
+        _FinalStage quoteSignatureUrl(String quoteSignatureUrl);
+
+        _FinalStage quoteSignatureUrl(Nullable<String> quoteSignatureUrl);
+
+        /**
+         * <p>The email address of the Whop user who signed the quote. <code>null</code> when the quote was not accepted, when the signer was not signed in to Whop, and without the member:email:read permission.</p>
+         */
+        _FinalStage quoteSignerEmail(Optional<String> quoteSignerEmail);
+
+        _FinalStage quoteSignerEmail(String quoteSignerEmail);
+
+        _FinalStage quoteSignerEmail(Nullable<String> quoteSignerEmail);
+
+        /**
+         * <p>The full name the customer typed to sign the quote. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         */
+        _FinalStage quoteSignerName(Optional<String> quoteSignerName);
+
+        _FinalStage quoteSignerName(String quoteSignerName);
+
+        _FinalStage quoteSignerName(Nullable<String> quoteSignerName);
 
         _FinalStage recipientEmails(List<String> recipientEmails);
 
@@ -848,6 +1318,18 @@ public final class Invoice {
 
         _FinalStage scheduledSendAt(Nullable<String> scheduledSendAt);
 
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid, and so does a time that has passed by then. An invoice with a start date skips its variants' free trial. With <code>charge_at_subscription_start</code>, the subscription and its access begin at this moment instead.</p>
+         */
+        _FinalStage subscriptionStartsAt(Optional<String> subscriptionStartsAt);
+
+        _FinalStage subscriptionStartsAt(String subscriptionStartsAt);
+
+        _FinalStage subscriptionStartsAt(Nullable<String> subscriptionStartsAt);
+
+        /**
+         * <p>The tax charged on the invoice. On a draft, it is an estimate once the draft has a complete billing address, calculated as if it were issued now. Issuing calculates it again, so the final tax can differ. <code>null</code> on a draft without a complete billing address, and when tax could not be estimated.</p>
+         */
         _FinalStage taxAmount(Optional<Money> taxAmount);
 
         _FinalStage taxAmount(Money taxAmount);
@@ -857,10 +1339,12 @@ public final class Invoice {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements AccountIdStage,
+            implements AccountStage,
+                    AccountIdStage,
                     AmountDueStage,
                     BuyerFeeAmountStage,
                     BuyerFeePercentageStage,
+                    ChargeAtSubscriptionStartStage,
                     CreatedAtStage,
                     DeletableStage,
                     IdStage,
@@ -870,10 +1354,13 @@ public final class Invoice {
                     SendsOnDueDateStage,
                     StatusStage,
                     SubtotalStage,
+                    TimeZoneStage,
                     TotalStage,
                     TotalsStatusStage,
                     UpdatedAtStage,
                     _FinalStage {
+        private AccountSummary account;
+
         private String accountId;
 
         private Money amountDue;
@@ -881,6 +1368,8 @@ public final class Invoice {
         private Money buyerFeeAmount;
 
         private double buyerFeePercentage;
+
+        private boolean chargeAtSubscriptionStart;
 
         private String createdAt;
 
@@ -900,6 +1389,8 @@ public final class Invoice {
 
         private Money subtotal;
 
+        private String timeZone;
+
         private Money total;
 
         private InvoiceTotalsStatus totalsStatus;
@@ -908,6 +1399,8 @@ public final class Invoice {
 
         private Optional<Money> taxAmount = Optional.empty();
 
+        private Optional<String> subscriptionStartsAt = Optional.empty();
+
         private Optional<String> scheduledSendAt = Optional.empty();
 
         private Optional<InvoiceScheduledCollectionMethod> scheduledCollectionMethod = Optional.empty();
@@ -915,6 +1408,28 @@ public final class Invoice {
         private Optional<String> scheduledChargeAt = Optional.empty();
 
         private List<String> recipientEmails = new ArrayList<>();
+
+        private Optional<String> quoteSignerName = Optional.empty();
+
+        private Optional<String> quoteSignerEmail = Optional.empty();
+
+        private Optional<String> quoteSignatureUrl = Optional.empty();
+
+        private Optional<String> quoteSentAt = Optional.empty();
+
+        private Optional<String> quotePaymentUrl = Optional.empty();
+
+        private List<String> quoteInvoiceIds = new ArrayList<>();
+
+        private Optional<Double> quoteDepositPercentage = Optional.empty();
+
+        private Optional<Money> quoteDepositAmount = Optional.empty();
+
+        private Optional<Money> quoteAmountRemaining = Optional.empty();
+
+        private Optional<Money> quoteAmountPaid = Optional.empty();
+
+        private Optional<String> quoteAcceptedAt = Optional.empty();
 
         private Optional<String> paymentMethodId = Optional.empty();
 
@@ -934,6 +1449,8 @@ public final class Invoice {
 
         private List<InvoiceLineItem> lineItems = new ArrayList<>();
 
+        private Optional<String> issuedAt = Optional.empty();
+
         private Optional<String> invoicePrefix = Optional.empty();
 
         private Optional<String> emailAddress = Optional.empty();
@@ -952,11 +1469,13 @@ public final class Invoice {
 
         @java.lang.Override
         public Builder from(Invoice other) {
+            account(other.getAccount());
             accountId(other.getAccountId());
             amountDue(other.getAmountDue());
             billingAddress(other.getBillingAddress());
             buyerFeeAmount(other.getBuyerFeeAmount());
             buyerFeePercentage(other.getBuyerFeePercentage());
+            chargeAtSubscriptionStart(other.getChargeAtSubscriptionStart());
             checkoutLink(other.getCheckoutLink());
             createdAt(other.getCreatedAt());
             customerName(other.getCustomerName());
@@ -965,6 +1484,7 @@ public final class Invoice {
             emailAddress(other.getEmailAddress());
             id(other.getId());
             invoicePrefix(other.getInvoicePrefix());
+            issuedAt(other.getIssuedAt());
             lineItems(other.getLineItems());
             mailingAddressId(other.getMailingAddressId());
             memberId(other.getMemberId());
@@ -977,17 +1497,41 @@ public final class Invoice {
             paidAt(other.getPaidAt());
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             paymentMethodId(other.getPaymentMethodId());
+            quoteAcceptedAt(other.getQuoteAcceptedAt());
+            quoteAmountPaid(other.getQuoteAmountPaid());
+            quoteAmountRemaining(other.getQuoteAmountRemaining());
+            quoteDepositAmount(other.getQuoteDepositAmount());
+            quoteDepositPercentage(other.getQuoteDepositPercentage());
+            quoteInvoiceIds(other.getQuoteInvoiceIds());
+            quotePaymentUrl(other.getQuotePaymentUrl());
+            quoteSentAt(other.getQuoteSentAt());
+            quoteSignatureUrl(other.getQuoteSignatureUrl());
+            quoteSignerEmail(other.getQuoteSignerEmail());
+            quoteSignerName(other.getQuoteSignerName());
             recipientEmails(other.getRecipientEmails());
             scheduledChargeAt(other.getScheduledChargeAt());
             scheduledCollectionMethod(other.getScheduledCollectionMethod());
             scheduledSendAt(other.getScheduledSendAt());
             sendsOnDueDate(other.getSendsOnDueDate());
             status(other.getStatus());
+            subscriptionStartsAt(other.getSubscriptionStartsAt());
             subtotal(other.getSubtotal());
             taxAmount(other.getTaxAmount());
+            timeZone(other.getTimeZone());
             total(other.getTotal());
             totalsStatus(other.getTotalsStatus());
             updatedAt(other.getUpdatedAt());
+            return this;
+        }
+
+        /**
+         * <p>The account that sent the invoice.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account")
+        public AccountIdStage account(@NotNull AccountSummary account) {
+            this.account = Objects.requireNonNull(account, "account must not be null");
             return this;
         }
 
@@ -1014,8 +1558,19 @@ public final class Invoice {
 
         @java.lang.Override
         @JsonSetter("buyer_fee_percentage")
-        public CreatedAtStage buyerFeePercentage(double buyerFeePercentage) {
+        public ChargeAtSubscriptionStartStage buyerFeePercentage(double buyerFeePercentage) {
             this.buyerFeePercentage = buyerFeePercentage;
+            return this;
+        }
+
+        /**
+         * <p>True when the customer pays only the initial fee of each item now and is first charged the renewal price at <code>subscription_starts_at</code>. Until then the membership is <code>scheduled</code> and has no access.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("charge_at_subscription_start")
+        public CreatedAtStage chargeAtSubscriptionStart(boolean chargeAtSubscriptionStart) {
+            this.chargeAtSubscriptionStart = chargeAtSubscriptionStart;
             return this;
         }
 
@@ -1066,7 +1621,7 @@ public final class Invoice {
         }
 
         /**
-         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft and for a draft with a scheduled send. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
+         * <p>Whether this draft is issued automatically when its <code>due_at</code> arrives. Issuing it charges its <code>payment_method_id</code>, or emails its payment link to its <code>recipient_emails</code>. <code>false</code> for an invoice that is not a draft, for a draft with a scheduled send, and for a draft sent as a quote. <code>false</code> while sending the draft would fail for missing recipients or an unavailable payment link. <code>false</code> for a draft that had no future <code>due_at</code> when it was last saved. <code>false</code> for a draft created before 2026-11-12T22:00:00Z.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1085,11 +1640,26 @@ public final class Invoice {
 
         @java.lang.Override
         @JsonSetter("subtotal")
-        public TotalStage subtotal(@NotNull Money subtotal) {
+        public TimeZoneStage subtotal(@NotNull Money subtotal) {
             this.subtotal = Objects.requireNonNull(subtotal, "subtotal must not be null");
             return this;
         }
 
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF, such as <code>America/New_York</code>. <code>UTC</code> unless one was set.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("time_zone")
+        public TotalStage timeZone(@NotNull String timeZone) {
+            this.timeZone = Objects.requireNonNull(timeZone, "timeZone must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The amount the invoice charges, including tax. On a draft, it includes the estimated <code>tax_amount</code>, if any.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("total")
         public TotalsStatusStage total(@NotNull Money total) {
@@ -1111,6 +1681,10 @@ public final class Invoice {
             return this;
         }
 
+        /**
+         * <p>The tax charged on the invoice. On a draft, it is an estimate once the draft has a complete billing address, calculated as if it were issued now. Issuing calculates it again, so the final tax can differ. <code>null</code> on a draft without a complete billing address, and when tax could not be estimated.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage taxAmount(Nullable<Money> taxAmount) {
             if (taxAmount.isNull()) {
@@ -1123,16 +1697,59 @@ public final class Invoice {
             return this;
         }
 
+        /**
+         * <p>The tax charged on the invoice. On a draft, it is an estimate once the draft has a complete billing address, calculated as if it were issued now. Issuing calculates it again, so the final tax can differ. <code>null</code> on a draft without a complete billing address, and when tax could not be estimated.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage taxAmount(Money taxAmount) {
             this.taxAmount = Optional.ofNullable(taxAmount);
             return this;
         }
 
+        /**
+         * <p>The tax charged on the invoice. On a draft, it is an estimate once the draft has a complete billing address, calculated as if it were issued now. Issuing calculates it again, so the final tax can differ. <code>null</code> on a draft without a complete billing address, and when tax could not be estimated.</p>
+         */
         @java.lang.Override
         @JsonSetter(value = "tax_amount", nulls = Nulls.SKIP)
         public _FinalStage taxAmount(Optional<Money> taxAmount) {
             this.taxAmount = taxAmount;
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid, and so does a time that has passed by then. An invoice with a start date skips its variants' free trial. With <code>charge_at_subscription_start</code>, the subscription and its access begin at this moment instead.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subscriptionStartsAt(Nullable<String> subscriptionStartsAt) {
+            if (subscriptionStartsAt.isNull()) {
+                this.subscriptionStartsAt = null;
+            } else if (subscriptionStartsAt.isEmpty()) {
+                this.subscriptionStartsAt = Optional.empty();
+            } else {
+                this.subscriptionStartsAt = Optional.of(subscriptionStartsAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid, and so does a time that has passed by then. An invoice with a start date skips its variants' free trial. With <code>charge_at_subscription_start</code>, the subscription and its access begin at this moment instead.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subscriptionStartsAt(String subscriptionStartsAt) {
+            this.subscriptionStartsAt = Optional.ofNullable(subscriptionStartsAt);
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid, and so does a time that has passed by then. An invoice with a start date skips its variants' free trial. With <code>charge_at_subscription_start</code>, the subscription and its access begin at this moment instead.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "subscription_starts_at", nulls = Nulls.SKIP)
+        public _FinalStage subscriptionStartsAt(Optional<String> subscriptionStartsAt) {
+            this.subscriptionStartsAt = subscriptionStartsAt;
             return this;
         }
 
@@ -1259,6 +1876,390 @@ public final class Invoice {
             return this;
         }
 
+        /**
+         * <p>The full name the customer typed to sign the quote. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignerName(Nullable<String> quoteSignerName) {
+            if (quoteSignerName.isNull()) {
+                this.quoteSignerName = null;
+            } else if (quoteSignerName.isEmpty()) {
+                this.quoteSignerName = Optional.empty();
+            } else {
+                this.quoteSignerName = Optional.of(quoteSignerName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The full name the customer typed to sign the quote. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignerName(String quoteSignerName) {
+            this.quoteSignerName = Optional.ofNullable(quoteSignerName);
+            return this;
+        }
+
+        /**
+         * <p>The full name the customer typed to sign the quote. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_signer_name", nulls = Nulls.SKIP)
+        public _FinalStage quoteSignerName(Optional<String> quoteSignerName) {
+            this.quoteSignerName = quoteSignerName;
+            return this;
+        }
+
+        /**
+         * <p>The email address of the Whop user who signed the quote. <code>null</code> when the quote was not accepted, when the signer was not signed in to Whop, and without the member:email:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignerEmail(Nullable<String> quoteSignerEmail) {
+            if (quoteSignerEmail.isNull()) {
+                this.quoteSignerEmail = null;
+            } else if (quoteSignerEmail.isEmpty()) {
+                this.quoteSignerEmail = Optional.empty();
+            } else {
+                this.quoteSignerEmail = Optional.of(quoteSignerEmail.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The email address of the Whop user who signed the quote. <code>null</code> when the quote was not accepted, when the signer was not signed in to Whop, and without the member:email:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignerEmail(String quoteSignerEmail) {
+            this.quoteSignerEmail = Optional.ofNullable(quoteSignerEmail);
+            return this;
+        }
+
+        /**
+         * <p>The email address of the Whop user who signed the quote. <code>null</code> when the quote was not accepted, when the signer was not signed in to Whop, and without the member:email:read permission.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_signer_email", nulls = Nulls.SKIP)
+        public _FinalStage quoteSignerEmail(Optional<String> quoteSignerEmail) {
+            this.quoteSignerEmail = quoteSignerEmail;
+            return this;
+        }
+
+        /**
+         * <p>A link to the signature the customer drew, as a PNG image with a transparent background. The link expires after a short time. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignatureUrl(Nullable<String> quoteSignatureUrl) {
+            if (quoteSignatureUrl.isNull()) {
+                this.quoteSignatureUrl = null;
+            } else if (quoteSignatureUrl.isEmpty()) {
+                this.quoteSignatureUrl = Optional.empty();
+            } else {
+                this.quoteSignatureUrl = Optional.of(quoteSignatureUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A link to the signature the customer drew, as a PNG image with a transparent background. The link expires after a short time. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSignatureUrl(String quoteSignatureUrl) {
+            this.quoteSignatureUrl = Optional.ofNullable(quoteSignatureUrl);
+            return this;
+        }
+
+        /**
+         * <p>A link to the signature the customer drew, as a PNG image with a transparent background. The link expires after a short time. <code>null</code> when the quote was not accepted, and for a credential without the member:basic:read permission.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_signature_url", nulls = Nulls.SKIP)
+        public _FinalStage quoteSignatureUrl(Optional<String> quoteSignatureUrl) {
+            this.quoteSignatureUrl = quoteSignatureUrl;
+            return this;
+        }
+
+        /**
+         * <p>When the draft was last emailed to its recipients as a quote, as an ISO 8601 timestamp. A quote stays a draft and cannot be paid. It is not issued on its <code>due_at</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSentAt(Nullable<String> quoteSentAt) {
+            if (quoteSentAt.isNull()) {
+                this.quoteSentAt = null;
+            } else if (quoteSentAt.isEmpty()) {
+                this.quoteSentAt = Optional.empty();
+            } else {
+                this.quoteSentAt = Optional.of(quoteSentAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the draft was last emailed to its recipients as a quote, as an ISO 8601 timestamp. A quote stays a draft and cannot be paid. It is not issued on its <code>due_at</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteSentAt(String quoteSentAt) {
+            this.quoteSentAt = Optional.ofNullable(quoteSentAt);
+            return this;
+        }
+
+        /**
+         * <p>When the draft was last emailed to its recipients as a quote, as an ISO 8601 timestamp. A quote stays a draft and cannot be paid. It is not issued on its <code>due_at</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_sent_at", nulls = Nulls.SKIP)
+        public _FinalStage quoteSentAt(Optional<String> quoteSentAt) {
+            this.quoteSentAt = quoteSentAt;
+            return this;
+        }
+
+        /**
+         * <p>Where the customer pays the next unpaid invoice in <code>quote_invoice_ids</code>. Only returned when the quote is read with its customer <code>token</code>. <code>null</code> otherwise, and when nothing is waiting to be paid.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quotePaymentUrl(Nullable<String> quotePaymentUrl) {
+            if (quotePaymentUrl.isNull()) {
+                this.quotePaymentUrl = null;
+            } else if (quotePaymentUrl.isEmpty()) {
+                this.quotePaymentUrl = Optional.empty();
+            } else {
+                this.quotePaymentUrl = Optional.of(quotePaymentUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the customer pays the next unpaid invoice in <code>quote_invoice_ids</code>. Only returned when the quote is read with its customer <code>token</code>. <code>null</code> otherwise, and when nothing is waiting to be paid.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quotePaymentUrl(String quotePaymentUrl) {
+            this.quotePaymentUrl = Optional.ofNullable(quotePaymentUrl);
+            return this;
+        }
+
+        /**
+         * <p>Where the customer pays the next unpaid invoice in <code>quote_invoice_ids</code>. Only returned when the quote is read with its customer <code>token</code>. <code>null</code> otherwise, and when nothing is waiting to be paid.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_payment_url", nulls = Nulls.SKIP)
+        public _FinalStage quotePaymentUrl(Optional<String> quotePaymentUrl) {
+            this.quotePaymentUrl = quotePaymentUrl;
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllQuoteInvoiceIds(List<String> quoteInvoiceIds) {
+            if (quoteInvoiceIds != null) {
+                this.quoteInvoiceIds.addAll(quoteInvoiceIds);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addQuoteInvoiceIds(String quoteInvoiceIds) {
+            this.quoteInvoiceIds.add(quoteInvoiceIds);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "quote_invoice_ids", nulls = Nulls.SKIP)
+        public _FinalStage quoteInvoiceIds(List<String> quoteInvoiceIds) {
+            this.quoteInvoiceIds.clear();
+            if (quoteInvoiceIds != null) {
+                this.quoteInvoiceIds.addAll(quoteInvoiceIds);
+            }
+            return this;
+        }
+
+        /**
+         * <p>The share of the quote billed as a deposit when the customer signs, such as <code>30</code> for 30%. <code>null</code> when the deposit is a fixed amount or there is none.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteDepositPercentage(Nullable<Double> quoteDepositPercentage) {
+            if (quoteDepositPercentage.isNull()) {
+                this.quoteDepositPercentage = null;
+            } else if (quoteDepositPercentage.isEmpty()) {
+                this.quoteDepositPercentage = Optional.empty();
+            } else {
+                this.quoteDepositPercentage = Optional.of(quoteDepositPercentage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The share of the quote billed as a deposit when the customer signs, such as <code>30</code> for 30%. <code>null</code> when the deposit is a fixed amount or there is none.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteDepositPercentage(Double quoteDepositPercentage) {
+            this.quoteDepositPercentage = Optional.ofNullable(quoteDepositPercentage);
+            return this;
+        }
+
+        /**
+         * <p>The share of the quote billed as a deposit when the customer signs, such as <code>30</code> for 30%. <code>null</code> when the deposit is a fixed amount or there is none.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_deposit_percentage", nulls = Nulls.SKIP)
+        public _FinalStage quoteDepositPercentage(Optional<Double> quoteDepositPercentage) {
+            this.quoteDepositPercentage = quoteDepositPercentage;
+            return this;
+        }
+
+        /**
+         * <p>How much is billed as a deposit when the customer signs, before tax. <code>null</code> when the quote has no deposit.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteDepositAmount(Nullable<Money> quoteDepositAmount) {
+            if (quoteDepositAmount.isNull()) {
+                this.quoteDepositAmount = null;
+            } else if (quoteDepositAmount.isEmpty()) {
+                this.quoteDepositAmount = Optional.empty();
+            } else {
+                this.quoteDepositAmount = Optional.of(quoteDepositAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How much is billed as a deposit when the customer signs, before tax. <code>null</code> when the quote has no deposit.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteDepositAmount(Money quoteDepositAmount) {
+            this.quoteDepositAmount = Optional.ofNullable(quoteDepositAmount);
+            return this;
+        }
+
+        /**
+         * <p>How much is billed as a deposit when the customer signs, before tax. <code>null</code> when the quote has no deposit.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_deposit_amount", nulls = Nulls.SKIP)
+        public _FinalStage quoteDepositAmount(Optional<Money> quoteDepositAmount) {
+            this.quoteDepositAmount = quoteDepositAmount;
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote is not yet billed: its line items before tax, minus every invoice in <code>quote_invoice_ids</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAmountRemaining(Nullable<Money> quoteAmountRemaining) {
+            if (quoteAmountRemaining.isNull()) {
+                this.quoteAmountRemaining = null;
+            } else if (quoteAmountRemaining.isEmpty()) {
+                this.quoteAmountRemaining = Optional.empty();
+            } else {
+                this.quoteAmountRemaining = Optional.of(quoteAmountRemaining.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote is not yet billed: its line items before tax, minus every invoice in <code>quote_invoice_ids</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAmountRemaining(Money quoteAmountRemaining) {
+            this.quoteAmountRemaining = Optional.ofNullable(quoteAmountRemaining);
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote is not yet billed: its line items before tax, minus every invoice in <code>quote_invoice_ids</code>. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_amount_remaining", nulls = Nulls.SKIP)
+        public _FinalStage quoteAmountRemaining(Optional<Money> quoteAmountRemaining) {
+            this.quoteAmountRemaining = quoteAmountRemaining;
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote its paid invoices in <code>quote_invoice_ids</code> cover, before tax. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAmountPaid(Nullable<Money> quoteAmountPaid) {
+            if (quoteAmountPaid.isNull()) {
+                this.quoteAmountPaid = null;
+            } else if (quoteAmountPaid.isEmpty()) {
+                this.quoteAmountPaid = Optional.empty();
+            } else {
+                this.quoteAmountPaid = Optional.of(quoteAmountPaid.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote its paid invoices in <code>quote_invoice_ids</code> cover, before tax. <code>null</code> when the invoice was never sent as a quote.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAmountPaid(Money quoteAmountPaid) {
+            this.quoteAmountPaid = Optional.ofNullable(quoteAmountPaid);
+            return this;
+        }
+
+        /**
+         * <p>How much of the quote its paid invoices in <code>quote_invoice_ids</code> cover, before tax. <code>null</code> when the invoice was never sent as a quote.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_amount_paid", nulls = Nulls.SKIP)
+        public _FinalStage quoteAmountPaid(Optional<Money> quoteAmountPaid) {
+            this.quoteAmountPaid = quoteAmountPaid;
+            return this;
+        }
+
+        /**
+         * <p>When the customer accepted and signed the quote, as an ISO 8601 timestamp. An edit to the draft clears it, unless the edit changes only <code>recipient_emails</code>. <code>null</code> when the quote was not accepted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAcceptedAt(Nullable<String> quoteAcceptedAt) {
+            if (quoteAcceptedAt.isNull()) {
+                this.quoteAcceptedAt = null;
+            } else if (quoteAcceptedAt.isEmpty()) {
+                this.quoteAcceptedAt = Optional.empty();
+            } else {
+                this.quoteAcceptedAt = Optional.of(quoteAcceptedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the customer accepted and signed the quote, as an ISO 8601 timestamp. An edit to the draft clears it, unless the edit changes only <code>recipient_emails</code>. <code>null</code> when the quote was not accepted.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage quoteAcceptedAt(String quoteAcceptedAt) {
+            this.quoteAcceptedAt = Optional.ofNullable(quoteAcceptedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the customer accepted and signed the quote, as an ISO 8601 timestamp. An edit to the draft clears it, unless the edit changes only <code>recipient_emails</code>. <code>null</code> when the quote was not accepted.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "quote_accepted_at", nulls = Nulls.SKIP)
+        public _FinalStage quoteAcceptedAt(Optional<String> quoteAcceptedAt) {
+            this.quoteAcceptedAt = quoteAcceptedAt;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage paymentMethodId(Nullable<String> paymentMethodId) {
             if (paymentMethodId.isNull()) {
@@ -1348,12 +2349,20 @@ public final class Invoice {
             return this;
         }
 
+        /**
+         * <p>Key-value pairs the seller stored on the invoice. Empty when the invoice is read without a credential.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage metadata(String key, String value) {
             this.metadata.put(key, value);
             return this;
         }
 
+        /**
+         * <p>Key-value pairs the seller stored on the invoice. Empty when the invoice is read without a credential.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         public _FinalStage putAllMetadata(Map<String, String> metadata) {
             if (metadata != null) {
@@ -1362,6 +2371,9 @@ public final class Invoice {
             return this;
         }
 
+        /**
+         * <p>Key-value pairs the seller stored on the invoice. Empty when the invoice is read without a credential.</p>
+         */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public _FinalStage metadata(Map<String, String> metadata) {
@@ -1515,6 +2527,42 @@ public final class Invoice {
             if (lineItems != null) {
                 this.lineItems.addAll(lineItems);
             }
+            return this;
+        }
+
+        /**
+         * <p>When the invoice was issued, as an ISO 8601 timestamp. This is when it left draft, which can be after <code>created_at</code> for an invoice drafted or scheduled ahead. <code>null</code> while the invoice is a draft, and for invoices issued before this field was introduced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage issuedAt(Nullable<String> issuedAt) {
+            if (issuedAt.isNull()) {
+                this.issuedAt = null;
+            } else if (issuedAt.isEmpty()) {
+                this.issuedAt = Optional.empty();
+            } else {
+                this.issuedAt = Optional.of(issuedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the invoice was issued, as an ISO 8601 timestamp. This is when it left draft, which can be after <code>created_at</code> for an invoice drafted or scheduled ahead. <code>null</code> while the invoice is a draft, and for invoices issued before this field was introduced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage issuedAt(String issuedAt) {
+            this.issuedAt = Optional.ofNullable(issuedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the invoice was issued, as an ISO 8601 timestamp. This is when it left draft, which can be after <code>created_at</code> for an invoice drafted or scheduled ahead. <code>null</code> while the invoice is a draft, and for invoices issued before this field was introduced.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "issued_at", nulls = Nulls.SKIP)
+        public _FinalStage issuedAt(Optional<String> issuedAt) {
+            this.issuedAt = issuedAt;
             return this;
         }
 
@@ -1682,11 +2730,13 @@ public final class Invoice {
         @java.lang.Override
         public Invoice build() {
             return new Invoice(
+                    account,
                     accountId,
                     amountDue,
                     billingAddress,
                     buyerFeeAmount,
                     buyerFeePercentage,
+                    chargeAtSubscriptionStart,
                     checkoutLink,
                     createdAt,
                     customerName,
@@ -1695,6 +2745,7 @@ public final class Invoice {
                     emailAddress,
                     id,
                     invoicePrefix,
+                    issuedAt,
                     lineItems,
                     mailingAddressId,
                     memberId,
@@ -1707,14 +2758,27 @@ public final class Invoice {
                     paidAt,
                     paymentMethodConfiguration,
                     paymentMethodId,
+                    quoteAcceptedAt,
+                    quoteAmountPaid,
+                    quoteAmountRemaining,
+                    quoteDepositAmount,
+                    quoteDepositPercentage,
+                    quoteInvoiceIds,
+                    quotePaymentUrl,
+                    quoteSentAt,
+                    quoteSignatureUrl,
+                    quoteSignerEmail,
+                    quoteSignerName,
                     recipientEmails,
                     scheduledChargeAt,
                     scheduledCollectionMethod,
                     scheduledSendAt,
                     sendsOnDueDate,
                     status,
+                    subscriptionStartsAt,
                     subtotal,
                     taxAmount,
+                    timeZone,
                     total,
                     totalsStatus,
                     updatedAt,
@@ -1723,11 +2787,13 @@ public final class Invoice {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("account_id")
+            if (key.equalsIgnoreCase("account")
+                    || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("amount_due")
                     || key.equalsIgnoreCase("billing_address")
                     || key.equalsIgnoreCase("buyer_fee_amount")
                     || key.equalsIgnoreCase("buyer_fee_percentage")
+                    || key.equalsIgnoreCase("charge_at_subscription_start")
                     || key.equalsIgnoreCase("checkout_link")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("customer_name")
@@ -1736,6 +2802,7 @@ public final class Invoice {
                     || key.equalsIgnoreCase("email_address")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("invoice_prefix")
+                    || key.equalsIgnoreCase("issued_at")
                     || key.equalsIgnoreCase("line_items")
                     || key.equalsIgnoreCase("mailing_address_id")
                     || key.equalsIgnoreCase("member_id")
@@ -1748,14 +2815,27 @@ public final class Invoice {
                     || key.equalsIgnoreCase("paid_at")
                     || key.equalsIgnoreCase("payment_method_configuration")
                     || key.equalsIgnoreCase("payment_method_id")
+                    || key.equalsIgnoreCase("quote_accepted_at")
+                    || key.equalsIgnoreCase("quote_amount_paid")
+                    || key.equalsIgnoreCase("quote_amount_remaining")
+                    || key.equalsIgnoreCase("quote_deposit_amount")
+                    || key.equalsIgnoreCase("quote_deposit_percentage")
+                    || key.equalsIgnoreCase("quote_invoice_ids")
+                    || key.equalsIgnoreCase("quote_payment_url")
+                    || key.equalsIgnoreCase("quote_sent_at")
+                    || key.equalsIgnoreCase("quote_signature_url")
+                    || key.equalsIgnoreCase("quote_signer_email")
+                    || key.equalsIgnoreCase("quote_signer_name")
                     || key.equalsIgnoreCase("recipient_emails")
                     || key.equalsIgnoreCase("scheduled_charge_at")
                     || key.equalsIgnoreCase("scheduled_collection_method")
                     || key.equalsIgnoreCase("scheduled_send_at")
                     || key.equalsIgnoreCase("sends_on_due_date")
                     || key.equalsIgnoreCase("status")
+                    || key.equalsIgnoreCase("subscription_starts_at")
                     || key.equalsIgnoreCase("subtotal")
                     || key.equalsIgnoreCase("tax_amount")
+                    || key.equalsIgnoreCase("time_zone")
                     || key.equalsIgnoreCase("total")
                     || key.equalsIgnoreCase("totals_status")
                     || key.equalsIgnoreCase("updated_at")) {

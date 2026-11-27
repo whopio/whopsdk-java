@@ -1,5 +1,5 @@
 {
-  "cliVersion": "5.213.0",
+  "cliVersion": "5.224.0",
   "generatorName": "fernapi/fern-java-sdk",
   "generatorVersion": "4.37.6",
   "generatorConfig": {
@@ -7,8 +7,7 @@
     "group": "com.whop.api",
     "artifact": "whop-java"
   },
-  "originGitCommit": "6c2e2119355476e931ab5084119092783f82102e",
-  "originGitCommitIsDirty": true,
+  "originGitCommit": "8b99bb640b8832543c4cfd3ac565a20cb04ce6b9",
   "invokedBy": "ci",
   "requestedVersion": "2.8.1",
   "ciProvider": "unknown"

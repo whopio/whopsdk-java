@@ -32,6 +32,8 @@ public final class Livestream {
 
     private final Optional<String> pinnedAt;
 
+    private final Optional<LivestreamRecap> recap;
+
     private final Optional<String> recordingStartedAt;
 
     private final Optional<LivestreamRecordingStatus> recordingStatus;
@@ -51,6 +53,7 @@ public final class Livestream {
             Optional<String> endedAt,
             String id,
             Optional<String> pinnedAt,
+            Optional<LivestreamRecap> recap,
             Optional<String> recordingStartedAt,
             Optional<LivestreamRecordingStatus> recordingStatus,
             Optional<String> recordingUrl,
@@ -62,6 +65,7 @@ public final class Livestream {
         this.endedAt = endedAt;
         this.id = id;
         this.pinnedAt = pinnedAt;
+        this.recap = recap;
         this.recordingStartedAt = recordingStartedAt;
         this.recordingStatus = recordingStatus;
         this.recordingUrl = recordingUrl;
@@ -99,7 +103,7 @@ public final class Livestream {
     }
 
     /**
-     * @return When a moderator pinned this livestream's recording, as an ISO 8601 timestamp. <code>null</code> when it is not pinned.
+     * @return When the recording was pinned or last moved, as an ISO 8601 timestamp. Pinned livestreams are ordered by it, newest first. <code>null</code> when not pinned.
      */
     @JsonIgnore
     public Optional<String> getPinnedAt() {
@@ -107,6 +111,14 @@ public final class Livestream {
             return Optional.empty();
         }
         return pinnedAt;
+    }
+
+    /**
+     * @return Top moments AI picked from chat, and chat activity. Only <code>retrieve</code> returns it, and only to callers with the <code>livestream:moderate</code> permission.
+     */
+    @JsonProperty("recap")
+    public Optional<LivestreamRecap> getRecap() {
+        return recap;
     }
 
     /**
@@ -230,6 +242,7 @@ public final class Livestream {
                 && endedAt.equals(other.endedAt)
                 && id.equals(other.id)
                 && pinnedAt.equals(other.pinnedAt)
+                && recap.equals(other.recap)
                 && recordingStartedAt.equals(other.recordingStartedAt)
                 && recordingStatus.equals(other.recordingStatus)
                 && recordingUrl.equals(other.recordingUrl)
@@ -245,6 +258,7 @@ public final class Livestream {
                 this.endedAt,
                 this.id,
                 this.pinnedAt,
+                this.recap,
                 this.recordingStartedAt,
                 this.recordingStatus,
                 this.recordingUrl,
@@ -302,13 +316,20 @@ public final class Livestream {
         _FinalStage endedAt(Nullable<String> endedAt);
 
         /**
-         * <p>When a moderator pinned this livestream's recording, as an ISO 8601 timestamp. <code>null</code> when it is not pinned.</p>
+         * <p>When the recording was pinned or last moved, as an ISO 8601 timestamp. Pinned livestreams are ordered by it, newest first. <code>null</code> when not pinned.</p>
          */
         _FinalStage pinnedAt(Optional<String> pinnedAt);
 
         _FinalStage pinnedAt(String pinnedAt);
 
         _FinalStage pinnedAt(Nullable<String> pinnedAt);
+
+        /**
+         * <p>Top moments AI picked from chat, and chat activity. Only <code>retrieve</code> returns it, and only to callers with the <code>livestream:moderate</code> permission.</p>
+         */
+        _FinalStage recap(Optional<LivestreamRecap> recap);
+
+        _FinalStage recap(LivestreamRecap recap);
 
         /**
          * <p>When the recording's first frame was captured, as an ISO 8601 timestamp. Offsets into the recording count from here, not from <code>started_at</code>. <code>null</code> until recording starts.</p>
@@ -374,6 +395,8 @@ public final class Livestream {
 
         private Optional<String> recordingStartedAt = Optional.empty();
 
+        private Optional<LivestreamRecap> recap = Optional.empty();
+
         private Optional<String> pinnedAt = Optional.empty();
 
         private Optional<String> endedAt = Optional.empty();
@@ -388,6 +411,7 @@ public final class Livestream {
             endedAt(other.getEndedAt());
             id(other.getId());
             pinnedAt(other.getPinnedAt());
+            recap(other.getRecap());
             recordingStartedAt(other.getRecordingStartedAt());
             recordingStatus(other.getRecordingStatus());
             recordingUrl(other.getRecordingUrl());
@@ -611,7 +635,27 @@ public final class Livestream {
         }
 
         /**
-         * <p>When a moderator pinned this livestream's recording, as an ISO 8601 timestamp. <code>null</code> when it is not pinned.</p>
+         * <p>Top moments AI picked from chat, and chat activity. Only <code>retrieve</code> returns it, and only to callers with the <code>livestream:moderate</code> permission.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage recap(LivestreamRecap recap) {
+            this.recap = Optional.ofNullable(recap);
+            return this;
+        }
+
+        /**
+         * <p>Top moments AI picked from chat, and chat activity. Only <code>retrieve</code> returns it, and only to callers with the <code>livestream:moderate</code> permission.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "recap", nulls = Nulls.SKIP)
+        public _FinalStage recap(Optional<LivestreamRecap> recap) {
+            this.recap = recap;
+            return this;
+        }
+
+        /**
+         * <p>When the recording was pinned or last moved, as an ISO 8601 timestamp. Pinned livestreams are ordered by it, newest first. <code>null</code> when not pinned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -627,7 +671,7 @@ public final class Livestream {
         }
 
         /**
-         * <p>When a moderator pinned this livestream's recording, as an ISO 8601 timestamp. <code>null</code> when it is not pinned.</p>
+         * <p>When the recording was pinned or last moved, as an ISO 8601 timestamp. Pinned livestreams are ordered by it, newest first. <code>null</code> when not pinned.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -637,7 +681,7 @@ public final class Livestream {
         }
 
         /**
-         * <p>When a moderator pinned this livestream's recording, as an ISO 8601 timestamp. <code>null</code> when it is not pinned.</p>
+         * <p>When the recording was pinned or last moved, as an ISO 8601 timestamp. Pinned livestreams are ordered by it, newest first. <code>null</code> when not pinned.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "pinned_at", nulls = Nulls.SKIP)
@@ -689,6 +733,7 @@ public final class Livestream {
                     endedAt,
                     id,
                     pinnedAt,
+                    recap,
                     recordingStartedAt,
                     recordingStatus,
                     recordingUrl,
@@ -704,6 +749,7 @@ public final class Livestream {
                     || key.equalsIgnoreCase("ended_at")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("pinned_at")
+                    || key.equalsIgnoreCase("recap")
                     || key.equalsIgnoreCase("recording_started_at")
                     || key.equalsIgnoreCase("recording_status")
                     || key.equalsIgnoreCase("recording_url")

@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.PaymentRegisterDiscount;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,6 +24,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreatePaymentsRequestLineItemsItem.Builder.class)
 public final class CreatePaymentsRequestLineItemsItem {
+    private final Optional<PaymentRegisterDiscount> discount;
+
     private final Optional<Integer> quantity;
 
     private final Optional<CreatePaymentsRequestLineItemsItemVariant> variant;
@@ -32,14 +35,27 @@ public final class CreatePaymentsRequestLineItemsItem {
     private final Map<String, Object> additionalProperties;
 
     private CreatePaymentsRequestLineItemsItem(
+            Optional<PaymentRegisterDiscount> discount,
             Optional<Integer> quantity,
             Optional<CreatePaymentsRequestLineItemsItemVariant> variant,
             Optional<String> variantId,
             Map<String, Object> additionalProperties) {
+        this.discount = discount;
         this.quantity = quantity;
         this.variant = variant;
         this.variantId = variantId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return A discount typed at the register for this line. It comes off the line's price for its full quantity, and can't be more than that price. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.
+     */
+    @JsonIgnore
+    public Optional<PaymentRegisterDiscount> getDiscount() {
+        if (discount == null) {
+            return Optional.empty();
+        }
+        return discount;
     }
 
     /**
@@ -70,6 +86,12 @@ public final class CreatePaymentsRequestLineItemsItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("discount")
+    private Optional<PaymentRegisterDiscount> _getDiscount() {
+        return discount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("quantity")
     private Optional<Integer> _getQuantity() {
         return quantity;
@@ -88,12 +110,15 @@ public final class CreatePaymentsRequestLineItemsItem {
     }
 
     private boolean equalTo(CreatePaymentsRequestLineItemsItem other) {
-        return quantity.equals(other.quantity) && variant.equals(other.variant) && variantId.equals(other.variantId);
+        return discount.equals(other.discount)
+                && quantity.equals(other.quantity)
+                && variant.equals(other.variant)
+                && variantId.equals(other.variantId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.quantity, this.variant, this.variantId);
+        return Objects.hash(this.discount, this.quantity, this.variant, this.variantId);
     }
 
     @java.lang.Override
@@ -107,6 +132,8 @@ public final class CreatePaymentsRequestLineItemsItem {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<PaymentRegisterDiscount> discount = Optional.empty();
+
         private Optional<Integer> quantity = Optional.empty();
 
         private Optional<CreatePaymentsRequestLineItemsItemVariant> variant = Optional.empty();
@@ -118,9 +145,35 @@ public final class CreatePaymentsRequestLineItemsItem {
         private Builder() {}
 
         public Builder from(CreatePaymentsRequestLineItemsItem other) {
+            discount(other.getDiscount());
             quantity(other.getQuantity());
             variant(other.getVariant());
             variantId(other.getVariantId());
+            return this;
+        }
+
+        /**
+         * <p>A discount typed at the register for this line. It comes off the line's price for its full quantity, and can't be more than that price. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.</p>
+         */
+        @JsonSetter(value = "discount", nulls = Nulls.SKIP)
+        public Builder discount(Optional<PaymentRegisterDiscount> discount) {
+            this.discount = discount;
+            return this;
+        }
+
+        public Builder discount(PaymentRegisterDiscount discount) {
+            this.discount = Optional.ofNullable(discount);
+            return this;
+        }
+
+        public Builder discount(Nullable<PaymentRegisterDiscount> discount) {
+            if (discount.isNull()) {
+                this.discount = null;
+            } else if (discount.isEmpty()) {
+                this.discount = Optional.empty();
+            } else {
+                this.discount = Optional.of(discount.get());
+            }
             return this;
         }
 
@@ -178,12 +231,13 @@ public final class CreatePaymentsRequestLineItemsItem {
         }
 
         public CreatePaymentsRequestLineItemsItem build() {
-            return new CreatePaymentsRequestLineItemsItem(quantity, variant, variantId, additionalProperties);
+            return new CreatePaymentsRequestLineItemsItem(discount, quantity, variant, variantId, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("quantity")
+            if (key.equalsIgnoreCase("discount")
+                    || key.equalsIgnoreCase("quantity")
                     || key.equalsIgnoreCase("variant")
                     || key.equalsIgnoreCase("variant_id")) {
                 return;

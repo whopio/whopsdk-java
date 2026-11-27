@@ -103,6 +103,8 @@ public final class CreateDirectRequestPlanCurrency {
 
     public static final CreateDirectRequestPlanCurrency MUR = new CreateDirectRequestPlanCurrency(Value.MUR, "mur");
 
+    public static final CreateDirectRequestPlanCurrency HNL = new CreateDirectRequestPlanCurrency(Value.HNL, "hnl");
+
     public static final CreateDirectRequestPlanCurrency PEN = new CreateDirectRequestPlanCurrency(Value.PEN, "pen");
 
     public static final CreateDirectRequestPlanCurrency USD = new CreateDirectRequestPlanCurrency(Value.USD, "usd");
@@ -317,6 +319,8 @@ public final class CreateDirectRequestPlanCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -506,6 +510,8 @@ public final class CreateDirectRequestPlanCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -776,6 +782,8 @@ public final class CreateDirectRequestPlanCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -959,6 +967,8 @@ public final class CreateDirectRequestPlanCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

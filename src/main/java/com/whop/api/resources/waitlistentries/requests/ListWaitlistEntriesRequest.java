@@ -15,7 +15,10 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.waitlistentries.types.ListWaitlistEntriesRequestDirection;
 import com.whop.api.resources.waitlistentries.types.ListWaitlistEntriesRequestOrder;
 import com.whop.api.resources.waitlistentries.types.ListWaitlistEntriesRequestStatus;
+import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,6 +26,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListWaitlistEntriesRequest.Builder.class)
 public final class ListWaitlistEntriesRequest {
+    private final Optional<List<String>> productIds;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -30,6 +35,8 @@ public final class ListWaitlistEntriesRequest {
     private final Optional<Integer> last;
 
     private final Optional<String> before;
+
+    private final Optional<Boolean> includeTotalCount;
 
     private final Optional<String> variantId;
 
@@ -43,9 +50,9 @@ public final class ListWaitlistEntriesRequest {
 
     private final Optional<String> query;
 
-    private final Optional<String> createdBefore;
+    private final Optional<OffsetDateTime> createdBefore;
 
-    private final Optional<String> createdAfter;
+    private final Optional<OffsetDateTime> createdAfter;
 
     private final Optional<ListWaitlistEntriesRequestOrder> order;
 
@@ -54,25 +61,29 @@ public final class ListWaitlistEntriesRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListWaitlistEntriesRequest(
+            Optional<List<String>> productIds,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Optional<String> variantId,
             Optional<String> accountId,
             Optional<String> productId,
             Optional<String> buyerAccountId,
             Optional<ListWaitlistEntriesRequestStatus> status,
             Optional<String> query,
-            Optional<String> createdBefore,
-            Optional<String> createdAfter,
+            Optional<OffsetDateTime> createdBefore,
+            Optional<OffsetDateTime> createdAfter,
             Optional<ListWaitlistEntriesRequestOrder> order,
             Optional<ListWaitlistEntriesRequestDirection> direction,
             Map<String, Object> additionalProperties) {
+        this.productIds = productIds;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.variantId = variantId;
         this.accountId = accountId;
         this.productId = productId;
@@ -84,6 +95,14 @@ public final class ListWaitlistEntriesRequest {
         this.order = order;
         this.direction = direction;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only return signups for variants on any of these products, prefixed <code>prod_</code>. Unknown IDs match nothing.
+     */
+    @JsonProperty("product_ids")
+    public Optional<List<String>> getProductIds() {
+        return productIds;
     }
 
     /**
@@ -116,6 +135,14 @@ public final class ListWaitlistEntriesRequest {
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     /**
@@ -170,7 +197,7 @@ public final class ListWaitlistEntriesRequest {
      * @return Only return signups submitted at or before this ISO 8601 timestamp.
      */
     @JsonProperty("created_before")
-    public Optional<String> getCreatedBefore() {
+    public Optional<OffsetDateTime> getCreatedBefore() {
         return createdBefore;
     }
 
@@ -178,7 +205,7 @@ public final class ListWaitlistEntriesRequest {
      * @return Only return signups submitted at or after this ISO 8601 timestamp.
      */
     @JsonProperty("created_after")
-    public Optional<String> getCreatedAfter() {
+    public Optional<OffsetDateTime> getCreatedAfter() {
         return createdAfter;
     }
 
@@ -210,10 +237,12 @@ public final class ListWaitlistEntriesRequest {
     }
 
     private boolean equalTo(ListWaitlistEntriesRequest other) {
-        return first.equals(other.first)
+        return productIds.equals(other.productIds)
+                && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
                 && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount)
                 && variantId.equals(other.variantId)
                 && accountId.equals(other.accountId)
                 && productId.equals(other.productId)
@@ -229,10 +258,12 @@ public final class ListWaitlistEntriesRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.productIds,
                 this.first,
                 this.after,
                 this.last,
                 this.before,
+                this.includeTotalCount,
                 this.variantId,
                 this.accountId,
                 this.productId,
@@ -256,6 +287,8 @@ public final class ListWaitlistEntriesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<String>> productIds = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
@@ -263,6 +296,8 @@ public final class ListWaitlistEntriesRequest {
         private Optional<Integer> last = Optional.empty();
 
         private Optional<String> before = Optional.empty();
+
+        private Optional<Boolean> includeTotalCount = Optional.empty();
 
         private Optional<String> variantId = Optional.empty();
 
@@ -276,9 +311,9 @@ public final class ListWaitlistEntriesRequest {
 
         private Optional<String> query = Optional.empty();
 
-        private Optional<String> createdBefore = Optional.empty();
+        private Optional<OffsetDateTime> createdBefore = Optional.empty();
 
-        private Optional<String> createdAfter = Optional.empty();
+        private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
         private Optional<ListWaitlistEntriesRequestOrder> order = Optional.empty();
 
@@ -289,10 +324,12 @@ public final class ListWaitlistEntriesRequest {
         private Builder() {}
 
         public Builder from(ListWaitlistEntriesRequest other) {
+            productIds(other.getProductIds());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             variantId(other.getVariantId());
             accountId(other.getAccountId());
             productId(other.getProductId());
@@ -303,6 +340,25 @@ public final class ListWaitlistEntriesRequest {
             createdAfter(other.getCreatedAfter());
             order(other.getOrder());
             direction(other.getDirection());
+            return this;
+        }
+
+        /**
+         * <p>Only return signups for variants on any of these products, prefixed <code>prod_</code>. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
             return this;
         }
 
@@ -359,6 +415,20 @@ public final class ListWaitlistEntriesRequest {
 
         public Builder before(String before) {
             this.before = Optional.ofNullable(before);
+            return this;
+        }
+
+        /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
             return this;
         }
 
@@ -450,12 +520,12 @@ public final class ListWaitlistEntriesRequest {
          * <p>Only return signups submitted at or before this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
-        public Builder createdBefore(Optional<String> createdBefore) {
+        public Builder createdBefore(Optional<OffsetDateTime> createdBefore) {
             this.createdBefore = createdBefore;
             return this;
         }
 
-        public Builder createdBefore(String createdBefore) {
+        public Builder createdBefore(OffsetDateTime createdBefore) {
             this.createdBefore = Optional.ofNullable(createdBefore);
             return this;
         }
@@ -464,12 +534,12 @@ public final class ListWaitlistEntriesRequest {
          * <p>Only return signups submitted at or after this ISO 8601 timestamp.</p>
          */
         @JsonSetter(value = "created_after", nulls = Nulls.SKIP)
-        public Builder createdAfter(Optional<String> createdAfter) {
+        public Builder createdAfter(Optional<OffsetDateTime> createdAfter) {
             this.createdAfter = createdAfter;
             return this;
         }
 
-        public Builder createdAfter(String createdAfter) {
+        public Builder createdAfter(OffsetDateTime createdAfter) {
             this.createdAfter = Optional.ofNullable(createdAfter);
             return this;
         }
@@ -504,10 +574,12 @@ public final class ListWaitlistEntriesRequest {
 
         public ListWaitlistEntriesRequest build() {
             return new ListWaitlistEntriesRequest(
+                    productIds,
                     first,
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     variantId,
                     accountId,
                     productId,
@@ -523,10 +595,12 @@ public final class ListWaitlistEntriesRequest {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("first")
+            if (key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("first")
                     || key.equalsIgnoreCase("after")
                     || key.equalsIgnoreCase("last")
                     || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")
                     || key.equalsIgnoreCase("variant_id")
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("product_id")

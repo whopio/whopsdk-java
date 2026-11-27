@@ -113,7 +113,7 @@ public final class ListReportsResponseDataItem {
     }
 
     /**
-     * @return <code>range</code> reports measure activity in a period; <code>as_of</code> reports measure state at a moment.
+     * @return <code>range</code> reports measure activity in a period. <code>as_of</code> reports measure state at a moment.
      */
     @JsonProperty("window_kind")
     public ListReportsResponseDataItemWindowKind getWindowKind() {
@@ -193,7 +193,7 @@ public final class ListReportsResponseDataItem {
 
     public interface WindowKindStage {
         /**
-         * <p><code>range</code> reports measure activity in a period; <code>as_of</code> reports measure state at a moment.</p>
+         * <p><code>range</code> reports measure activity in a period. <code>as_of</code> reports measure state at a moment.</p>
          */
         _FinalStage windowKind(@NotNull ListReportsResponseDataItemWindowKind windowKind);
     }
@@ -299,7 +299,7 @@ public final class ListReportsResponseDataItem {
         }
 
         /**
-         * <p><code>range</code> reports measure activity in a period; <code>as_of</code> reports measure state at a moment.</p>
+         * <p><code>range</code> reports measure activity in a period. <code>as_of</code> reports measure state at a moment.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

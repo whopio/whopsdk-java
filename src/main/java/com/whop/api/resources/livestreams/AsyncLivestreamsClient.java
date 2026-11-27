@@ -7,11 +7,15 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.core.pagination.SyncPagingIterable;
+import com.whop.api.resources.livestreams.requests.AddCoHostLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.ListLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.PinLivestreamsRequest;
+import com.whop.api.resources.livestreams.requests.RemoveCoHostLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.RetrieveLivestreamsRequest;
+import com.whop.api.resources.livestreams.requests.RetrieveViewershipLivestreamsRequest;
 import com.whop.api.resources.livestreams.requests.UnpinLivestreamsRequest;
 import com.whop.api.types.Livestream;
+import com.whop.api.types.LivestreamViewership;
 import java.util.concurrent.CompletableFuture;
 
 public class AsyncLivestreamsClient {
@@ -62,7 +66,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<Livestream> retrieve(String id) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.retrieve(id);
@@ -76,7 +80,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<Livestream> retrieve(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.retrieve(id, requestOptions);
@@ -90,7 +94,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<Livestream> retrieve(String id, RetrieveLivestreamsRequest request) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.retrieve(id, request);
@@ -104,7 +108,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Retrieves a livestream by ID.
+     * Retrieves a livestream by ID. Callers with the <code>livestream:moderate</code> permission also get its <code>recap</code>: the top moments AI picked from chat, and chat activity.
      */
     public CompletableFuture<Livestream> retrieve(
             String id, RetrieveLivestreamsRequest request, RequestOptions requestOptions) {
@@ -120,7 +124,37 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Makes someone in a live livestream a co-host until it ends. Co-hosts can change chat settings, manage the stage, and moderate chat, but can't end the livestream.
+     */
+    public CompletableFuture<Livestream> addCoHost(String id, AddCoHostLivestreamsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.addCoHost(id, request);
+        CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Makes someone in a live livestream a co-host until it ends. Co-hosts can change chat settings, manage the stage, and moderate chat, but can't end the livestream.
+     */
+    public CompletableFuture<Livestream> addCoHost(
+            String id, AddCoHostLivestreamsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture =
+                this.rawClient.addCoHost(id, request, requestOptions);
+        CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<Livestream> pin(String id) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.pin(id);
@@ -134,7 +168,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<Livestream> pin(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.pin(id, requestOptions);
@@ -148,7 +182,7 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<Livestream> pin(String id, PinLivestreamsRequest request) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.pin(id, request);
@@ -162,10 +196,40 @@ public class AsyncLivestreamsClient {
     }
 
     /**
-     * Pins an ended livestream's recording so everyone in the experience sees it featured. Pinning it again keeps the original <code>pinned_at</code>.
+     * Pins an ended livestream's recording so everyone in the experience sees it featured, up to 3 per experience. Without <code>position</code>, a new pin goes first and an existing pin keeps its place. With <code>position</code>, the pin moves there and every pinned livestream in that experience gets a new <code>pinned_at</code> in the new order.
      */
     public CompletableFuture<Livestream> pin(String id, PinLivestreamsRequest request, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.pin(id, request, requestOptions);
+        CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Removes a co-host from a live livestream.
+     */
+    public CompletableFuture<Livestream> removeCoHost(String id, RemoveCoHostLivestreamsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture = this.rawClient.removeCoHost(id, request);
+        CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Removes a co-host from a live livestream.
+     */
+    public CompletableFuture<Livestream> removeCoHost(
+            String id, RemoveCoHostLivestreamsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture =
+                this.rawClient.removeCoHost(id, request, requestOptions);
         CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {
@@ -225,6 +289,67 @@ public class AsyncLivestreamsClient {
         CompletableFuture<WhopApiHttpResponse<Livestream>> rawFuture =
                 this.rawClient.unpin(id, request, requestOptions);
         CompletableFuture<Livestream> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<LivestreamViewership> retrieveViewership(String id) {
+        CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> rawFuture = this.rawClient.retrieveViewership(id);
+        CompletableFuture<LivestreamViewership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<LivestreamViewership> retrieveViewership(String id, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> rawFuture =
+                this.rawClient.retrieveViewership(id, requestOptions);
+        CompletableFuture<LivestreamViewership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<LivestreamViewership> retrieveViewership(
+            String id, RetrieveViewershipLivestreamsRequest request) {
+        CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> rawFuture =
+                this.rawClient.retrieveViewership(id, request);
+        CompletableFuture<LivestreamViewership> future = rawFuture.thenApply(response -> response.body());
+        future.whenComplete((result_, throwable_) -> {
+            if (future.isCancelled()) {
+                rawFuture.cancel(true);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Retrieves a livestream's viewership: peak, average, and unique viewers, total watch time, viewers for each minute, and how many members joined the account during it. Counts update while the livestream is live and settle about five minutes after it ends.
+     */
+    public CompletableFuture<LivestreamViewership> retrieveViewership(
+            String id, RetrieveViewershipLivestreamsRequest request, RequestOptions requestOptions) {
+        CompletableFuture<WhopApiHttpResponse<LivestreamViewership>> rawFuture =
+                this.rawClient.retrieveViewership(id, request, requestOptions);
+        CompletableFuture<LivestreamViewership> future = rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {
                 rawFuture.cancel(true);

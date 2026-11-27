@@ -162,28 +162,28 @@ public class AdGroupsClient {
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public DuplicateAdGroupsResponse duplicate(String id) {
         return this.rawClient.duplicate(id).body();
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public DuplicateAdGroupsResponse duplicate(String id, RequestOptions requestOptions) {
         return this.rawClient.duplicate(id, requestOptions).body();
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public DuplicateAdGroupsResponse duplicate(String id, DuplicateAdGroupsRequest request) {
         return this.rawClient.duplicate(id, request).body();
     }
 
     /**
-     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>: it then takes the source's <code>active</code> or <code>paused</code> status, or, if the copy could not be completed, is deleted and returns 404.
+     * Starts copying an ad group and returns the copies in <code>duplicating</code> status. Poll each returned ad group until it leaves <code>duplicating</code>. A copy then takes the source's <code>active</code> or <code>paused</code> status. A copy that could not be completed is deleted and returns 404. An ad group with a lifetime budget can't be duplicated.
      */
     public DuplicateAdGroupsResponse duplicate(
             String id, DuplicateAdGroupsRequest request, RequestOptions requestOptions) {

@@ -151,6 +151,9 @@ public final class UpdateInvoicesRequestItemsItemVariantCurrency {
     public static final UpdateInvoicesRequestItemsItemVariantCurrency MUR =
             new UpdateInvoicesRequestItemsItemVariantCurrency(Value.MUR, "mur");
 
+    public static final UpdateInvoicesRequestItemsItemVariantCurrency HNL =
+            new UpdateInvoicesRequestItemsItemVariantCurrency(Value.HNL, "hnl");
+
     public static final UpdateInvoicesRequestItemsItemVariantCurrency PEN =
             new UpdateInvoicesRequestItemsItemVariantCurrency(Value.PEN, "pen");
 
@@ -406,6 +409,8 @@ public final class UpdateInvoicesRequestItemsItemVariantCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -595,6 +600,8 @@ public final class UpdateInvoicesRequestItemsItemVariantCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -865,6 +872,8 @@ public final class UpdateInvoicesRequestItemsItemVariantCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -1048,6 +1057,8 @@ public final class UpdateInvoicesRequestItemsItemVariantCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

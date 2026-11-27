@@ -473,7 +473,7 @@ public final class Membership {
     }
 
     /**
-     * @return Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.
+     * @return Billing state of the membership. <code>active</code> and <code>trialing</code> memberships grant access. <code>past_due</code> is the grace period after a failed payment. <code>completed</code> one-time purchases keep access. <code>scheduled</code> memberships wait for their variant's start date, when the first charge runs and access starts. <code>canceled</code> and <code>expired</code> memberships do not grant access.
      */
     @JsonProperty("status")
     public MembershipStatus getStatus() {
@@ -794,7 +794,7 @@ public final class Membership {
 
     public interface StatusStage {
         /**
-         * <p>Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.</p>
+         * <p>Billing state of the membership. <code>active</code> and <code>trialing</code> memberships grant access. <code>past_due</code> is the grace period after a failed payment. <code>completed</code> one-time purchases keep access. <code>scheduled</code> memberships wait for their variant's start date, when the first charge runs and access starts. <code>canceled</code> and <code>expired</code> memberships do not grant access.</p>
          */
         UpdatedAtStage status(@NotNull MembershipStatus status);
     }
@@ -1236,7 +1236,7 @@ public final class Membership {
         }
 
         /**
-         * <p>Billing state of the membership. <code>active</code>/<code>trialing</code> memberships grant access; <code>past_due</code> is the grace period after a failed payment; <code>completed</code> one-time purchases keep access; <code>canceled</code>/<code>expired</code> do not.</p>
+         * <p>Billing state of the membership. <code>active</code> and <code>trialing</code> memberships grant access. <code>past_due</code> is the grace period after a failed payment. <code>completed</code> one-time purchases keep access. <code>scheduled</code> memberships wait for their variant's start date, when the first charge runs and access starts. <code>canceled</code> and <code>expired</code> memberships do not grant access.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

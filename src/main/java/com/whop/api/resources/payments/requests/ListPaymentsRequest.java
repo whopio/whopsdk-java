@@ -202,7 +202,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded.
+     * @return Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded. A purchase Whop's risk checks blocked reports <code>failed</code>, so <code>failed</code> matches it and <code>blocked</code> does not.
      */
     @JsonProperty("substatuses")
     public Optional<List<ListPaymentsRequestSubstatusesItem>> getSubstatuses() {
@@ -258,7 +258,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.
+     * @return Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read, and with <code>user_id=me</code> the user's own purchases too. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.
      */
     @JsonProperty("mode")
     public Optional<ListPaymentsRequestMode> getMode() {
@@ -266,7 +266,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only payments charged by this account, prefixed <code>biz_</code>.
+     * @return Only payments charged by this account, prefixed <code>biz_</code>. With <code>user_id=me</code>, an account whose payments you cannot read lists only your own purchases from it.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -282,7 +282,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes. Only supported with <code>mode=account_sales</code>.
+     * @return Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes, and none of the user's purchases. Only supported with <code>mode=account_sales</code>.
      */
     @JsonProperty("tracking_status")
     public Optional<ListPaymentsRequestTrackingStatus> getTrackingStatus() {
@@ -306,7 +306,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return Only payments made by this buyer, prefixed <code>user_</code>. This filters sales the caller can read, so <code>me</code> is not accepted; list the caller's own purchases with <code>GET /memberships?user_id=me</code>.
+     * @return Only payments made by this buyer, prefixed <code>user_</code>. <code>me</code> is the signed-in user and needs a user credential: a whop.com session, an OAuth token or a user-scoped token. It lists the user's own payments: their purchases from any account, and their payments on accounts they read as the seller.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
@@ -442,7 +442,7 @@ public final class ListPaymentsRequest {
     }
 
     /**
-     * @return The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in.
+     * @return The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in. <code>status</code>, <code>product</code>, <code>plan</code> (initial price, no currency) and <code>method</code> are a 400 unless the list is filtered to 50,000 payments or fewer.
      */
     @JsonProperty("order")
     public Optional<ListPaymentsRequestOrder> getOrder() {
@@ -745,7 +745,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded.</p>
+         * <p>Only payments whose <code>substatus</code> is any of these. Repeat the parameter to pass several. <code>incomplete</code> also matches payments that report <code>incomplete</code> because no finer status was recorded. A purchase Whop's risk checks blocked reports <code>failed</code>, so <code>failed</code> matches it and <code>blocked</code> does not.</p>
          */
         @JsonSetter(value = "substatuses", nulls = Nulls.SKIP)
         public Builder substatuses(Optional<List<ListPaymentsRequestSubstatusesItem>> substatuses) {
@@ -878,7 +878,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.</p>
+         * <p>Which sales to list. <code>account_sales</code> returns sales for the accounts the caller can read, and with <code>user_id=me</code> the user's own purchases too. <code>user_sales</code> returns only sales the signed-in user received personally, outside any account; it requires the user's own Whop login session and cannot be combined with <code>account_id</code>.</p>
          */
         @JsonSetter(value = "mode", nulls = Nulls.SKIP)
         public Builder mode(Optional<ListPaymentsRequestMode> mode) {
@@ -892,7 +892,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only payments charged by this account, prefixed <code>biz_</code>.</p>
+         * <p>Only payments charged by this account, prefixed <code>biz_</code>. With <code>user_id=me</code>, an account whose payments you cannot read lists only your own purchases from it.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -920,7 +920,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes. Only supported with <code>mode=account_sales</code>.</p>
+         * <p>Only payments whose most recently attached kept shipment is in this tracking state. <code>missing_tracking</code> selects paid payments with a captured shipping address and no kept shipment, excluding fully refunded payments. <code>needs_tracking</code> selects payments with an open pre-shipment funds hold and no kept shipment. Shipment states do not imply a payment or refund state. Requires <code>shipment:basic:read</code> as well as <code>payment:basic:read</code>; user-wide lists include only accounts readable under both scopes, and none of the user's purchases. Only supported with <code>mode=account_sales</code>.</p>
          */
         @JsonSetter(value = "tracking_status", nulls = Nulls.SKIP)
         public Builder trackingStatus(Optional<ListPaymentsRequestTrackingStatus> trackingStatus) {
@@ -962,7 +962,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>Only payments made by this buyer, prefixed <code>user_</code>. This filters sales the caller can read, so <code>me</code> is not accepted; list the caller's own purchases with <code>GET /memberships?user_id=me</code>.</p>
+         * <p>Only payments made by this buyer, prefixed <code>user_</code>. <code>me</code> is the signed-in user and needs a user credential: a whop.com session, an OAuth token or a user-scoped token. It lists the user's own payments: their purchases from any account, and their payments on accounts they read as the seller.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -1200,7 +1200,7 @@ public final class ListPaymentsRequest {
         }
 
         /**
-         * <p>The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in.</p>
+         * <p>The field to sort by. <code>amount</code> sorts by the amount charged, in the currency it was charged in. <code>status</code>, <code>product</code>, <code>plan</code> (initial price, no currency) and <code>method</code> are a 400 unless the list is filtered to 50,000 payments or fewer.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListPaymentsRequestOrder> order) {

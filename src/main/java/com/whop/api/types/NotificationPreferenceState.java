@@ -26,20 +26,20 @@ import org.jetbrains.annotations.NotNull;
 public final class NotificationPreferenceState {
     private final Optional<NotificationPreferenceStateLevel> level;
 
-    private final NotificationPreferenceStateObject object;
-
     private final NotificationPreferenceScope scope;
+
+    private final NotificationPreferenceStateType type;
 
     private final Map<String, Object> additionalProperties;
 
     private NotificationPreferenceState(
             Optional<NotificationPreferenceStateLevel> level,
-            NotificationPreferenceStateObject object,
             NotificationPreferenceScope scope,
+            NotificationPreferenceStateType type,
             Map<String, Object> additionalProperties) {
         this.level = level;
-        this.object = object;
         this.scope = scope;
+        this.type = type;
         this.additionalProperties = additionalProperties;
     }
 
@@ -55,19 +55,19 @@ public final class NotificationPreferenceState {
     }
 
     /**
-     * @return Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.
-     */
-    @JsonProperty("object")
-    public NotificationPreferenceStateObject getObject() {
-        return object;
-    }
-
-    /**
      * @return The scope that was written, resolved. <code>null</code> on a dimension means the preference is not narrowed there.
      */
     @JsonProperty("scope")
     public NotificationPreferenceScope getScope() {
         return scope;
+    }
+
+    /**
+     * @return Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.
+     */
+    @JsonProperty("type")
+    public NotificationPreferenceStateType getType() {
+        return type;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -88,12 +88,12 @@ public final class NotificationPreferenceState {
     }
 
     private boolean equalTo(NotificationPreferenceState other) {
-        return level.equals(other.level) && object.equals(other.object) && scope.equals(other.scope);
+        return level.equals(other.level) && scope.equals(other.scope) && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.level, this.object, this.scope);
+        return Objects.hash(this.level, this.scope, this.type);
     }
 
     @java.lang.Override
@@ -101,24 +101,24 @@ public final class NotificationPreferenceState {
         return ObjectMappers.stringify(this);
     }
 
-    public static ObjectStage builder() {
+    public static ScopeStage builder() {
         return new Builder();
-    }
-
-    public interface ObjectStage {
-        /**
-         * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
-         */
-        ScopeStage object(@NotNull NotificationPreferenceStateObject object);
-
-        Builder from(NotificationPreferenceState other);
     }
 
     public interface ScopeStage {
         /**
          * <p>The scope that was written, resolved. <code>null</code> on a dimension means the preference is not narrowed there.</p>
          */
-        _FinalStage scope(@NotNull NotificationPreferenceScope scope);
+        TypeStage scope(@NotNull NotificationPreferenceScope scope);
+
+        Builder from(NotificationPreferenceState other);
+    }
+
+    public interface TypeStage {
+        /**
+         * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
+         */
+        _FinalStage type(@NotNull NotificationPreferenceStateType type);
     }
 
     public interface _FinalStage {
@@ -139,10 +139,10 @@ public final class NotificationPreferenceState {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements ObjectStage, ScopeStage, _FinalStage {
-        private NotificationPreferenceStateObject object;
-
+    public static final class Builder implements ScopeStage, TypeStage, _FinalStage {
         private NotificationPreferenceScope scope;
+
+        private NotificationPreferenceStateType type;
 
         private Optional<NotificationPreferenceStateLevel> level = Optional.empty();
 
@@ -153,19 +153,8 @@ public final class NotificationPreferenceState {
         @java.lang.Override
         public Builder from(NotificationPreferenceState other) {
             level(other.getLevel());
-            object(other.getObject());
             scope(other.getScope());
-            return this;
-        }
-
-        /**
-         * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("object")
-        public ScopeStage object(@NotNull NotificationPreferenceStateObject object) {
-            this.object = Objects.requireNonNull(object, "object must not be null");
+            type(other.getType());
             return this;
         }
 
@@ -175,8 +164,19 @@ public final class NotificationPreferenceState {
          */
         @java.lang.Override
         @JsonSetter("scope")
-        public _FinalStage scope(@NotNull NotificationPreferenceScope scope) {
+        public TypeStage scope(@NotNull NotificationPreferenceScope scope) {
             this.scope = Objects.requireNonNull(scope, "scope must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Which kind of preference was written: <code>experience_notification_preference</code> for an experience level, <code>notification_preference</code> for a topic override.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull NotificationPreferenceStateType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
@@ -218,12 +218,12 @@ public final class NotificationPreferenceState {
 
         @java.lang.Override
         public NotificationPreferenceState build() {
-            return new NotificationPreferenceState(level, object, scope, additionalProperties);
+            return new NotificationPreferenceState(level, scope, type, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("object") || key.equalsIgnoreCase("scope")) {
+            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("scope") || key.equalsIgnoreCase("type")) {
                 return;
             }
             this.additionalProperties.put(key, value);

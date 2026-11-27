@@ -37,7 +37,7 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
     }
 
     /**
-     * @return A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.
+     * @return A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.
      */
     @JsonIgnore
     public Optional<String> getApiKey() {
@@ -48,7 +48,7 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
     }
 
     /**
-     * @return The exact shop domain configured in Triple Whale's Settings → Store (for Shopify this is the <code>.myshopify.com</code> domain; for a custom sales platform it's whatever domain Triple Whale assigned when the shop was set up there). A leading <code>https://</code> and trailing <code>/</code> are stripped, and what remains must be a bare hostname with no path or spaces. Validated against Triple Whale — the API key must have access to it — before it is stored. Changing it on a connected integration backfills the account's ad spend onto the new shop. Omit to keep the stored domain; there is no way to clear a stored value, only to overwrite it with a new domain.
+     * @return The exact shop domain in Triple Whale's Settings → Store. For Shopify, this is the <code>.myshopify.com</code> domain. For a custom sales platform, it is the domain Triple Whale assigned when the shop was set up. Whop strips a leading <code>https://</code> and a trailing <code>/</code>. What remains must be a bare hostname with no path or spaces. Whop validates it against Triple Whale before storing it, and the API key must have access to it. Omit to keep the stored domain. You can't clear a stored value, only overwrite it with a new domain.
      */
     @JsonProperty("shop_domain")
     public Optional<String> getShopDomain() {
@@ -108,7 +108,7 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Connecting for the first time backfills the account's existing ad spend. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.</p>
+         * <p>A Triple Whale Data-In API key with the <code>Ads: Write</code> scope, validated against Triple Whale before it is stored. Pass <code>null</code> to disconnect. Required unless you are only changing <code>shop_domain</code> on an already connected integration, in which case the stored key is reused.</p>
          */
         @JsonSetter(value = "api_key", nulls = Nulls.SKIP)
         public Builder apiKey(Optional<String> apiKey) {
@@ -133,7 +133,7 @@ public final class UpdatePreferencesRequestAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The exact shop domain configured in Triple Whale's Settings → Store (for Shopify this is the <code>.myshopify.com</code> domain; for a custom sales platform it's whatever domain Triple Whale assigned when the shop was set up there). A leading <code>https://</code> and trailing <code>/</code> are stripped, and what remains must be a bare hostname with no path or spaces. Validated against Triple Whale — the API key must have access to it — before it is stored. Changing it on a connected integration backfills the account's ad spend onto the new shop. Omit to keep the stored domain; there is no way to clear a stored value, only to overwrite it with a new domain.</p>
+         * <p>The exact shop domain in Triple Whale's Settings → Store. For Shopify, this is the <code>.myshopify.com</code> domain. For a custom sales platform, it is the domain Triple Whale assigned when the shop was set up. Whop strips a leading <code>https://</code> and a trailing <code>/</code>. What remains must be a bare hostname with no path or spaces. Whop validates it against Triple Whale before storing it, and the API key must have access to it. Omit to keep the stored domain. You can't clear a stored value, only overwrite it with a new domain.</p>
          */
         @JsonSetter(value = "shop_domain", nulls = Nulls.SKIP)
         public Builder shopDomain(Optional<String> shopDomain) {

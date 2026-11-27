@@ -21,6 +21,9 @@ public final class ListMembersRequestOrder {
     public static final ListMembersRequestOrder CREATED_AT =
             new ListMembersRequestOrder(Value.CREATED_AT, "created_at");
 
+    public static final ListMembersRequestOrder NEEDS_REPLY =
+            new ListMembersRequestOrder(Value.NEEDS_REPLY, "needs_reply");
+
     public static final ListMembersRequestOrder LAST_ACCESSED_AT =
             new ListMembersRequestOrder(Value.LAST_ACCESSED_AT, "last_accessed_at");
 
@@ -67,6 +70,8 @@ public final class ListMembersRequestOrder {
                 return visitor.visitMostRecentActionAt();
             case CREATED_AT:
                 return visitor.visitCreatedAt();
+            case NEEDS_REPLY:
+                return visitor.visitNeedsReply();
             case LAST_ACCESSED_AT:
                 return visitor.visitLastAccessedAt();
             case UNKNOWN:
@@ -88,6 +93,8 @@ public final class ListMembersRequestOrder {
                 return MOST_RECENT_ACTION_AT;
             case "created_at":
                 return CREATED_AT;
+            case "needs_reply":
+                return NEEDS_REPLY;
             case "last_accessed_at":
                 return LAST_ACCESSED_AT;
             default:
@@ -108,6 +115,8 @@ public final class ListMembersRequestOrder {
 
         USD_TOTAL_SPENT,
 
+        NEEDS_REPLY,
+
         UNKNOWN
     }
 
@@ -123,6 +132,8 @@ public final class ListMembersRequestOrder {
         T visitMostRecentActionAt();
 
         T visitUsdTotalSpent();
+
+        T visitNeedsReply();
 
         T visitUnknown(String unknownType);
     }

@@ -31,7 +31,7 @@ public final class CreateDomainsRequestTransfer {
     }
 
     /**
-     * @return Where the domain moves. <code>internal</code> moves it to another Whop account.
+     * @return Where the domain moves. <code>internal</code> moves it to another Whop account. <code>external</code> moves it to another registrar.
      */
     @JsonProperty("destination")
     public Optional<CreateDomainsRequestTransferDestination> getDestination() {
@@ -81,7 +81,7 @@ public final class CreateDomainsRequestTransfer {
         }
 
         /**
-         * <p>Where the domain moves. <code>internal</code> moves it to another Whop account.</p>
+         * <p>Where the domain moves. <code>internal</code> moves it to another Whop account. <code>external</code> moves it to another registrar.</p>
          */
         @JsonSetter(value = "destination", nulls = Nulls.SKIP)
         public Builder destination(Optional<CreateDomainsRequestTransferDestination> destination) {

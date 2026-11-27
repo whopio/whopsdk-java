@@ -595,28 +595,28 @@ public class RawChannelsClient {
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public WhopApiHttpResponse<ChannelMember> accept(String id) {
         return accept(id, AcceptChannelsRequest.builder().build());
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public WhopApiHttpResponse<ChannelMember> accept(String id, RequestOptions requestOptions) {
         return accept(id, AcceptChannelsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public WhopApiHttpResponse<ChannelMember> accept(String id, AcceptChannelsRequest request) {
         return accept(id, request, null);
     }
 
     /**
-     * Accept a direct-message request.
+     * Accept a direct-message request or restore a hidden conversation. Your membership must not have been removed.
      */
     public WhopApiHttpResponse<ChannelMember> accept(
             String id, AcceptChannelsRequest request, RequestOptions requestOptions) {

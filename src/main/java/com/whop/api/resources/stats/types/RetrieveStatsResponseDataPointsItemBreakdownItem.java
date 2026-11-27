@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RetrieveStatsResponseDataPointsItemBreakdownItem.Builder.class)
 public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
+    private final Optional<String> label;
+
     private final String name;
 
     private final Optional<List<FunnelStepResult>> steps;
@@ -35,14 +37,24 @@ public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
     private final Map<String, Object> additionalProperties;
 
     private RetrieveStatsResponseDataPointsItemBreakdownItem(
+            Optional<String> label,
             String name,
             Optional<List<FunnelStepResult>> steps,
             Optional<Double> value,
             Map<String, Object> additionalProperties) {
+        this.label = label;
         this.name = name;
         this.steps = steps;
         this.value = value;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The display name of the property value. It is present only when the value has a name. For example, a country code has the name of its country.
+     */
+    @JsonProperty("label")
+    public Optional<String> getLabel() {
+        return label;
     }
 
     /**
@@ -91,12 +103,15 @@ public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
     }
 
     private boolean equalTo(RetrieveStatsResponseDataPointsItemBreakdownItem other) {
-        return name.equals(other.name) && steps.equals(other.steps) && value.equals(other.value);
+        return label.equals(other.label)
+                && name.equals(other.name)
+                && steps.equals(other.steps)
+                && value.equals(other.value);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.name, this.steps, this.value);
+        return Objects.hash(this.label, this.name, this.steps, this.value);
     }
 
     @java.lang.Override
@@ -125,6 +140,13 @@ public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>The display name of the property value. It is present only when the value has a name. For example, a country code has the name of its country.</p>
+         */
+        _FinalStage label(Optional<String> label);
+
+        _FinalStage label(String label);
+
+        /**
          * <p>Present for the funnel metric. People reaching each step in order, starting with the entry step.</p>
          */
         _FinalStage steps(Optional<List<FunnelStepResult>> steps);
@@ -149,12 +171,15 @@ public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
 
         private Optional<List<FunnelStepResult>> steps = Optional.empty();
 
+        private Optional<String> label = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(RetrieveStatsResponseDataPointsItemBreakdownItem other) {
+            label(other.getLabel());
             name(other.getName());
             steps(other.getSteps());
             value(other.getValue());
@@ -228,14 +253,38 @@ public final class RetrieveStatsResponseDataPointsItemBreakdownItem {
             return this;
         }
 
+        /**
+         * <p>The display name of the property value. It is present only when the value has a name. For example, a country code has the name of its country.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage label(String label) {
+            this.label = Optional.ofNullable(label);
+            return this;
+        }
+
+        /**
+         * <p>The display name of the property value. It is present only when the value has a name. For example, a country code has the name of its country.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "label", nulls = Nulls.SKIP)
+        public _FinalStage label(Optional<String> label) {
+            this.label = label;
+            return this;
+        }
+
         @java.lang.Override
         public RetrieveStatsResponseDataPointsItemBreakdownItem build() {
-            return new RetrieveStatsResponseDataPointsItemBreakdownItem(name, steps, value, additionalProperties);
+            return new RetrieveStatsResponseDataPointsItemBreakdownItem(
+                    label, name, steps, value, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("name") || key.equalsIgnoreCase("steps") || key.equalsIgnoreCase("value")) {
+            if (key.equalsIgnoreCase("label")
+                    || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("steps")
+                    || key.equalsIgnoreCase("value")) {
                 return;
             }
             this.additionalProperties.put(key, value);

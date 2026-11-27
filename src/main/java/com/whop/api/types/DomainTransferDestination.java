@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public final class DomainTransferDestination {
     public static final DomainTransferDestination INTERNAL = new DomainTransferDestination(Value.INTERNAL, "internal");
 
+    public static final DomainTransferDestination EXTERNAL = new DomainTransferDestination(Value.EXTERNAL, "external");
+
     private final Value value;
 
     private final String string;
@@ -44,6 +46,8 @@ public final class DomainTransferDestination {
         switch (value) {
             case INTERNAL:
                 return visitor.visitInternal();
+            case EXTERNAL:
+                return visitor.visitExternal();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -55,6 +59,8 @@ public final class DomainTransferDestination {
         switch (value) {
             case "internal":
                 return INTERNAL;
+            case "external":
+                return EXTERNAL;
             default:
                 return new DomainTransferDestination(Value.UNKNOWN, value);
         }
@@ -63,11 +69,15 @@ public final class DomainTransferDestination {
     public enum Value {
         INTERNAL,
 
+        EXTERNAL,
+
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitInternal();
+
+        T visitExternal();
 
         T visitUnknown(String unknownType);
     }

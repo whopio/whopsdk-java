@@ -170,9 +170,9 @@ public final class ConversionEventZero {
 
         CONTENT_VIEW,
 
-        SEARCH,
-
         CONTACT,
+
+        SEARCH,
 
         CUSTOMIZE_PRODUCT,
 
@@ -206,9 +206,9 @@ public final class ConversionEventZero {
 
         T visitContentView();
 
-        T visitSearch();
-
         T visitContact();
+
+        T visitSearch();
 
         T visitCustomizeProduct();
 

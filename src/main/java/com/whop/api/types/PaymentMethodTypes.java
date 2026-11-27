@@ -217,6 +217,9 @@ public final class PaymentMethodTypes {
 
     public static final PaymentMethodTypes CARD = new PaymentMethodTypes(Value.CARD, "card");
 
+    public static final PaymentMethodTypes PIX_AUTOMATICO =
+            new PaymentMethodTypes(Value.PIX_AUTOMATICO, "pix_automatico");
+
     public static final PaymentMethodTypes NG_WALLET = new PaymentMethodTypes(Value.NG_WALLET, "ng_wallet");
 
     public static final PaymentMethodTypes CARD_INSTALLMENTS_TWELVE =
@@ -229,6 +232,8 @@ public final class PaymentMethodTypes {
     public static final PaymentMethodTypes PAYTO = new PaymentMethodTypes(Value.PAYTO, "payto");
 
     public static final PaymentMethodTypes ALMA = new PaymentMethodTypes(Value.ALMA, "alma");
+
+    public static final PaymentMethodTypes BIZUM = new PaymentMethodTypes(Value.BIZUM, "bizum");
 
     public static final PaymentMethodTypes RECHNUNG = new PaymentMethodTypes(Value.RECHNUNG, "rechnung");
 
@@ -530,6 +535,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitUpi();
             case CARD:
                 return visitor.visitCard();
+            case PIX_AUTOMATICO:
+                return visitor.visitPixAutomatico();
             case NG_WALLET:
                 return visitor.visitNgWallet();
             case CARD_INSTALLMENTS_TWELVE:
@@ -542,6 +549,8 @@ public final class PaymentMethodTypes {
                 return visitor.visitPayto();
             case ALMA:
                 return visitor.visitAlma();
+            case BIZUM:
+                return visitor.visitBizum();
             case RECHNUNG:
                 return visitor.visitRechnung();
             case NETBANKING:
@@ -815,6 +824,8 @@ public final class PaymentMethodTypes {
                 return UPI;
             case "card":
                 return CARD;
+            case "pix_automatico":
+                return PIX_AUTOMATICO;
             case "ng_wallet":
                 return NG_WALLET;
             case "card_installments_twelve":
@@ -827,6 +838,8 @@ public final class PaymentMethodTypes {
                 return PAYTO;
             case "alma":
                 return ALMA;
+            case "bizum":
+                return BIZUM;
             case "rechnung":
                 return RECHNUNG;
             case "netbanking":
@@ -938,6 +951,8 @@ public final class PaymentMethodTypes {
         BANK_WIRE,
 
         BILLIE,
+
+        BIZUM,
 
         BLIK,
 
@@ -1103,6 +1118,8 @@ public final class PaymentMethodTypes {
 
         PIX,
 
+        PIX_AUTOMATICO,
+
         PLATFORM_BALANCE,
 
         PROMPTPAY,
@@ -1218,6 +1235,8 @@ public final class PaymentMethodTypes {
         T visitBankWire();
 
         T visitBillie();
+
+        T visitBizum();
 
         T visitBlik();
 
@@ -1382,6 +1401,8 @@ public final class PaymentMethodTypes {
         T visitPaytoBankAccount();
 
         T visitPix();
+
+        T visitPixAutomatico();
 
         T visitPlatformBalance();
 

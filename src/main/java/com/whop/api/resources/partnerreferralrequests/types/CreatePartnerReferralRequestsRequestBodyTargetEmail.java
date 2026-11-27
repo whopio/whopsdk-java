@@ -57,7 +57,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetEmail {
     }
 
     /**
-     * @return Email address on an existing user's account. Matching is case-insensitive. The user does not need to be enrolled in the partner program.
+     * @return Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.
      */
     @JsonProperty("target_email")
     public String getTargetEmail() {
@@ -98,7 +98,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetEmail {
 
     public interface TargetEmailStage {
         /**
-         * <p>Email address on an existing user's account. Matching is case-insensitive. The user does not need to be enrolled in the partner program.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          */
         _FinalStage targetEmail(@NotNull String targetEmail);
 
@@ -148,7 +148,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetEmail {
         }
 
         /**
-         * <p>Email address on an existing user's account. Matching is case-insensitive. The user does not need to be enrolled in the partner program.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

@@ -5,14 +5,18 @@ package com.whop.api.resources.channels.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.channels.types.ListChannelsRequestDirection;
+import com.whop.api.resources.channels.types.ListChannelsRequestIncludeMembers;
 import com.whop.api.resources.channels.types.ListChannelsRequestKindItem;
 import com.whop.api.resources.channels.types.ListChannelsRequestOrder;
 import com.whop.api.resources.channels.types.ListChannelsRequestStatus;
@@ -59,7 +63,7 @@ public final class ListChannelsRequest {
 
     private final Optional<ListChannelsRequestOrder> order;
 
-    private final Optional<Boolean> includeMembers;
+    private final Optional<ListChannelsRequestIncludeMembers> includeMembers;
 
     private final Optional<Boolean> includeLastMessage;
 
@@ -92,7 +96,7 @@ public final class ListChannelsRequest {
             Optional<Boolean> viewed,
             Optional<Boolean> requested,
             Optional<ListChannelsRequestOrder> order,
-            Optional<Boolean> includeMembers,
+            Optional<ListChannelsRequestIncludeMembers> includeMembers,
             Optional<Boolean> includeLastMessage,
             Optional<ListChannelsRequestDirection> direction,
             Optional<Boolean> includeDeleted,
@@ -255,10 +259,13 @@ public final class ListChannelsRequest {
     }
 
     /**
-     * @return Include the current members of private and support channels, including you, with their public profiles.
+     * @return Members to include for private and support channels, with their public profiles. <code>current</code> includes current members. <code>current_and_deleted</code> also includes former members, marked with <code>deleted_at</code>. Omit or pass <code>null</code> to leave out members.
      */
-    @JsonProperty("include_members")
-    public Optional<Boolean> getIncludeMembers() {
+    @JsonIgnore
+    public Optional<ListChannelsRequestIncludeMembers> getIncludeMembers() {
+        if (includeMembers == null) {
+            return Optional.empty();
+        }
         return includeMembers;
     }
 
@@ -308,6 +315,12 @@ public final class ListChannelsRequest {
     @JsonProperty("created_after")
     public Optional<String> getCreatedAfter() {
         return createdAfter;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("include_members")
+    private Optional<ListChannelsRequestIncludeMembers> _getIncludeMembers() {
+        return includeMembers;
     }
 
     @java.lang.Override
@@ -418,7 +431,7 @@ public final class ListChannelsRequest {
 
         private Optional<ListChannelsRequestOrder> order = Optional.empty();
 
-        private Optional<Boolean> includeMembers = Optional.empty();
+        private Optional<ListChannelsRequestIncludeMembers> includeMembers = Optional.empty();
 
         private Optional<Boolean> includeLastMessage = Optional.empty();
 
@@ -693,16 +706,27 @@ public final class ListChannelsRequest {
         }
 
         /**
-         * <p>Include the current members of private and support channels, including you, with their public profiles.</p>
+         * <p>Members to include for private and support channels, with their public profiles. <code>current</code> includes current members. <code>current_and_deleted</code> also includes former members, marked with <code>deleted_at</code>. Omit or pass <code>null</code> to leave out members.</p>
          */
         @JsonSetter(value = "include_members", nulls = Nulls.SKIP)
-        public Builder includeMembers(Optional<Boolean> includeMembers) {
+        public Builder includeMembers(Optional<ListChannelsRequestIncludeMembers> includeMembers) {
             this.includeMembers = includeMembers;
             return this;
         }
 
-        public Builder includeMembers(Boolean includeMembers) {
+        public Builder includeMembers(ListChannelsRequestIncludeMembers includeMembers) {
             this.includeMembers = Optional.ofNullable(includeMembers);
+            return this;
+        }
+
+        public Builder includeMembers(Nullable<ListChannelsRequestIncludeMembers> includeMembers) {
+            if (includeMembers.isNull()) {
+                this.includeMembers = null;
+            } else if (includeMembers.isEmpty()) {
+                this.includeMembers = Optional.empty();
+            } else {
+                this.includeMembers = Optional.of(includeMembers.get());
+            }
             return this;
         }
 

@@ -80,6 +80,8 @@ public final class PlanListItem {
 
     private final String purchaseUrl;
 
+    private final Optional<String> redirectUrl;
+
     private final PlanListItemReleaseMethod releaseMethod;
 
     private final double renewalPrice;
@@ -136,6 +138,7 @@ public final class PlanListItem {
             Optional<Map<String, Object>> paymentMethodConfiguration,
             Optional<Map<String, Object>> product,
             String purchaseUrl,
+            Optional<String> redirectUrl,
             PlanListItemReleaseMethod releaseMethod,
             double renewalPrice,
             Optional<String> sku,
@@ -177,6 +180,7 @@ public final class PlanListItem {
         this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.product = product;
         this.purchaseUrl = purchaseUrl;
+        this.redirectUrl = redirectUrl;
         this.releaseMethod = releaseMethod;
         this.renewalPrice = renewalPrice;
         this.sku = sku;
@@ -362,7 +366,7 @@ public final class PlanListItem {
     }
 
     /**
-     * @return Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.
+     * @return Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.
      */
     @JsonProperty("initial_price_due")
     public Money getInitialPriceDue() {
@@ -403,7 +407,7 @@ public final class PlanListItem {
     }
 
     /**
-     * @return Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.
+     * @return Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.
      */
     @JsonIgnore
     public Optional<Map<String, Object>> getMetadata() {
@@ -452,6 +456,17 @@ public final class PlanListItem {
     @JsonProperty("purchase_url")
     public String getPurchaseUrl() {
         return purchaseUrl;
+    }
+
+    /**
+     * @return Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.
+     */
+    @JsonIgnore
+    public Optional<String> getRedirectUrl() {
+        if (redirectUrl == null) {
+            return Optional.empty();
+        }
+        return redirectUrl;
     }
 
     /**
@@ -679,6 +694,12 @@ public final class PlanListItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("redirect_url")
+    private Optional<String> _getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("sku")
     private Optional<String> _getSku() {
         return sku;
@@ -765,6 +786,7 @@ public final class PlanListItem {
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && product.equals(other.product)
                 && purchaseUrl.equals(other.purchaseUrl)
+                && redirectUrl.equals(other.redirectUrl)
                 && releaseMethod.equals(other.releaseMethod)
                 && renewalPrice == other.renewalPrice
                 && sku.equals(other.sku)
@@ -810,6 +832,7 @@ public final class PlanListItem {
                 this.paymentMethodConfiguration,
                 this.product,
                 this.purchaseUrl,
+                this.redirectUrl,
                 this.releaseMethod,
                 this.renewalPrice,
                 this.sku,
@@ -894,7 +917,7 @@ public final class PlanListItem {
 
     public interface InitialPriceDueStage {
         /**
-         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          */
         PurchaseUrlStage initialPriceDue(@NotNull Money initialPriceDue);
     }
@@ -1063,7 +1086,7 @@ public final class PlanListItem {
         _FinalStage memberCount(Nullable<Double> memberCount);
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          */
         _FinalStage metadata(Optional<Map<String, Object>> metadata);
 
@@ -1097,6 +1120,15 @@ public final class PlanListItem {
         _FinalStage product(Map<String, Object> product);
 
         _FinalStage product(Nullable<Map<String, Object>> product);
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        _FinalStage redirectUrl(Optional<String> redirectUrl);
+
+        _FinalStage redirectUrl(String redirectUrl);
+
+        _FinalStage redirectUrl(Nullable<String> redirectUrl);
 
         /**
          * <p>Stock keeping unit, free text set by the seller (e.g. <code>TSHIRT-LARGE-BLUE</code>). Not enforced unique. <code>null</code> when unset.</p>
@@ -1235,6 +1267,8 @@ public final class PlanListItem {
 
         private Optional<String> sku = Optional.empty();
 
+        private Optional<String> redirectUrl = Optional.empty();
+
         private Optional<Map<String, Object>> product = Optional.empty();
 
         private Optional<Map<String, Object>> paymentMethodConfiguration = Optional.empty();
@@ -1302,6 +1336,7 @@ public final class PlanListItem {
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             product(other.getProduct());
             purchaseUrl(other.getPurchaseUrl());
+            redirectUrl(other.getRedirectUrl());
             releaseMethod(other.getReleaseMethod());
             renewalPrice(other.getRenewalPrice());
             sku(other.getSku());
@@ -1407,7 +1442,7 @@ public final class PlanListItem {
         }
 
         /**
-         * <p>Total charged at checkout for one unit, before promo codes and tax: <code>initial_price</code> plus the first <code>renewal_price</code> for recurring variants, or <code>initial_price</code> alone while a free trial applies. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
+         * <p>Total charged at checkout for one unit, before promo codes and tax. For recurring variants it is <code>initial_price</code> plus the first <code>renewal_price</code>. It is <code>initial_price</code> alone while a free trial applies or the <code>subscription_starts_at</code> metadata key is in the future. The trial does not apply when the viewing user has already used one for this variant. Stated in <code>currency</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1772,6 +1807,42 @@ public final class PlanListItem {
         }
 
         /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(Nullable<String> redirectUrl) {
+            if (redirectUrl.isNull()) {
+                this.redirectUrl = null;
+            } else if (redirectUrl.isEmpty()) {
+                this.redirectUrl = Optional.empty();
+            } else {
+                this.redirectUrl = Optional.of(redirectUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(String redirectUrl) {
+            this.redirectUrl = Optional.ofNullable(redirectUrl);
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. <code>null</code> when none is set, or unless the actor has the <code>plan:basic:read</code> scope on the variant's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "redirect_url", nulls = Nulls.SKIP)
+        public _FinalStage redirectUrl(Optional<String> redirectUrl) {
+            this.redirectUrl = redirectUrl;
+            return this;
+        }
+
+        /**
          * <p>Product this variant belongs to; <code>null</code> for standalone variants.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1880,7 +1951,7 @@ public final class PlanListItem {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1896,7 +1967,7 @@ public final class PlanListItem {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1906,7 +1977,7 @@ public final class PlanListItem {
         }
 
         /**
-         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant.</p>
+         * <p>Custom key-value pairs stored on the variant. Included in webhook payloads for payment and membership events. Maximum 50 keys, 100 characters per key, 500 characters per value. The reserved keys <code>custom_cta</code> and <code>custom_cta_url</code>, when set, override the product's checkout call to action for this variant. The reserved key <code>subscription_starts_at</code> takes an ISO 8601 timestamp on a recurring variant. Until then, checkout saves the payment method without charging it. The membership is <code>scheduled</code> with no access until the first charge runs at that time.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
@@ -2401,6 +2472,7 @@ public final class PlanListItem {
                     paymentMethodConfiguration,
                     product,
                     purchaseUrl,
+                    redirectUrl,
                     releaseMethod,
                     renewalPrice,
                     sku,
@@ -2446,6 +2518,7 @@ public final class PlanListItem {
                     || key.equalsIgnoreCase("payment_method_configuration")
                     || key.equalsIgnoreCase("product")
                     || key.equalsIgnoreCase("purchase_url")
+                    || key.equalsIgnoreCase("redirect_url")
                     || key.equalsIgnoreCase("release_method")
                     || key.equalsIgnoreCase("renewal_price")
                     || key.equalsIgnoreCase("sku")

@@ -128,7 +128,7 @@ public final class ListReportsResponseDataItemColumnsItem {
     }
 
     /**
-     * @return Properties only. <code>fixed</code> breakdowns list every value, zero-filled; <code>open</code> ones list values with activity.
+     * @return Properties only. <code>fixed</code> breakdowns list every value, zero-filled. <code>open</code> ones list values with activity.
      */
     @JsonProperty("set")
     public Optional<ListReportsResponseDataItemColumnsItemSet> getSet() {
@@ -303,7 +303,7 @@ public final class ListReportsResponseDataItemColumnsItem {
         _FinalStage default_(Boolean default_);
 
         /**
-         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled; <code>open</code> ones list values with activity.</p>
+         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled. <code>open</code> ones list values with activity.</p>
          */
         _FinalStage set(Optional<ListReportsResponseDataItemColumnsItemSet> set);
 
@@ -505,7 +505,7 @@ public final class ListReportsResponseDataItemColumnsItem {
         }
 
         /**
-         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled; <code>open</code> ones list values with activity.</p>
+         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled. <code>open</code> ones list values with activity.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -515,7 +515,7 @@ public final class ListReportsResponseDataItemColumnsItem {
         }
 
         /**
-         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled; <code>open</code> ones list values with activity.</p>
+         * <p>Properties only. <code>fixed</code> breakdowns list every value, zero-filled. <code>open</code> ones list values with activity.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "set", nulls = Nulls.SKIP)

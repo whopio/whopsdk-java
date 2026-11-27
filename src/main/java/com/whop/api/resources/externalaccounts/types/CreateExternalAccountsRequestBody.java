@@ -11,6 +11,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.whop.api.types.CreateAimerceExternalAccount;
+import com.whop.api.types.CreateFacebookExternalAccount;
+import com.whop.api.types.CreateKlaviyoExternalAccount;
+import com.whop.api.types.CreateTiktokExternalAccount;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,66 +30,66 @@ public final class CreateExternalAccountsRequestBody {
         return value.visit(visitor);
     }
 
-    public static CreateExternalAccountsRequestBody facebook(CreateExternalAccountsRequestBodyFacebook value) {
-        return new CreateExternalAccountsRequestBody(new FacebookValue(value));
-    }
-
-    public static CreateExternalAccountsRequestBody tiktok(CreateExternalAccountsRequestBodyTiktok value) {
-        return new CreateExternalAccountsRequestBody(new TiktokValue(value));
-    }
-
-    public static CreateExternalAccountsRequestBody klaviyo(CreateExternalAccountsRequestBodyKlaviyo value) {
-        return new CreateExternalAccountsRequestBody(new KlaviyoValue(value));
-    }
-
-    public static CreateExternalAccountsRequestBody aimerce(CreateExternalAccountsRequestBodyAimerce value) {
+    public static CreateExternalAccountsRequestBody aimerce(CreateAimerceExternalAccount value) {
         return new CreateExternalAccountsRequestBody(new AimerceValue(value));
     }
 
-    public boolean isFacebook() {
-        return value instanceof FacebookValue;
+    public static CreateExternalAccountsRequestBody facebook(CreateFacebookExternalAccount value) {
+        return new CreateExternalAccountsRequestBody(new FacebookValue(value));
     }
 
-    public boolean isTiktok() {
-        return value instanceof TiktokValue;
+    public static CreateExternalAccountsRequestBody klaviyo(CreateKlaviyoExternalAccount value) {
+        return new CreateExternalAccountsRequestBody(new KlaviyoValue(value));
     }
 
-    public boolean isKlaviyo() {
-        return value instanceof KlaviyoValue;
+    public static CreateExternalAccountsRequestBody tiktok(CreateTiktokExternalAccount value) {
+        return new CreateExternalAccountsRequestBody(new TiktokValue(value));
     }
 
     public boolean isAimerce() {
         return value instanceof AimerceValue;
     }
 
+    public boolean isFacebook() {
+        return value instanceof FacebookValue;
+    }
+
+    public boolean isKlaviyo() {
+        return value instanceof KlaviyoValue;
+    }
+
+    public boolean isTiktok() {
+        return value instanceof TiktokValue;
+    }
+
     public boolean _isUnknown() {
         return value instanceof _UnknownValue;
     }
 
-    public Optional<CreateExternalAccountsRequestBodyFacebook> getFacebook() {
+    public Optional<CreateAimerceExternalAccount> getAimerce() {
+        if (isAimerce()) {
+            return Optional.of(((AimerceValue) value).value);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<CreateFacebookExternalAccount> getFacebook() {
         if (isFacebook()) {
             return Optional.of(((FacebookValue) value).value);
         }
         return Optional.empty();
     }
 
-    public Optional<CreateExternalAccountsRequestBodyTiktok> getTiktok() {
-        if (isTiktok()) {
-            return Optional.of(((TiktokValue) value).value);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<CreateExternalAccountsRequestBodyKlaviyo> getKlaviyo() {
+    public Optional<CreateKlaviyoExternalAccount> getKlaviyo() {
         if (isKlaviyo()) {
             return Optional.of(((KlaviyoValue) value).value);
         }
         return Optional.empty();
     }
 
-    public Optional<CreateExternalAccountsRequestBodyAimerce> getAimerce() {
-        if (isAimerce()) {
-            return Optional.of(((AimerceValue) value).value);
+    public Optional<CreateTiktokExternalAccount> getTiktok() {
+        if (isTiktok()) {
+            return Optional.of(((TiktokValue) value).value);
         }
         return Optional.empty();
     }
@@ -120,27 +124,67 @@ public final class CreateExternalAccountsRequestBody {
     }
 
     public interface Visitor<T> {
-        T visitFacebook(CreateExternalAccountsRequestBodyFacebook facebook);
+        T visitAimerce(CreateAimerceExternalAccount aimerce);
 
-        T visitTiktok(CreateExternalAccountsRequestBodyTiktok tiktok);
+        T visitFacebook(CreateFacebookExternalAccount facebook);
 
-        T visitKlaviyo(CreateExternalAccountsRequestBodyKlaviyo klaviyo);
+        T visitKlaviyo(CreateKlaviyoExternalAccount klaviyo);
 
-        T visitAimerce(CreateExternalAccountsRequestBodyAimerce aimerce);
+        T visitTiktok(CreateTiktokExternalAccount tiktok);
 
         T _visitUnknown(Object unknownType);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "platform", visible = true, defaultImpl = _UnknownValue.class)
     @JsonSubTypes({
+        @JsonSubTypes.Type(AimerceValue.class),
         @JsonSubTypes.Type(FacebookValue.class),
-        @JsonSubTypes.Type(TiktokValue.class),
         @JsonSubTypes.Type(KlaviyoValue.class),
-        @JsonSubTypes.Type(AimerceValue.class)
+        @JsonSubTypes.Type(TiktokValue.class)
     })
     @JsonIgnoreProperties(ignoreUnknown = true)
     private interface Value {
         <T> T visit(Visitor<T> visitor);
+    }
+
+    @JsonTypeName("aimerce")
+    @JsonIgnoreProperties("platform")
+    private static final class AimerceValue implements Value {
+        @JsonUnwrapped
+        @JsonIgnoreProperties(value = "platform", allowSetters = true)
+        private CreateAimerceExternalAccount value;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        private AimerceValue() {}
+
+        private AimerceValue(CreateAimerceExternalAccount value) {
+            this.value = value;
+        }
+
+        @java.lang.Override
+        public <T> T visit(Visitor<T> visitor) {
+            return visitor.visitAimerce(value);
+        }
+
+        @java.lang.Override
+        public boolean equals(Object other) {
+            if (this == other) return true;
+            return other instanceof AimerceValue && equalTo((AimerceValue) other);
+        }
+
+        private boolean equalTo(AimerceValue other) {
+            return value.equals(other.value);
+        }
+
+        @java.lang.Override
+        public int hashCode() {
+            return Objects.hash(this.value);
+        }
+
+        @java.lang.Override
+        public String toString() {
+            return "CreateExternalAccountsRequestBody{" + "value: " + value + "}";
+        }
     }
 
     @JsonTypeName("facebook")
@@ -148,12 +192,12 @@ public final class CreateExternalAccountsRequestBody {
     private static final class FacebookValue implements Value {
         @JsonUnwrapped
         @JsonIgnoreProperties(value = "platform", allowSetters = true)
-        private CreateExternalAccountsRequestBodyFacebook value;
+        private CreateFacebookExternalAccount value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         private FacebookValue() {}
 
-        private FacebookValue(CreateExternalAccountsRequestBodyFacebook value) {
+        private FacebookValue(CreateFacebookExternalAccount value) {
             this.value = value;
         }
 
@@ -183,57 +227,17 @@ public final class CreateExternalAccountsRequestBody {
         }
     }
 
-    @JsonTypeName("tiktok")
-    @JsonIgnoreProperties("platform")
-    private static final class TiktokValue implements Value {
-        @JsonUnwrapped
-        @JsonIgnoreProperties(value = "platform", allowSetters = true)
-        private CreateExternalAccountsRequestBodyTiktok value;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private TiktokValue() {}
-
-        private TiktokValue(CreateExternalAccountsRequestBodyTiktok value) {
-            this.value = value;
-        }
-
-        @java.lang.Override
-        public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitTiktok(value);
-        }
-
-        @java.lang.Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            return other instanceof TiktokValue && equalTo((TiktokValue) other);
-        }
-
-        private boolean equalTo(TiktokValue other) {
-            return value.equals(other.value);
-        }
-
-        @java.lang.Override
-        public int hashCode() {
-            return Objects.hash(this.value);
-        }
-
-        @java.lang.Override
-        public String toString() {
-            return "CreateExternalAccountsRequestBody{" + "value: " + value + "}";
-        }
-    }
-
     @JsonTypeName("klaviyo")
     @JsonIgnoreProperties("platform")
     private static final class KlaviyoValue implements Value {
         @JsonUnwrapped
         @JsonIgnoreProperties(value = "platform", allowSetters = true)
-        private CreateExternalAccountsRequestBodyKlaviyo value;
+        private CreateKlaviyoExternalAccount value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         private KlaviyoValue() {}
 
-        private KlaviyoValue(CreateExternalAccountsRequestBodyKlaviyo value) {
+        private KlaviyoValue(CreateKlaviyoExternalAccount value) {
             this.value = value;
         }
 
@@ -263,32 +267,32 @@ public final class CreateExternalAccountsRequestBody {
         }
     }
 
-    @JsonTypeName("aimerce")
+    @JsonTypeName("tiktok")
     @JsonIgnoreProperties("platform")
-    private static final class AimerceValue implements Value {
+    private static final class TiktokValue implements Value {
         @JsonUnwrapped
         @JsonIgnoreProperties(value = "platform", allowSetters = true)
-        private CreateExternalAccountsRequestBodyAimerce value;
+        private CreateTiktokExternalAccount value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        private AimerceValue() {}
+        private TiktokValue() {}
 
-        private AimerceValue(CreateExternalAccountsRequestBodyAimerce value) {
+        private TiktokValue(CreateTiktokExternalAccount value) {
             this.value = value;
         }
 
         @java.lang.Override
         public <T> T visit(Visitor<T> visitor) {
-            return visitor.visitAimerce(value);
+            return visitor.visitTiktok(value);
         }
 
         @java.lang.Override
         public boolean equals(Object other) {
             if (this == other) return true;
-            return other instanceof AimerceValue && equalTo((AimerceValue) other);
+            return other instanceof TiktokValue && equalTo((TiktokValue) other);
         }
 
-        private boolean equalTo(AimerceValue other) {
+        private boolean equalTo(TiktokValue other) {
             return value.equals(other.value);
         }
 

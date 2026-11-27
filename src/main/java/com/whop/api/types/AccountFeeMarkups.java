@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AccountFeeMarkups.Builder.class)
 public final class AccountFeeMarkups {
+    private final Map<String, AccountFeeMarkup> cardRegions;
+
     private final AccountFeeMarkup cardSpend;
 
     private final AccountFeeMarkup cryptoSwaps;
@@ -38,6 +40,7 @@ public final class AccountFeeMarkups {
     private final Map<String, Object> additionalProperties;
 
     private AccountFeeMarkups(
+            Map<String, AccountFeeMarkup> cardRegions,
             AccountFeeMarkup cardSpend,
             AccountFeeMarkup cryptoSwaps,
             Map<String, AccountFeeMarkup> deposits,
@@ -46,6 +49,7 @@ public final class AccountFeeMarkups {
             Map<String, AccountFeeMarkup> payouts,
             AccountFeeMarkup transfers,
             Map<String, Object> additionalProperties) {
+        this.cardRegions = cardRegions;
         this.cardSpend = cardSpend;
         this.cryptoSwaps = cryptoSwaps;
         this.deposits = deposits;
@@ -54,6 +58,14 @@ public final class AccountFeeMarkups {
         this.payouts = payouts;
         this.transfers = transfers;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Markups on card payments, keyed by acquiring region (<code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>). A region without its own markup uses <code>payment_methods.card</code>.
+     */
+    @JsonProperty("card_regions")
+    public Map<String, AccountFeeMarkup> getCardRegions() {
+        return cardRegions;
     }
 
     /**
@@ -124,7 +136,8 @@ public final class AccountFeeMarkups {
     }
 
     private boolean equalTo(AccountFeeMarkups other) {
-        return cardSpend.equals(other.cardSpend)
+        return cardRegions.equals(other.cardRegions)
+                && cardSpend.equals(other.cardSpend)
                 && cryptoSwaps.equals(other.cryptoSwaps)
                 && deposits.equals(other.deposits)
                 && paymentMethods.equals(other.paymentMethods)
@@ -136,6 +149,7 @@ public final class AccountFeeMarkups {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.cardRegions,
                 this.cardSpend,
                 this.cryptoSwaps,
                 this.deposits,
@@ -192,6 +206,15 @@ public final class AccountFeeMarkups {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Markups on card payments, keyed by acquiring region (<code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>). A region without its own markup uses <code>payment_methods.card</code>.</p>
+         */
+        _FinalStage cardRegions(Map<String, AccountFeeMarkup> cardRegions);
+
+        _FinalStage putAllCardRegions(Map<String, AccountFeeMarkup> cardRegions);
+
+        _FinalStage cardRegions(String key, AccountFeeMarkup value);
+
+        /**
          * <p>Markups on deposits into the account's balance, keyed by rail: <code>bank</code> and <code>crypto</code>.</p>
          */
         _FinalStage deposits(Map<String, AccountFeeMarkup> deposits);
@@ -236,12 +259,15 @@ public final class AccountFeeMarkups {
 
         private Map<String, AccountFeeMarkup> deposits = new LinkedHashMap<>();
 
+        private Map<String, AccountFeeMarkup> cardRegions = new LinkedHashMap<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(AccountFeeMarkups other) {
+            cardRegions(other.getCardRegions());
             cardSpend(other.getCardSpend());
             cryptoSwaps(other.getCryptoSwaps());
             deposits(other.getDeposits());
@@ -401,9 +427,45 @@ public final class AccountFeeMarkups {
             return this;
         }
 
+        /**
+         * <p>Markups on card payments, keyed by acquiring region (<code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>). A region without its own markup uses <code>payment_methods.card</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage cardRegions(String key, AccountFeeMarkup value) {
+            this.cardRegions.put(key, value);
+            return this;
+        }
+
+        /**
+         * <p>Markups on card payments, keyed by acquiring region (<code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>). A region without its own markup uses <code>payment_methods.card</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage putAllCardRegions(Map<String, AccountFeeMarkup> cardRegions) {
+            if (cardRegions != null) {
+                this.cardRegions.putAll(cardRegions);
+            }
+            return this;
+        }
+
+        /**
+         * <p>Markups on card payments, keyed by acquiring region (<code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>). A region without its own markup uses <code>payment_methods.card</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "card_regions", nulls = Nulls.SKIP)
+        public _FinalStage cardRegions(Map<String, AccountFeeMarkup> cardRegions) {
+            this.cardRegions.clear();
+            if (cardRegions != null) {
+                this.cardRegions.putAll(cardRegions);
+            }
+            return this;
+        }
+
         @java.lang.Override
         public AccountFeeMarkups build() {
             return new AccountFeeMarkups(
+                    cardRegions,
                     cardSpend,
                     cryptoSwaps,
                     deposits,
@@ -416,7 +478,8 @@ public final class AccountFeeMarkups {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("card_spend")
+            if (key.equalsIgnoreCase("card_regions")
+                    || key.equalsIgnoreCase("card_spend")
                     || key.equalsIgnoreCase("crypto_swaps")
                     || key.equalsIgnoreCase("deposits")
                     || key.equalsIgnoreCase("payment_methods")

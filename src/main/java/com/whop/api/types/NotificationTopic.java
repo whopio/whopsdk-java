@@ -28,6 +28,10 @@ public final class NotificationTopic {
 
     private final Optional<String> description;
 
+    private final NotificationTopicEmailDelivery emailDelivery;
+
+    private final boolean everyChannelCoversEmail;
+
     private final String id;
 
     private final String identifier;
@@ -36,6 +40,8 @@ public final class NotificationTopic {
 
     private final String name;
 
+    private final NotificationTopicPushDelivery pushDelivery;
+
     private final NotificationTopicTopicType topicType;
 
     private final Map<String, Object> additionalProperties;
@@ -43,18 +49,24 @@ public final class NotificationTopic {
     private NotificationTopic(
             boolean defaultPreferenceValue,
             Optional<String> description,
+            NotificationTopicEmailDelivery emailDelivery,
+            boolean everyChannelCoversEmail,
             String id,
             String identifier,
             boolean isMention,
             String name,
+            NotificationTopicPushDelivery pushDelivery,
             NotificationTopicTopicType topicType,
             Map<String, Object> additionalProperties) {
         this.defaultPreferenceValue = defaultPreferenceValue;
         this.description = description;
+        this.emailDelivery = emailDelivery;
+        this.everyChannelCoversEmail = everyChannelCoversEmail;
         this.id = id;
         this.identifier = identifier;
         this.isMention = isMention;
         this.name = name;
+        this.pushDelivery = pushDelivery;
         this.topicType = topicType;
         this.additionalProperties = additionalProperties;
     }
@@ -76,6 +88,22 @@ public final class NotificationTopic {
             return Optional.empty();
         }
         return description;
+    }
+
+    /**
+     * @return How the topic sends email. <code>optional</code> means a preference with channel <code>email</code> turns its emails on or off. <code>always</code> means its emails are sent whatever the preferences say. <code>unavailable</code> means the topic sends no email.
+     */
+    @JsonProperty("email_delivery")
+    public NotificationTopicEmailDelivery getEmailDelivery() {
+        return emailDelivery;
+    }
+
+    /**
+     * @return Whether a preference with no channel also turns this topic's email on or off. When <code>false</code>, only a preference with channel <code>email</code> changes its email.
+     */
+    @JsonProperty("every_channel_covers_email")
+    public boolean getEveryChannelCoversEmail() {
+        return everyChannelCoversEmail;
     }
 
     /**
@@ -111,6 +139,14 @@ public final class NotificationTopic {
     }
 
     /**
+     * @return How the topic sends push and in-app notifications. <code>optional</code> means a preference with channel <code>mobile</code> or <code>in_app</code> turns them on or off. A <code>mobile</code> preference wins over an <code>in_app</code> one. <code>unavailable</code> means the topic sends no push or in-app notification.
+     */
+    @JsonProperty("push_delivery")
+    public NotificationTopicPushDelivery getPushDelivery() {
+        return pushDelivery;
+    }
+
+    /**
      * @return Scope of the topic: whether it applies to an account, a user, or an account's team.
      */
     @JsonProperty("topic_type")
@@ -138,10 +174,13 @@ public final class NotificationTopic {
     private boolean equalTo(NotificationTopic other) {
         return defaultPreferenceValue == other.defaultPreferenceValue
                 && description.equals(other.description)
+                && emailDelivery.equals(other.emailDelivery)
+                && everyChannelCoversEmail == other.everyChannelCoversEmail
                 && id.equals(other.id)
                 && identifier.equals(other.identifier)
                 && isMention == other.isMention
                 && name.equals(other.name)
+                && pushDelivery.equals(other.pushDelivery)
                 && topicType.equals(other.topicType);
     }
 
@@ -150,10 +189,13 @@ public final class NotificationTopic {
         return Objects.hash(
                 this.defaultPreferenceValue,
                 this.description,
+                this.emailDelivery,
+                this.everyChannelCoversEmail,
                 this.id,
                 this.identifier,
                 this.isMention,
                 this.name,
+                this.pushDelivery,
                 this.topicType);
     }
 
@@ -170,9 +212,23 @@ public final class NotificationTopic {
         /**
          * <p>Whether notifications for this topic are enabled by default when the user has not set a preference.</p>
          */
-        IdStage defaultPreferenceValue(boolean defaultPreferenceValue);
+        EmailDeliveryStage defaultPreferenceValue(boolean defaultPreferenceValue);
 
         Builder from(NotificationTopic other);
+    }
+
+    public interface EmailDeliveryStage {
+        /**
+         * <p>How the topic sends email. <code>optional</code> means a preference with channel <code>email</code> turns its emails on or off. <code>always</code> means its emails are sent whatever the preferences say. <code>unavailable</code> means the topic sends no email.</p>
+         */
+        EveryChannelCoversEmailStage emailDelivery(@NotNull NotificationTopicEmailDelivery emailDelivery);
+    }
+
+    public interface EveryChannelCoversEmailStage {
+        /**
+         * <p>Whether a preference with no channel also turns this topic's email on or off. When <code>false</code>, only a preference with channel <code>email</code> changes its email.</p>
+         */
+        IdStage everyChannelCoversEmail(boolean everyChannelCoversEmail);
     }
 
     public interface IdStage {
@@ -200,7 +256,14 @@ public final class NotificationTopic {
         /**
          * <p>Display name shown in notification preference settings.</p>
          */
-        TopicTypeStage name(@NotNull String name);
+        PushDeliveryStage name(@NotNull String name);
+    }
+
+    public interface PushDeliveryStage {
+        /**
+         * <p>How the topic sends push and in-app notifications. <code>optional</code> means a preference with channel <code>mobile</code> or <code>in_app</code> turns them on or off. A <code>mobile</code> preference wins over an <code>in_app</code> one. <code>unavailable</code> means the topic sends no push or in-app notification.</p>
+         */
+        TopicTypeStage pushDelivery(@NotNull NotificationTopicPushDelivery pushDelivery);
     }
 
     public interface TopicTypeStage {
@@ -230,13 +293,20 @@ public final class NotificationTopic {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
             implements DefaultPreferenceValueStage,
+                    EmailDeliveryStage,
+                    EveryChannelCoversEmailStage,
                     IdStage,
                     IdentifierStage,
                     IsMentionStage,
                     NameStage,
+                    PushDeliveryStage,
                     TopicTypeStage,
                     _FinalStage {
         private boolean defaultPreferenceValue;
+
+        private NotificationTopicEmailDelivery emailDelivery;
+
+        private boolean everyChannelCoversEmail;
 
         private String id;
 
@@ -245,6 +315,8 @@ public final class NotificationTopic {
         private boolean isMention;
 
         private String name;
+
+        private NotificationTopicPushDelivery pushDelivery;
 
         private NotificationTopicTopicType topicType;
 
@@ -258,10 +330,13 @@ public final class NotificationTopic {
         public Builder from(NotificationTopic other) {
             defaultPreferenceValue(other.getDefaultPreferenceValue());
             description(other.getDescription());
+            emailDelivery(other.getEmailDelivery());
+            everyChannelCoversEmail(other.getEveryChannelCoversEmail());
             id(other.getId());
             identifier(other.getIdentifier());
             isMention(other.getIsMention());
             name(other.getName());
+            pushDelivery(other.getPushDelivery());
             topicType(other.getTopicType());
             return this;
         }
@@ -272,8 +347,30 @@ public final class NotificationTopic {
          */
         @java.lang.Override
         @JsonSetter("default_preference_value")
-        public IdStage defaultPreferenceValue(boolean defaultPreferenceValue) {
+        public EmailDeliveryStage defaultPreferenceValue(boolean defaultPreferenceValue) {
             this.defaultPreferenceValue = defaultPreferenceValue;
+            return this;
+        }
+
+        /**
+         * <p>How the topic sends email. <code>optional</code> means a preference with channel <code>email</code> turns its emails on or off. <code>always</code> means its emails are sent whatever the preferences say. <code>unavailable</code> means the topic sends no email.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("email_delivery")
+        public EveryChannelCoversEmailStage emailDelivery(@NotNull NotificationTopicEmailDelivery emailDelivery) {
+            this.emailDelivery = Objects.requireNonNull(emailDelivery, "emailDelivery must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Whether a preference with no channel also turns this topic's email on or off. When <code>false</code>, only a preference with channel <code>email</code> changes its email.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("every_channel_covers_email")
+        public IdStage everyChannelCoversEmail(boolean everyChannelCoversEmail) {
+            this.everyChannelCoversEmail = everyChannelCoversEmail;
             return this;
         }
 
@@ -316,8 +413,19 @@ public final class NotificationTopic {
          */
         @java.lang.Override
         @JsonSetter("name")
-        public TopicTypeStage name(@NotNull String name) {
+        public PushDeliveryStage name(@NotNull String name) {
             this.name = Objects.requireNonNull(name, "name must not be null");
+            return this;
+        }
+
+        /**
+         * <p>How the topic sends push and in-app notifications. <code>optional</code> means a preference with channel <code>mobile</code> or <code>in_app</code> turns them on or off. A <code>mobile</code> preference wins over an <code>in_app</code> one. <code>unavailable</code> means the topic sends no push or in-app notification.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("push_delivery")
+        public TopicTypeStage pushDelivery(@NotNull NotificationTopicPushDelivery pushDelivery) {
+            this.pushDelivery = Objects.requireNonNull(pushDelivery, "pushDelivery must not be null");
             return this;
         }
 
@@ -373,10 +481,13 @@ public final class NotificationTopic {
             return new NotificationTopic(
                     defaultPreferenceValue,
                     description,
+                    emailDelivery,
+                    everyChannelCoversEmail,
                     id,
                     identifier,
                     isMention,
                     name,
+                    pushDelivery,
                     topicType,
                     additionalProperties);
         }
@@ -385,10 +496,13 @@ public final class NotificationTopic {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("default_preference_value")
                     || key.equalsIgnoreCase("description")
+                    || key.equalsIgnoreCase("email_delivery")
+                    || key.equalsIgnoreCase("every_channel_covers_email")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("identifier")
                     || key.equalsIgnoreCase("is_mention")
                     || key.equalsIgnoreCase("name")
+                    || key.equalsIgnoreCase("push_delivery")
                     || key.equalsIgnoreCase("topic_type")) {
                 return;
             }

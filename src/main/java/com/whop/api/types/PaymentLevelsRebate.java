@@ -30,6 +30,8 @@ public final class PaymentLevelsRebate {
 
     private final Optional<Double> effectiveRatePercentage;
 
+    private final Optional<PaymentLevelsRebateEstimate> estimate;
+
     private final Optional<PaymentLevelsRebateIneligibleReason> ineligibleReason;
 
     private final Optional<Integer> level;
@@ -50,6 +52,7 @@ public final class PaymentLevelsRebate {
             Optional<Money> amount,
             Optional<Double> coveredShare,
             Optional<Double> effectiveRatePercentage,
+            Optional<PaymentLevelsRebateEstimate> estimate,
             Optional<PaymentLevelsRebateIneligibleReason> ineligibleReason,
             Optional<Integer> level,
             Optional<String> monthStartedAt,
@@ -61,6 +64,7 @@ public final class PaymentLevelsRebate {
         this.amount = amount;
         this.coveredShare = coveredShare;
         this.effectiveRatePercentage = effectiveRatePercentage;
+        this.estimate = estimate;
         this.ineligibleReason = ineligibleReason;
         this.level = level;
         this.monthStartedAt = monthStartedAt;
@@ -102,6 +106,17 @@ public final class PaymentLevelsRebate {
             return Optional.empty();
         }
         return effectiveRatePercentage;
+    }
+
+    /**
+     * @return Estimate of the payment's part of its account's monthly rebate, as if its month closed now. It uses the account's level so far and the share of the payment that its spend so far covers. Both can change until the month closes. <code>null</code> unless <code>status</code> is <code>pending</code> with the processing fee posted, and when estimates are unavailable.
+     */
+    @JsonIgnore
+    public Optional<PaymentLevelsRebateEstimate> getEstimate() {
+        if (estimate == null) {
+            return Optional.empty();
+        }
+        return estimate;
     }
 
     /**
@@ -194,6 +209,12 @@ public final class PaymentLevelsRebate {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("estimate")
+    private Optional<PaymentLevelsRebateEstimate> _getEstimate() {
+        return estimate;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("ineligible_reason")
     private Optional<PaymentLevelsRebateIneligibleReason> _getIneligibleReason() {
         return ineligibleReason;
@@ -238,6 +259,7 @@ public final class PaymentLevelsRebate {
         return amount.equals(other.amount)
                 && coveredShare.equals(other.coveredShare)
                 && effectiveRatePercentage.equals(other.effectiveRatePercentage)
+                && estimate.equals(other.estimate)
                 && ineligibleReason.equals(other.ineligibleReason)
                 && level.equals(other.level)
                 && monthStartedAt.equals(other.monthStartedAt)
@@ -253,6 +275,7 @@ public final class PaymentLevelsRebate {
                 this.amount,
                 this.coveredShare,
                 this.effectiveRatePercentage,
+                this.estimate,
                 this.ineligibleReason,
                 this.level,
                 this.monthStartedAt,
@@ -322,6 +345,15 @@ public final class PaymentLevelsRebate {
         _FinalStage effectiveRatePercentage(Nullable<Double> effectiveRatePercentage);
 
         /**
+         * <p>Estimate of the payment's part of its account's monthly rebate, as if its month closed now. It uses the account's level so far and the share of the payment that its spend so far covers. Both can change until the month closes. <code>null</code> unless <code>status</code> is <code>pending</code> with the processing fee posted, and when estimates are unavailable.</p>
+         */
+        _FinalStage estimate(Optional<PaymentLevelsRebateEstimate> estimate);
+
+        _FinalStage estimate(PaymentLevelsRebateEstimate estimate);
+
+        _FinalStage estimate(Nullable<PaymentLevelsRebateEstimate> estimate);
+
+        /**
          * <p>Why the payment can't earn a rebate: <code>not_card_payment</code>, <code>before_levels</code> (made before Whop Levels started), <code>not_in_levels</code> (its account wasn't in Whop Levels that month), <code>fee_not_posted</code>, <code>fee_at_level_rate</code> (its fee was already at or below the level's rate) or <code>no_level_rate</code> (its fee matched no level rate). <code>null</code> unless <code>status</code> is <code>ineligible</code>.</p>
          */
         _FinalStage ineligibleReason(Optional<PaymentLevelsRebateIneligibleReason> ineligibleReason);
@@ -383,6 +415,8 @@ public final class PaymentLevelsRebate {
 
         private Optional<PaymentLevelsRebateIneligibleReason> ineligibleReason = Optional.empty();
 
+        private Optional<PaymentLevelsRebateEstimate> estimate = Optional.empty();
+
         private Optional<Double> effectiveRatePercentage = Optional.empty();
 
         private Optional<Double> coveredShare = Optional.empty();
@@ -398,6 +432,7 @@ public final class PaymentLevelsRebate {
             amount(other.getAmount());
             coveredShare(other.getCoveredShare());
             effectiveRatePercentage(other.getEffectiveRatePercentage());
+            estimate(other.getEstimate());
             ineligibleReason(other.getIneligibleReason());
             level(other.getLevel());
             monthStartedAt(other.getMonthStartedAt());
@@ -611,6 +646,42 @@ public final class PaymentLevelsRebate {
         }
 
         /**
+         * <p>Estimate of the payment's part of its account's monthly rebate, as if its month closed now. It uses the account's level so far and the share of the payment that its spend so far covers. Both can change until the month closes. <code>null</code> unless <code>status</code> is <code>pending</code> with the processing fee posted, and when estimates are unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimate(Nullable<PaymentLevelsRebateEstimate> estimate) {
+            if (estimate.isNull()) {
+                this.estimate = null;
+            } else if (estimate.isEmpty()) {
+                this.estimate = Optional.empty();
+            } else {
+                this.estimate = Optional.of(estimate.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Estimate of the payment's part of its account's monthly rebate, as if its month closed now. It uses the account's level so far and the share of the payment that its spend so far covers. Both can change until the month closes. <code>null</code> unless <code>status</code> is <code>pending</code> with the processing fee posted, and when estimates are unavailable.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage estimate(PaymentLevelsRebateEstimate estimate) {
+            this.estimate = Optional.ofNullable(estimate);
+            return this;
+        }
+
+        /**
+         * <p>Estimate of the payment's part of its account's monthly rebate, as if its month closed now. It uses the account's level so far and the share of the payment that its spend so far covers. Both can change until the month closes. <code>null</code> unless <code>status</code> is <code>pending</code> with the processing fee posted, and when estimates are unavailable.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "estimate", nulls = Nulls.SKIP)
+        public _FinalStage estimate(Optional<PaymentLevelsRebateEstimate> estimate) {
+            this.estimate = estimate;
+            return this;
+        }
+
+        /**
          * <p>Processing fee as a percentage of the amount it was charged on, before the rebate, where <code>2.7</code> means 2.7%. <code>null</code> unless <code>status</code> is <code>rebated</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -724,6 +795,7 @@ public final class PaymentLevelsRebate {
                     amount,
                     coveredShare,
                     effectiveRatePercentage,
+                    estimate,
                     ineligibleReason,
                     level,
                     monthStartedAt,
@@ -739,6 +811,7 @@ public final class PaymentLevelsRebate {
             if (key.equalsIgnoreCase("amount")
                     || key.equalsIgnoreCase("covered_share")
                     || key.equalsIgnoreCase("effective_rate_percentage")
+                    || key.equalsIgnoreCase("estimate")
                     || key.equalsIgnoreCase("ineligible_reason")
                     || key.equalsIgnoreCase("level")
                     || key.equalsIgnoreCase("month_started_at")

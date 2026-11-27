@@ -7,7 +7,9 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.members.notes.requests.CreateNotesRequest;
+import com.whop.api.resources.members.notes.requests.DeleteNotesRequest;
 import com.whop.api.resources.members.notes.requests.ListNotesRequest;
+import com.whop.api.resources.members.notes.types.DeleteNotesResponse;
 import com.whop.api.types.MemberNote;
 
 public class NotesClient {
@@ -68,5 +70,34 @@ public class NotesClient {
      */
     public MemberNote create(String memberId, CreateNotesRequest request, RequestOptions requestOptions) {
         return this.rawClient.create(memberId, request, requestOptions).body();
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public DeleteNotesResponse delete(String memberId, String id) {
+        return this.rawClient.delete(memberId, id).body();
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public DeleteNotesResponse delete(String memberId, String id, RequestOptions requestOptions) {
+        return this.rawClient.delete(memberId, id, requestOptions).body();
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public DeleteNotesResponse delete(String memberId, String id, DeleteNotesRequest request) {
+        return this.rawClient.delete(memberId, id, request).body();
+    }
+
+    /**
+     * Deletes a note from a member, whoever wrote it. A deleted note's ID returns a <code>404</code>. Deleting can't be undone.
+     */
+    public DeleteNotesResponse delete(
+            String memberId, String id, DeleteNotesRequest request, RequestOptions requestOptions) {
+        return this.rawClient.delete(memberId, id, request, requestOptions).body();
     }
 }

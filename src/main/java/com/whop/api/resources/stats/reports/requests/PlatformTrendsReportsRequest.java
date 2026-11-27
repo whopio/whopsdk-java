@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsRequestBreakdownBy;
 import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsRequestDirection;
+import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsRequestMode;
 import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsRequestOrder;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +54,8 @@ public final class PlatformTrendsReportsRequest {
 
     private final Optional<String> after;
 
+    private final Optional<PlatformTrendsReportsRequestMode> mode;
+
     private final Map<String, Object> additionalProperties;
 
     private PlatformTrendsReportsRequest(
@@ -71,6 +74,7 @@ public final class PlatformTrendsReportsRequest {
             Optional<String> blueprint,
             Optional<Integer> first,
             Optional<String> after,
+            Optional<PlatformTrendsReportsRequestMode> mode,
             Map<String, Object> additionalProperties) {
         this.breakdownBy = breakdownBy;
         this.columns = columns;
@@ -87,6 +91,7 @@ public final class PlatformTrendsReportsRequest {
         this.blueprint = blueprint;
         this.first = first;
         this.after = after;
+        this.mode = mode;
         this.additionalProperties = additionalProperties;
     }
 
@@ -163,7 +168,7 @@ public final class PlatformTrendsReportsRequest {
     }
 
     /**
-     * @return Only counts payments for products in these comma-separated product categories, such as <code>algo_trading_course</code>.
+     * @return Only counts payments for products in these comma-separated product categories, such as <code>algo_trading_program</code>.
      */
     @JsonProperty("product_category")
     public Optional<String> getProductCategory() {
@@ -210,6 +215,14 @@ public final class PlatformTrendsReportsRequest {
         return after;
     }
 
+    /**
+     * @return Whose figures the report reads, one of the modes the report has. <code>global</code> reads all of Whop with nothing left out.
+     */
+    @JsonProperty("mode")
+    public Optional<PlatformTrendsReportsRequestMode> getMode() {
+        return mode;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -236,7 +249,8 @@ public final class PlatformTrendsReportsRequest {
                 && customerCountry.equals(other.customerCountry)
                 && blueprint.equals(other.blueprint)
                 && first.equals(other.first)
-                && after.equals(other.after);
+                && after.equals(other.after)
+                && mode.equals(other.mode);
     }
 
     @java.lang.Override
@@ -256,7 +270,8 @@ public final class PlatformTrendsReportsRequest {
                 this.customerCountry,
                 this.blueprint,
                 this.first,
-                this.after);
+                this.after,
+                this.mode);
     }
 
     @java.lang.Override
@@ -300,6 +315,8 @@ public final class PlatformTrendsReportsRequest {
 
         private Optional<String> after = Optional.empty();
 
+        private Optional<PlatformTrendsReportsRequestMode> mode = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -320,6 +337,7 @@ public final class PlatformTrendsReportsRequest {
             blueprint(other.getBlueprint());
             first(other.getFirst());
             after(other.getAfter());
+            mode(other.getMode());
             return this;
         }
 
@@ -450,7 +468,7 @@ public final class PlatformTrendsReportsRequest {
         }
 
         /**
-         * <p>Only counts payments for products in these comma-separated product categories, such as <code>algo_trading_course</code>.</p>
+         * <p>Only counts payments for products in these comma-separated product categories, such as <code>algo_trading_program</code>.</p>
          */
         @JsonSetter(value = "product_category", nulls = Nulls.SKIP)
         public Builder productCategory(Optional<String> productCategory) {
@@ -533,6 +551,20 @@ public final class PlatformTrendsReportsRequest {
             return this;
         }
 
+        /**
+         * <p>Whose figures the report reads, one of the modes the report has. <code>global</code> reads all of Whop with nothing left out.</p>
+         */
+        @JsonSetter(value = "mode", nulls = Nulls.SKIP)
+        public Builder mode(Optional<PlatformTrendsReportsRequestMode> mode) {
+            this.mode = mode;
+            return this;
+        }
+
+        public Builder mode(PlatformTrendsReportsRequestMode mode) {
+            this.mode = Optional.ofNullable(mode);
+            return this;
+        }
+
         public PlatformTrendsReportsRequest build() {
             return new PlatformTrendsReportsRequest(
                     breakdownBy,
@@ -550,6 +582,7 @@ public final class PlatformTrendsReportsRequest {
                     blueprint,
                     first,
                     after,
+                    mode,
                     additionalProperties);
         }
 
@@ -569,7 +602,8 @@ public final class PlatformTrendsReportsRequest {
                     || key.equalsIgnoreCase("customer_country")
                     || key.equalsIgnoreCase("blueprint")
                     || key.equalsIgnoreCase("first")
-                    || key.equalsIgnoreCase("after")) {
+                    || key.equalsIgnoreCase("after")
+                    || key.equalsIgnoreCase("mode")) {
                 return;
             }
             this.additionalProperties.put(key, value);

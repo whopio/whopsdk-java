@@ -39,6 +39,8 @@ public final class ApiKey {
 
     private final boolean isDefaultForResource;
 
+    private final Optional<String> lastUsedAt;
+
     private final Optional<String> name;
 
     private final String obfuscatedSecretKey;
@@ -59,6 +61,7 @@ public final class ApiKey {
             String id,
             Optional<List<String>> ipAllowlist,
             boolean isDefaultForResource,
+            Optional<String> lastUsedAt,
             Optional<String> name,
             String obfuscatedSecretKey,
             Optional<String> secretKey,
@@ -72,6 +75,7 @@ public final class ApiKey {
         this.id = id;
         this.ipAllowlist = ipAllowlist;
         this.isDefaultForResource = isDefaultForResource;
+        this.lastUsedAt = lastUsedAt;
         this.name = name;
         this.obfuscatedSecretKey = obfuscatedSecretKey;
         this.secretKey = secretKey;
@@ -137,6 +141,17 @@ public final class ApiKey {
     }
 
     /**
+     * @return When the API key last authenticated a request, as an ISO 8601 timestamp. Recorded at most once an hour, so it can trail the latest request by up to an hour. <code>null</code> means the key has not been used since this field was introduced.
+     */
+    @JsonIgnore
+    public Optional<String> getLastUsedAt() {
+        if (lastUsedAt == null) {
+            return Optional.empty();
+        }
+        return lastUsedAt;
+    }
+
+    /**
      * @return Human-readable name identifying the API key, or <code>null</code> when none was set.
      */
     @JsonIgnore
@@ -195,6 +210,12 @@ public final class ApiKey {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("last_used_at")
+    private Optional<String> _getLastUsedAt() {
+        return lastUsedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("name")
     private Optional<String> _getName() {
         return name;
@@ -225,6 +246,7 @@ public final class ApiKey {
                 && id.equals(other.id)
                 && ipAllowlist.equals(other.ipAllowlist)
                 && isDefaultForResource == other.isDefaultForResource
+                && lastUsedAt.equals(other.lastUsedAt)
                 && name.equals(other.name)
                 && obfuscatedSecretKey.equals(other.obfuscatedSecretKey)
                 && secretKey.equals(other.secretKey)
@@ -242,6 +264,7 @@ public final class ApiKey {
                 this.id,
                 this.ipAllowlist,
                 this.isDefaultForResource,
+                this.lastUsedAt,
                 this.name,
                 this.obfuscatedSecretKey,
                 this.secretKey,
@@ -329,6 +352,15 @@ public final class ApiKey {
         _FinalStage ipAllowlist(Nullable<List<String>> ipAllowlist);
 
         /**
+         * <p>When the API key last authenticated a request, as an ISO 8601 timestamp. Recorded at most once an hour, so it can trail the latest request by up to an hour. <code>null</code> means the key has not been used since this field was introduced.</p>
+         */
+        _FinalStage lastUsedAt(Optional<String> lastUsedAt);
+
+        _FinalStage lastUsedAt(String lastUsedAt);
+
+        _FinalStage lastUsedAt(Nullable<String> lastUsedAt);
+
+        /**
          * <p>Human-readable name identifying the API key, or <code>null</code> when none was set.</p>
          */
         _FinalStage name(Optional<String> name);
@@ -381,6 +413,8 @@ public final class ApiKey {
 
         private Optional<String> name = Optional.empty();
 
+        private Optional<String> lastUsedAt = Optional.empty();
+
         private Optional<List<String>> ipAllowlist = Optional.empty();
 
         private Optional<List<ApiKeyGrant>> grants = Optional.empty();
@@ -400,6 +434,7 @@ public final class ApiKey {
             id(other.getId());
             ipAllowlist(other.getIpAllowlist());
             isDefaultForResource(other.getIsDefaultForResource());
+            lastUsedAt(other.getLastUsedAt());
             name(other.getName());
             obfuscatedSecretKey(other.getObfuscatedSecretKey());
             secretKey(other.getSecretKey());
@@ -567,6 +602,42 @@ public final class ApiKey {
             return this;
         }
 
+        /**
+         * <p>When the API key last authenticated a request, as an ISO 8601 timestamp. Recorded at most once an hour, so it can trail the latest request by up to an hour. <code>null</code> means the key has not been used since this field was introduced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastUsedAt(Nullable<String> lastUsedAt) {
+            if (lastUsedAt.isNull()) {
+                this.lastUsedAt = null;
+            } else if (lastUsedAt.isEmpty()) {
+                this.lastUsedAt = Optional.empty();
+            } else {
+                this.lastUsedAt = Optional.of(lastUsedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the API key last authenticated a request, as an ISO 8601 timestamp. Recorded at most once an hour, so it can trail the latest request by up to an hour. <code>null</code> means the key has not been used since this field was introduced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage lastUsedAt(String lastUsedAt) {
+            this.lastUsedAt = Optional.ofNullable(lastUsedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the API key last authenticated a request, as an ISO 8601 timestamp. Recorded at most once an hour, so it can trail the latest request by up to an hour. <code>null</code> means the key has not been used since this field was introduced.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "last_used_at", nulls = Nulls.SKIP)
+        public _FinalStage lastUsedAt(Optional<String> lastUsedAt) {
+            this.lastUsedAt = lastUsedAt;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage ipAllowlist(Nullable<List<String>> ipAllowlist) {
             if (ipAllowlist.isNull()) {
@@ -651,6 +722,7 @@ public final class ApiKey {
                     id,
                     ipAllowlist,
                     isDefaultForResource,
+                    lastUsedAt,
                     name,
                     obfuscatedSecretKey,
                     secretKey,
@@ -668,6 +740,7 @@ public final class ApiKey {
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("ip_allowlist")
                     || key.equalsIgnoreCase("is_default_for_resource")
+                    || key.equalsIgnoreCase("last_used_at")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("obfuscated_secret_key")
                     || key.equalsIgnoreCase("secret_key")

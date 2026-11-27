@@ -36,6 +36,8 @@ public final class CreateInvoicesRequest {
 
     private final Optional<Double> buyerFeePercentage;
 
+    private final Optional<Boolean> chargeAtSubscriptionStart;
+
     private final Optional<String> customerName;
 
     private final Optional<OffsetDateTime> dueAt;
@@ -58,12 +60,17 @@ public final class CreateInvoicesRequest {
 
     private final Optional<List<String>> recipientEmails;
 
+    private final Optional<OffsetDateTime> subscriptionStartsAt;
+
+    private final Optional<String> timeZone;
+
     private final Map<String, Object> additionalProperties;
 
     private CreateInvoicesRequest(
             String accountId,
             Optional<CreateInvoicesRequestBillingAddress> billingAddress,
             Optional<Double> buyerFeePercentage,
+            Optional<Boolean> chargeAtSubscriptionStart,
             Optional<String> customerName,
             Optional<OffsetDateTime> dueAt,
             Optional<String> emailAddress,
@@ -75,10 +82,13 @@ public final class CreateInvoicesRequest {
             Optional<CreateInvoicesRequestPaymentMethodConfiguration> paymentMethodConfiguration,
             Optional<String> paymentMethodId,
             Optional<List<String>> recipientEmails,
+            Optional<OffsetDateTime> subscriptionStartsAt,
+            Optional<String> timeZone,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.billingAddress = billingAddress;
         this.buyerFeePercentage = buyerFeePercentage;
+        this.chargeAtSubscriptionStart = chargeAtSubscriptionStart;
         this.customerName = customerName;
         this.dueAt = dueAt;
         this.emailAddress = emailAddress;
@@ -90,6 +100,8 @@ public final class CreateInvoicesRequest {
         this.paymentMethodConfiguration = paymentMethodConfiguration;
         this.paymentMethodId = paymentMethodId;
         this.recipientEmails = recipientEmails;
+        this.subscriptionStartsAt = subscriptionStartsAt;
+        this.timeZone = timeZone;
         this.additionalProperties = additionalProperties;
     }
 
@@ -118,6 +130,14 @@ public final class CreateInvoicesRequest {
     @JsonProperty("buyer_fee_percentage")
     public Optional<Double> getBuyerFeePercentage() {
         return buyerFeePercentage;
+    }
+
+    /**
+     * @return When true, the customer pays only each item's initial fee now, and their payment method is first charged the renewal price at <code>subscription_starts_at</code>. The membership is <code>scheduled</code> and has no access until then. Needs <code>subscription_starts_at</code>, items that all renew, no split pay, and renewals that charge the payment method. With nothing due now, it also needs <code>payment_method_id</code>. Defaults to <code>false</code>. Can be updated on drafts.
+     */
+    @JsonProperty("charge_at_subscription_start")
+    public Optional<Boolean> getChargeAtSubscriptionStart() {
+        return chargeAtSubscriptionStart;
     }
 
     /**
@@ -154,7 +174,7 @@ public final class CreateInvoicesRequest {
     }
 
     /**
-     * @return The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.
+     * @return The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. When the variant has <code>trial_period_days</code>, the first invoice charges only <code>initial_price</code>. Paying it starts the trial, and the first renewal is billed when the trial ends. A customer who already had a subscription to the variant gets no trial, so paying starts a paid billing period immediately. Renewal invoices never start a trial. When the trial leaves nothing due, issuing or sending needs a <code>payment_method_id</code> or the <code>send_invoice</code> collection method. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, access, and trial settings.
      */
     @JsonProperty("items")
     public List<CreateInvoicesRequestItemsItem> getItems() {
@@ -232,6 +252,28 @@ public final class CreateInvoicesRequest {
         return recipientEmails;
     }
 
+    /**
+     * @return When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp in the future. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid. Needs a recurring item. Can be updated on drafts. A start date replaces a variant's free trial, and the invoice bills the full price. With <code>charge_at_subscription_start</code>, the subscription, its first renewal charge and its access begin at this moment instead.
+     */
+    @JsonIgnore
+    public Optional<OffsetDateTime> getSubscriptionStartsAt() {
+        if (subscriptionStartsAt == null) {
+            return Optional.empty();
+        }
+        return subscriptionStartsAt;
+    }
+
+    /**
+     * @return The IANA time zone for the dates on the invoice's email and PDF. Set it so the due date reads as the day you picked. When omitted, a new invoice uses the time zone Whop has for the user creating it, else UTC. Can be updated on drafts.
+     */
+    @JsonIgnore
+    public Optional<String> getTimeZone() {
+        if (timeZone == null) {
+            return Optional.empty();
+        }
+        return timeZone;
+    }
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("billing_address")
     private Optional<CreateInvoicesRequestBillingAddress> _getBillingAddress() {
@@ -286,6 +328,18 @@ public final class CreateInvoicesRequest {
         return paymentMethodId;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("subscription_starts_at")
+    private Optional<OffsetDateTime> _getSubscriptionStartsAt() {
+        return subscriptionStartsAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("time_zone")
+    private Optional<String> _getTimeZone() {
+        return timeZone;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -301,6 +355,7 @@ public final class CreateInvoicesRequest {
         return accountId.equals(other.accountId)
                 && billingAddress.equals(other.billingAddress)
                 && buyerFeePercentage.equals(other.buyerFeePercentage)
+                && chargeAtSubscriptionStart.equals(other.chargeAtSubscriptionStart)
                 && customerName.equals(other.customerName)
                 && dueAt.equals(other.dueAt)
                 && emailAddress.equals(other.emailAddress)
@@ -311,7 +366,9 @@ public final class CreateInvoicesRequest {
                 && metadata.equals(other.metadata)
                 && paymentMethodConfiguration.equals(other.paymentMethodConfiguration)
                 && paymentMethodId.equals(other.paymentMethodId)
-                && recipientEmails.equals(other.recipientEmails);
+                && recipientEmails.equals(other.recipientEmails)
+                && subscriptionStartsAt.equals(other.subscriptionStartsAt)
+                && timeZone.equals(other.timeZone);
     }
 
     @java.lang.Override
@@ -320,6 +377,7 @@ public final class CreateInvoicesRequest {
                 this.accountId,
                 this.billingAddress,
                 this.buyerFeePercentage,
+                this.chargeAtSubscriptionStart,
                 this.customerName,
                 this.dueAt,
                 this.emailAddress,
@@ -330,7 +388,9 @@ public final class CreateInvoicesRequest {
                 this.metadata,
                 this.paymentMethodConfiguration,
                 this.paymentMethodId,
-                this.recipientEmails);
+                this.recipientEmails,
+                this.subscriptionStartsAt,
+                this.timeZone);
     }
 
     @java.lang.Override
@@ -375,6 +435,13 @@ public final class CreateInvoicesRequest {
         _FinalStage buyerFeePercentage(Double buyerFeePercentage);
 
         /**
+         * <p>When true, the customer pays only each item's initial fee now, and their payment method is first charged the renewal price at <code>subscription_starts_at</code>. The membership is <code>scheduled</code> and has no access until then. Needs <code>subscription_starts_at</code>, items that all renew, no split pay, and renewals that charge the payment method. With nothing due now, it also needs <code>payment_method_id</code>. Defaults to <code>false</code>. Can be updated on drafts.</p>
+         */
+        _FinalStage chargeAtSubscriptionStart(Optional<Boolean> chargeAtSubscriptionStart);
+
+        _FinalStage chargeAtSubscriptionStart(Boolean chargeAtSubscriptionStart);
+
+        /**
          * <p>The contact name when creating an email-only member.</p>
          */
         _FinalStage customerName(Optional<String> customerName);
@@ -402,7 +469,7 @@ public final class CreateInvoicesRequest {
         _FinalStage emailAddress(Nullable<String> emailAddress);
 
         /**
-         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.</p>
+         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. When the variant has <code>trial_period_days</code>, the first invoice charges only <code>initial_price</code>. Paying it starts the trial, and the first renewal is billed when the trial ends. A customer who already had a subscription to the variant gets no trial, so paying starts a paid billing period immediately. Renewal invoices never start a trial. When the trial leaves nothing due, issuing or sending needs a <code>payment_method_id</code> or the <code>send_invoice</code> collection method. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, access, and trial settings.</p>
          */
         _FinalStage items(List<CreateInvoicesRequestItemsItem> items);
 
@@ -471,11 +538,33 @@ public final class CreateInvoicesRequest {
         _FinalStage recipientEmails(Optional<List<String>> recipientEmails);
 
         _FinalStage recipientEmails(List<String> recipientEmails);
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp in the future. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid. Needs a recurring item. Can be updated on drafts. A start date replaces a variant's free trial, and the invoice bills the full price. With <code>charge_at_subscription_start</code>, the subscription, its first renewal charge and its access begin at this moment instead.</p>
+         */
+        _FinalStage subscriptionStartsAt(Optional<OffsetDateTime> subscriptionStartsAt);
+
+        _FinalStage subscriptionStartsAt(OffsetDateTime subscriptionStartsAt);
+
+        _FinalStage subscriptionStartsAt(Nullable<OffsetDateTime> subscriptionStartsAt);
+
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF. Set it so the due date reads as the day you picked. When omitted, a new invoice uses the time zone Whop has for the user creating it, else UTC. Can be updated on drafts.</p>
+         */
+        _FinalStage timeZone(Optional<String> timeZone);
+
+        _FinalStage timeZone(String timeZone);
+
+        _FinalStage timeZone(Nullable<String> timeZone);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder implements AccountIdStage, _FinalStage {
         private String accountId;
+
+        private Optional<String> timeZone = Optional.empty();
+
+        private Optional<OffsetDateTime> subscriptionStartsAt = Optional.empty();
 
         private Optional<List<String>> recipientEmails = Optional.empty();
 
@@ -499,6 +588,8 @@ public final class CreateInvoicesRequest {
 
         private Optional<String> customerName = Optional.empty();
 
+        private Optional<Boolean> chargeAtSubscriptionStart = Optional.empty();
+
         private Optional<Double> buyerFeePercentage = Optional.empty();
 
         private Optional<CreateInvoicesRequestBillingAddress> billingAddress = Optional.empty();
@@ -512,6 +603,7 @@ public final class CreateInvoicesRequest {
             accountId(other.getAccountId());
             billingAddress(other.getBillingAddress());
             buyerFeePercentage(other.getBuyerFeePercentage());
+            chargeAtSubscriptionStart(other.getChargeAtSubscriptionStart());
             customerName(other.getCustomerName());
             dueAt(other.getDueAt());
             emailAddress(other.getEmailAddress());
@@ -523,6 +615,8 @@ public final class CreateInvoicesRequest {
             paymentMethodConfiguration(other.getPaymentMethodConfiguration());
             paymentMethodId(other.getPaymentMethodId());
             recipientEmails(other.getRecipientEmails());
+            subscriptionStartsAt(other.getSubscriptionStartsAt());
+            timeZone(other.getTimeZone());
             return this;
         }
 
@@ -534,6 +628,78 @@ public final class CreateInvoicesRequest {
         @JsonSetter("account_id")
         public _FinalStage accountId(@NotNull String accountId) {
             this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF. Set it so the due date reads as the day you picked. When omitted, a new invoice uses the time zone Whop has for the user creating it, else UTC. Can be updated on drafts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage timeZone(Nullable<String> timeZone) {
+            if (timeZone.isNull()) {
+                this.timeZone = null;
+            } else if (timeZone.isEmpty()) {
+                this.timeZone = Optional.empty();
+            } else {
+                this.timeZone = Optional.of(timeZone.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF. Set it so the due date reads as the day you picked. When omitted, a new invoice uses the time zone Whop has for the user creating it, else UTC. Can be updated on drafts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage timeZone(String timeZone) {
+            this.timeZone = Optional.ofNullable(timeZone);
+            return this;
+        }
+
+        /**
+         * <p>The IANA time zone for the dates on the invoice's email and PDF. Set it so the due date reads as the day you picked. When omitted, a new invoice uses the time zone Whop has for the user creating it, else UTC. Can be updated on drafts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "time_zone", nulls = Nulls.SKIP)
+        public _FinalStage timeZone(Optional<String> timeZone) {
+            this.timeZone = timeZone;
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp in the future. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid. Needs a recurring item. Can be updated on drafts. A start date replaces a variant's free trial, and the invoice bills the full price. With <code>charge_at_subscription_start</code>, the subscription, its first renewal charge and its access begin at this moment instead.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subscriptionStartsAt(Nullable<OffsetDateTime> subscriptionStartsAt) {
+            if (subscriptionStartsAt.isNull()) {
+                this.subscriptionStartsAt = null;
+            } else if (subscriptionStartsAt.isEmpty()) {
+                this.subscriptionStartsAt = Optional.empty();
+            } else {
+                this.subscriptionStartsAt = Optional.of(subscriptionStartsAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp in the future. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid. Needs a recurring item. Can be updated on drafts. A start date replaces a variant's free trial, and the invoice bills the full price. With <code>charge_at_subscription_start</code>, the subscription, its first renewal charge and its access begin at this moment instead.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subscriptionStartsAt(OffsetDateTime subscriptionStartsAt) {
+            this.subscriptionStartsAt = Optional.ofNullable(subscriptionStartsAt);
+            return this;
+        }
+
+        /**
+         * <p>When the first billing period of the invoice's recurring items starts, as an ISO 8601 timestamp in the future. Renewals count from this moment. <code>null</code> starts the period when the invoice is paid. Needs a recurring item. Can be updated on drafts. A start date replaces a variant's free trial, and the invoice bills the full price. With <code>charge_at_subscription_start</code>, the subscription, its first renewal charge and its access begin at this moment instead.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "subscription_starts_at", nulls = Nulls.SKIP)
+        public _FinalStage subscriptionStartsAt(Optional<OffsetDateTime> subscriptionStartsAt) {
+            this.subscriptionStartsAt = subscriptionStartsAt;
             return this;
         }
 
@@ -761,7 +927,7 @@ public final class CreateInvoicesRequest {
         }
 
         /**
-         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.</p>
+         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. When the variant has <code>trial_period_days</code>, the first invoice charges only <code>initial_price</code>. Paying it starts the trial, and the first renewal is billed when the trial ends. A customer who already had a subscription to the variant gets no trial, so paying starts a paid billing period immediately. Renewal invoices never start a trial. When the trial leaves nothing due, issuing or sending needs a <code>payment_method_id</code> or the <code>send_invoice</code> collection method. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, access, and trial settings.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -773,7 +939,7 @@ public final class CreateInvoicesRequest {
         }
 
         /**
-         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.</p>
+         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. When the variant has <code>trial_period_days</code>, the first invoice charges only <code>initial_price</code>. Paying it starts the trial, and the first renewal is billed when the trial ends. A customer who already had a subscription to the variant gets no trial, so paying starts a paid billing period immediately. Renewal invoices never start a trial. When the trial leaves nothing due, issuing or sending needs a <code>payment_method_id</code> or the <code>send_invoice</code> collection method. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, access, and trial settings.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -783,7 +949,7 @@ public final class CreateInvoicesRequest {
         }
 
         /**
-         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. Paying the first invoice starts a paid billing period immediately, without the variant's trial. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, and access settings.</p>
+         * <p>The variants being invoiced, all in the same currency. Each variant may appear once. Use quantity for multiple units. A recurring variant must belong to a product. Its first invoice charges <code>initial_price</code> plus <code>renewal_price</code>. Later invoices charge only <code>renewal_price</code>. When the variant has <code>trial_period_days</code>, the first invoice charges only <code>initial_price</code>. Paying it starts the trial, and the first renewal is billed when the trial ends. A customer who already had a subscription to the variant gets no trial, so paying starts a paid billing period immediately. Renewal invoices never start a trial. When the trial leaves nothing due, issuing or sending needs a <code>payment_method_id</code> or the <code>send_invoice</code> collection method. The subscription uses the <code>collection_method</code> the invoice was sent or issued with. A finite payment count includes the first paid invoice. With several items, every item that has a product must be a regular product, and all items need compatible payment, tax, access, and trial settings.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "items", nulls = Nulls.SKIP)
@@ -904,6 +1070,26 @@ public final class CreateInvoicesRequest {
         }
 
         /**
+         * <p>When true, the customer pays only each item's initial fee now, and their payment method is first charged the renewal price at <code>subscription_starts_at</code>. The membership is <code>scheduled</code> and has no access until then. Needs <code>subscription_starts_at</code>, items that all renew, no split pay, and renewals that charge the payment method. With nothing due now, it also needs <code>payment_method_id</code>. Defaults to <code>false</code>. Can be updated on drafts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage chargeAtSubscriptionStart(Boolean chargeAtSubscriptionStart) {
+            this.chargeAtSubscriptionStart = Optional.ofNullable(chargeAtSubscriptionStart);
+            return this;
+        }
+
+        /**
+         * <p>When true, the customer pays only each item's initial fee now, and their payment method is first charged the renewal price at <code>subscription_starts_at</code>. The membership is <code>scheduled</code> and has no access until then. Needs <code>subscription_starts_at</code>, items that all renew, no split pay, and renewals that charge the payment method. With nothing due now, it also needs <code>payment_method_id</code>. Defaults to <code>false</code>. Can be updated on drafts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "charge_at_subscription_start", nulls = Nulls.SKIP)
+        public _FinalStage chargeAtSubscriptionStart(Optional<Boolean> chargeAtSubscriptionStart) {
+            this.chargeAtSubscriptionStart = chargeAtSubscriptionStart;
+            return this;
+        }
+
+        /**
          * <p>The buyer's adjustable fee in percentage points, with at most two decimal places: <code>0</code> for none, or between 5 and 100. The account keeps it, and Whop waives its take rate on the invoice.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -965,6 +1151,7 @@ public final class CreateInvoicesRequest {
                     accountId,
                     billingAddress,
                     buyerFeePercentage,
+                    chargeAtSubscriptionStart,
                     customerName,
                     dueAt,
                     emailAddress,
@@ -976,6 +1163,8 @@ public final class CreateInvoicesRequest {
                     paymentMethodConfiguration,
                     paymentMethodId,
                     recipientEmails,
+                    subscriptionStartsAt,
+                    timeZone,
                     additionalProperties);
         }
 
@@ -984,6 +1173,7 @@ public final class CreateInvoicesRequest {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("billing_address")
                     || key.equalsIgnoreCase("buyer_fee_percentage")
+                    || key.equalsIgnoreCase("charge_at_subscription_start")
                     || key.equalsIgnoreCase("customer_name")
                     || key.equalsIgnoreCase("due_at")
                     || key.equalsIgnoreCase("email_address")
@@ -994,7 +1184,9 @@ public final class CreateInvoicesRequest {
                     || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("payment_method_configuration")
                     || key.equalsIgnoreCase("payment_method_id")
-                    || key.equalsIgnoreCase("recipient_emails")) {
+                    || key.equalsIgnoreCase("recipient_emails")
+                    || key.equalsIgnoreCase("subscription_starts_at")
+                    || key.equalsIgnoreCase("time_zone")) {
                 return;
             }
             this.additionalProperties.put(key, value);

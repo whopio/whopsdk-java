@@ -25,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListSupportedMethodsResponseDataItem.Builder.class)
 public final class ListSupportedMethodsResponseDataItem {
+    private final Optional<ListSupportedMethodsResponseDataItemCategory> category;
+
     private final ListSupportedMethodsResponseDataItemDeliveryType deliveryType;
 
     private final ListSupportedMethodsResponseDataItemFeeStructure feeStructure;
@@ -41,6 +43,8 @@ public final class ListSupportedMethodsResponseDataItem {
 
     private final Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes;
 
+    private final Optional<String> rail;
+
     private final Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields;
 
     private final boolean supportsInstantDelivery;
@@ -52,6 +56,7 @@ public final class ListSupportedMethodsResponseDataItem {
     private final Map<String, Object> additionalProperties;
 
     private ListSupportedMethodsResponseDataItem(
+            Optional<ListSupportedMethodsResponseDataItemCategory> category,
             ListSupportedMethodsResponseDataItemDeliveryType deliveryType,
             ListSupportedMethodsResponseDataItemFeeStructure feeStructure,
             Optional<String> iconUrl,
@@ -60,11 +65,13 @@ public final class ListSupportedMethodsResponseDataItem {
             ListSupportedMethodsResponseDataItemObject object,
             Optional<String> parentId,
             Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes,
+            Optional<String> rail,
             Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields,
             boolean supportsInstantDelivery,
             Optional<Boolean> supportsPaypalLogin,
             boolean supportsStandardDelivery,
             Map<String, Object> additionalProperties) {
+        this.category = category;
         this.deliveryType = deliveryType;
         this.feeStructure = feeStructure;
         this.iconUrl = iconUrl;
@@ -73,11 +80,23 @@ public final class ListSupportedMethodsResponseDataItem {
         this.object = object;
         this.parentId = parentId;
         this.quotes = quotes;
+        this.rail = rail;
         this.requiredFields = requiredFields;
         this.supportsInstantDelivery = supportsInstantDelivery;
         this.supportsPaypalLogin = supportsPaypalLogin;
         this.supportsStandardDelivery = supportsStandardDelivery;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Category of the payout route that this method belongs to. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.
+     */
+    @JsonIgnore
+    public Optional<ListSupportedMethodsResponseDataItemCategory> getCategory() {
+        if (category == null) {
+            return Optional.empty();
+        }
+        return category;
     }
 
     /**
@@ -154,6 +173,17 @@ public final class ListSupportedMethodsResponseDataItem {
     }
 
     /**
+     * @return Payout rail that this method pays through, for example <code>ach</code>, <code>sepa</code>, <code>venmo</code> or <code>ethereum</code>. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.
+     */
+    @JsonIgnore
+    public Optional<String> getRail() {
+        if (rail == null) {
+            return Optional.empty();
+        }
+        return rail;
+    }
+
+    /**
      * @return Fields to collect before saving this supported payout method. Present only when supported_payout_method_id narrows the request to one method.
      */
     @JsonIgnore
@@ -170,7 +200,7 @@ public final class ListSupportedMethodsResponseDataItem {
     }
 
     /**
-     * @return Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.
+     * @return Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method.
      */
     @JsonProperty("supports_paypal_login")
     public Optional<Boolean> getSupportsPaypalLogin() {
@@ -180,6 +210,12 @@ public final class ListSupportedMethodsResponseDataItem {
     @JsonProperty("supports_standard_delivery")
     public boolean getSupportsStandardDelivery() {
         return supportsStandardDelivery;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("category")
+    private Optional<ListSupportedMethodsResponseDataItemCategory> _getCategory() {
+        return category;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -207,6 +243,12 @@ public final class ListSupportedMethodsResponseDataItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("rail")
+    private Optional<String> _getRail() {
+        return rail;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("required_fields")
     private Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> _getRequiredFields() {
         return requiredFields;
@@ -225,7 +267,8 @@ public final class ListSupportedMethodsResponseDataItem {
     }
 
     private boolean equalTo(ListSupportedMethodsResponseDataItem other) {
-        return deliveryType.equals(other.deliveryType)
+        return category.equals(other.category)
+                && deliveryType.equals(other.deliveryType)
                 && feeStructure.equals(other.feeStructure)
                 && iconUrl.equals(other.iconUrl)
                 && id.equals(other.id)
@@ -233,6 +276,7 @@ public final class ListSupportedMethodsResponseDataItem {
                 && object.equals(other.object)
                 && parentId.equals(other.parentId)
                 && quotes.equals(other.quotes)
+                && rail.equals(other.rail)
                 && requiredFields.equals(other.requiredFields)
                 && supportsInstantDelivery == other.supportsInstantDelivery
                 && supportsPaypalLogin.equals(other.supportsPaypalLogin)
@@ -242,6 +286,7 @@ public final class ListSupportedMethodsResponseDataItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.category,
                 this.deliveryType,
                 this.feeStructure,
                 this.iconUrl,
@@ -250,6 +295,7 @@ public final class ListSupportedMethodsResponseDataItem {
                 this.object,
                 this.parentId,
                 this.quotes,
+                this.rail,
                 this.requiredFields,
                 this.supportsInstantDelivery,
                 this.supportsPaypalLogin,
@@ -308,6 +354,15 @@ public final class ListSupportedMethodsResponseDataItem {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>Category of the payout route that this method belongs to. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         */
+        _FinalStage category(Optional<ListSupportedMethodsResponseDataItemCategory> category);
+
+        _FinalStage category(ListSupportedMethodsResponseDataItemCategory category);
+
+        _FinalStage category(Nullable<ListSupportedMethodsResponseDataItemCategory> category);
+
+        /**
          * <p>Supported payout method icon URL.</p>
          */
         _FinalStage iconUrl(Optional<String> iconUrl);
@@ -344,6 +399,15 @@ public final class ListSupportedMethodsResponseDataItem {
         _FinalStage quotes(Nullable<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes);
 
         /**
+         * <p>Payout rail that this method pays through, for example <code>ach</code>, <code>sepa</code>, <code>venmo</code> or <code>ethereum</code>. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         */
+        _FinalStage rail(Optional<String> rail);
+
+        _FinalStage rail(String rail);
+
+        _FinalStage rail(Nullable<String> rail);
+
+        /**
          * <p>Fields to collect before saving this supported payout method. Present only when supported_payout_method_id narrows the request to one method.</p>
          */
         _FinalStage requiredFields(
@@ -355,7 +419,7 @@ public final class ListSupportedMethodsResponseDataItem {
                 Nullable<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields);
 
         /**
-         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method.</p>
          */
         _FinalStage supportsPaypalLogin(Optional<Boolean> supportsPaypalLogin);
 
@@ -388,6 +452,8 @@ public final class ListSupportedMethodsResponseDataItem {
         private Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields =
                 Optional.empty();
 
+        private Optional<String> rail = Optional.empty();
+
         private Optional<List<ListSupportedMethodsResponseDataItemQuotesItem>> quotes = Optional.empty();
 
         private Optional<String> parentId = Optional.empty();
@@ -396,12 +462,15 @@ public final class ListSupportedMethodsResponseDataItem {
 
         private Optional<String> iconUrl = Optional.empty();
 
+        private Optional<ListSupportedMethodsResponseDataItemCategory> category = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ListSupportedMethodsResponseDataItem other) {
+            category(other.getCategory());
             deliveryType(other.getDeliveryType());
             feeStructure(other.getFeeStructure());
             iconUrl(other.getIconUrl());
@@ -410,6 +479,7 @@ public final class ListSupportedMethodsResponseDataItem {
             object(other.getObject());
             parentId(other.getParentId());
             quotes(other.getQuotes());
+            rail(other.getRail());
             requiredFields(other.getRequiredFields());
             supportsInstantDelivery(other.getSupportsInstantDelivery());
             supportsPaypalLogin(other.getSupportsPaypalLogin());
@@ -472,7 +542,7 @@ public final class ListSupportedMethodsResponseDataItem {
         }
 
         /**
-         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -482,7 +552,7 @@ public final class ListSupportedMethodsResponseDataItem {
         }
 
         /**
-         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method, and only once PayPal login is enabled for the account.</p>
+         * <p>Whether the payer can add this method by logging in to PayPal through <code>POST /payouts/paypal_link_sessions</code>, which confirms the PayPal account is verified and owned by the payee. True only for the PayPal method.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "supports_paypal_login", nulls = Nulls.SKIP)
@@ -526,6 +596,42 @@ public final class ListSupportedMethodsResponseDataItem {
         public _FinalStage requiredFields(
                 Optional<List<ListSupportedMethodsResponseDataItemRequiredFieldsItem>> requiredFields) {
             this.requiredFields = requiredFields;
+            return this;
+        }
+
+        /**
+         * <p>Payout rail that this method pays through, for example <code>ach</code>, <code>sepa</code>, <code>venmo</code> or <code>ethereum</code>. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage rail(Nullable<String> rail) {
+            if (rail.isNull()) {
+                this.rail = null;
+            } else if (rail.isEmpty()) {
+                this.rail = Optional.empty();
+            } else {
+                this.rail = Optional.of(rail.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Payout rail that this method pays through, for example <code>ach</code>, <code>sepa</code>, <code>venmo</code> or <code>ethereum</code>. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage rail(String rail) {
+            this.rail = Optional.ofNullable(rail);
+            return this;
+        }
+
+        /**
+         * <p>Payout rail that this method pays through, for example <code>ach</code>, <code>sepa</code>, <code>venmo</code> or <code>ethereum</code>. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "rail", nulls = Nulls.SKIP)
+        public _FinalStage rail(Optional<String> rail) {
+            this.rail = rail;
             return this;
         }
 
@@ -673,9 +779,46 @@ public final class ListSupportedMethodsResponseDataItem {
             return this;
         }
 
+        /**
+         * <p>Category of the payout route that this method belongs to. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(Nullable<ListSupportedMethodsResponseDataItemCategory> category) {
+            if (category.isNull()) {
+                this.category = null;
+            } else if (category.isEmpty()) {
+                this.category = Optional.empty();
+            } else {
+                this.category = Optional.of(category.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Category of the payout route that this method belongs to. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage category(ListSupportedMethodsResponseDataItemCategory category) {
+            this.category = Optional.ofNullable(category);
+            return this;
+        }
+
+        /**
+         * <p>Category of the payout route that this method belongs to. Set only when <code>generic_only</code> is true and this country lists methods by payout route. <code>null</code> for every other method.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "category", nulls = Nulls.SKIP)
+        public _FinalStage category(Optional<ListSupportedMethodsResponseDataItemCategory> category) {
+            this.category = category;
+            return this;
+        }
+
         @java.lang.Override
         public ListSupportedMethodsResponseDataItem build() {
             return new ListSupportedMethodsResponseDataItem(
+                    category,
                     deliveryType,
                     feeStructure,
                     iconUrl,
@@ -684,6 +827,7 @@ public final class ListSupportedMethodsResponseDataItem {
                     object,
                     parentId,
                     quotes,
+                    rail,
                     requiredFields,
                     supportsInstantDelivery,
                     supportsPaypalLogin,
@@ -693,7 +837,8 @@ public final class ListSupportedMethodsResponseDataItem {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("delivery_type")
+            if (key.equalsIgnoreCase("category")
+                    || key.equalsIgnoreCase("delivery_type")
                     || key.equalsIgnoreCase("fee_structure")
                     || key.equalsIgnoreCase("icon_url")
                     || key.equalsIgnoreCase("id")
@@ -701,6 +846,7 @@ public final class ListSupportedMethodsResponseDataItem {
                     || key.equalsIgnoreCase("object")
                     || key.equalsIgnoreCase("parent_id")
                     || key.equalsIgnoreCase("quotes")
+                    || key.equalsIgnoreCase("rail")
                     || key.equalsIgnoreCase("required_fields")
                     || key.equalsIgnoreCase("supports_instant_delivery")
                     || key.equalsIgnoreCase("supports_paypal_login")

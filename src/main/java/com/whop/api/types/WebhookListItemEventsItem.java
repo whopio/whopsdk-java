@@ -164,6 +164,9 @@ public final class WebhookListItemEventsItem {
     public static final WebhookListItemEventsItem PRODUCT_DELETED =
             new WebhookListItemEventsItem(Value.PRODUCT_DELETED, "product.deleted");
 
+    public static final WebhookListItemEventsItem CAPITAL_CREATED =
+            new WebhookListItemEventsItem(Value.CAPITAL_CREATED, "capital.created");
+
     public static final WebhookListItemEventsItem PAYMENT_CREATED =
             new WebhookListItemEventsItem(Value.PAYMENT_CREATED, "payment.created");
 
@@ -276,6 +279,9 @@ public final class WebhookListItemEventsItem {
     public static final WebhookListItemEventsItem PAYMENT_FAILED =
             new WebhookListItemEventsItem(Value.PAYMENT_FAILED, "payment.failed");
 
+    public static final WebhookListItemEventsItem CAPITAL_UPDATED =
+            new WebhookListItemEventsItem(Value.CAPITAL_UPDATED, "capital.updated");
+
     public static final WebhookListItemEventsItem ACCOUNT_FINANCING_APPROVED =
             new WebhookListItemEventsItem(Value.ACCOUNT_FINANCING_APPROVED, "account.financing_approved");
 
@@ -320,6 +326,9 @@ public final class WebhookListItemEventsItem {
 
     public static final WebhookListItemEventsItem DOMAIN_CREATED =
             new WebhookListItemEventsItem(Value.DOMAIN_CREATED, "domain.created");
+
+    public static final WebhookListItemEventsItem AD_CAMPAIGN_CLAIM_ENDED =
+            new WebhookListItemEventsItem(Value.AD_CAMPAIGN_CLAIM_ENDED, "ad_campaign.claim_ended");
 
     public static final WebhookListItemEventsItem MEMBERSHIP_EXPERIENCE_CLAIMED =
             new WebhookListItemEventsItem(Value.MEMBERSHIP_EXPERIENCE_CLAIMED, "membership.experience_claimed");
@@ -506,6 +515,8 @@ public final class WebhookListItemEventsItem {
                 return visitor.visitCardApplicationApproved();
             case PRODUCT_DELETED:
                 return visitor.visitProductDeleted();
+            case CAPITAL_CREATED:
+                return visitor.visitCapitalCreated();
             case PAYMENT_CREATED:
                 return visitor.visitPaymentCreated();
             case INVOICE_MARKED_UNCOLLECTIBLE:
@@ -580,6 +591,8 @@ public final class WebhookListItemEventsItem {
                 return visitor.visitDomainUpdated();
             case PAYMENT_FAILED:
                 return visitor.visitPaymentFailed();
+            case CAPITAL_UPDATED:
+                return visitor.visitCapitalUpdated();
             case ACCOUNT_FINANCING_APPROVED:
                 return visitor.visitAccountFinancingApproved();
             case RESOLUTION_DECIDED:
@@ -610,6 +623,8 @@ public final class WebhookListItemEventsItem {
                 return visitor.visitResolutionCenterCaseDecided();
             case DOMAIN_CREATED:
                 return visitor.visitDomainCreated();
+            case AD_CAMPAIGN_CLAIM_ENDED:
+                return visitor.visitAdCampaignClaimEnded();
             case MEMBERSHIP_EXPERIENCE_CLAIMED:
                 return visitor.visitMembershipExperienceClaimed();
             case PRODUCT_PUBLISHED:
@@ -755,6 +770,8 @@ public final class WebhookListItemEventsItem {
                 return CARD_APPLICATION_APPROVED;
             case "product.deleted":
                 return PRODUCT_DELETED;
+            case "capital.created":
+                return CAPITAL_CREATED;
             case "payment.created":
                 return PAYMENT_CREATED;
             case "invoice.marked_uncollectible":
@@ -829,6 +846,8 @@ public final class WebhookListItemEventsItem {
                 return DOMAIN_UPDATED;
             case "payment.failed":
                 return PAYMENT_FAILED;
+            case "capital.updated":
+                return CAPITAL_UPDATED;
             case "account.financing_approved":
                 return ACCOUNT_FINANCING_APPROVED;
             case "resolution.decided":
@@ -859,6 +878,8 @@ public final class WebhookListItemEventsItem {
                 return RESOLUTION_CENTER_CASE_DECIDED;
             case "domain.created":
                 return DOMAIN_CREATED;
+            case "ad_campaign.claim_ended":
+                return AD_CAMPAIGN_CLAIM_ENDED;
             case "membership.experience_claimed":
                 return MEMBERSHIP_EXPERIENCE_CLAIMED;
             case "product.published":
@@ -1001,6 +1022,10 @@ public final class WebhookListItemEventsItem {
 
         DOMAIN_DELETED,
 
+        CAPITAL_CREATED,
+
+        CAPITAL_UPDATED,
+
         PAYOUT_METHOD_CREATED,
 
         VERIFICATION_SUCCEEDED,
@@ -1058,6 +1083,8 @@ public final class WebhookListItemEventsItem {
         AD_CAMPAIGN_EVENTS,
 
         AD_CAMPAIGN_DELETED,
+
+        AD_CAMPAIGN_CLAIM_ENDED,
 
         AD_GROUP_CREATED,
 
@@ -1245,6 +1272,10 @@ public final class WebhookListItemEventsItem {
 
         T visitDomainDeleted();
 
+        T visitCapitalCreated();
+
+        T visitCapitalUpdated();
+
         T visitPayoutMethodCreated();
 
         T visitVerificationSucceeded();
@@ -1302,6 +1333,8 @@ public final class WebhookListItemEventsItem {
         T visitAdCampaignEvents();
 
         T visitAdCampaignDeleted();
+
+        T visitAdCampaignClaimEnded();
 
         T visitAdGroupCreated();
 

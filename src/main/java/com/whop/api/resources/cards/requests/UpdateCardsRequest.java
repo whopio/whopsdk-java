@@ -79,7 +79,7 @@ public final class UpdateCardsRequest {
     }
 
     /**
-     * @return The owning account ID (a biz_ identifier). Provide this or user_id.
+     * @return The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -103,7 +103,7 @@ public final class UpdateCardsRequest {
     }
 
     /**
-     * @return Details for the invited cardholder, accepted only while completing onboarding on an invited card. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not.
+     * @return Details for the cardholder. On an invited card, these fields complete onboarding. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not. On an issued card, only email and phone can be changed. 3D Secure verification codes go to that email and phone.
      */
     @JsonProperty("cardholder")
     public Optional<UpdateCardsRequestCardholder> getCardholder() {
@@ -273,7 +273,7 @@ public final class UpdateCardsRequest {
         }
 
         /**
-         * <p>The owning account ID (a biz_ identifier). Provide this or user_id.</p>
+         * <p>The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -315,7 +315,7 @@ public final class UpdateCardsRequest {
         }
 
         /**
-         * <p>Details for the invited cardholder, accepted only while completing onboarding on an invited card. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not.</p>
+         * <p>Details for the cardholder. On an invited card, these fields complete onboarding. The legal name comes from an approved identity verification when the invited user has one, and from these fields when they do not. On an issued card, only email and phone can be changed. 3D Secure verification codes go to that email and phone.</p>
          */
         @JsonSetter(value = "cardholder", nulls = Nulls.SKIP)
         public Builder cardholder(Optional<UpdateCardsRequestCardholder> cardholder) {

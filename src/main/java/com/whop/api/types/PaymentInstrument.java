@@ -26,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 public final class PaymentInstrument {
     private final Optional<PaymentInstrumentCard> card;
 
+    private final Optional<PaymentInstrumentCrypto> crypto;
+
     private final String displayName;
 
     private final PaymentMethodIcons icons;
@@ -38,12 +40,14 @@ public final class PaymentInstrument {
 
     private PaymentInstrument(
             Optional<PaymentInstrumentCard> card,
+            Optional<PaymentInstrumentCrypto> crypto,
             String displayName,
             PaymentMethodIcons icons,
             Optional<Double> installmentCount,
             String paymentMethodType,
             Map<String, Object> additionalProperties) {
         this.card = card;
+        this.crypto = crypto;
         this.displayName = displayName;
         this.icons = icons;
         this.installmentCount = installmentCount;
@@ -52,7 +56,7 @@ public final class PaymentInstrument {
     }
 
     /**
-     * @return Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.
+     * @return Card, Apple Pay, and Google Pay payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.
      */
     @JsonIgnore
     public Optional<PaymentInstrumentCard> getCard() {
@@ -60,6 +64,17 @@ public final class PaymentInstrument {
             return Optional.empty();
         }
         return card;
+    }
+
+    /**
+     * @return Crypto payments only: the on-chain transaction that the buyer sent.
+     */
+    @JsonIgnore
+    public Optional<PaymentInstrumentCrypto> getCrypto() {
+        if (crypto == null) {
+            return Optional.empty();
+        }
+        return crypto;
     }
 
     /**
@@ -104,6 +119,12 @@ public final class PaymentInstrument {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("crypto")
+    private Optional<PaymentInstrumentCrypto> _getCrypto() {
+        return crypto;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("installment_count")
     private Optional<Double> _getInstallmentCount() {
         return installmentCount;
@@ -122,6 +143,7 @@ public final class PaymentInstrument {
 
     private boolean equalTo(PaymentInstrument other) {
         return card.equals(other.card)
+                && crypto.equals(other.crypto)
                 && displayName.equals(other.displayName)
                 && icons.equals(other.icons)
                 && installmentCount.equals(other.installmentCount)
@@ -130,7 +152,8 @@ public final class PaymentInstrument {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.card, this.displayName, this.icons, this.installmentCount, this.paymentMethodType);
+        return Objects.hash(
+                this.card, this.crypto, this.displayName, this.icons, this.installmentCount, this.paymentMethodType);
     }
 
     @java.lang.Override
@@ -173,13 +196,22 @@ public final class PaymentInstrument {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
+         * <p>Card, Apple Pay, and Google Pay payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          */
         _FinalStage card(Optional<PaymentInstrumentCard> card);
 
         _FinalStage card(PaymentInstrumentCard card);
 
         _FinalStage card(Nullable<PaymentInstrumentCard> card);
+
+        /**
+         * <p>Crypto payments only: the on-chain transaction that the buyer sent.</p>
+         */
+        _FinalStage crypto(Optional<PaymentInstrumentCrypto> crypto);
+
+        _FinalStage crypto(PaymentInstrumentCrypto crypto);
+
+        _FinalStage crypto(Nullable<PaymentInstrumentCrypto> crypto);
 
         /**
          * <p>Installment methods only: how many payments the charge splits into. Data, not copy — compose and translate the label client-side.</p>
@@ -201,6 +233,8 @@ public final class PaymentInstrument {
 
         private Optional<Double> installmentCount = Optional.empty();
 
+        private Optional<PaymentInstrumentCrypto> crypto = Optional.empty();
+
         private Optional<PaymentInstrumentCard> card = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -210,6 +244,7 @@ public final class PaymentInstrument {
         @java.lang.Override
         public Builder from(PaymentInstrument other) {
             card(other.getCard());
+            crypto(other.getCrypto());
             displayName(other.getDisplayName());
             icons(other.getIcons());
             installmentCount(other.getInstallmentCount());
@@ -287,7 +322,43 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
+         * <p>Crypto payments only: the on-chain transaction that the buyer sent.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage crypto(Nullable<PaymentInstrumentCrypto> crypto) {
+            if (crypto.isNull()) {
+                this.crypto = null;
+            } else if (crypto.isEmpty()) {
+                this.crypto = Optional.empty();
+            } else {
+                this.crypto = Optional.of(crypto.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Crypto payments only: the on-chain transaction that the buyer sent.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage crypto(PaymentInstrumentCrypto crypto) {
+            this.crypto = Optional.ofNullable(crypto);
+            return this;
+        }
+
+        /**
+         * <p>Crypto payments only: the on-chain transaction that the buyer sent.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "crypto", nulls = Nulls.SKIP)
+        public _FinalStage crypto(Optional<PaymentInstrumentCrypto> crypto) {
+            this.crypto = crypto;
+            return this;
+        }
+
+        /**
+         * <p>Card, Apple Pay, and Google Pay payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -303,7 +374,7 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
+         * <p>Card, Apple Pay, and Google Pay payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -313,7 +384,7 @@ public final class PaymentInstrument {
         }
 
         /**
-         * <p>Card payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
+         * <p>Card, Apple Pay, and Google Pay payments only: the card's network, last four, issuer identification number, expiry, and network transaction id.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "card", nulls = Nulls.SKIP)
@@ -325,12 +396,13 @@ public final class PaymentInstrument {
         @java.lang.Override
         public PaymentInstrument build() {
             return new PaymentInstrument(
-                    card, displayName, icons, installmentCount, paymentMethodType, additionalProperties);
+                    card, crypto, displayName, icons, installmentCount, paymentMethodType, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("card")
+                    || key.equalsIgnoreCase("crypto")
                     || key.equalsIgnoreCase("display_name")
                     || key.equalsIgnoreCase("icons")
                     || key.equalsIgnoreCase("installment_count")

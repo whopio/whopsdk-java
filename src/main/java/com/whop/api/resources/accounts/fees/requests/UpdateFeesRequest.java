@@ -41,6 +41,7 @@ import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestPoolPayout;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestRevshare;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestSepaDispute;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestSepaReturn;
+import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestSubaccountFeeMode;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestTaxCalculation;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestTaxService;
 import com.whop.api.resources.accounts.fees.types.UpdateFeesRequestThreeDs;
@@ -113,6 +114,8 @@ public final class UpdateFeesRequest {
 
     private final Optional<UpdateFeesRequestSepaReturn> sepaReturn;
 
+    private final Optional<UpdateFeesRequestSubaccountFeeMode> subaccountFeeMode;
+
     private final Optional<UpdateFeesRequestTaxCalculation> taxCalculation;
 
     private final Optional<UpdateFeesRequestTaxService> taxService;
@@ -154,6 +157,7 @@ public final class UpdateFeesRequest {
             Optional<UpdateFeesRequestRevshare> revshare,
             Optional<UpdateFeesRequestSepaDispute> sepaDispute,
             Optional<UpdateFeesRequestSepaReturn> sepaReturn,
+            Optional<UpdateFeesRequestSubaccountFeeMode> subaccountFeeMode,
             Optional<UpdateFeesRequestTaxCalculation> taxCalculation,
             Optional<UpdateFeesRequestTaxService> taxService,
             Optional<UpdateFeesRequestThreeDs> threeDs,
@@ -189,6 +193,7 @@ public final class UpdateFeesRequest {
         this.revshare = revshare;
         this.sepaDispute = sepaDispute;
         this.sepaReturn = sepaReturn;
+        this.subaccountFeeMode = subaccountFeeMode;
         this.taxCalculation = taxCalculation;
         this.taxService = taxService;
         this.threeDs = threeDs;
@@ -437,6 +442,14 @@ public final class UpdateFeesRequest {
     }
 
     /**
+     * @return Changes how this account charges its subaccounts. Only an account without a parent account can set it. An account can change <code>inherit</code> to either other mode. It can change <code>subaccount_rates_collect_difference</code> to <code>subaccount_rates</code>. Whop must make other changes.
+     */
+    @JsonProperty("subaccount_fee_mode")
+    public Optional<UpdateFeesRequestSubaccountFeeMode> getSubaccountFeeMode() {
+        return subaccountFeeMode;
+    }
+
+    /**
      * @return The fields of a fee the caller may change. Only the keys sent are replaced.
      */
     @JsonProperty("tax_calculation")
@@ -510,6 +523,7 @@ public final class UpdateFeesRequest {
                 && revshare.equals(other.revshare)
                 && sepaDispute.equals(other.sepaDispute)
                 && sepaReturn.equals(other.sepaReturn)
+                && subaccountFeeMode.equals(other.subaccountFeeMode)
                 && taxCalculation.equals(other.taxCalculation)
                 && taxService.equals(other.taxService)
                 && threeDs.equals(other.threeDs)
@@ -549,6 +563,7 @@ public final class UpdateFeesRequest {
                 this.revshare,
                 this.sepaDispute,
                 this.sepaReturn,
+                this.subaccountFeeMode,
                 this.taxCalculation,
                 this.taxService,
                 this.threeDs,
@@ -626,6 +641,8 @@ public final class UpdateFeesRequest {
 
         private Optional<UpdateFeesRequestSepaReturn> sepaReturn = Optional.empty();
 
+        private Optional<UpdateFeesRequestSubaccountFeeMode> subaccountFeeMode = Optional.empty();
+
         private Optional<UpdateFeesRequestTaxCalculation> taxCalculation = Optional.empty();
 
         private Optional<UpdateFeesRequestTaxService> taxService = Optional.empty();
@@ -669,6 +686,7 @@ public final class UpdateFeesRequest {
             revshare(other.getRevshare());
             sepaDispute(other.getSepaDispute());
             sepaReturn(other.getSepaReturn());
+            subaccountFeeMode(other.getSubaccountFeeMode());
             taxCalculation(other.getTaxCalculation());
             taxService(other.getTaxService());
             threeDs(other.getThreeDs());
@@ -1097,6 +1115,20 @@ public final class UpdateFeesRequest {
         }
 
         /**
+         * <p>Changes how this account charges its subaccounts. Only an account without a parent account can set it. An account can change <code>inherit</code> to either other mode. It can change <code>subaccount_rates_collect_difference</code> to <code>subaccount_rates</code>. Whop must make other changes.</p>
+         */
+        @JsonSetter(value = "subaccount_fee_mode", nulls = Nulls.SKIP)
+        public Builder subaccountFeeMode(Optional<UpdateFeesRequestSubaccountFeeMode> subaccountFeeMode) {
+            this.subaccountFeeMode = subaccountFeeMode;
+            return this;
+        }
+
+        public Builder subaccountFeeMode(UpdateFeesRequestSubaccountFeeMode subaccountFeeMode) {
+            this.subaccountFeeMode = Optional.ofNullable(subaccountFeeMode);
+            return this;
+        }
+
+        /**
          * <p>The fields of a fee the caller may change. Only the keys sent are replaced.</p>
          */
         @JsonSetter(value = "tax_calculation", nulls = Nulls.SKIP)
@@ -1184,6 +1216,7 @@ public final class UpdateFeesRequest {
                     revshare,
                     sepaDispute,
                     sepaReturn,
+                    subaccountFeeMode,
                     taxCalculation,
                     taxService,
                     threeDs,
@@ -1223,6 +1256,7 @@ public final class UpdateFeesRequest {
                     || key.equalsIgnoreCase("revshare")
                     || key.equalsIgnoreCase("sepa_dispute")
                     || key.equalsIgnoreCase("sepa_return")
+                    || key.equalsIgnoreCase("subaccount_fee_mode")
                     || key.equalsIgnoreCase("tax_calculation")
                     || key.equalsIgnoreCase("tax_service")
                     || key.equalsIgnoreCase("three_ds")

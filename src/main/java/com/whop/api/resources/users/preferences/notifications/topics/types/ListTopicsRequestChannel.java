@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListTopicsRequestChannel {
+    public static final ListTopicsRequestChannel EMAIL = new ListTopicsRequestChannel(Value.EMAIL, "email");
+
     public static final ListTopicsRequestChannel MOBILE = new ListTopicsRequestChannel(Value.MOBILE, "mobile");
 
     public static final ListTopicsRequestChannel IN_APP = new ListTopicsRequestChannel(Value.IN_APP, "in_app");
@@ -44,6 +46,8 @@ public final class ListTopicsRequestChannel {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case EMAIL:
+                return visitor.visitEmail();
             case MOBILE:
                 return visitor.visitMobile();
             case IN_APP:
@@ -57,6 +61,8 @@ public final class ListTopicsRequestChannel {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListTopicsRequestChannel valueOf(String value) {
         switch (value) {
+            case "email":
+                return EMAIL;
             case "mobile":
                 return MOBILE;
             case "in_app":
@@ -71,6 +77,8 @@ public final class ListTopicsRequestChannel {
 
         MOBILE,
 
+        EMAIL,
+
         UNKNOWN
     }
 
@@ -78,6 +86,8 @@ public final class ListTopicsRequestChannel {
         T visitInApp();
 
         T visitMobile();
+
+        T visitEmail();
 
         T visitUnknown(String unknownType);
     }

@@ -87,6 +87,8 @@ public final class AccountFees {
 
     private final AccountFee sepaReturn;
 
+    private final Optional<AccountSubaccountFeeMode> subaccountFeeMode;
+
     private final AccountFee taxCalculation;
 
     private final AccountFee taxService;
@@ -129,6 +131,7 @@ public final class AccountFees {
             AccountFee revshare,
             AccountFee sepaDispute,
             AccountFee sepaReturn,
+            Optional<AccountSubaccountFeeMode> subaccountFeeMode,
             AccountFee taxCalculation,
             AccountFee taxService,
             AccountFee threeDs,
@@ -165,6 +168,7 @@ public final class AccountFees {
         this.revshare = revshare;
         this.sepaDispute = sepaDispute;
         this.sepaReturn = sepaReturn;
+        this.subaccountFeeMode = subaccountFeeMode;
         this.taxCalculation = taxCalculation;
         this.taxService = taxService;
         this.threeDs = threeDs;
@@ -430,6 +434,17 @@ public final class AccountFees {
     }
 
     /**
+     * @return How this account charges its subaccounts, and whether the caller can change it. <code>null</code> for a subaccount.
+     */
+    @JsonIgnore
+    public Optional<AccountSubaccountFeeMode> getSubaccountFeeMode() {
+        if (subaccountFeeMode == null) {
+            return Optional.empty();
+        }
+        return subaccountFeeMode;
+    }
+
+    /**
      * @return Charged when Whop calculates tax on a payment and the account remits the tax itself. An account whose <code>tax_remitted_by</code> is <code>null</code> pays it on every taxed payment.
      */
     @JsonProperty("tax_calculation")
@@ -479,6 +494,12 @@ public final class AccountFees {
         return parentAccountId;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("subaccount_fee_mode")
+    private Optional<AccountSubaccountFeeMode> _getSubaccountFeeMode() {
+        return subaccountFeeMode;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -522,6 +543,7 @@ public final class AccountFees {
                 && revshare.equals(other.revshare)
                 && sepaDispute.equals(other.sepaDispute)
                 && sepaReturn.equals(other.sepaReturn)
+                && subaccountFeeMode.equals(other.subaccountFeeMode)
                 && taxCalculation.equals(other.taxCalculation)
                 && taxService.equals(other.taxService)
                 && threeDs.equals(other.threeDs)
@@ -562,6 +584,7 @@ public final class AccountFees {
                 this.revshare,
                 this.sepaDispute,
                 this.sepaReturn,
+                this.subaccountFeeMode,
                 this.taxCalculation,
                 this.taxService,
                 this.threeDs,
@@ -840,6 +863,15 @@ public final class AccountFees {
         _FinalStage putAllPayouts(Map<String, AccountFee> payouts);
 
         _FinalStage payouts(String key, AccountFee value);
+
+        /**
+         * <p>How this account charges its subaccounts, and whether the caller can change it. <code>null</code> for a subaccount.</p>
+         */
+        _FinalStage subaccountFeeMode(Optional<AccountSubaccountFeeMode> subaccountFeeMode);
+
+        _FinalStage subaccountFeeMode(AccountSubaccountFeeMode subaccountFeeMode);
+
+        _FinalStage subaccountFeeMode(Nullable<AccountSubaccountFeeMode> subaccountFeeMode);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -935,6 +967,8 @@ public final class AccountFees {
 
         private AccountFee transfers;
 
+        private Optional<AccountSubaccountFeeMode> subaccountFeeMode = Optional.empty();
+
         private Map<String, AccountFee> payouts = new LinkedHashMap<>();
 
         private Map<String, AccountFee> paymentMethods = new LinkedHashMap<>();
@@ -982,6 +1016,7 @@ public final class AccountFees {
             revshare(other.getRevshare());
             sepaDispute(other.getSepaDispute());
             sepaReturn(other.getSepaReturn());
+            subaccountFeeMode(other.getSubaccountFeeMode());
             taxCalculation(other.getTaxCalculation());
             taxService(other.getTaxService());
             threeDs(other.getThreeDs());
@@ -1321,6 +1356,42 @@ public final class AccountFees {
         }
 
         /**
+         * <p>How this account charges its subaccounts, and whether the caller can change it. <code>null</code> for a subaccount.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountFeeMode(Nullable<AccountSubaccountFeeMode> subaccountFeeMode) {
+            if (subaccountFeeMode.isNull()) {
+                this.subaccountFeeMode = null;
+            } else if (subaccountFeeMode.isEmpty()) {
+                this.subaccountFeeMode = Optional.empty();
+            } else {
+                this.subaccountFeeMode = Optional.of(subaccountFeeMode.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How this account charges its subaccounts, and whether the caller can change it. <code>null</code> for a subaccount.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage subaccountFeeMode(AccountSubaccountFeeMode subaccountFeeMode) {
+            this.subaccountFeeMode = Optional.ofNullable(subaccountFeeMode);
+            return this;
+        }
+
+        /**
+         * <p>How this account charges its subaccounts, and whether the caller can change it. <code>null</code> for a subaccount.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "subaccount_fee_mode", nulls = Nulls.SKIP)
+        public _FinalStage subaccountFeeMode(Optional<AccountSubaccountFeeMode> subaccountFeeMode) {
+            this.subaccountFeeMode = subaccountFeeMode;
+            return this;
+        }
+
+        /**
          * <p>Fees on withdrawals, keyed by payout method: <code>bank_wire</code>, <code>same_day_bank</code>, <code>next_day_bank</code>, <code>rtp</code>, <code>crypto</code>, and <code>digital_wallet</code>. Payout fees the parent account covers show as zero when a subaccount's fees are read without access to its parent account.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1532,6 +1603,7 @@ public final class AccountFees {
                     revshare,
                     sepaDispute,
                     sepaReturn,
+                    subaccountFeeMode,
                     taxCalculation,
                     taxService,
                     threeDs,
@@ -1572,6 +1644,7 @@ public final class AccountFees {
                     || key.equalsIgnoreCase("revshare")
                     || key.equalsIgnoreCase("sepa_dispute")
                     || key.equalsIgnoreCase("sepa_return")
+                    || key.equalsIgnoreCase("subaccount_fee_mode")
                     || key.equalsIgnoreCase("tax_calculation")
                     || key.equalsIgnoreCase("tax_service")
                     || key.equalsIgnoreCase("three_ds")

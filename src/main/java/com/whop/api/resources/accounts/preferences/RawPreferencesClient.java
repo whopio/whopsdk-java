@@ -125,14 +125,16 @@ public class RawPreferencesClient {
     }
 
     /**
-     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * Updates the account's preferences. Keys left out keep their current values. In <code>affiliate_program</code> and <code>ads_triple_whale_integration</code>, only the fields you send change. <code>customer_tracking</code>, <code>card_surcharge</code> and <code>ads_payment_methods</code> replace their stored value as a whole.
      * <p>The required scope depends on which preferences you update.</p>
      * <ul>
      * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
-     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>, <code>merchant_of_record</code>.</li>
+     * <li><code>payment:manage</code>: <code>off_session_payment_rules</code>.</li>
      * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
-     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>, <code>card_surcharge</code>, <code>apple_iap_fee_payer</code>.</li>
      * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * <li><code>affiliate:update</code>: <code>affiliate_program</code>.</li>
      * </ul>
      * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
@@ -141,14 +143,16 @@ public class RawPreferencesClient {
     }
 
     /**
-     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * Updates the account's preferences. Keys left out keep their current values. In <code>affiliate_program</code> and <code>ads_triple_whale_integration</code>, only the fields you send change. <code>customer_tracking</code>, <code>card_surcharge</code> and <code>ads_payment_methods</code> replace their stored value as a whole.
      * <p>The required scope depends on which preferences you update.</p>
      * <ul>
      * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
-     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>, <code>merchant_of_record</code>.</li>
+     * <li><code>payment:manage</code>: <code>off_session_payment_rules</code>.</li>
      * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
-     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>, <code>card_surcharge</code>, <code>apple_iap_fee_payer</code>.</li>
      * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * <li><code>affiliate:update</code>: <code>affiliate_program</code>.</li>
      * </ul>
      * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
@@ -157,14 +161,16 @@ public class RawPreferencesClient {
     }
 
     /**
-     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * Updates the account's preferences. Keys left out keep their current values. In <code>affiliate_program</code> and <code>ads_triple_whale_integration</code>, only the fields you send change. <code>customer_tracking</code>, <code>card_surcharge</code> and <code>ads_payment_methods</code> replace their stored value as a whole.
      * <p>The required scope depends on which preferences you update.</p>
      * <ul>
      * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
-     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>, <code>merchant_of_record</code>.</li>
+     * <li><code>payment:manage</code>: <code>off_session_payment_rules</code>.</li>
      * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
-     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>, <code>card_surcharge</code>, <code>apple_iap_fee_payer</code>.</li>
      * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * <li><code>affiliate:update</code>: <code>affiliate_program</code>.</li>
      * </ul>
      * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */
@@ -173,14 +179,16 @@ public class RawPreferencesClient {
     }
 
     /**
-     * Updates the account's preferences. Each top-level key in the body replaces its stored value as a whole. Keys left out keep their current values.
+     * Updates the account's preferences. Keys left out keep their current values. In <code>affiliate_program</code> and <code>ads_triple_whale_integration</code>, only the fields you send change. <code>customer_tracking</code>, <code>card_surcharge</code> and <code>ads_payment_methods</code> replace their stored value as a whole.
      * <p>The required scope depends on which preferences you update.</p>
      * <ul>
      * <li><code>ad_campaign:create</code>: <code>ads_payment_methods</code>, <code>ads_reporting_currency</code>, <code>ads_scheduling_timezone</code>, <code>ads_triple_whale_integration</code>.</li>
-     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>.</li>
+     * <li><code>payout:account:update</code>: <code>cards_auto_top_up</code>, <code>cards_notifications</code>, <code>covers_subaccount_negative_balances</code>, <code>merchant_of_record</code>.</li>
+     * <li><code>payment:manage</code>: <code>off_session_payment_rules</code>.</li>
      * <li><code>payment:dispute</code>: <code>dispute_fighter_enabled</code>.</li>
-     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>.</li>
+     * <li><code>company:update</code>: <code>economic_intelligence_duration_key</code>, <code>economic_intelligence_auto_renew</code>, <code>review_request_emails</code>, <code>cancellation_emails</code>, <code>renewal_reminder_emails</code>, <code>failed_payment_emails</code>, <code>subaccount_notifications</code>, <code>subaccount_team_view_only</code>, <code>card_surcharge</code>, <code>apple_iap_fee_payer</code>.</li>
      * <li><code>company:manage_checkout</code>: <code>feedback_options</code>, <code>customer_tracking</code>.</li>
+     * <li><code>affiliate:update</code>: <code>affiliate_program</code>.</li>
      * </ul>
      * <p>To update keys under more than one scope, the API key needs all of those scopes.</p>
      */

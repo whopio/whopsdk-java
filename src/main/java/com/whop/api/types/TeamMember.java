@@ -41,6 +41,8 @@ public final class TeamMember {
 
     private final boolean isPartner;
 
+    private final Optional<String> legalName;
+
     private final Optional<List<TeamMemberManager>> reportsToChain;
 
     private final Optional<String> reportsToId;
@@ -64,6 +66,7 @@ public final class TeamMember {
             String id,
             boolean isAgent,
             boolean isPartner,
+            Optional<String> legalName,
             Optional<List<TeamMemberManager>> reportsToChain,
             Optional<String> reportsToId,
             TeamMemberRole role,
@@ -79,6 +82,7 @@ public final class TeamMember {
         this.id = id;
         this.isAgent = isAgent;
         this.isPartner = isPartner;
+        this.legalName = legalName;
         this.reportsToChain = reportsToChain;
         this.reportsToId = reportsToId;
         this.role = role;
@@ -161,6 +165,17 @@ public final class TeamMember {
         return isPartner;
     }
 
+    /**
+     * @return The first and last name on the member's approved identity verification, set only when the member has no profile name. Returned to the account's own API key when listing or retrieving a partner account's team members. <code>null</code> when the member has a profile name or no approved verification, for invites, on write responses, and for other callers.
+     */
+    @JsonIgnore
+    public Optional<String> getLegalName() {
+        if (legalName == null) {
+            return Optional.empty();
+        }
+        return legalName;
+    }
+
     @JsonIgnore
     public Optional<List<TeamMemberManager>> getReportsToChain() {
         if (reportsToChain == null) {
@@ -234,6 +249,12 @@ public final class TeamMember {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("legal_name")
+    private Optional<String> _getLegalName() {
+        return legalName;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("reports_to_chain")
     private Optional<List<TeamMemberManager>> _getReportsToChain() {
         return reportsToChain;
@@ -271,6 +292,7 @@ public final class TeamMember {
                 && id.equals(other.id)
                 && isAgent == other.isAgent
                 && isPartner == other.isPartner
+                && legalName.equals(other.legalName)
                 && reportsToChain.equals(other.reportsToChain)
                 && reportsToId.equals(other.reportsToId)
                 && role.equals(other.role)
@@ -290,6 +312,7 @@ public final class TeamMember {
                 this.id,
                 this.isAgent,
                 this.isPartner,
+                this.legalName,
                 this.reportsToChain,
                 this.reportsToId,
                 this.role,
@@ -399,6 +422,15 @@ public final class TeamMember {
 
         _FinalStage email(Nullable<String> email);
 
+        /**
+         * <p>The first and last name on the member's approved identity verification, set only when the member has no profile name. Returned to the account's own API key when listing or retrieving a partner account's team members. <code>null</code> when the member has a profile name or no approved verification, for invites, on write responses, and for other callers.</p>
+         */
+        _FinalStage legalName(Optional<String> legalName);
+
+        _FinalStage legalName(String legalName);
+
+        _FinalStage legalName(Nullable<String> legalName);
+
         _FinalStage reportsToChain(Optional<List<TeamMemberManager>> reportsToChain);
 
         _FinalStage reportsToChain(List<TeamMemberManager> reportsToChain);
@@ -457,6 +489,8 @@ public final class TeamMember {
 
         private Optional<List<TeamMemberManager>> reportsToChain = Optional.empty();
 
+        private Optional<String> legalName = Optional.empty();
+
         private Optional<String> email = Optional.empty();
 
         private Optional<Integer> directReportsCount = Optional.empty();
@@ -477,6 +511,7 @@ public final class TeamMember {
             id(other.getId());
             isAgent(other.getIsAgent());
             isPartner(other.getIsPartner());
+            legalName(other.getLegalName());
             reportsToChain(other.getReportsToChain());
             reportsToId(other.getReportsToId());
             role(other.getRole());
@@ -672,6 +707,42 @@ public final class TeamMember {
         }
 
         /**
+         * <p>The first and last name on the member's approved identity verification, set only when the member has no profile name. Returned to the account's own API key when listing or retrieving a partner account's team members. <code>null</code> when the member has a profile name or no approved verification, for invites, on write responses, and for other callers.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage legalName(Nullable<String> legalName) {
+            if (legalName.isNull()) {
+                this.legalName = null;
+            } else if (legalName.isEmpty()) {
+                this.legalName = Optional.empty();
+            } else {
+                this.legalName = Optional.of(legalName.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The first and last name on the member's approved identity verification, set only when the member has no profile name. Returned to the account's own API key when listing or retrieving a partner account's team members. <code>null</code> when the member has a profile name or no approved verification, for invites, on write responses, and for other callers.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage legalName(String legalName) {
+            this.legalName = Optional.ofNullable(legalName);
+            return this;
+        }
+
+        /**
+         * <p>The first and last name on the member's approved identity verification, set only when the member has no profile name. Returned to the account's own API key when listing or retrieving a partner account's team members. <code>null</code> when the member has a profile name or no approved verification, for invites, on write responses, and for other callers.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "legal_name", nulls = Nulls.SKIP)
+        public _FinalStage legalName(Optional<String> legalName) {
+            this.legalName = legalName;
+            return this;
+        }
+
+        /**
          * <p>The member's email address. For an invite to an email with no Whop account yet, this is the invited address. Otherwise it is <code>null</code> unless the caller holds the <code>company:authorized_user:email:read</code> scope.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -790,6 +861,7 @@ public final class TeamMember {
                     id,
                     isAgent,
                     isPartner,
+                    legalName,
                     reportsToChain,
                     reportsToId,
                     role,
@@ -809,6 +881,7 @@ public final class TeamMember {
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("is_agent")
                     || key.equalsIgnoreCase("is_partner")
+                    || key.equalsIgnoreCase("legal_name")
                     || key.equalsIgnoreCase("reports_to_chain")
                     || key.equalsIgnoreCase("reports_to_id")
                     || key.equalsIgnoreCase("role")

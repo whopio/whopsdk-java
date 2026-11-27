@@ -29,6 +29,8 @@ public final class InvoiceLineItem {
 
     private final Optional<String> id;
 
+    private final Optional<Money> initialPrice;
+
     private final Optional<String> label;
 
     private final Optional<String> productId;
@@ -38,6 +40,8 @@ public final class InvoiceLineItem {
     private final Optional<Money> subtotal;
 
     private final Optional<Money> taxAmount;
+
+    private final Optional<Integer> trialPeriodDays;
 
     private final Optional<Money> unitAmount;
 
@@ -49,22 +53,26 @@ public final class InvoiceLineItem {
             Optional<String> description,
             Optional<Money> discountAmount,
             Optional<String> id,
+            Optional<Money> initialPrice,
             Optional<String> label,
             Optional<String> productId,
             double quantity,
             Optional<Money> subtotal,
             Optional<Money> taxAmount,
+            Optional<Integer> trialPeriodDays,
             Optional<Money> unitAmount,
             Optional<String> variantId,
             Map<String, Object> additionalProperties) {
         this.description = description;
         this.discountAmount = discountAmount;
         this.id = id;
+        this.initialPrice = initialPrice;
         this.label = label;
         this.productId = productId;
         this.quantity = quantity;
         this.subtotal = subtotal;
         this.taxAmount = taxAmount;
+        this.trialPeriodDays = trialPeriodDays;
         this.unitAmount = unitAmount;
         this.variantId = variantId;
         this.additionalProperties = additionalProperties;
@@ -101,6 +109,17 @@ public final class InvoiceLineItem {
             return Optional.empty();
         }
         return id;
+    }
+
+    /**
+     * @return The part of <code>unit_amount</code> that is a recurring variant's one-time upfront fee, the variant's <code>initial_price</code>, charged on this invoice only. The rest of <code>unit_amount</code> is the first billing period. A trial has no first-period charge. Null for one-time items, renewal invoices, items with no upfront fee, and items whose variant prices changed after the invoice was priced.
+     */
+    @JsonIgnore
+    public Optional<Money> getInitialPrice() {
+        if (initialPrice == null) {
+            return Optional.empty();
+        }
+        return initialPrice;
     }
 
     /**
@@ -156,7 +175,18 @@ public final class InvoiceLineItem {
     }
 
     /**
-     * @return The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee and first billing period. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.
+     * @return Free trial days before this recurring item's first renewal charge, from the variant's <code>trial_period_days</code>. The invoice then bills only the variant's <code>initial_price</code> for the item. <code>null</code> for one-time items and renewal invoices, and when the customer already had a subscription to the variant.
+     */
+    @JsonIgnore
+    public Optional<Integer> getTrialPeriodDays() {
+        if (trialPeriodDays == null) {
+            return Optional.empty();
+        }
+        return trialPeriodDays;
+    }
+
+    /**
+     * @return The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee, plus the first billing period unless the item starts with a trial. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.
      */
     @JsonIgnore
     public Optional<Money> getUnitAmount() {
@@ -196,6 +226,12 @@ public final class InvoiceLineItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("initial_price")
+    private Optional<Money> _getInitialPrice() {
+        return initialPrice;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("label")
     private Optional<String> _getLabel() {
         return label;
@@ -217,6 +253,12 @@ public final class InvoiceLineItem {
     @JsonProperty("tax_amount")
     private Optional<Money> _getTaxAmount() {
         return taxAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("trial_period_days")
+    private Optional<Integer> _getTrialPeriodDays() {
+        return trialPeriodDays;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -246,11 +288,13 @@ public final class InvoiceLineItem {
         return description.equals(other.description)
                 && discountAmount.equals(other.discountAmount)
                 && id.equals(other.id)
+                && initialPrice.equals(other.initialPrice)
                 && label.equals(other.label)
                 && productId.equals(other.productId)
                 && quantity == other.quantity
                 && subtotal.equals(other.subtotal)
                 && taxAmount.equals(other.taxAmount)
+                && trialPeriodDays.equals(other.trialPeriodDays)
                 && unitAmount.equals(other.unitAmount)
                 && variantId.equals(other.variantId);
     }
@@ -261,11 +305,13 @@ public final class InvoiceLineItem {
                 this.description,
                 this.discountAmount,
                 this.id,
+                this.initialPrice,
                 this.label,
                 this.productId,
                 this.quantity,
                 this.subtotal,
                 this.taxAmount,
+                this.trialPeriodDays,
                 this.unitAmount,
                 this.variantId);
     }
@@ -323,6 +369,15 @@ public final class InvoiceLineItem {
         _FinalStage id(Nullable<String> id);
 
         /**
+         * <p>The part of <code>unit_amount</code> that is a recurring variant's one-time upfront fee, the variant's <code>initial_price</code>, charged on this invoice only. The rest of <code>unit_amount</code> is the first billing period. A trial has no first-period charge. Null for one-time items, renewal invoices, items with no upfront fee, and items whose variant prices changed after the invoice was priced.</p>
+         */
+        _FinalStage initialPrice(Optional<Money> initialPrice);
+
+        _FinalStage initialPrice(Money initialPrice);
+
+        _FinalStage initialPrice(Nullable<Money> initialPrice);
+
+        /**
          * <p>The item's name as shown at checkout (the product title, else the variant title).</p>
          */
         _FinalStage label(Optional<String> label);
@@ -359,7 +414,16 @@ public final class InvoiceLineItem {
         _FinalStage taxAmount(Nullable<Money> taxAmount);
 
         /**
-         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee and first billing period. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
+         * <p>Free trial days before this recurring item's first renewal charge, from the variant's <code>trial_period_days</code>. The invoice then bills only the variant's <code>initial_price</code> for the item. <code>null</code> for one-time items and renewal invoices, and when the customer already had a subscription to the variant.</p>
+         */
+        _FinalStage trialPeriodDays(Optional<Integer> trialPeriodDays);
+
+        _FinalStage trialPeriodDays(Integer trialPeriodDays);
+
+        _FinalStage trialPeriodDays(Nullable<Integer> trialPeriodDays);
+
+        /**
+         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee, plus the first billing period unless the item starts with a trial. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
          */
         _FinalStage unitAmount(Optional<Money> unitAmount);
 
@@ -385,6 +449,8 @@ public final class InvoiceLineItem {
 
         private Optional<Money> unitAmount = Optional.empty();
 
+        private Optional<Integer> trialPeriodDays = Optional.empty();
+
         private Optional<Money> taxAmount = Optional.empty();
 
         private Optional<Money> subtotal = Optional.empty();
@@ -392,6 +458,8 @@ public final class InvoiceLineItem {
         private Optional<String> productId = Optional.empty();
 
         private Optional<String> label = Optional.empty();
+
+        private Optional<Money> initialPrice = Optional.empty();
 
         private Optional<String> id = Optional.empty();
 
@@ -408,11 +476,13 @@ public final class InvoiceLineItem {
             description(other.getDescription());
             discountAmount(other.getDiscountAmount());
             id(other.getId());
+            initialPrice(other.getInitialPrice());
             label(other.getLabel());
             productId(other.getProductId());
             quantity(other.getQuantity());
             subtotal(other.getSubtotal());
             taxAmount(other.getTaxAmount());
+            trialPeriodDays(other.getTrialPeriodDays());
             unitAmount(other.getUnitAmount());
             variantId(other.getVariantId());
             return this;
@@ -466,7 +536,7 @@ public final class InvoiceLineItem {
         }
 
         /**
-         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee and first billing period. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
+         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee, plus the first billing period unless the item starts with a trial. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -482,7 +552,7 @@ public final class InvoiceLineItem {
         }
 
         /**
-         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee and first billing period. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
+         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee, plus the first billing period unless the item starts with a trial. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -492,12 +562,48 @@ public final class InvoiceLineItem {
         }
 
         /**
-         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee and first billing period. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
+         * <p>The saved price of one unit before discounts, in the payment's <code>currency</code>. Creating or replacing recurring items includes the upfront fee, plus the first billing period unless the item starts with a trial. Renewal invoices exclude the upfront fee. Other edits preserve saved prices. Null when the payment recorded no price.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "unit_amount", nulls = Nulls.SKIP)
         public _FinalStage unitAmount(Optional<Money> unitAmount) {
             this.unitAmount = unitAmount;
+            return this;
+        }
+
+        /**
+         * <p>Free trial days before this recurring item's first renewal charge, from the variant's <code>trial_period_days</code>. The invoice then bills only the variant's <code>initial_price</code> for the item. <code>null</code> for one-time items and renewal invoices, and when the customer already had a subscription to the variant.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage trialPeriodDays(Nullable<Integer> trialPeriodDays) {
+            if (trialPeriodDays.isNull()) {
+                this.trialPeriodDays = null;
+            } else if (trialPeriodDays.isEmpty()) {
+                this.trialPeriodDays = Optional.empty();
+            } else {
+                this.trialPeriodDays = Optional.of(trialPeriodDays.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Free trial days before this recurring item's first renewal charge, from the variant's <code>trial_period_days</code>. The invoice then bills only the variant's <code>initial_price</code> for the item. <code>null</code> for one-time items and renewal invoices, and when the customer already had a subscription to the variant.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage trialPeriodDays(Integer trialPeriodDays) {
+            this.trialPeriodDays = Optional.ofNullable(trialPeriodDays);
+            return this;
+        }
+
+        /**
+         * <p>Free trial days before this recurring item's first renewal charge, from the variant's <code>trial_period_days</code>. The invoice then bills only the variant's <code>initial_price</code> for the item. <code>null</code> for one-time items and renewal invoices, and when the customer already had a subscription to the variant.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "trial_period_days", nulls = Nulls.SKIP)
+        public _FinalStage trialPeriodDays(Optional<Integer> trialPeriodDays) {
+            this.trialPeriodDays = trialPeriodDays;
             return this;
         }
 
@@ -646,6 +752,42 @@ public final class InvoiceLineItem {
         }
 
         /**
+         * <p>The part of <code>unit_amount</code> that is a recurring variant's one-time upfront fee, the variant's <code>initial_price</code>, charged on this invoice only. The rest of <code>unit_amount</code> is the first billing period. A trial has no first-period charge. Null for one-time items, renewal invoices, items with no upfront fee, and items whose variant prices changed after the invoice was priced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage initialPrice(Nullable<Money> initialPrice) {
+            if (initialPrice.isNull()) {
+                this.initialPrice = null;
+            } else if (initialPrice.isEmpty()) {
+                this.initialPrice = Optional.empty();
+            } else {
+                this.initialPrice = Optional.of(initialPrice.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The part of <code>unit_amount</code> that is a recurring variant's one-time upfront fee, the variant's <code>initial_price</code>, charged on this invoice only. The rest of <code>unit_amount</code> is the first billing period. A trial has no first-period charge. Null for one-time items, renewal invoices, items with no upfront fee, and items whose variant prices changed after the invoice was priced.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage initialPrice(Money initialPrice) {
+            this.initialPrice = Optional.ofNullable(initialPrice);
+            return this;
+        }
+
+        /**
+         * <p>The part of <code>unit_amount</code> that is a recurring variant's one-time upfront fee, the variant's <code>initial_price</code>, charged on this invoice only. The rest of <code>unit_amount</code> is the first billing period. A trial has no first-period charge. Null for one-time items, renewal invoices, items with no upfront fee, and items whose variant prices changed after the invoice was priced.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "initial_price", nulls = Nulls.SKIP)
+        public _FinalStage initialPrice(Optional<Money> initialPrice) {
+            this.initialPrice = initialPrice;
+            return this;
+        }
+
+        /**
          * <p>Line item ID, prefixed <code>li_</code>. Null when the payment predates item snapshots and the item is read from the payment's variant.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -759,11 +901,13 @@ public final class InvoiceLineItem {
                     description,
                     discountAmount,
                     id,
+                    initialPrice,
                     label,
                     productId,
                     quantity,
                     subtotal,
                     taxAmount,
+                    trialPeriodDays,
                     unitAmount,
                     variantId,
                     additionalProperties);
@@ -774,11 +918,13 @@ public final class InvoiceLineItem {
             if (key.equalsIgnoreCase("description")
                     || key.equalsIgnoreCase("discount_amount")
                     || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("initial_price")
                     || key.equalsIgnoreCase("label")
                     || key.equalsIgnoreCase("product_id")
                     || key.equalsIgnoreCase("quantity")
                     || key.equalsIgnoreCase("subtotal")
                     || key.equalsIgnoreCase("tax_amount")
+                    || key.equalsIgnoreCase("trial_period_days")
                     || key.equalsIgnoreCase("unit_amount")
                     || key.equalsIgnoreCase("variant_id")) {
                 return;

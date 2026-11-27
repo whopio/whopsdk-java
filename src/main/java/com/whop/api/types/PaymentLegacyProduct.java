@@ -67,7 +67,7 @@ public final class PaymentLegacyProduct {
     }
 
     /**
-     * @return URL slug in the product's public link, e.g. <code>pickaxe-analytics</code> in whop.com/company/pickaxe-analytics.
+     * @return URL slug in the product's public link, e.g. <code>ceramic-coating-package</code> in whop.com/company/ceramic-coating-package.
      */
     @JsonProperty("route")
     public String getRoute() {
@@ -131,7 +131,7 @@ public final class PaymentLegacyProduct {
 
     public interface RouteStage {
         /**
-         * <p>URL slug in the product's public link, e.g. <code>pickaxe-analytics</code> in whop.com/company/pickaxe-analytics.</p>
+         * <p>URL slug in the product's public link, e.g. <code>ceramic-coating-package</code> in whop.com/company/ceramic-coating-package.</p>
          */
         TitleStage route(@NotNull String route);
     }
@@ -195,7 +195,7 @@ public final class PaymentLegacyProduct {
         }
 
         /**
-         * <p>URL slug in the product's public link, e.g. <code>pickaxe-analytics</code> in whop.com/company/pickaxe-analytics.</p>
+         * <p>URL slug in the product's public link, e.g. <code>ceramic-coating-package</code> in whop.com/company/ceramic-coating-package.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

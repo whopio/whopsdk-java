@@ -21,20 +21,20 @@ import org.jetbrains.annotations.NotNull;
 public final class ExperienceNotificationPreference {
     private final ExperienceNotificationPreferenceLevel level;
 
-    private final ExperienceNotificationPreferenceObject object;
-
     private final NotificationPreferenceScope scope;
+
+    private final ExperienceNotificationPreferenceType type;
 
     private final Map<String, Object> additionalProperties;
 
     private ExperienceNotificationPreference(
             ExperienceNotificationPreferenceLevel level,
-            ExperienceNotificationPreferenceObject object,
             NotificationPreferenceScope scope,
+            ExperienceNotificationPreferenceType type,
             Map<String, Object> additionalProperties) {
         this.level = level;
-        this.object = object;
         this.scope = scope;
+        this.type = type;
         this.additionalProperties = additionalProperties;
     }
 
@@ -47,19 +47,19 @@ public final class ExperienceNotificationPreference {
     }
 
     /**
-     * @return The type of object. Always <code>experience_notification_preference</code>.
-     */
-    @JsonProperty("object")
-    public ExperienceNotificationPreferenceObject getObject() {
-        return object;
-    }
-
-    /**
      * @return What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.
      */
     @JsonProperty("scope")
     public NotificationPreferenceScope getScope() {
         return scope;
+    }
+
+    /**
+     * @return Always <code>experience_notification_preference</code>.
+     */
+    @JsonProperty("type")
+    public ExperienceNotificationPreferenceType getType() {
+        return type;
     }
 
     @java.lang.Override
@@ -74,12 +74,12 @@ public final class ExperienceNotificationPreference {
     }
 
     private boolean equalTo(ExperienceNotificationPreference other) {
-        return level.equals(other.level) && object.equals(other.object) && scope.equals(other.scope);
+        return level.equals(other.level) && scope.equals(other.scope) && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.level, this.object, this.scope);
+        return Objects.hash(this.level, this.scope, this.type);
     }
 
     @java.lang.Override
@@ -95,23 +95,23 @@ public final class ExperienceNotificationPreference {
         /**
          * <p>What the user is notified about in the experience: <code>all</code> notifications, only <code>mentions</code>, or <code>nothing</code>.</p>
          */
-        ObjectStage level(@NotNull ExperienceNotificationPreferenceLevel level);
+        ScopeStage level(@NotNull ExperienceNotificationPreferenceLevel level);
 
         Builder from(ExperienceNotificationPreference other);
-    }
-
-    public interface ObjectStage {
-        /**
-         * <p>The type of object. Always <code>experience_notification_preference</code>.</p>
-         */
-        ScopeStage object(@NotNull ExperienceNotificationPreferenceObject object);
     }
 
     public interface ScopeStage {
         /**
          * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
          */
-        _FinalStage scope(@NotNull NotificationPreferenceScope scope);
+        TypeStage scope(@NotNull NotificationPreferenceScope scope);
+    }
+
+    public interface TypeStage {
+        /**
+         * <p>Always <code>experience_notification_preference</code>.</p>
+         */
+        _FinalStage type(@NotNull ExperienceNotificationPreferenceType type);
     }
 
     public interface _FinalStage {
@@ -123,12 +123,12 @@ public final class ExperienceNotificationPreference {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements LevelStage, ObjectStage, ScopeStage, _FinalStage {
+    public static final class Builder implements LevelStage, ScopeStage, TypeStage, _FinalStage {
         private ExperienceNotificationPreferenceLevel level;
 
-        private ExperienceNotificationPreferenceObject object;
-
         private NotificationPreferenceScope scope;
+
+        private ExperienceNotificationPreferenceType type;
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -137,8 +137,8 @@ public final class ExperienceNotificationPreference {
         @java.lang.Override
         public Builder from(ExperienceNotificationPreference other) {
             level(other.getLevel());
-            object(other.getObject());
             scope(other.getScope());
+            type(other.getType());
             return this;
         }
 
@@ -148,19 +148,8 @@ public final class ExperienceNotificationPreference {
          */
         @java.lang.Override
         @JsonSetter("level")
-        public ObjectStage level(@NotNull ExperienceNotificationPreferenceLevel level) {
+        public ScopeStage level(@NotNull ExperienceNotificationPreferenceLevel level) {
             this.level = Objects.requireNonNull(level, "level must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The type of object. Always <code>experience_notification_preference</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("object")
-        public ScopeStage object(@NotNull ExperienceNotificationPreferenceObject object) {
-            this.object = Objects.requireNonNull(object, "object must not be null");
             return this;
         }
 
@@ -170,19 +159,30 @@ public final class ExperienceNotificationPreference {
          */
         @java.lang.Override
         @JsonSetter("scope")
-        public _FinalStage scope(@NotNull NotificationPreferenceScope scope) {
+        public TypeStage scope(@NotNull NotificationPreferenceScope scope) {
             this.scope = Objects.requireNonNull(scope, "scope must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Always <code>experience_notification_preference</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull ExperienceNotificationPreferenceType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
         @java.lang.Override
         public ExperienceNotificationPreference build() {
-            return new ExperienceNotificationPreference(level, object, scope, additionalProperties);
+            return new ExperienceNotificationPreference(level, scope, type, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("object") || key.equalsIgnoreCase("scope")) {
+            if (key.equalsIgnoreCase("level") || key.equalsIgnoreCase("scope") || key.equalsIgnoreCase("type")) {
                 return;
             }
             this.additionalProperties.put(key, value);

@@ -38,6 +38,8 @@ public final class ListMembersRequest {
 
     private final Optional<List<String>> promoCodeIds;
 
+    private final Optional<List<String>> buyerAccountIds;
+
     private final Optional<String> accountId;
 
     private final Optional<ListMembersRequestAccessLevel> accessLevel;
@@ -45,6 +47,10 @@ public final class ListMembersRequest {
     private final Optional<ListMembersRequestStatus> status;
 
     private final Optional<ListMembersRequestMembershipStatus> membershipStatus;
+
+    private final Optional<String> affiliateId;
+
+    private final Optional<String> metadata;
 
     private final Optional<String> query;
 
@@ -74,10 +80,13 @@ public final class ListMembersRequest {
             Optional<List<String>> productIds,
             Optional<List<String>> variantIds,
             Optional<List<String>> promoCodeIds,
+            Optional<List<String>> buyerAccountIds,
             Optional<String> accountId,
             Optional<ListMembersRequestAccessLevel> accessLevel,
             Optional<ListMembersRequestStatus> status,
             Optional<ListMembersRequestMembershipStatus> membershipStatus,
+            Optional<String> affiliateId,
+            Optional<String> metadata,
             Optional<String> query,
             Optional<String> createdAfter,
             Optional<String> createdBefore,
@@ -94,10 +103,13 @@ public final class ListMembersRequest {
         this.productIds = productIds;
         this.variantIds = variantIds;
         this.promoCodeIds = promoCodeIds;
+        this.buyerAccountIds = buyerAccountIds;
         this.accountId = accountId;
         this.accessLevel = accessLevel;
         this.status = status;
         this.membershipStatus = membershipStatus;
+        this.affiliateId = affiliateId;
+        this.metadata = metadata;
         this.query = query;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
@@ -152,6 +164,14 @@ public final class ListMembersRequest {
     }
 
     /**
+     * @return Only return members bought by these accounts, prefixed <code>biz_</code>. Unknown IDs match nothing.
+     */
+    @JsonProperty("buyer_account_ids")
+    public Optional<List<String>> getBuyerAccountIds() {
+        return buyerAccountIds;
+    }
+
+    /**
      * @return The account to list members for (<code>biz_</code> tag). Defaults to the account the credential acts as.
      */
     @JsonProperty("account_id")
@@ -184,6 +204,22 @@ public final class ListMembersRequest {
     }
 
     /**
+     * @return Only return members this affiliate referred, prefixed <code>aff_</code>. Requires <code>affiliate:basic:read</code> and sorts by <code>created_at</code> only. Unknown IDs match nothing.
+     */
+    @JsonProperty("affiliate_id")
+    public Optional<String> getAffiliateId() {
+        return affiliateId;
+    }
+
+    /**
+     * @return JSON-encoded object of key and value pairs. Only returns members whose own metadata holds every pair with exactly that value, for example <code>{&quot;utm_source&quot;:&quot;twitter&quot;}</code>. Takes up to 5 keys. Only the account's newest 50,000 members are searched, and a search that takes over 5 seconds returns a 400. Stored numbers and true or false values match their text. Nested query keys such as <code>metadata[utm_source]=twitter</code> also work.
+     */
+    @JsonProperty("metadata")
+    public Optional<String> getMetadata() {
+        return metadata;
+    }
+
+    /**
      * @return Search members by name or username. An exact email address also matches when the credential holds the member:email:read scope.
      */
     @JsonProperty("query")
@@ -208,7 +244,7 @@ public final class ListMembersRequest {
     }
 
     /**
-     * @return Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending.
+     * @return Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending. <code>needs_reply</code> lists customers awaiting a support reply first, ordered by their latest qualifying message. Other members follow in last-activity order. Direction applies within each group. Requires <code>support_chat:read</code>.
      */
     @JsonProperty("order")
     public Optional<ListMembersRequestOrder> getOrder() {
@@ -280,10 +316,13 @@ public final class ListMembersRequest {
                 && productIds.equals(other.productIds)
                 && variantIds.equals(other.variantIds)
                 && promoCodeIds.equals(other.promoCodeIds)
+                && buyerAccountIds.equals(other.buyerAccountIds)
                 && accountId.equals(other.accountId)
                 && accessLevel.equals(other.accessLevel)
                 && status.equals(other.status)
                 && membershipStatus.equals(other.membershipStatus)
+                && affiliateId.equals(other.affiliateId)
+                && metadata.equals(other.metadata)
                 && query.equals(other.query)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
@@ -304,10 +343,13 @@ public final class ListMembersRequest {
                 this.productIds,
                 this.variantIds,
                 this.promoCodeIds,
+                this.buyerAccountIds,
                 this.accountId,
                 this.accessLevel,
                 this.status,
                 this.membershipStatus,
+                this.affiliateId,
+                this.metadata,
                 this.query,
                 this.createdAfter,
                 this.createdBefore,
@@ -341,6 +383,8 @@ public final class ListMembersRequest {
 
         private Optional<List<String>> promoCodeIds = Optional.empty();
 
+        private Optional<List<String>> buyerAccountIds = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Optional<ListMembersRequestAccessLevel> accessLevel = Optional.empty();
@@ -348,6 +392,10 @@ public final class ListMembersRequest {
         private Optional<ListMembersRequestStatus> status = Optional.empty();
 
         private Optional<ListMembersRequestMembershipStatus> membershipStatus = Optional.empty();
+
+        private Optional<String> affiliateId = Optional.empty();
+
+        private Optional<String> metadata = Optional.empty();
 
         private Optional<String> query = Optional.empty();
 
@@ -379,10 +427,13 @@ public final class ListMembersRequest {
             productIds(other.getProductIds());
             variantIds(other.getVariantIds());
             promoCodeIds(other.getPromoCodeIds());
+            buyerAccountIds(other.getBuyerAccountIds());
             accountId(other.getAccountId());
             accessLevel(other.getAccessLevel());
             status(other.getStatus());
             membershipStatus(other.getMembershipStatus());
+            affiliateId(other.getAffiliateId());
+            metadata(other.getMetadata());
             query(other.getQuery());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
@@ -492,6 +543,25 @@ public final class ListMembersRequest {
         }
 
         /**
+         * <p>Only return members bought by these accounts, prefixed <code>biz_</code>. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "buyer_account_ids", nulls = Nulls.SKIP)
+        public Builder buyerAccountIds(Optional<List<String>> buyerAccountIds) {
+            this.buyerAccountIds = buyerAccountIds;
+            return this;
+        }
+
+        public Builder buyerAccountIds(List<String> buyerAccountIds) {
+            this.buyerAccountIds = Optional.ofNullable(buyerAccountIds);
+            return this;
+        }
+
+        public Builder buyerAccountIds(String buyerAccountIds) {
+            this.buyerAccountIds = Optional.of(Collections.singletonList(buyerAccountIds));
+            return this;
+        }
+
+        /**
          * <p>The account to list members for (<code>biz_</code> tag). Defaults to the account the credential acts as.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -548,6 +618,34 @@ public final class ListMembersRequest {
         }
 
         /**
+         * <p>Only return members this affiliate referred, prefixed <code>aff_</code>. Requires <code>affiliate:basic:read</code> and sorts by <code>created_at</code> only. Unknown IDs match nothing.</p>
+         */
+        @JsonSetter(value = "affiliate_id", nulls = Nulls.SKIP)
+        public Builder affiliateId(Optional<String> affiliateId) {
+            this.affiliateId = affiliateId;
+            return this;
+        }
+
+        public Builder affiliateId(String affiliateId) {
+            this.affiliateId = Optional.ofNullable(affiliateId);
+            return this;
+        }
+
+        /**
+         * <p>JSON-encoded object of key and value pairs. Only returns members whose own metadata holds every pair with exactly that value, for example <code>{&quot;utm_source&quot;:&quot;twitter&quot;}</code>. Takes up to 5 keys. Only the account's newest 50,000 members are searched, and a search that takes over 5 seconds returns a 400. Stored numbers and true or false values match their text. Nested query keys such as <code>metadata[utm_source]=twitter</code> also work.</p>
+         */
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public Builder metadata(Optional<String> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        public Builder metadata(String metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        /**
          * <p>Search members by name or username. An exact email address also matches when the credential holds the member:email:read scope.</p>
          */
         @JsonSetter(value = "query", nulls = Nulls.SKIP)
@@ -590,7 +688,7 @@ public final class ListMembersRequest {
         }
 
         /**
-         * <p>Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending.</p>
+         * <p>Sort field. <code>most_recent_action_at</code> and <code>last_activity_at</code> place members without one first when ascending and last when descending. <code>needs_reply</code> lists customers awaiting a support reply first, ordered by their latest qualifying message. Other members follow in last-activity order. Direction applies within each group. Requires <code>support_chat:read</code>.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListMembersRequestOrder> order) {
@@ -694,10 +792,13 @@ public final class ListMembersRequest {
                     productIds,
                     variantIds,
                     promoCodeIds,
+                    buyerAccountIds,
                     accountId,
                     accessLevel,
                     status,
                     membershipStatus,
+                    affiliateId,
+                    metadata,
                     query,
                     createdAfter,
                     createdBefore,
@@ -718,10 +819,13 @@ public final class ListMembersRequest {
                     || key.equalsIgnoreCase("product_ids")
                     || key.equalsIgnoreCase("variant_ids")
                     || key.equalsIgnoreCase("promo_code_ids")
+                    || key.equalsIgnoreCase("buyer_account_ids")
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("access_level")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("membership_status")
+                    || key.equalsIgnoreCase("affiliate_id")
+                    || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("query")
                     || key.equalsIgnoreCase("created_after")
                     || key.equalsIgnoreCase("created_before")

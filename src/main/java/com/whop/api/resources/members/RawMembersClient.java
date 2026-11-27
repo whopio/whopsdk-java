@@ -91,6 +91,14 @@ public class RawMembersClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "membership_status", request.getMembershipStatus().get(), false);
         }
+        if (request.getAffiliateId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "affiliate_id", request.getAffiliateId().get(), false);
+        }
+        if (request.getMetadata().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "metadata", request.getMetadata().get(), false);
+        }
         if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "query", request.getQuery().get(), false);
@@ -156,6 +164,10 @@ public class RawMembersClient {
         if (request.getPromoCodeIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "promo_code_ids", request.getPromoCodeIds().get(), true);
+        }
+        if (request.getBuyerAccountIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "buyer_account_ids", request.getBuyerAccountIds().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {

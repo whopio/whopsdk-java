@@ -44,7 +44,7 @@ public final class UpdateCardsRequestCardholder {
     }
 
     /**
-     * @return Email address for the invited cardholder.
+     * @return Email address for the cardholder.
      */
     @JsonProperty("email")
     public Optional<String> getEmail() {
@@ -52,7 +52,7 @@ public final class UpdateCardsRequestCardholder {
     }
 
     /**
-     * @return Legal first name of the invited cardholder.
+     * @return Legal first name of the invited cardholder. Only accepted on an invited card.
      */
     @JsonProperty("first_name")
     public Optional<String> getFirstName() {
@@ -60,7 +60,7 @@ public final class UpdateCardsRequestCardholder {
     }
 
     /**
-     * @return Legal last name of the invited cardholder.
+     * @return Legal last name of the invited cardholder. Only accepted on an invited card.
      */
     @JsonProperty("last_name")
     public Optional<String> getLastName() {
@@ -68,7 +68,7 @@ public final class UpdateCardsRequestCardholder {
     }
 
     /**
-     * @return Phone number for the invited cardholder.
+     * @return Phone number for the cardholder, in international format with the country code (for example <code>+14155550100</code>).
      */
     @JsonProperty("phone")
     public Optional<String> getPhone() {
@@ -130,7 +130,7 @@ public final class UpdateCardsRequestCardholder {
         }
 
         /**
-         * <p>Email address for the invited cardholder.</p>
+         * <p>Email address for the cardholder.</p>
          */
         @JsonSetter(value = "email", nulls = Nulls.SKIP)
         public Builder email(Optional<String> email) {
@@ -144,7 +144,7 @@ public final class UpdateCardsRequestCardholder {
         }
 
         /**
-         * <p>Legal first name of the invited cardholder.</p>
+         * <p>Legal first name of the invited cardholder. Only accepted on an invited card.</p>
          */
         @JsonSetter(value = "first_name", nulls = Nulls.SKIP)
         public Builder firstName(Optional<String> firstName) {
@@ -158,7 +158,7 @@ public final class UpdateCardsRequestCardholder {
         }
 
         /**
-         * <p>Legal last name of the invited cardholder.</p>
+         * <p>Legal last name of the invited cardholder. Only accepted on an invited card.</p>
          */
         @JsonSetter(value = "last_name", nulls = Nulls.SKIP)
         public Builder lastName(Optional<String> lastName) {
@@ -172,7 +172,7 @@ public final class UpdateCardsRequestCardholder {
         }
 
         /**
-         * <p>Phone number for the invited cardholder.</p>
+         * <p>Phone number for the cardholder, in international format with the country code (for example <code>+14155550100</code>).</p>
          */
         @JsonSetter(value = "phone", nulls = Nulls.SKIP)
         public Builder phone(Optional<String> phone) {

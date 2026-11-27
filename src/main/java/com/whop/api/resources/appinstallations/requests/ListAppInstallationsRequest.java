@@ -35,6 +35,8 @@ public final class ListAppInstallationsRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<Boolean> requestingReauthorization;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -42,6 +44,8 @@ public final class ListAppInstallationsRequest {
     private final Optional<Integer> last;
 
     private final Optional<String> before;
+
+    private final Optional<Boolean> includeTotalCount;
 
     private final Optional<ListAppInstallationsRequestOrder> order;
 
@@ -56,10 +60,12 @@ public final class ListAppInstallationsRequest {
             Optional<String> externalId,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<Boolean> requestingReauthorization,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
             Optional<String> before,
+            Optional<Boolean> includeTotalCount,
             Optional<ListAppInstallationsRequestOrder> order,
             Optional<ListAppInstallationsRequestDirection> direction,
             Map<String, Object> additionalProperties) {
@@ -69,10 +75,12 @@ public final class ListAppInstallationsRequest {
         this.externalId = externalId;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.requestingReauthorization = requestingReauthorization;
         this.first = first;
         this.after = after;
         this.last = last;
         this.before = before;
+        this.includeTotalCount = includeTotalCount;
         this.order = order;
         this.direction = direction;
         this.additionalProperties = additionalProperties;
@@ -127,6 +135,14 @@ public final class ListAppInstallationsRequest {
     }
 
     /**
+     * @return When <code>true</code>, only return installations whose app asks for permissions the account hasn't approved yet. When <code>false</code>, only return the others.
+     */
+    @JsonProperty("requesting_reauthorization")
+    public Optional<Boolean> getRequestingReauthorization() {
+        return requestingReauthorization;
+    }
+
+    /**
      * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
@@ -156,6 +172,14 @@ public final class ListAppInstallationsRequest {
     @JsonProperty("before")
     public Optional<String> getBefore() {
         return before;
+    }
+
+    /**
+     * @return Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.
+     */
+    @JsonProperty("include_total_count")
+    public Optional<Boolean> getIncludeTotalCount() {
+        return includeTotalCount;
     }
 
     /**
@@ -192,10 +216,12 @@ public final class ListAppInstallationsRequest {
                 && externalId.equals(other.externalId)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
+                && requestingReauthorization.equals(other.requestingReauthorization)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
                 && before.equals(other.before)
+                && includeTotalCount.equals(other.includeTotalCount)
                 && order.equals(other.order)
                 && direction.equals(other.direction);
     }
@@ -209,10 +235,12 @@ public final class ListAppInstallationsRequest {
                 this.externalId,
                 this.createdBefore,
                 this.createdAfter,
+                this.requestingReauthorization,
                 this.first,
                 this.after,
                 this.last,
                 this.before,
+                this.includeTotalCount,
                 this.order,
                 this.direction);
     }
@@ -240,6 +268,8 @@ public final class ListAppInstallationsRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
+        private Optional<Boolean> requestingReauthorization = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
@@ -247,6 +277,8 @@ public final class ListAppInstallationsRequest {
         private Optional<Integer> last = Optional.empty();
 
         private Optional<String> before = Optional.empty();
+
+        private Optional<Boolean> includeTotalCount = Optional.empty();
 
         private Optional<ListAppInstallationsRequestOrder> order = Optional.empty();
 
@@ -263,10 +295,12 @@ public final class ListAppInstallationsRequest {
             externalId(other.getExternalId());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            requestingReauthorization(other.getRequestingReauthorization());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
             before(other.getBefore());
+            includeTotalCount(other.getIncludeTotalCount());
             order(other.getOrder());
             direction(other.getDirection());
             return this;
@@ -357,6 +391,20 @@ public final class ListAppInstallationsRequest {
         }
 
         /**
+         * <p>When <code>true</code>, only return installations whose app asks for permissions the account hasn't approved yet. When <code>false</code>, only return the others.</p>
+         */
+        @JsonSetter(value = "requesting_reauthorization", nulls = Nulls.SKIP)
+        public Builder requestingReauthorization(Optional<Boolean> requestingReauthorization) {
+            this.requestingReauthorization = requestingReauthorization;
+            return this;
+        }
+
+        public Builder requestingReauthorization(Boolean requestingReauthorization) {
+            this.requestingReauthorization = Optional.ofNullable(requestingReauthorization);
+            return this;
+        }
+
+        /**
          * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -413,6 +461,20 @@ public final class ListAppInstallationsRequest {
         }
 
         /**
+         * <p>Set to <code>true</code> to return the number of matching results in <code>page_info.total_count</code>. Send <code>first=0</code> as well to return the count without any results.</p>
+         */
+        @JsonSetter(value = "include_total_count", nulls = Nulls.SKIP)
+        public Builder includeTotalCount(Optional<Boolean> includeTotalCount) {
+            this.includeTotalCount = includeTotalCount;
+            return this;
+        }
+
+        public Builder includeTotalCount(Boolean includeTotalCount) {
+            this.includeTotalCount = Optional.ofNullable(includeTotalCount);
+            return this;
+        }
+
+        /**
          * <p>Field to sort installations by. <code>name</code> sorts by app name, and only when listing the apps installed on one account.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
@@ -448,10 +510,12 @@ public final class ListAppInstallationsRequest {
                     externalId,
                     createdBefore,
                     createdAfter,
+                    requestingReauthorization,
                     first,
                     after,
                     last,
                     before,
+                    includeTotalCount,
                     order,
                     direction,
                     additionalProperties);
@@ -465,10 +529,12 @@ public final class ListAppInstallationsRequest {
                     || key.equalsIgnoreCase("external_id")
                     || key.equalsIgnoreCase("created_before")
                     || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("requesting_reauthorization")
                     || key.equalsIgnoreCase("first")
                     || key.equalsIgnoreCase("after")
                     || key.equalsIgnoreCase("last")
                     || key.equalsIgnoreCase("before")
+                    || key.equalsIgnoreCase("include_total_count")
                     || key.equalsIgnoreCase("order")
                     || key.equalsIgnoreCase("direction")) {
                 return;

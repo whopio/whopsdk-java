@@ -13,6 +13,9 @@ public final class PartnerReferralRequestRequestType {
     public static final PartnerReferralRequestRequestType LINK =
             new PartnerReferralRequestRequestType(Value.LINK, "link");
 
+    public static final PartnerReferralRequestRequestType LEAD =
+            new PartnerReferralRequestRequestType(Value.LEAD, "lead");
+
     public static final PartnerReferralRequestRequestType MANUAL =
             new PartnerReferralRequestRequestType(Value.MANUAL, "manual");
 
@@ -53,6 +56,8 @@ public final class PartnerReferralRequestRequestType {
                 return visitor.visitOwnershipTransfer();
             case LINK:
                 return visitor.visitLink();
+            case LEAD:
+                return visitor.visitLead();
             case MANUAL:
                 return visitor.visitManual();
             case UNKNOWN:
@@ -68,6 +73,8 @@ public final class PartnerReferralRequestRequestType {
                 return OWNERSHIP_TRANSFER;
             case "link":
                 return LINK;
+            case "lead":
+                return LEAD;
             case "manual":
                 return MANUAL;
             default:
@@ -82,6 +89,8 @@ public final class PartnerReferralRequestRequestType {
 
         LINK,
 
+        LEAD,
+
         UNKNOWN
     }
 
@@ -91,6 +100,8 @@ public final class PartnerReferralRequestRequestType {
         T visitOwnershipTransfer();
 
         T visitLink();
+
+        T visitLead();
 
         T visitUnknown(String unknownType);
     }

@@ -10,6 +10,9 @@ public final class UpdateDomainsRequestTransferDestination {
     public static final UpdateDomainsRequestTransferDestination INTERNAL =
             new UpdateDomainsRequestTransferDestination(Value.INTERNAL, "internal");
 
+    public static final UpdateDomainsRequestTransferDestination EXTERNAL =
+            new UpdateDomainsRequestTransferDestination(Value.EXTERNAL, "external");
+
     private final Value value;
 
     private final String string;
@@ -45,6 +48,8 @@ public final class UpdateDomainsRequestTransferDestination {
         switch (value) {
             case INTERNAL:
                 return visitor.visitInternal();
+            case EXTERNAL:
+                return visitor.visitExternal();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -56,6 +61,8 @@ public final class UpdateDomainsRequestTransferDestination {
         switch (value) {
             case "internal":
                 return INTERNAL;
+            case "external":
+                return EXTERNAL;
             default:
                 return new UpdateDomainsRequestTransferDestination(Value.UNKNOWN, value);
         }
@@ -64,11 +71,15 @@ public final class UpdateDomainsRequestTransferDestination {
     public enum Value {
         INTERNAL,
 
+        EXTERNAL,
+
         UNKNOWN
     }
 
     public interface Visitor<T> {
         T visitInternal();
+
+        T visitExternal();
 
         T visitUnknown(String unknownType);
     }

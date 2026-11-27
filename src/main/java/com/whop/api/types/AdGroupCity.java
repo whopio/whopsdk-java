@@ -34,7 +34,7 @@ public final class AdGroupCity {
     }
 
     /**
-     * @return The city's key in the location taxonomy.
+     * @return The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -42,7 +42,7 @@ public final class AdGroupCity {
     }
 
     /**
-     * @return City name, such as <code>Austin</code>. Absent when the location taxonomy has none.
+     * @return City name, such as <code>Austin</code>. Absent when the ad group stores none.
      */
     @JsonProperty("name")
     public Optional<String> getName() {
@@ -80,7 +80,7 @@ public final class AdGroupCity {
 
     public interface KeyStage {
         /**
-         * <p>The city's key in the location taxonomy.</p>
+         * <p>The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -95,7 +95,7 @@ public final class AdGroupCity {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the ad group stores none.</p>
          */
         _FinalStage name(Optional<String> name);
 
@@ -120,7 +120,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>The city's key in the location taxonomy.</p>
+         * <p>The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -131,7 +131,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the ad group stores none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -141,7 +141,7 @@ public final class AdGroupCity {
         }
 
         /**
-         * <p>City name, such as <code>Austin</code>. Absent when the location taxonomy has none.</p>
+         * <p>City name, such as <code>Austin</code>. Absent when the ad group stores none.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "name", nulls = Nulls.SKIP)

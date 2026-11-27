@@ -34,7 +34,7 @@ public final class RetrieveCardsRequest {
     }
 
     /**
-     * @return The owning account ID (a biz_ identifier). Provide this or user_id.
+     * @return The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.
      */
     @JsonProperty("account_id")
     public Optional<String> getAccountId() {
@@ -95,7 +95,7 @@ public final class RetrieveCardsRequest {
         }
 
         /**
-         * <p>The owning account ID (a biz_ identifier). Provide this or user_id.</p>
+         * <p>The owning account ID: a biz_ identifier for a business, or a user_ identifier for a personal account. Provide this or user_id.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {

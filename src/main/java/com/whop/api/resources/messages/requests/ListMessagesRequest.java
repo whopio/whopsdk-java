@@ -31,6 +31,8 @@ public final class ListMessagesRequest {
 
     private final Optional<Boolean> includeDeleted;
 
+    private final Optional<Boolean> includeReplyingToMessage;
+
     private final Optional<String> createdAfter;
 
     private final Optional<String> createdBefore;
@@ -64,6 +66,7 @@ public final class ListMessagesRequest {
             Optional<String> replyingToMessageId,
             Optional<Boolean> pinned,
             Optional<Boolean> includeDeleted,
+            Optional<Boolean> includeReplyingToMessage,
             Optional<String> createdAfter,
             Optional<String> createdBefore,
             Optional<String> updatedAfter,
@@ -82,6 +85,7 @@ public final class ListMessagesRequest {
         this.replyingToMessageId = replyingToMessageId;
         this.pinned = pinned;
         this.includeDeleted = includeDeleted;
+        this.includeReplyingToMessage = includeReplyingToMessage;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
         this.updatedAfter = updatedAfter;
@@ -128,6 +132,14 @@ public final class ListMessagesRequest {
     @JsonProperty("include_deleted")
     public Optional<Boolean> getIncludeDeleted() {
         return includeDeleted;
+    }
+
+    /**
+     * @return Include the full replied-to message. Nested replies are not included.
+     */
+    @JsonProperty("include_replying_to_message")
+    public Optional<Boolean> getIncludeReplyingToMessage() {
+        return includeReplyingToMessage;
     }
 
     /**
@@ -250,6 +262,7 @@ public final class ListMessagesRequest {
                 && replyingToMessageId.equals(other.replyingToMessageId)
                 && pinned.equals(other.pinned)
                 && includeDeleted.equals(other.includeDeleted)
+                && includeReplyingToMessage.equals(other.includeReplyingToMessage)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
                 && updatedAfter.equals(other.updatedAfter)
@@ -272,6 +285,7 @@ public final class ListMessagesRequest {
                 this.replyingToMessageId,
                 this.pinned,
                 this.includeDeleted,
+                this.includeReplyingToMessage,
                 this.createdAfter,
                 this.createdBefore,
                 this.updatedAfter,
@@ -332,6 +346,13 @@ public final class ListMessagesRequest {
         _FinalStage includeDeleted(Optional<Boolean> includeDeleted);
 
         _FinalStage includeDeleted(Boolean includeDeleted);
+
+        /**
+         * <p>Include the full replied-to message. Nested replies are not included.</p>
+         */
+        _FinalStage includeReplyingToMessage(Optional<Boolean> includeReplyingToMessage);
+
+        _FinalStage includeReplyingToMessage(Boolean includeReplyingToMessage);
 
         /**
          * <p>Return messages created strictly after this ISO 8601 timestamp.</p>
@@ -455,6 +476,8 @@ public final class ListMessagesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
+        private Optional<Boolean> includeReplyingToMessage = Optional.empty();
+
         private Optional<Boolean> includeDeleted = Optional.empty();
 
         private Optional<Boolean> pinned = Optional.empty();
@@ -471,6 +494,7 @@ public final class ListMessagesRequest {
             replyingToMessageId(other.getReplyingToMessageId());
             pinned(other.getPinned());
             includeDeleted(other.getIncludeDeleted());
+            includeReplyingToMessage(other.getIncludeReplyingToMessage());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
             updatedAfter(other.getUpdatedAfter());
@@ -759,6 +783,26 @@ public final class ListMessagesRequest {
         }
 
         /**
+         * <p>Include the full replied-to message. Nested replies are not included.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage includeReplyingToMessage(Boolean includeReplyingToMessage) {
+            this.includeReplyingToMessage = Optional.ofNullable(includeReplyingToMessage);
+            return this;
+        }
+
+        /**
+         * <p>Include the full replied-to message. Nested replies are not included.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "include_replying_to_message", nulls = Nulls.SKIP)
+        public _FinalStage includeReplyingToMessage(Optional<Boolean> includeReplyingToMessage) {
+            this.includeReplyingToMessage = includeReplyingToMessage;
+            return this;
+        }
+
+        /**
          * <p>Include redacted deletion entries for cache synchronization.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -825,6 +869,7 @@ public final class ListMessagesRequest {
                     replyingToMessageId,
                     pinned,
                     includeDeleted,
+                    includeReplyingToMessage,
                     createdAfter,
                     createdBefore,
                     updatedAfter,
@@ -847,6 +892,7 @@ public final class ListMessagesRequest {
                     || key.equalsIgnoreCase("replying_to_message_id")
                     || key.equalsIgnoreCase("pinned")
                     || key.equalsIgnoreCase("include_deleted")
+                    || key.equalsIgnoreCase("include_replying_to_message")
                     || key.equalsIgnoreCase("created_after")
                     || key.equalsIgnoreCase("created_before")
                     || key.equalsIgnoreCase("updated_after")

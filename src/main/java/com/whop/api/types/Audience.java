@@ -15,9 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,13 +42,9 @@ public final class Audience {
 
     private final Optional<Double> lookalikeStartingRatio;
 
-    private final List<AudienceMatchRate> matchRates;
-
     private final double matchedRows;
 
     private final String name;
-
-    private final List<String> platformAudienceIds;
 
     private final double processedRows;
 
@@ -78,10 +72,8 @@ public final class Audience {
             Optional<String> lastRefreshedAt,
             Optional<Double> lookalikeRatio,
             Optional<Double> lookalikeStartingRatio,
-            List<AudienceMatchRate> matchRates,
             double matchedRows,
             String name,
-            List<String> platformAudienceIds,
             double processedRows,
             double progressPercent,
             Optional<String> sourceAudienceId,
@@ -99,10 +91,8 @@ public final class Audience {
         this.lastRefreshedAt = lastRefreshedAt;
         this.lookalikeRatio = lookalikeRatio;
         this.lookalikeStartingRatio = lookalikeStartingRatio;
-        this.matchRates = matchRates;
         this.matchedRows = matchedRows;
         this.name = name;
-        this.platformAudienceIds = platformAudienceIds;
         this.processedRows = processedRows;
         this.progressPercent = progressPercent;
         this.sourceAudienceId = sourceAudienceId;
@@ -200,13 +190,8 @@ public final class Audience {
         return lookalikeStartingRatio;
     }
 
-    @JsonProperty("match_rates")
-    public List<AudienceMatchRate> getMatchRates() {
-        return matchRates;
-    }
-
     /**
-     * @return Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.
+     * @return Members Whop can target with ads. Always 0 for lookalikes and engagement audiences.
      */
     @JsonProperty("matched_rows")
     public double getMatchedRows() {
@@ -219,11 +204,6 @@ public final class Audience {
     @JsonProperty("name")
     public String getName() {
         return name;
-    }
-
-    @JsonProperty("platform_audience_ids")
-    public List<String> getPlatformAudienceIds() {
-        return platformAudienceIds;
     }
 
     /**
@@ -262,7 +242,7 @@ public final class Audience {
     }
 
     /**
-     * @return Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.
+     * @return Processing state. When the audience is <code>pending</code>, <code>partial</code>, or <code>failed</code>, <code>error_message</code> says why.
      */
     @JsonProperty("status")
     public AudienceStatus getStatus() {
@@ -270,7 +250,7 @@ public final class Audience {
     }
 
     /**
-     * @return Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.
+     * @return Members found in the source: CSV rows for an uploaded list, or matching people for a People audience. Always 0 for lookalikes and engagement audiences.
      */
     @JsonProperty("total_rows")
     public double getTotalRows() {
@@ -342,10 +322,8 @@ public final class Audience {
                 && lastRefreshedAt.equals(other.lastRefreshedAt)
                 && lookalikeRatio.equals(other.lookalikeRatio)
                 && lookalikeStartingRatio.equals(other.lookalikeStartingRatio)
-                && matchRates.equals(other.matchRates)
                 && matchedRows == other.matchedRows
                 && name.equals(other.name)
-                && platformAudienceIds.equals(other.platformAudienceIds)
                 && processedRows == other.processedRows
                 && progressPercent == other.progressPercent
                 && sourceAudienceId.equals(other.sourceAudienceId)
@@ -367,10 +345,8 @@ public final class Audience {
                 this.lastRefreshedAt,
                 this.lookalikeRatio,
                 this.lookalikeStartingRatio,
-                this.matchRates,
                 this.matchedRows,
                 this.name,
-                this.platformAudienceIds,
                 this.processedRows,
                 this.progressPercent,
                 this.sourceAudienceId,
@@ -421,7 +397,7 @@ public final class Audience {
 
     public interface MatchedRowsStage {
         /**
-         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.</p>
+         * <p>Members Whop can target with ads. Always 0 for lookalikes and engagement audiences.</p>
          */
         NameStage matchedRows(double matchedRows);
     }
@@ -456,14 +432,14 @@ public final class Audience {
 
     public interface StatusStage {
         /**
-         * <p>Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
+         * <p>Processing state. When the audience is <code>pending</code>, <code>partial</code>, or <code>failed</code>, <code>error_message</code> says why.</p>
          */
         TotalRowsStage status(@NotNull AudienceStatus status);
     }
 
     public interface TotalRowsStage {
         /**
-         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.</p>
+         * <p>Members found in the source: CSV rows for an uploaded list, or matching people for a People audience. Always 0 for lookalikes and engagement audiences.</p>
          */
         UpdatedAtStage totalRows(double totalRows);
     }
@@ -527,18 +503,6 @@ public final class Audience {
 
         _FinalStage lookalikeStartingRatio(Nullable<Double> lookalikeStartingRatio);
 
-        _FinalStage matchRates(List<AudienceMatchRate> matchRates);
-
-        _FinalStage addMatchRates(AudienceMatchRate matchRates);
-
-        _FinalStage addAllMatchRates(List<AudienceMatchRate> matchRates);
-
-        _FinalStage platformAudienceIds(List<String> platformAudienceIds);
-
-        _FinalStage addPlatformAudienceIds(String platformAudienceIds);
-
-        _FinalStage addAllPlatformAudienceIds(List<String> platformAudienceIds);
-
         /**
          * <p>For lookalikes: the audience this lookalike was built from. <code>null</code> for custom audiences.</p>
          */
@@ -590,10 +554,6 @@ public final class Audience {
 
         private Optional<String> sourceAudienceId = Optional.empty();
 
-        private List<String> platformAudienceIds = new ArrayList<>();
-
-        private List<AudienceMatchRate> matchRates = new ArrayList<>();
-
         private Optional<Double> lookalikeStartingRatio = Optional.empty();
 
         private Optional<Double> lookalikeRatio = Optional.empty();
@@ -619,10 +579,8 @@ public final class Audience {
             lastRefreshedAt(other.getLastRefreshedAt());
             lookalikeRatio(other.getLookalikeRatio());
             lookalikeStartingRatio(other.getLookalikeStartingRatio());
-            matchRates(other.getMatchRates());
             matchedRows(other.getMatchedRows());
             name(other.getName());
-            platformAudienceIds(other.getPlatformAudienceIds());
             processedRows(other.getProcessedRows());
             progressPercent(other.getProgressPercent());
             sourceAudienceId(other.getSourceAudienceId());
@@ -678,7 +636,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Members successfully uploaded to connected ad accounts. Always 0 for lookalikes and engagement audiences.</p>
+         * <p>Members Whop can target with ads. Always 0 for lookalikes and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -733,7 +691,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Current state of audience creation. When a <code>pending</code> audience is waiting on something, such as an ad account to upload to, <code>error_message</code> says what. When status is <code>partial</code> or <code>failed</code>, <code>error_message</code> explains what went wrong.</p>
+         * <p>Processing state. When the audience is <code>pending</code>, <code>partial</code>, or <code>failed</code>, <code>error_message</code> says why.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -744,7 +702,7 @@ public final class Audience {
         }
 
         /**
-         * <p>Total members detected in the source — CSV rows for uploaded lists, matching people for automatic audiences. Always 0 for lookalikes and engagement audiences.</p>
+         * <p>Members found in the source: CSV rows for an uploaded list, or matching people for a People audience. Always 0 for lookalikes and engagement audiences.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -798,54 +756,6 @@ public final class Audience {
         @JsonSetter(value = "source_audience_id", nulls = Nulls.SKIP)
         public _FinalStage sourceAudienceId(Optional<String> sourceAudienceId) {
             this.sourceAudienceId = sourceAudienceId;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addAllPlatformAudienceIds(List<String> platformAudienceIds) {
-            if (platformAudienceIds != null) {
-                this.platformAudienceIds.addAll(platformAudienceIds);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addPlatformAudienceIds(String platformAudienceIds) {
-            this.platformAudienceIds.add(platformAudienceIds);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "platform_audience_ids", nulls = Nulls.SKIP)
-        public _FinalStage platformAudienceIds(List<String> platformAudienceIds) {
-            this.platformAudienceIds.clear();
-            if (platformAudienceIds != null) {
-                this.platformAudienceIds.addAll(platformAudienceIds);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addAllMatchRates(List<AudienceMatchRate> matchRates) {
-            if (matchRates != null) {
-                this.matchRates.addAll(matchRates);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addMatchRates(AudienceMatchRate matchRates) {
-            this.matchRates.add(matchRates);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "match_rates", nulls = Nulls.SKIP)
-        public _FinalStage matchRates(List<AudienceMatchRate> matchRates) {
-            this.matchRates.clear();
-            if (matchRates != null) {
-                this.matchRates.addAll(matchRates);
-            }
             return this;
         }
 
@@ -1041,10 +951,8 @@ public final class Audience {
                     lastRefreshedAt,
                     lookalikeRatio,
                     lookalikeStartingRatio,
-                    matchRates,
                     matchedRows,
                     name,
-                    platformAudienceIds,
                     processedRows,
                     progressPercent,
                     sourceAudienceId,
@@ -1066,10 +974,8 @@ public final class Audience {
                     || key.equalsIgnoreCase("last_refreshed_at")
                     || key.equalsIgnoreCase("lookalike_ratio")
                     || key.equalsIgnoreCase("lookalike_starting_ratio")
-                    || key.equalsIgnoreCase("match_rates")
                     || key.equalsIgnoreCase("matched_rows")
                     || key.equalsIgnoreCase("name")
-                    || key.equalsIgnoreCase("platform_audience_ids")
                     || key.equalsIgnoreCase("processed_rows")
                     || key.equalsIgnoreCase("progress_percent")
                     || key.equalsIgnoreCase("source_audience_id")

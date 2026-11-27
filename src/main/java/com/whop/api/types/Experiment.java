@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +41,9 @@ public final class Experiment {
 
     private final Optional<String> createdBy;
 
-    private final Optional<String> endedAt;
+    private final Optional<ExperimentDecisionMode> decisionMode;
 
-    private final Optional<Boolean> featureFlagOnly;
+    private final Optional<String> endedAt;
 
     private final Optional<String> findings;
 
@@ -51,6 +52,8 @@ public final class Experiment {
     private final Optional<String> hypothesis;
 
     private final String id;
+
+    private final Optional<ExperimentKind> kind;
 
     private final Optional<Map<String, String>> metadata;
 
@@ -62,9 +65,9 @@ public final class Experiment {
 
     private final ExperimentStatus status;
 
-    private final List<ExperimentTargetingRulesItem> targetingRules;
+    private final Optional<List<ExperimentStat>> targetStats;
 
-    private final Optional<String> updatedAt;
+    private final Optional<OffsetDateTime> updatedAt;
 
     private final List<ExperimentVariantsItem> variants;
 
@@ -80,19 +83,20 @@ public final class Experiment {
             ExperimentControl control,
             Optional<String> createdAt,
             Optional<String> createdBy,
+            Optional<ExperimentDecisionMode> decisionMode,
             Optional<String> endedAt,
-            Optional<Boolean> featureFlagOnly,
             Optional<String> findings,
             String flagKey,
             Optional<String> hypothesis,
             String id,
+            Optional<ExperimentKind> kind,
             Optional<Map<String, String>> metadata,
             String name,
             ExperimentResourceReference relatedResource,
             Optional<String> startedAt,
             ExperimentStatus status,
-            List<ExperimentTargetingRulesItem> targetingRules,
-            Optional<String> updatedAt,
+            Optional<List<ExperimentStat>> targetStats,
+            Optional<OffsetDateTime> updatedAt,
             List<ExperimentVariantsItem> variants,
             Optional<String> winningArm,
             Map<String, Object> additionalProperties) {
@@ -103,18 +107,19 @@ public final class Experiment {
         this.control = control;
         this.createdAt = createdAt;
         this.createdBy = createdBy;
+        this.decisionMode = decisionMode;
         this.endedAt = endedAt;
-        this.featureFlagOnly = featureFlagOnly;
         this.findings = findings;
         this.flagKey = flagKey;
         this.hypothesis = hypothesis;
         this.id = id;
+        this.kind = kind;
         this.metadata = metadata;
         this.name = name;
         this.relatedResource = relatedResource;
         this.startedAt = startedAt;
         this.status = status;
-        this.targetingRules = targetingRules;
+        this.targetStats = targetStats;
         this.updatedAt = updatedAt;
         this.variants = variants;
         this.winningArm = winningArm;
@@ -184,6 +189,17 @@ public final class Experiment {
     }
 
     /**
+     * @return How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. <code>null</code> leaves it to the owner.
+     */
+    @JsonIgnore
+    public Optional<ExperimentDecisionMode> getDecisionMode() {
+        if (decisionMode == null) {
+            return Optional.empty();
+        }
+        return decisionMode;
+    }
+
+    /**
      * @return When the experiment stopped collecting data, as an ISO 8601 timestamp. <code>null</code> while still running.
      */
     @JsonIgnore
@@ -192,17 +208,6 @@ public final class Experiment {
             return Optional.empty();
         }
         return endedAt;
-    }
-
-    /**
-     * @return <code>true</code> when this was created as a feature flag rather than a full experiment. Feature flags share the same evaluation API but do not collect metric results.
-     */
-    @JsonIgnore
-    public Optional<Boolean> getFeatureFlagOnly() {
-        if (featureFlagOnly == null) {
-            return Optional.empty();
-        }
-        return featureFlagOnly;
     }
 
     /**
@@ -241,6 +246,14 @@ public final class Experiment {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return The kind of experiment: <code>boolean</code> is a feature flag, <code>experiment</code> assigns its subjects to arms, <code>beforeafter</code> compares a change with the period before it.
+     */
+    @JsonProperty("kind")
+    public Optional<ExperimentKind> getKind() {
+        return kind;
     }
 
     /**
@@ -287,15 +300,18 @@ public final class Experiment {
     }
 
     /**
-     * @return Rules gating who is in the experiment at all. Conditions within a rule are AND-ed, rules are OR-ed, and <code>exclude</code> rules always win. Empty means everyone qualifies.
+     * @return The measures the experiment sets out to move, as the stats API reads them. <code>null</code> when there are none.
      */
-    @JsonProperty("targeting_rules")
-    public List<ExperimentTargetingRulesItem> getTargetingRules() {
-        return targetingRules;
+    @JsonIgnore
+    public Optional<List<ExperimentStat>> getTargetStats() {
+        if (targetStats == null) {
+            return Optional.empty();
+        }
+        return targetStats;
     }
 
     @JsonIgnore
-    public Optional<String> getUpdatedAt() {
+    public Optional<OffsetDateTime> getUpdatedAt() {
         if (updatedAt == null) {
             return Optional.empty();
         }
@@ -340,15 +356,15 @@ public final class Experiment {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("ended_at")
-    private Optional<String> _getEndedAt() {
-        return endedAt;
+    @JsonProperty("decision_mode")
+    private Optional<ExperimentDecisionMode> _getDecisionMode() {
+        return decisionMode;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("feature_flag_only")
-    private Optional<Boolean> _getFeatureFlagOnly() {
-        return featureFlagOnly;
+    @JsonProperty("ended_at")
+    private Optional<String> _getEndedAt() {
+        return endedAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -370,8 +386,14 @@ public final class Experiment {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("target_stats")
+    private Optional<List<ExperimentStat>> _getTargetStats() {
+        return targetStats;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("updated_at")
-    private Optional<String> _getUpdatedAt() {
+    private Optional<OffsetDateTime> _getUpdatedAt() {
         return updatedAt;
     }
 
@@ -400,18 +422,19 @@ public final class Experiment {
                 && control.equals(other.control)
                 && createdAt.equals(other.createdAt)
                 && createdBy.equals(other.createdBy)
+                && decisionMode.equals(other.decisionMode)
                 && endedAt.equals(other.endedAt)
-                && featureFlagOnly.equals(other.featureFlagOnly)
                 && findings.equals(other.findings)
                 && flagKey.equals(other.flagKey)
                 && hypothesis.equals(other.hypothesis)
                 && id.equals(other.id)
+                && kind.equals(other.kind)
                 && metadata.equals(other.metadata)
                 && name.equals(other.name)
                 && relatedResource.equals(other.relatedResource)
                 && startedAt.equals(other.startedAt)
                 && status.equals(other.status)
-                && targetingRules.equals(other.targetingRules)
+                && targetStats.equals(other.targetStats)
                 && updatedAt.equals(other.updatedAt)
                 && variants.equals(other.variants)
                 && winningArm.equals(other.winningArm);
@@ -427,18 +450,19 @@ public final class Experiment {
                 this.control,
                 this.createdAt,
                 this.createdBy,
+                this.decisionMode,
                 this.endedAt,
-                this.featureFlagOnly,
                 this.findings,
                 this.flagKey,
                 this.hypothesis,
                 this.id,
+                this.kind,
                 this.metadata,
                 this.name,
                 this.relatedResource,
                 this.startedAt,
                 this.status,
-                this.targetingRules,
+                this.targetStats,
                 this.updatedAt,
                 this.variants,
                 this.winningArm);
@@ -550,6 +574,15 @@ public final class Experiment {
         _FinalStage createdBy(Nullable<String> createdBy);
 
         /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. <code>null</code> leaves it to the owner.</p>
+         */
+        _FinalStage decisionMode(Optional<ExperimentDecisionMode> decisionMode);
+
+        _FinalStage decisionMode(ExperimentDecisionMode decisionMode);
+
+        _FinalStage decisionMode(Nullable<ExperimentDecisionMode> decisionMode);
+
+        /**
          * <p>When the experiment stopped collecting data, as an ISO 8601 timestamp. <code>null</code> while still running.</p>
          */
         _FinalStage endedAt(Optional<String> endedAt);
@@ -557,15 +590,6 @@ public final class Experiment {
         _FinalStage endedAt(String endedAt);
 
         _FinalStage endedAt(Nullable<String> endedAt);
-
-        /**
-         * <p><code>true</code> when this was created as a feature flag rather than a full experiment. Feature flags share the same evaluation API but do not collect metric results.</p>
-         */
-        _FinalStage featureFlagOnly(Optional<Boolean> featureFlagOnly);
-
-        _FinalStage featureFlagOnly(Boolean featureFlagOnly);
-
-        _FinalStage featureFlagOnly(Nullable<Boolean> featureFlagOnly);
 
         /**
          * <p>What was learned and why this outcome, recorded when the experiment was ended. <code>null</code> until then.</p>
@@ -586,6 +610,13 @@ public final class Experiment {
         _FinalStage hypothesis(Nullable<String> hypothesis);
 
         /**
+         * <p>The kind of experiment: <code>boolean</code> is a feature flag, <code>experiment</code> assigns its subjects to arms, <code>beforeafter</code> compares a change with the period before it.</p>
+         */
+        _FinalStage kind(Optional<ExperimentKind> kind);
+
+        _FinalStage kind(ExperimentKind kind);
+
+        /**
          * <p>Key-value pairs attached when the experiment was created. Empty when none were set.</p>
          */
         _FinalStage metadata(Optional<Map<String, String>> metadata);
@@ -602,19 +633,19 @@ public final class Experiment {
         _FinalStage startedAt(Nullable<String> startedAt);
 
         /**
-         * <p>Rules gating who is in the experiment at all. Conditions within a rule are AND-ed, rules are OR-ed, and <code>exclude</code> rules always win. Empty means everyone qualifies.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. <code>null</code> when there are none.</p>
          */
-        _FinalStage targetingRules(List<ExperimentTargetingRulesItem> targetingRules);
+        _FinalStage targetStats(Optional<List<ExperimentStat>> targetStats);
 
-        _FinalStage addTargetingRules(ExperimentTargetingRulesItem targetingRules);
+        _FinalStage targetStats(List<ExperimentStat> targetStats);
 
-        _FinalStage addAllTargetingRules(List<ExperimentTargetingRulesItem> targetingRules);
+        _FinalStage targetStats(Nullable<List<ExperimentStat>> targetStats);
 
-        _FinalStage updatedAt(Optional<String> updatedAt);
+        _FinalStage updatedAt(Optional<OffsetDateTime> updatedAt);
 
-        _FinalStage updatedAt(String updatedAt);
+        _FinalStage updatedAt(OffsetDateTime updatedAt);
 
-        _FinalStage updatedAt(Nullable<String> updatedAt);
+        _FinalStage updatedAt(Nullable<OffsetDateTime> updatedAt);
 
         /**
          * <p>Treatment arms. Users outside every arm's allocation form the implicit <code>control</code> group. Weights only ever grow and arms are never removed, so a user moves from control into a treatment at most once.</p>
@@ -669,21 +700,23 @@ public final class Experiment {
 
         private List<ExperimentVariantsItem> variants = new ArrayList<>();
 
-        private Optional<String> updatedAt = Optional.empty();
+        private Optional<OffsetDateTime> updatedAt = Optional.empty();
 
-        private List<ExperimentTargetingRulesItem> targetingRules = new ArrayList<>();
+        private Optional<List<ExperimentStat>> targetStats = Optional.empty();
 
         private Optional<String> startedAt = Optional.empty();
 
         private Optional<Map<String, String>> metadata = Optional.empty();
 
+        private Optional<ExperimentKind> kind = Optional.empty();
+
         private Optional<String> hypothesis = Optional.empty();
 
         private Optional<String> findings = Optional.empty();
 
-        private Optional<Boolean> featureFlagOnly = Optional.empty();
-
         private Optional<String> endedAt = Optional.empty();
+
+        private Optional<ExperimentDecisionMode> decisionMode = Optional.empty();
 
         private Optional<String> createdBy = Optional.empty();
 
@@ -704,18 +737,19 @@ public final class Experiment {
             control(other.getControl());
             createdAt(other.getCreatedAt());
             createdBy(other.getCreatedBy());
+            decisionMode(other.getDecisionMode());
             endedAt(other.getEndedAt());
-            featureFlagOnly(other.getFeatureFlagOnly());
             findings(other.getFindings());
             flagKey(other.getFlagKey());
             hypothesis(other.getHypothesis());
             id(other.getId());
+            kind(other.getKind());
             metadata(other.getMetadata());
             name(other.getName());
             relatedResource(other.getRelatedResource());
             startedAt(other.getStartedAt());
             status(other.getStatus());
-            targetingRules(other.getTargetingRules());
+            targetStats(other.getTargetStats());
             updatedAt(other.getUpdatedAt());
             variants(other.getVariants());
             winningArm(other.getWinningArm());
@@ -889,7 +923,7 @@ public final class Experiment {
         }
 
         @java.lang.Override
-        public _FinalStage updatedAt(Nullable<String> updatedAt) {
+        public _FinalStage updatedAt(Nullable<OffsetDateTime> updatedAt) {
             if (updatedAt.isNull()) {
                 this.updatedAt = null;
             } else if (updatedAt.isEmpty()) {
@@ -901,50 +935,51 @@ public final class Experiment {
         }
 
         @java.lang.Override
-        public _FinalStage updatedAt(String updatedAt) {
+        public _FinalStage updatedAt(OffsetDateTime updatedAt) {
             this.updatedAt = Optional.ofNullable(updatedAt);
             return this;
         }
 
         @java.lang.Override
         @JsonSetter(value = "updated_at", nulls = Nulls.SKIP)
-        public _FinalStage updatedAt(Optional<String> updatedAt) {
+        public _FinalStage updatedAt(Optional<OffsetDateTime> updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
 
         /**
-         * <p>Rules gating who is in the experiment at all. Conditions within a rule are AND-ed, rules are OR-ed, and <code>exclude</code> rules always win. Empty means everyone qualifies.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. <code>null</code> when there are none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage addAllTargetingRules(List<ExperimentTargetingRulesItem> targetingRules) {
-            if (targetingRules != null) {
-                this.targetingRules.addAll(targetingRules);
+        public _FinalStage targetStats(Nullable<List<ExperimentStat>> targetStats) {
+            if (targetStats.isNull()) {
+                this.targetStats = null;
+            } else if (targetStats.isEmpty()) {
+                this.targetStats = Optional.empty();
+            } else {
+                this.targetStats = Optional.of(targetStats.get());
             }
             return this;
         }
 
         /**
-         * <p>Rules gating who is in the experiment at all. Conditions within a rule are AND-ed, rules are OR-ed, and <code>exclude</code> rules always win. Empty means everyone qualifies.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. <code>null</code> when there are none.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage addTargetingRules(ExperimentTargetingRulesItem targetingRules) {
-            this.targetingRules.add(targetingRules);
+        public _FinalStage targetStats(List<ExperimentStat> targetStats) {
+            this.targetStats = Optional.ofNullable(targetStats);
             return this;
         }
 
         /**
-         * <p>Rules gating who is in the experiment at all. Conditions within a rule are AND-ed, rules are OR-ed, and <code>exclude</code> rules always win. Empty means everyone qualifies.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. <code>null</code> when there are none.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "targeting_rules", nulls = Nulls.SKIP)
-        public _FinalStage targetingRules(List<ExperimentTargetingRulesItem> targetingRules) {
-            this.targetingRules.clear();
-            if (targetingRules != null) {
-                this.targetingRules.addAll(targetingRules);
-            }
+        @JsonSetter(value = "target_stats", nulls = Nulls.SKIP)
+        public _FinalStage targetStats(Optional<List<ExperimentStat>> targetStats) {
+            this.targetStats = targetStats;
             return this;
         }
 
@@ -1001,6 +1036,26 @@ public final class Experiment {
         @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
         public _FinalStage metadata(Optional<Map<String, String>> metadata) {
             this.metadata = metadata;
+            return this;
+        }
+
+        /**
+         * <p>The kind of experiment: <code>boolean</code> is a feature flag, <code>experiment</code> assigns its subjects to arms, <code>beforeafter</code> compares a change with the period before it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage kind(ExperimentKind kind) {
+            this.kind = Optional.ofNullable(kind);
+            return this;
+        }
+
+        /**
+         * <p>The kind of experiment: <code>boolean</code> is a feature flag, <code>experiment</code> assigns its subjects to arms, <code>beforeafter</code> compares a change with the period before it.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "kind", nulls = Nulls.SKIP)
+        public _FinalStage kind(Optional<ExperimentKind> kind) {
+            this.kind = kind;
             return this;
         }
 
@@ -1077,42 +1132,6 @@ public final class Experiment {
         }
 
         /**
-         * <p><code>true</code> when this was created as a feature flag rather than a full experiment. Feature flags share the same evaluation API but do not collect metric results.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage featureFlagOnly(Nullable<Boolean> featureFlagOnly) {
-            if (featureFlagOnly.isNull()) {
-                this.featureFlagOnly = null;
-            } else if (featureFlagOnly.isEmpty()) {
-                this.featureFlagOnly = Optional.empty();
-            } else {
-                this.featureFlagOnly = Optional.of(featureFlagOnly.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p><code>true</code> when this was created as a feature flag rather than a full experiment. Feature flags share the same evaluation API but do not collect metric results.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage featureFlagOnly(Boolean featureFlagOnly) {
-            this.featureFlagOnly = Optional.ofNullable(featureFlagOnly);
-            return this;
-        }
-
-        /**
-         * <p><code>true</code> when this was created as a feature flag rather than a full experiment. Feature flags share the same evaluation API but do not collect metric results.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "feature_flag_only", nulls = Nulls.SKIP)
-        public _FinalStage featureFlagOnly(Optional<Boolean> featureFlagOnly) {
-            this.featureFlagOnly = featureFlagOnly;
-            return this;
-        }
-
-        /**
          * <p>When the experiment stopped collecting data, as an ISO 8601 timestamp. <code>null</code> while still running.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1145,6 +1164,42 @@ public final class Experiment {
         @JsonSetter(value = "ended_at", nulls = Nulls.SKIP)
         public _FinalStage endedAt(Optional<String> endedAt) {
             this.endedAt = endedAt;
+            return this;
+        }
+
+        /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. <code>null</code> leaves it to the owner.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage decisionMode(Nullable<ExperimentDecisionMode> decisionMode) {
+            if (decisionMode.isNull()) {
+                this.decisionMode = null;
+            } else if (decisionMode.isEmpty()) {
+                this.decisionMode = Optional.empty();
+            } else {
+                this.decisionMode = Optional.of(decisionMode.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. <code>null</code> leaves it to the owner.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage decisionMode(ExperimentDecisionMode decisionMode) {
+            this.decisionMode = Optional.ofNullable(decisionMode);
+            return this;
+        }
+
+        /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. <code>null</code> leaves it to the owner.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "decision_mode", nulls = Nulls.SKIP)
+        public _FinalStage decisionMode(Optional<ExperimentDecisionMode> decisionMode) {
+            this.decisionMode = decisionMode;
             return this;
         }
 
@@ -1266,18 +1321,19 @@ public final class Experiment {
                     control,
                     createdAt,
                     createdBy,
+                    decisionMode,
                     endedAt,
-                    featureFlagOnly,
                     findings,
                     flagKey,
                     hypothesis,
                     id,
+                    kind,
                     metadata,
                     name,
                     relatedResource,
                     startedAt,
                     status,
-                    targetingRules,
+                    targetStats,
                     updatedAt,
                     variants,
                     winningArm,
@@ -1293,18 +1349,19 @@ public final class Experiment {
                     || key.equalsIgnoreCase("control")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("created_by")
+                    || key.equalsIgnoreCase("decision_mode")
                     || key.equalsIgnoreCase("ended_at")
-                    || key.equalsIgnoreCase("feature_flag_only")
                     || key.equalsIgnoreCase("findings")
                     || key.equalsIgnoreCase("flag_key")
                     || key.equalsIgnoreCase("hypothesis")
                     || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("kind")
                     || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("related_resource")
                     || key.equalsIgnoreCase("started_at")
                     || key.equalsIgnoreCase("status")
-                    || key.equalsIgnoreCase("targeting_rules")
+                    || key.equalsIgnoreCase("target_stats")
                     || key.equalsIgnoreCase("updated_at")
                     || key.equalsIgnoreCase("variants")
                     || key.equalsIgnoreCase("winning_arm")) {

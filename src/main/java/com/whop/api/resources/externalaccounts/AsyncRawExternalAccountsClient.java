@@ -21,7 +21,6 @@ import com.whop.api.errors.ConflictError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.NotFoundError;
 import com.whop.api.errors.ServiceUnavailableError;
-import com.whop.api.errors.TooManyRequestsError;
 import com.whop.api.errors.UnauthorizedError;
 import com.whop.api.resources.externalaccounts.requests.ConnectExternalAccountsRequest;
 import com.whop.api.resources.externalaccounts.requests.DeleteExternalAccountsRequest;
@@ -596,21 +595,21 @@ public class AsyncRawExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<WhopApiHttpResponse<ExternalAccount>> refresh(String id) {
         return refresh(id, RefreshExternalAccountsRequest.builder().build());
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<WhopApiHttpResponse<ExternalAccount>> refresh(String id, RequestOptions requestOptions) {
         return refresh(id, RefreshExternalAccountsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<WhopApiHttpResponse<ExternalAccount>> refresh(
             String id, RefreshExternalAccountsRequest request) {
@@ -618,7 +617,7 @@ public class AsyncRawExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<WhopApiHttpResponse<ExternalAccount>> refresh(
             String id, RefreshExternalAccountsRequest request, RequestOptions requestOptions) {
@@ -676,11 +675,6 @@ public class AsyncRawExternalAccountsClient {
                     }
                     try {
                         switch (response.code()) {
-                            case 400:
-                                future.completeExceptionally(new BadRequestError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
                             case 401:
                                 future.completeExceptionally(new UnauthorizedError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
@@ -698,11 +692,6 @@ public class AsyncRawExternalAccountsClient {
                                 return;
                             case 409:
                                 future.completeExceptionally(new ConflictError(
-                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
-                                        response));
-                                return;
-                            case 429:
-                                future.completeExceptionally(new TooManyRequestsError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;

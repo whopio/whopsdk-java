@@ -15,9 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,27 +24,15 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = EconomicIntelligence.Builder.class)
 public final class EconomicIntelligence {
-    private final Optional<String> accountId;
-
-    private final Optional<String> acknowledgedAt;
+    private final String accountId;
 
     private final Optional<String> actionType;
 
-    private final Optional<String> aiChatId;
-
-    private final Optional<String> createdAt;
+    private final String createdAt;
 
     private final Optional<String> executedAt;
 
-    private final Optional<List<EconomicIntelligenceOperation>> expectedToolCalls;
-
     private final String id;
-
-    private final Optional<String> input;
-
-    private final List<EconomicIntelligenceInput> inputs;
-
-    private final Optional<String> prompt;
 
     private final Optional<String> reasoning;
 
@@ -58,89 +44,51 @@ public final class EconomicIntelligence {
 
     private final Optional<String> runStartedAt;
 
-    private final Optional<EconomicIntelligenceSentiment> sentiment;
-
     private final EconomicIntelligenceStatus status;
 
     private final Optional<String> supersededAt;
 
-    private final Optional<String> targetUrl;
-
     private final Optional<String> title;
-
-    private final Optional<String> userFeedback;
 
     private final Map<String, Object> additionalProperties;
 
     private EconomicIntelligence(
-            Optional<String> accountId,
-            Optional<String> acknowledgedAt,
+            String accountId,
             Optional<String> actionType,
-            Optional<String> aiChatId,
-            Optional<String> createdAt,
+            String createdAt,
             Optional<String> executedAt,
-            Optional<List<EconomicIntelligenceOperation>> expectedToolCalls,
             String id,
-            Optional<String> input,
-            List<EconomicIntelligenceInput> inputs,
-            Optional<String> prompt,
             Optional<String> reasoning,
             Optional<String> resultUrl,
             Optional<String> runByUserId,
             Optional<String> runEndedAt,
             Optional<String> runStartedAt,
-            Optional<EconomicIntelligenceSentiment> sentiment,
             EconomicIntelligenceStatus status,
             Optional<String> supersededAt,
-            Optional<String> targetUrl,
             Optional<String> title,
-            Optional<String> userFeedback,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
-        this.acknowledgedAt = acknowledgedAt;
         this.actionType = actionType;
-        this.aiChatId = aiChatId;
         this.createdAt = createdAt;
         this.executedAt = executedAt;
-        this.expectedToolCalls = expectedToolCalls;
         this.id = id;
-        this.input = input;
-        this.inputs = inputs;
-        this.prompt = prompt;
         this.reasoning = reasoning;
         this.resultUrl = resultUrl;
         this.runByUserId = runByUserId;
         this.runEndedAt = runEndedAt;
         this.runStartedAt = runStartedAt;
-        this.sentiment = sentiment;
         this.status = status;
         this.supersededAt = supersededAt;
-        this.targetUrl = targetUrl;
         this.title = title;
-        this.userFeedback = userFeedback;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return ID of the account this recommendation is for, prefixed <code>biz_</code>, or null for personal onboarding.
+     * @return ID of the account this recommendation is for, prefixed <code>biz_</code>.
      */
-    @JsonIgnore
-    public Optional<String> getAccountId() {
-        if (accountId == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("account_id")
+    public String getAccountId() {
         return accountId;
-    }
-
-    /**
-     * @return When the executed run was first marked as seen, as an ISO 8601 timestamp, or <code>null</code> if it has not been.
-     */
-    @JsonIgnore
-    public Optional<String> getAcknowledgedAt() {
-        if (acknowledgedAt == null) {
-            return Optional.empty();
-        }
-        return acknowledgedAt;
     }
 
     /**
@@ -155,24 +103,10 @@ public final class EconomicIntelligence {
     }
 
     /**
-     * @return The chat that ran the recommendation, shown only to the user who ran it, or <code>null</code> otherwise.
+     * @return When the recommendation was created, as an ISO 8601 timestamp.
      */
-    @JsonIgnore
-    public Optional<String> getAiChatId() {
-        if (aiChatId == null) {
-            return Optional.empty();
-        }
-        return aiChatId;
-    }
-
-    /**
-     * @return When the recommendation was created, as an ISO 8601 timestamp, or null for an unsaved recommendation.
-     */
-    @JsonIgnore
-    public Optional<String> getCreatedAt() {
-        if (createdAt == null) {
-            return Optional.empty();
-        }
+    @JsonProperty("created_at")
+    public String getCreatedAt() {
         return createdAt;
     }
 
@@ -187,47 +121,12 @@ public final class EconomicIntelligence {
         return executedAt;
     }
 
-    @JsonIgnore
-    public Optional<List<EconomicIntelligenceOperation>> getExpectedToolCalls() {
-        if (expectedToolCalls == null) {
-            return Optional.empty();
-        }
-        return expectedToolCalls;
-    }
-
     /**
-     * @return Recommendation ID, prefixed <code>reca_</code>, or <code>create_business</code> for an unsaved setup recommendation. Authenticate and list again before executing an unsaved recommendation.
+     * @return Recommendation ID, prefixed <code>reca_</code>.
      */
     @JsonProperty("id")
     public String getId() {
         return id;
-    }
-
-    /**
-     * @return What you requested, in your own words, or <code>null</code> for recommendations generated without your input.
-     */
-    @JsonIgnore
-    public Optional<String> getInput() {
-        if (input == null) {
-            return Optional.empty();
-        }
-        return input;
-    }
-
-    @JsonProperty("inputs")
-    public List<EconomicIntelligenceInput> getInputs() {
-        return inputs;
-    }
-
-    /**
-     * @return Step-by-step instructions for Whop AI, or <code>null</code> when no instructions are available.
-     */
-    @JsonIgnore
-    public Optional<String> getPrompt() {
-        if (prompt == null) {
-            return Optional.empty();
-        }
-        return prompt;
     }
 
     /**
@@ -242,7 +141,7 @@ public final class EconomicIntelligence {
     }
 
     /**
-     * @return Where to view what the run produced, such as the published website or created product, or <code>null</code> when the result is only in the chat.
+     * @return Where to view what the run produced, such as the published website or created product, or <code>null</code> when there is nothing to view.
      */
     @JsonIgnore
     public Optional<String> getResultUrl() {
@@ -275,7 +174,7 @@ public final class EconomicIntelligence {
     }
 
     /**
-     * @return When the run started, by Whop AI or the recommendation's API calls, as an ISO 8601 timestamp, or <code>null</code> if it has not run.
+     * @return When the run started, as an ISO 8601 timestamp, or <code>null</code> if it has not run.
      */
     @JsonIgnore
     public Optional<String> getRunStartedAt() {
@@ -286,18 +185,7 @@ public final class EconomicIntelligence {
     }
 
     /**
-     * @return How the user rated this recommendation, or <code>null</code> if they have not rated it
-     */
-    @JsonIgnore
-    public Optional<EconomicIntelligenceSentiment> getSentiment() {
-        if (sentiment == null) {
-            return Optional.empty();
-        }
-        return sentiment;
-    }
-
-    /**
-     * @return <code>queued</code> when awaiting generation; <code>pending</code> while generating or preparing its work; <code>ready</code> when available to run; <code>running</code> while Whop AI or the recommendation's API calls carry it out; <code>executed</code> when carried out; <code>incomplete</code> when the run ended without carrying it out; <code>superseded</code> when rejected or replaced.
+     * @return <code>queued</code> waits for generation. <code>pending</code> is being generated or prepared. <code>ready</code> can run. <code>running</code> is sending its API calls. <code>executed</code> was carried out. <code>incomplete</code> ended before it was carried out. <code>superseded</code> was rejected or replaced.
      */
     @JsonProperty("status")
     public EconomicIntelligenceStatus getStatus() {
@@ -316,17 +204,6 @@ public final class EconomicIntelligence {
     }
 
     /**
-     * @return Website URL selected for pixel setup, or <code>null</code> when no website was captured for this recommendation.
-     */
-    @JsonIgnore
-    public Optional<String> getTargetUrl() {
-        if (targetUrl == null) {
-            return Optional.empty();
-        }
-        return targetUrl;
-    }
-
-    /**
      * @return Recommended action and its expected benefit, or <code>null</code> until generated.
      */
     @JsonIgnore
@@ -337,29 +214,6 @@ public final class EconomicIntelligence {
         return title;
     }
 
-    /**
-     * @return The user's written feedback, or <code>null</code> if they have not provided any.
-     */
-    @JsonIgnore
-    public Optional<String> getUserFeedback() {
-        if (userFeedback == null) {
-            return Optional.empty();
-        }
-        return userFeedback;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("account_id")
-    private Optional<String> _getAccountId() {
-        return accountId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("acknowledged_at")
-    private Optional<String> _getAcknowledgedAt() {
-        return acknowledgedAt;
-    }
-
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("action_type")
     private Optional<String> _getActionType() {
@@ -367,39 +221,9 @@ public final class EconomicIntelligence {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("ai_chat_id")
-    private Optional<String> _getAiChatId() {
-        return aiChatId;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("created_at")
-    private Optional<String> _getCreatedAt() {
-        return createdAt;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("executed_at")
     private Optional<String> _getExecutedAt() {
         return executedAt;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("expected_tool_calls")
-    private Optional<List<EconomicIntelligenceOperation>> _getExpectedToolCalls() {
-        return expectedToolCalls;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("input")
-    private Optional<String> _getInput() {
-        return input;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("prompt")
-    private Optional<String> _getPrompt() {
-        return prompt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -433,33 +257,15 @@ public final class EconomicIntelligence {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("sentiment")
-    private Optional<EconomicIntelligenceSentiment> _getSentiment() {
-        return sentiment;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("superseded_at")
     private Optional<String> _getSupersededAt() {
         return supersededAt;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("target_url")
-    private Optional<String> _getTargetUrl() {
-        return targetUrl;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("title")
     private Optional<String> _getTitle() {
         return title;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("user_feedback")
-    private Optional<String> _getUserFeedback() {
-        return userFeedback;
     }
 
     @java.lang.Override
@@ -475,54 +281,36 @@ public final class EconomicIntelligence {
 
     private boolean equalTo(EconomicIntelligence other) {
         return accountId.equals(other.accountId)
-                && acknowledgedAt.equals(other.acknowledgedAt)
                 && actionType.equals(other.actionType)
-                && aiChatId.equals(other.aiChatId)
                 && createdAt.equals(other.createdAt)
                 && executedAt.equals(other.executedAt)
-                && expectedToolCalls.equals(other.expectedToolCalls)
                 && id.equals(other.id)
-                && input.equals(other.input)
-                && inputs.equals(other.inputs)
-                && prompt.equals(other.prompt)
                 && reasoning.equals(other.reasoning)
                 && resultUrl.equals(other.resultUrl)
                 && runByUserId.equals(other.runByUserId)
                 && runEndedAt.equals(other.runEndedAt)
                 && runStartedAt.equals(other.runStartedAt)
-                && sentiment.equals(other.sentiment)
                 && status.equals(other.status)
                 && supersededAt.equals(other.supersededAt)
-                && targetUrl.equals(other.targetUrl)
-                && title.equals(other.title)
-                && userFeedback.equals(other.userFeedback);
+                && title.equals(other.title);
     }
 
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
                 this.accountId,
-                this.acknowledgedAt,
                 this.actionType,
-                this.aiChatId,
                 this.createdAt,
                 this.executedAt,
-                this.expectedToolCalls,
                 this.id,
-                this.input,
-                this.inputs,
-                this.prompt,
                 this.reasoning,
                 this.resultUrl,
                 this.runByUserId,
                 this.runEndedAt,
                 this.runStartedAt,
-                this.sentiment,
                 this.status,
                 this.supersededAt,
-                this.targetUrl,
-                this.title,
-                this.userFeedback);
+                this.title);
     }
 
     @java.lang.Override
@@ -530,22 +318,36 @@ public final class EconomicIntelligence {
         return ObjectMappers.stringify(this);
     }
 
-    public static IdStage builder() {
+    public static AccountIdStage builder() {
         return new Builder();
     }
 
-    public interface IdStage {
+    public interface AccountIdStage {
         /**
-         * <p>Recommendation ID, prefixed <code>reca_</code>, or <code>create_business</code> for an unsaved setup recommendation. Authenticate and list again before executing an unsaved recommendation.</p>
+         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>.</p>
          */
-        StatusStage id(@NotNull String id);
+        CreatedAtStage accountId(@NotNull String accountId);
 
         Builder from(EconomicIntelligence other);
     }
 
+    public interface CreatedAtStage {
+        /**
+         * <p>When the recommendation was created, as an ISO 8601 timestamp.</p>
+         */
+        IdStage createdAt(@NotNull String createdAt);
+    }
+
+    public interface IdStage {
+        /**
+         * <p>Recommendation ID, prefixed <code>reca_</code>.</p>
+         */
+        StatusStage id(@NotNull String id);
+    }
+
     public interface StatusStage {
         /**
-         * <p><code>queued</code> when awaiting generation; <code>pending</code> while generating or preparing its work; <code>ready</code> when available to run; <code>running</code> while Whop AI or the recommendation's API calls carry it out; <code>executed</code> when carried out; <code>incomplete</code> when the run ended without carrying it out; <code>superseded</code> when rejected or replaced.</p>
+         * <p><code>queued</code> waits for generation. <code>pending</code> is being generated or prepared. <code>ready</code> can run. <code>running</code> is sending its API calls. <code>executed</code> was carried out. <code>incomplete</code> ended before it was carried out. <code>superseded</code> was rejected or replaced.</p>
          */
         _FinalStage status(@NotNull EconomicIntelligenceStatus status);
     }
@@ -558,24 +360,6 @@ public final class EconomicIntelligence {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>, or null for personal onboarding.</p>
-         */
-        _FinalStage accountId(Optional<String> accountId);
-
-        _FinalStage accountId(String accountId);
-
-        _FinalStage accountId(Nullable<String> accountId);
-
-        /**
-         * <p>When the executed run was first marked as seen, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
-         */
-        _FinalStage acknowledgedAt(Optional<String> acknowledgedAt);
-
-        _FinalStage acknowledgedAt(String acknowledgedAt);
-
-        _FinalStage acknowledgedAt(Nullable<String> acknowledgedAt);
-
-        /**
          * <p>Type of action recommended, or <code>null</code> when no type is assigned. New values may be added; handle unknown types gracefully.</p>
          */
         _FinalStage actionType(Optional<String> actionType);
@@ -585,24 +369,6 @@ public final class EconomicIntelligence {
         _FinalStage actionType(Nullable<String> actionType);
 
         /**
-         * <p>The chat that ran the recommendation, shown only to the user who ran it, or <code>null</code> otherwise.</p>
-         */
-        _FinalStage aiChatId(Optional<String> aiChatId);
-
-        _FinalStage aiChatId(String aiChatId);
-
-        _FinalStage aiChatId(Nullable<String> aiChatId);
-
-        /**
-         * <p>When the recommendation was created, as an ISO 8601 timestamp, or null for an unsaved recommendation.</p>
-         */
-        _FinalStage createdAt(Optional<String> createdAt);
-
-        _FinalStage createdAt(String createdAt);
-
-        _FinalStage createdAt(Nullable<String> createdAt);
-
-        /**
          * <p>When the recommendation was carried out, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
          */
         _FinalStage executedAt(Optional<String> executedAt);
@@ -610,36 +376,6 @@ public final class EconomicIntelligence {
         _FinalStage executedAt(String executedAt);
 
         _FinalStage executedAt(Nullable<String> executedAt);
-
-        _FinalStage expectedToolCalls(Optional<List<EconomicIntelligenceOperation>> expectedToolCalls);
-
-        _FinalStage expectedToolCalls(List<EconomicIntelligenceOperation> expectedToolCalls);
-
-        _FinalStage expectedToolCalls(Nullable<List<EconomicIntelligenceOperation>> expectedToolCalls);
-
-        /**
-         * <p>What you requested, in your own words, or <code>null</code> for recommendations generated without your input.</p>
-         */
-        _FinalStage input(Optional<String> input);
-
-        _FinalStage input(String input);
-
-        _FinalStage input(Nullable<String> input);
-
-        _FinalStage inputs(List<EconomicIntelligenceInput> inputs);
-
-        _FinalStage addInputs(EconomicIntelligenceInput inputs);
-
-        _FinalStage addAllInputs(List<EconomicIntelligenceInput> inputs);
-
-        /**
-         * <p>Step-by-step instructions for Whop AI, or <code>null</code> when no instructions are available.</p>
-         */
-        _FinalStage prompt(Optional<String> prompt);
-
-        _FinalStage prompt(String prompt);
-
-        _FinalStage prompt(Nullable<String> prompt);
 
         /**
          * <p>Evidence and metrics supporting the recommendation, or <code>null</code> when no reasoning was provided.</p>
@@ -651,7 +387,7 @@ public final class EconomicIntelligence {
         _FinalStage reasoning(Nullable<String> reasoning);
 
         /**
-         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when the result is only in the chat.</p>
+         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when there is nothing to view.</p>
          */
         _FinalStage resultUrl(Optional<String> resultUrl);
 
@@ -678,22 +414,13 @@ public final class EconomicIntelligence {
         _FinalStage runEndedAt(Nullable<String> runEndedAt);
 
         /**
-         * <p>When the run started, by Whop AI or the recommendation's API calls, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
+         * <p>When the run started, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
          */
         _FinalStage runStartedAt(Optional<String> runStartedAt);
 
         _FinalStage runStartedAt(String runStartedAt);
 
         _FinalStage runStartedAt(Nullable<String> runStartedAt);
-
-        /**
-         * <p>How the user rated this recommendation, or <code>null</code> if they have not rated it</p>
-         */
-        _FinalStage sentiment(Optional<EconomicIntelligenceSentiment> sentiment);
-
-        _FinalStage sentiment(EconomicIntelligenceSentiment sentiment);
-
-        _FinalStage sentiment(Nullable<EconomicIntelligenceSentiment> sentiment);
 
         /**
          * <p>When the recommendation was rejected or replaced, as an ISO 8601 timestamp, or <code>null</code> if neither has occurred.</p>
@@ -705,15 +432,6 @@ public final class EconomicIntelligence {
         _FinalStage supersededAt(Nullable<String> supersededAt);
 
         /**
-         * <p>Website URL selected for pixel setup, or <code>null</code> when no website was captured for this recommendation.</p>
-         */
-        _FinalStage targetUrl(Optional<String> targetUrl);
-
-        _FinalStage targetUrl(String targetUrl);
-
-        _FinalStage targetUrl(Nullable<String> targetUrl);
-
-        /**
          * <p>Recommended action and its expected benefit, or <code>null</code> until generated.</p>
          */
         _FinalStage title(Optional<String> title);
@@ -721,32 +439,21 @@ public final class EconomicIntelligence {
         _FinalStage title(String title);
 
         _FinalStage title(Nullable<String> title);
-
-        /**
-         * <p>The user's written feedback, or <code>null</code> if they have not provided any.</p>
-         */
-        _FinalStage userFeedback(Optional<String> userFeedback);
-
-        _FinalStage userFeedback(String userFeedback);
-
-        _FinalStage userFeedback(Nullable<String> userFeedback);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, StatusStage, _FinalStage {
+    public static final class Builder implements AccountIdStage, CreatedAtStage, IdStage, StatusStage, _FinalStage {
+        private String accountId;
+
+        private String createdAt;
+
         private String id;
 
         private EconomicIntelligenceStatus status;
 
-        private Optional<String> userFeedback = Optional.empty();
-
         private Optional<String> title = Optional.empty();
 
-        private Optional<String> targetUrl = Optional.empty();
-
         private Optional<String> supersededAt = Optional.empty();
-
-        private Optional<EconomicIntelligenceSentiment> sentiment = Optional.empty();
 
         private Optional<String> runStartedAt = Optional.empty();
 
@@ -758,25 +465,9 @@ public final class EconomicIntelligence {
 
         private Optional<String> reasoning = Optional.empty();
 
-        private Optional<String> prompt = Optional.empty();
-
-        private List<EconomicIntelligenceInput> inputs = new ArrayList<>();
-
-        private Optional<String> input = Optional.empty();
-
-        private Optional<List<EconomicIntelligenceOperation>> expectedToolCalls = Optional.empty();
-
         private Optional<String> executedAt = Optional.empty();
 
-        private Optional<String> createdAt = Optional.empty();
-
-        private Optional<String> aiChatId = Optional.empty();
-
         private Optional<String> actionType = Optional.empty();
-
-        private Optional<String> acknowledgedAt = Optional.empty();
-
-        private Optional<String> accountId = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -785,32 +476,45 @@ public final class EconomicIntelligence {
         @java.lang.Override
         public Builder from(EconomicIntelligence other) {
             accountId(other.getAccountId());
-            acknowledgedAt(other.getAcknowledgedAt());
             actionType(other.getActionType());
-            aiChatId(other.getAiChatId());
             createdAt(other.getCreatedAt());
             executedAt(other.getExecutedAt());
-            expectedToolCalls(other.getExpectedToolCalls());
             id(other.getId());
-            input(other.getInput());
-            inputs(other.getInputs());
-            prompt(other.getPrompt());
             reasoning(other.getReasoning());
             resultUrl(other.getResultUrl());
             runByUserId(other.getRunByUserId());
             runEndedAt(other.getRunEndedAt());
             runStartedAt(other.getRunStartedAt());
-            sentiment(other.getSentiment());
             status(other.getStatus());
             supersededAt(other.getSupersededAt());
-            targetUrl(other.getTargetUrl());
             title(other.getTitle());
-            userFeedback(other.getUserFeedback());
             return this;
         }
 
         /**
-         * <p>Recommendation ID, prefixed <code>reca_</code>, or <code>create_business</code> for an unsaved setup recommendation. Authenticate and list again before executing an unsaved recommendation.</p>
+         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("account_id")
+        public CreatedAtStage accountId(@NotNull String accountId) {
+            this.accountId = Objects.requireNonNull(accountId, "accountId must not be null");
+            return this;
+        }
+
+        /**
+         * <p>When the recommendation was created, as an ISO 8601 timestamp.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("created_at")
+        public IdStage createdAt(@NotNull String createdAt) {
+            this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Recommendation ID, prefixed <code>reca_</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -821,49 +525,13 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p><code>queued</code> when awaiting generation; <code>pending</code> while generating or preparing its work; <code>ready</code> when available to run; <code>running</code> while Whop AI or the recommendation's API calls carry it out; <code>executed</code> when carried out; <code>incomplete</code> when the run ended without carrying it out; <code>superseded</code> when rejected or replaced.</p>
+         * <p><code>queued</code> waits for generation. <code>pending</code> is being generated or prepared. <code>ready</code> can run. <code>running</code> is sending its API calls. <code>executed</code> was carried out. <code>incomplete</code> ended before it was carried out. <code>superseded</code> was rejected or replaced.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
         @JsonSetter("status")
         public _FinalStage status(@NotNull EconomicIntelligenceStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The user's written feedback, or <code>null</code> if they have not provided any.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage userFeedback(Nullable<String> userFeedback) {
-            if (userFeedback.isNull()) {
-                this.userFeedback = null;
-            } else if (userFeedback.isEmpty()) {
-                this.userFeedback = Optional.empty();
-            } else {
-                this.userFeedback = Optional.of(userFeedback.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The user's written feedback, or <code>null</code> if they have not provided any.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage userFeedback(String userFeedback) {
-            this.userFeedback = Optional.ofNullable(userFeedback);
-            return this;
-        }
-
-        /**
-         * <p>The user's written feedback, or <code>null</code> if they have not provided any.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "user_feedback", nulls = Nulls.SKIP)
-        public _FinalStage userFeedback(Optional<String> userFeedback) {
-            this.userFeedback = userFeedback;
             return this;
         }
 
@@ -904,42 +572,6 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>Website URL selected for pixel setup, or <code>null</code> when no website was captured for this recommendation.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage targetUrl(Nullable<String> targetUrl) {
-            if (targetUrl.isNull()) {
-                this.targetUrl = null;
-            } else if (targetUrl.isEmpty()) {
-                this.targetUrl = Optional.empty();
-            } else {
-                this.targetUrl = Optional.of(targetUrl.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Website URL selected for pixel setup, or <code>null</code> when no website was captured for this recommendation.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage targetUrl(String targetUrl) {
-            this.targetUrl = Optional.ofNullable(targetUrl);
-            return this;
-        }
-
-        /**
-         * <p>Website URL selected for pixel setup, or <code>null</code> when no website was captured for this recommendation.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "target_url", nulls = Nulls.SKIP)
-        public _FinalStage targetUrl(Optional<String> targetUrl) {
-            this.targetUrl = targetUrl;
-            return this;
-        }
-
-        /**
          * <p>When the recommendation was rejected or replaced, as an ISO 8601 timestamp, or <code>null</code> if neither has occurred.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -976,43 +608,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>How the user rated this recommendation, or <code>null</code> if they have not rated it</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage sentiment(Nullable<EconomicIntelligenceSentiment> sentiment) {
-            if (sentiment.isNull()) {
-                this.sentiment = null;
-            } else if (sentiment.isEmpty()) {
-                this.sentiment = Optional.empty();
-            } else {
-                this.sentiment = Optional.of(sentiment.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>How the user rated this recommendation, or <code>null</code> if they have not rated it</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage sentiment(EconomicIntelligenceSentiment sentiment) {
-            this.sentiment = Optional.ofNullable(sentiment);
-            return this;
-        }
-
-        /**
-         * <p>How the user rated this recommendation, or <code>null</code> if they have not rated it</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "sentiment", nulls = Nulls.SKIP)
-        public _FinalStage sentiment(Optional<EconomicIntelligenceSentiment> sentiment) {
-            this.sentiment = sentiment;
-            return this;
-        }
-
-        /**
-         * <p>When the run started, by Whop AI or the recommendation's API calls, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
+         * <p>When the run started, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1028,7 +624,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>When the run started, by Whop AI or the recommendation's API calls, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
+         * <p>When the run started, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1038,7 +634,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>When the run started, by Whop AI or the recommendation's API calls, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
+         * <p>When the run started, as an ISO 8601 timestamp, or <code>null</code> if it has not run.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "run_started_at", nulls = Nulls.SKIP)
@@ -1120,7 +716,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when the result is only in the chat.</p>
+         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when there is nothing to view.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1136,7 +732,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when the result is only in the chat.</p>
+         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when there is nothing to view.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1146,7 +742,7 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when the result is only in the chat.</p>
+         * <p>Where to view what the run produced, such as the published website or created product, or <code>null</code> when there is nothing to view.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "result_url", nulls = Nulls.SKIP)
@@ -1192,127 +788,6 @@ public final class EconomicIntelligence {
         }
 
         /**
-         * <p>Step-by-step instructions for Whop AI, or <code>null</code> when no instructions are available.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage prompt(Nullable<String> prompt) {
-            if (prompt.isNull()) {
-                this.prompt = null;
-            } else if (prompt.isEmpty()) {
-                this.prompt = Optional.empty();
-            } else {
-                this.prompt = Optional.of(prompt.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Step-by-step instructions for Whop AI, or <code>null</code> when no instructions are available.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage prompt(String prompt) {
-            this.prompt = Optional.ofNullable(prompt);
-            return this;
-        }
-
-        /**
-         * <p>Step-by-step instructions for Whop AI, or <code>null</code> when no instructions are available.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "prompt", nulls = Nulls.SKIP)
-        public _FinalStage prompt(Optional<String> prompt) {
-            this.prompt = prompt;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addAllInputs(List<EconomicIntelligenceInput> inputs) {
-            if (inputs != null) {
-                this.inputs.addAll(inputs);
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage addInputs(EconomicIntelligenceInput inputs) {
-            this.inputs.add(inputs);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "inputs", nulls = Nulls.SKIP)
-        public _FinalStage inputs(List<EconomicIntelligenceInput> inputs) {
-            this.inputs.clear();
-            if (inputs != null) {
-                this.inputs.addAll(inputs);
-            }
-            return this;
-        }
-
-        /**
-         * <p>What you requested, in your own words, or <code>null</code> for recommendations generated without your input.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage input(Nullable<String> input) {
-            if (input.isNull()) {
-                this.input = null;
-            } else if (input.isEmpty()) {
-                this.input = Optional.empty();
-            } else {
-                this.input = Optional.of(input.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>What you requested, in your own words, or <code>null</code> for recommendations generated without your input.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage input(String input) {
-            this.input = Optional.ofNullable(input);
-            return this;
-        }
-
-        /**
-         * <p>What you requested, in your own words, or <code>null</code> for recommendations generated without your input.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "input", nulls = Nulls.SKIP)
-        public _FinalStage input(Optional<String> input) {
-            this.input = input;
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage expectedToolCalls(Nullable<List<EconomicIntelligenceOperation>> expectedToolCalls) {
-            if (expectedToolCalls.isNull()) {
-                this.expectedToolCalls = null;
-            } else if (expectedToolCalls.isEmpty()) {
-                this.expectedToolCalls = Optional.empty();
-            } else {
-                this.expectedToolCalls = Optional.of(expectedToolCalls.get());
-            }
-            return this;
-        }
-
-        @java.lang.Override
-        public _FinalStage expectedToolCalls(List<EconomicIntelligenceOperation> expectedToolCalls) {
-            this.expectedToolCalls = Optional.ofNullable(expectedToolCalls);
-            return this;
-        }
-
-        @java.lang.Override
-        @JsonSetter(value = "expected_tool_calls", nulls = Nulls.SKIP)
-        public _FinalStage expectedToolCalls(Optional<List<EconomicIntelligenceOperation>> expectedToolCalls) {
-            this.expectedToolCalls = expectedToolCalls;
-            return this;
-        }
-
-        /**
          * <p>When the recommendation was carried out, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1345,78 +820,6 @@ public final class EconomicIntelligence {
         @JsonSetter(value = "executed_at", nulls = Nulls.SKIP)
         public _FinalStage executedAt(Optional<String> executedAt) {
             this.executedAt = executedAt;
-            return this;
-        }
-
-        /**
-         * <p>When the recommendation was created, as an ISO 8601 timestamp, or null for an unsaved recommendation.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdAt(Nullable<String> createdAt) {
-            if (createdAt.isNull()) {
-                this.createdAt = null;
-            } else if (createdAt.isEmpty()) {
-                this.createdAt = Optional.empty();
-            } else {
-                this.createdAt = Optional.of(createdAt.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>When the recommendation was created, as an ISO 8601 timestamp, or null for an unsaved recommendation.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage createdAt(String createdAt) {
-            this.createdAt = Optional.ofNullable(createdAt);
-            return this;
-        }
-
-        /**
-         * <p>When the recommendation was created, as an ISO 8601 timestamp, or null for an unsaved recommendation.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "created_at", nulls = Nulls.SKIP)
-        public _FinalStage createdAt(Optional<String> createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        /**
-         * <p>The chat that ran the recommendation, shown only to the user who ran it, or <code>null</code> otherwise.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage aiChatId(Nullable<String> aiChatId) {
-            if (aiChatId.isNull()) {
-                this.aiChatId = null;
-            } else if (aiChatId.isEmpty()) {
-                this.aiChatId = Optional.empty();
-            } else {
-                this.aiChatId = Optional.of(aiChatId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>The chat that ran the recommendation, shown only to the user who ran it, or <code>null</code> otherwise.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage aiChatId(String aiChatId) {
-            this.aiChatId = Optional.ofNullable(aiChatId);
-            return this;
-        }
-
-        /**
-         * <p>The chat that ran the recommendation, shown only to the user who ran it, or <code>null</code> otherwise.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "ai_chat_id", nulls = Nulls.SKIP)
-        public _FinalStage aiChatId(Optional<String> aiChatId) {
-            this.aiChatId = aiChatId;
             return this;
         }
 
@@ -1456,130 +859,40 @@ public final class EconomicIntelligence {
             return this;
         }
 
-        /**
-         * <p>When the executed run was first marked as seen, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage acknowledgedAt(Nullable<String> acknowledgedAt) {
-            if (acknowledgedAt.isNull()) {
-                this.acknowledgedAt = null;
-            } else if (acknowledgedAt.isEmpty()) {
-                this.acknowledgedAt = Optional.empty();
-            } else {
-                this.acknowledgedAt = Optional.of(acknowledgedAt.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>When the executed run was first marked as seen, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage acknowledgedAt(String acknowledgedAt) {
-            this.acknowledgedAt = Optional.ofNullable(acknowledgedAt);
-            return this;
-        }
-
-        /**
-         * <p>When the executed run was first marked as seen, as an ISO 8601 timestamp, or <code>null</code> if it has not been.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "acknowledged_at", nulls = Nulls.SKIP)
-        public _FinalStage acknowledgedAt(Optional<String> acknowledgedAt) {
-            this.acknowledgedAt = acknowledgedAt;
-            return this;
-        }
-
-        /**
-         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>, or null for personal onboarding.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage accountId(Nullable<String> accountId) {
-            if (accountId.isNull()) {
-                this.accountId = null;
-            } else if (accountId.isEmpty()) {
-                this.accountId = Optional.empty();
-            } else {
-                this.accountId = Optional.of(accountId.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>, or null for personal onboarding.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage accountId(String accountId) {
-            this.accountId = Optional.ofNullable(accountId);
-            return this;
-        }
-
-        /**
-         * <p>ID of the account this recommendation is for, prefixed <code>biz_</code>, or null for personal onboarding.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
-        public _FinalStage accountId(Optional<String> accountId) {
-            this.accountId = accountId;
-            return this;
-        }
-
         @java.lang.Override
         public EconomicIntelligence build() {
             return new EconomicIntelligence(
                     accountId,
-                    acknowledgedAt,
                     actionType,
-                    aiChatId,
                     createdAt,
                     executedAt,
-                    expectedToolCalls,
                     id,
-                    input,
-                    inputs,
-                    prompt,
                     reasoning,
                     resultUrl,
                     runByUserId,
                     runEndedAt,
                     runStartedAt,
-                    sentiment,
                     status,
                     supersededAt,
-                    targetUrl,
                     title,
-                    userFeedback,
                     additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account_id")
-                    || key.equalsIgnoreCase("acknowledged_at")
                     || key.equalsIgnoreCase("action_type")
-                    || key.equalsIgnoreCase("ai_chat_id")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("executed_at")
-                    || key.equalsIgnoreCase("expected_tool_calls")
                     || key.equalsIgnoreCase("id")
-                    || key.equalsIgnoreCase("input")
-                    || key.equalsIgnoreCase("inputs")
-                    || key.equalsIgnoreCase("prompt")
                     || key.equalsIgnoreCase("reasoning")
                     || key.equalsIgnoreCase("result_url")
                     || key.equalsIgnoreCase("run_by_user_id")
                     || key.equalsIgnoreCase("run_ended_at")
                     || key.equalsIgnoreCase("run_started_at")
-                    || key.equalsIgnoreCase("sentiment")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("superseded_at")
-                    || key.equalsIgnoreCase("target_url")
-                    || key.equalsIgnoreCase("title")
-                    || key.equalsIgnoreCase("user_feedback")) {
+                    || key.equalsIgnoreCase("title")) {
                 return;
             }
             this.additionalProperties.put(key, value);

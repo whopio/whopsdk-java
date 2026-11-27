@@ -56,21 +56,21 @@ public class RawResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>> list() {
         return list(ListResolutionCenterCasesRequest.builder().build());
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>> list(RequestOptions requestOptions) {
         return list(ListResolutionCenterCasesRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>> list(
             ListResolutionCenterCasesRequest request) {
@@ -78,7 +78,7 @@ public class RawResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>> list(
             ListResolutionCenterCasesRequest request, RequestOptions requestOptions) {
@@ -125,6 +125,10 @@ public class RawResolutionCenterCasesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
         if (request.getStatus().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "status", request.getStatus().get(), true);
@@ -136,6 +140,18 @@ public class RawResolutionCenterCasesClient {
         if (request.getOutcome().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "outcome", request.getOutcome().get(), true);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
+        }
+        if (request.getPaymentId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_id", request.getPaymentId().get(), true);
+        }
+        if (request.getPaymentMethods().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_methods", request.getPaymentMethods().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -208,14 +224,14 @@ public class RawResolutionCenterCasesClient {
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public WhopApiHttpResponse<ResolutionCenterCase> create(CreateResolutionCenterCasesRequest request) {
         return create(request, null);
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public WhopApiHttpResponse<ResolutionCenterCase> create(
             CreateResolutionCenterCasesRequest request, RequestOptions requestOptions) {
@@ -331,6 +347,10 @@ public class RawResolutionCenterCasesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
         }
+        if (request.getQuery().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "query", request.getQuery().get(), false);
+        }
         if (request.getGroups().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "groups", request.getGroups().get(), true);
@@ -346,6 +366,18 @@ public class RawResolutionCenterCasesClient {
         if (request.getOutcome().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "outcome", request.getOutcome().get(), true);
+        }
+        if (request.getProductIds().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "product_ids", request.getProductIds().get(), true);
+        }
+        if (request.getPaymentId().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_id", request.getPaymentId().get(), true);
+        }
+        if (request.getPaymentMethods().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "payment_methods", request.getPaymentMethods().get(), true);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -1068,16 +1100,22 @@ public class RawResolutionCenterCasesClient {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request.Builder _requestBuilder = new Request.Builder()
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method(
-                        "POST",
-                        BodyProperties.toRequestBody(
-                                requestOptions != null ? requestOptions.getBodyProperties() : null,
-                                RequestBody.create("", null)))
+                .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);

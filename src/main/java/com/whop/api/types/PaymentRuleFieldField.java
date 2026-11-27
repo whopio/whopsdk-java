@@ -25,6 +25,8 @@ public final class PaymentRuleFieldField {
 
     public static final PaymentRuleFieldField RISK_SCORE = new PaymentRuleFieldField(Value.RISK_SCORE, "risk_score");
 
+    public static final PaymentRuleFieldField CVV_CHECK = new PaymentRuleFieldField(Value.CVV_CHECK, "cvv_check");
+
     public static final PaymentRuleFieldField CUSTOMER_EMAIL =
             new PaymentRuleFieldField(Value.CUSTOMER_EMAIL, "customer_email");
 
@@ -37,6 +39,8 @@ public final class PaymentRuleFieldField {
 
     public static final PaymentRuleFieldField BILLING_CITY =
             new PaymentRuleFieldField(Value.BILLING_CITY, "billing_city");
+
+    public static final PaymentRuleFieldField AVS_CHECK = new PaymentRuleFieldField(Value.AVS_CHECK, "avs_check");
 
     public static final PaymentRuleFieldField BILLING_COUNTRY =
             new PaymentRuleFieldField(Value.BILLING_COUNTRY, "billing_country");
@@ -88,6 +92,8 @@ public final class PaymentRuleFieldField {
                 return visitor.visitEmailDomain();
             case RISK_SCORE:
                 return visitor.visitRiskScore();
+            case CVV_CHECK:
+                return visitor.visitCvvCheck();
             case CUSTOMER_EMAIL:
                 return visitor.visitCustomerEmail();
             case CARD_FUNDING:
@@ -98,6 +104,8 @@ public final class PaymentRuleFieldField {
                 return visitor.visitCardBrand();
             case BILLING_CITY:
                 return visitor.visitBillingCity();
+            case AVS_CHECK:
+                return visitor.visitAvsCheck();
             case BILLING_COUNTRY:
                 return visitor.visitBillingCountry();
             case UNKNOWN:
@@ -123,6 +131,8 @@ public final class PaymentRuleFieldField {
                 return EMAIL_DOMAIN;
             case "risk_score":
                 return RISK_SCORE;
+            case "cvv_check":
+                return CVV_CHECK;
             case "customer_email":
                 return CUSTOMER_EMAIL;
             case "card_funding":
@@ -133,6 +143,8 @@ public final class PaymentRuleFieldField {
                 return CARD_BRAND;
             case "billing_city":
                 return BILLING_CITY;
+            case "avs_check":
+                return AVS_CHECK;
             case "billing_country":
                 return BILLING_COUNTRY;
             default:
@@ -167,6 +179,10 @@ public final class PaymentRuleFieldField {
 
         IP_COUNTRY,
 
+        AVS_CHECK,
+
+        CVV_CHECK,
+
         UNKNOWN
     }
 
@@ -196,6 +212,10 @@ public final class PaymentRuleFieldField {
         T visitIpAddress();
 
         T visitIpCountry();
+
+        T visitAvsCheck();
+
+        T visitCvvCheck();
 
         T visitUnknown(String unknownType);
     }

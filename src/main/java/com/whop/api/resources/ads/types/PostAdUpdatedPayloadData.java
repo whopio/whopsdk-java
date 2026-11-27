@@ -36,6 +36,8 @@ public final class PostAdUpdatedPayloadData {
 
     private final AdEntityReference adGroup;
 
+    private final Optional<String> appealAvailableAt;
+
     private final Optional<PostAdUpdatedPayloadDataCallToAction> callToAction;
 
     private final AdContentReview contentReview;
@@ -71,6 +73,7 @@ public final class PostAdUpdatedPayloadData {
     private PostAdUpdatedPayloadData(
             AdEntityReference adCampaign,
             AdEntityReference adGroup,
+            Optional<String> appealAvailableAt,
             Optional<PostAdUpdatedPayloadDataCallToAction> callToAction,
             AdContentReview contentReview,
             String createdAt,
@@ -89,6 +92,7 @@ public final class PostAdUpdatedPayloadData {
             Map<String, Object> additionalProperties) {
         this.adCampaign = adCampaign;
         this.adGroup = adGroup;
+        this.appealAvailableAt = appealAvailableAt;
         this.callToAction = callToAction;
         this.contentReview = contentReview;
         this.createdAt = createdAt;
@@ -124,6 +128,17 @@ public final class PostAdUpdatedPayloadData {
     }
 
     /**
+     * @return When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.
+     */
+    @JsonIgnore
+    public Optional<String> getAppealAvailableAt() {
+        if (appealAvailableAt == null) {
+            return Optional.empty();
+        }
+        return appealAvailableAt;
+    }
+
+    /**
      * @return The call-to-action button shown on the ad.
      */
     @JsonIgnore
@@ -135,7 +150,7 @@ public final class PostAdUpdatedPayloadData {
     }
 
     /**
-     * @return Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.
+     * @return Whop's content review of this ad: whether it has finished and the content rules it breaks.
      */
     @JsonProperty("content_review")
     public AdContentReview getContentReview() {
@@ -238,6 +253,12 @@ public final class PostAdUpdatedPayloadData {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("appeal_available_at")
+    private Optional<String> _getAppealAvailableAt() {
+        return appealAvailableAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("call_to_action")
     private Optional<PostAdUpdatedPayloadDataCallToAction> _getCallToAction() {
         return callToAction;
@@ -269,6 +290,7 @@ public final class PostAdUpdatedPayloadData {
     private boolean equalTo(PostAdUpdatedPayloadData other) {
         return adCampaign.equals(other.adCampaign)
                 && adGroup.equals(other.adGroup)
+                && appealAvailableAt.equals(other.appealAvailableAt)
                 && callToAction.equals(other.callToAction)
                 && contentReview.equals(other.contentReview)
                 && createdAt.equals(other.createdAt)
@@ -291,6 +313,7 @@ public final class PostAdUpdatedPayloadData {
         return Objects.hash(
                 this.adCampaign,
                 this.adGroup,
+                this.appealAvailableAt,
                 this.callToAction,
                 this.contentReview,
                 this.createdAt,
@@ -335,7 +358,7 @@ public final class PostAdUpdatedPayloadData {
 
     public interface ContentReviewStage {
         /**
-         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         * <p>Whop's content review of this ad: whether it has finished and the content rules it breaks.</p>
          */
         CreatedAtStage contentReview(@NotNull AdContentReview contentReview);
     }
@@ -381,6 +404,15 @@ public final class PostAdUpdatedPayloadData {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         */
+        _FinalStage appealAvailableAt(Optional<String> appealAvailableAt);
+
+        _FinalStage appealAvailableAt(String appealAvailableAt);
+
+        _FinalStage appealAvailableAt(Nullable<String> appealAvailableAt);
 
         /**
          * <p>The call-to-action button shown on the ad.</p>
@@ -494,6 +526,8 @@ public final class PostAdUpdatedPayloadData {
 
         private Optional<PostAdUpdatedPayloadDataCallToAction> callToAction = Optional.empty();
 
+        private Optional<String> appealAvailableAt = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -502,6 +536,7 @@ public final class PostAdUpdatedPayloadData {
         public Builder from(PostAdUpdatedPayloadData other) {
             adCampaign(other.getAdCampaign());
             adGroup(other.getAdGroup());
+            appealAvailableAt(other.getAppealAvailableAt());
             callToAction(other.getCallToAction());
             contentReview(other.getContentReview());
             createdAt(other.getCreatedAt());
@@ -543,7 +578,7 @@ public final class PostAdUpdatedPayloadData {
         }
 
         /**
-         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         * <p>Whop's content review of this ad: whether it has finished and the content rules it breaks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -871,11 +906,48 @@ public final class PostAdUpdatedPayloadData {
             return this;
         }
 
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appealAvailableAt(Nullable<String> appealAvailableAt) {
+            if (appealAvailableAt.isNull()) {
+                this.appealAvailableAt = null;
+            } else if (appealAvailableAt.isEmpty()) {
+                this.appealAvailableAt = Optional.empty();
+            } else {
+                this.appealAvailableAt = Optional.of(appealAvailableAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appealAvailableAt(String appealAvailableAt) {
+            this.appealAvailableAt = Optional.ofNullable(appealAvailableAt);
+            return this;
+        }
+
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "appeal_available_at", nulls = Nulls.SKIP)
+        public _FinalStage appealAvailableAt(Optional<String> appealAvailableAt) {
+            this.appealAvailableAt = appealAvailableAt;
+            return this;
+        }
+
         @java.lang.Override
         public PostAdUpdatedPayloadData build() {
             return new PostAdUpdatedPayloadData(
                     adCampaign,
                     adGroup,
+                    appealAvailableAt,
                     callToAction,
                     contentReview,
                     createdAt,
@@ -898,6 +970,7 @@ public final class PostAdUpdatedPayloadData {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("ad_campaign")
                     || key.equalsIgnoreCase("ad_group")
+                    || key.equalsIgnoreCase("appeal_available_at")
                     || key.equalsIgnoreCase("call_to_action")
                     || key.equalsIgnoreCase("content_review")
                     || key.equalsIgnoreCase("created_at")

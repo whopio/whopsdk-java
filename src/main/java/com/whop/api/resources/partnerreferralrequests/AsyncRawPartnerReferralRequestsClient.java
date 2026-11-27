@@ -53,14 +53,14 @@ public class AsyncRawPartnerReferralRequestsClient {
     }
 
     /**
-     * Lists your referral links and attribution requests, including incoming requests for you or businesses you own, with filters for recipient, partner, type, and status.
+     * Lists your referral links and attribution requests, including incoming requests for businesses you own, with filters for business, partner, type, and status.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PartnerReferralRequest>>> list() {
         return list(ListPartnerReferralRequestsRequest.builder().build());
     }
 
     /**
-     * Lists your referral links and attribution requests, including incoming requests for you or businesses you own, with filters for recipient, partner, type, and status.
+     * Lists your referral links and attribution requests, including incoming requests for businesses you own, with filters for business, partner, type, and status.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PartnerReferralRequest>>> list(
             RequestOptions requestOptions) {
@@ -68,7 +68,7 @@ public class AsyncRawPartnerReferralRequestsClient {
     }
 
     /**
-     * Lists your referral links and attribution requests, including incoming requests for you or businesses you own, with filters for recipient, partner, type, and status.
+     * Lists your referral links and attribution requests, including incoming requests for businesses you own, with filters for business, partner, type, and status.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PartnerReferralRequest>>> list(
             ListPartnerReferralRequestsRequest request) {
@@ -76,7 +76,7 @@ public class AsyncRawPartnerReferralRequestsClient {
     }
 
     /**
-     * Lists your referral links and attribution requests, including incoming requests for you or businesses you own, with filters for recipient, partner, type, and status.
+     * Lists your referral links and attribution requests, including incoming requests for businesses you own, with filters for business, partner, type, and status.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<PartnerReferralRequest>>> list(
             ListPartnerReferralRequestsRequest request, RequestOptions requestOptions) {
@@ -253,7 +253,7 @@ public class AsyncRawPartnerReferralRequestsClient {
     }
 
     /**
-     * Creates a referral link, or sends an attribution request to an existing business or user for approval. Links require an enrolled partner who is not suspended; attribution requests require an enrolled, verified partner. Recipients do not need to join the partner program.
+     * Creates a referral link, or sends an attribution request to an existing business for approval. Links require an enrolled partner who is not suspended. Attribution requests require an enrolled, verified partner. Recipients do not need to join the partner program.
      */
     public CompletableFuture<WhopApiHttpResponse<PartnerReferralRequest>> create(
             CreatePartnerReferralRequestsRequestBody request) {
@@ -261,7 +261,7 @@ public class AsyncRawPartnerReferralRequestsClient {
     }
 
     /**
-     * Creates a referral link, or sends an attribution request to an existing business or user for approval. Links require an enrolled partner who is not suspended; attribution requests require an enrolled, verified partner. Recipients do not need to join the partner program.
+     * Creates a referral link, or sends an attribution request to an existing business for approval. Links require an enrolled partner who is not suspended. Attribution requests require an enrolled, verified partner. Recipients do not need to join the partner program.
      */
     public CompletableFuture<WhopApiHttpResponse<PartnerReferralRequest>> create(
             CreatePartnerReferralRequestsRequestBody request, RequestOptions requestOptions) {

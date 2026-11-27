@@ -28,6 +28,9 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
     public static final ReplacePaymentRulesRequestConditionsAllItemField RISK_SCORE =
             new ReplacePaymentRulesRequestConditionsAllItemField(Value.RISK_SCORE, "risk_score");
 
+    public static final ReplacePaymentRulesRequestConditionsAllItemField CVV_CHECK =
+            new ReplacePaymentRulesRequestConditionsAllItemField(Value.CVV_CHECK, "cvv_check");
+
     public static final ReplacePaymentRulesRequestConditionsAllItemField CUSTOMER_EMAIL =
             new ReplacePaymentRulesRequestConditionsAllItemField(Value.CUSTOMER_EMAIL, "customer_email");
 
@@ -42,6 +45,9 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
 
     public static final ReplacePaymentRulesRequestConditionsAllItemField BILLING_CITY =
             new ReplacePaymentRulesRequestConditionsAllItemField(Value.BILLING_CITY, "billing_city");
+
+    public static final ReplacePaymentRulesRequestConditionsAllItemField AVS_CHECK =
+            new ReplacePaymentRulesRequestConditionsAllItemField(Value.AVS_CHECK, "avs_check");
 
     public static final ReplacePaymentRulesRequestConditionsAllItemField BILLING_COUNTRY =
             new ReplacePaymentRulesRequestConditionsAllItemField(Value.BILLING_COUNTRY, "billing_country");
@@ -93,6 +99,8 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
                 return visitor.visitEmailDomain();
             case RISK_SCORE:
                 return visitor.visitRiskScore();
+            case CVV_CHECK:
+                return visitor.visitCvvCheck();
             case CUSTOMER_EMAIL:
                 return visitor.visitCustomerEmail();
             case CARD_FUNDING:
@@ -103,6 +111,8 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
                 return visitor.visitCardBrand();
             case BILLING_CITY:
                 return visitor.visitBillingCity();
+            case AVS_CHECK:
+                return visitor.visitAvsCheck();
             case BILLING_COUNTRY:
                 return visitor.visitBillingCountry();
             case UNKNOWN:
@@ -128,6 +138,8 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
                 return EMAIL_DOMAIN;
             case "risk_score":
                 return RISK_SCORE;
+            case "cvv_check":
+                return CVV_CHECK;
             case "customer_email":
                 return CUSTOMER_EMAIL;
             case "card_funding":
@@ -138,6 +150,8 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
                 return CARD_BRAND;
             case "billing_city":
                 return BILLING_CITY;
+            case "avs_check":
+                return AVS_CHECK;
             case "billing_country":
                 return BILLING_COUNTRY;
             default:
@@ -172,6 +186,10 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
 
         IP_COUNTRY,
 
+        AVS_CHECK,
+
+        CVV_CHECK,
+
         UNKNOWN
     }
 
@@ -201,6 +219,10 @@ public final class ReplacePaymentRulesRequestConditionsAllItemField {
         T visitIpAddress();
 
         T visitIpCountry();
+
+        T visitAvsCheck();
+
+        T visitCvvCheck();
 
         T visitUnknown(String unknownType);
     }

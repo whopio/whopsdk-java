@@ -7,8 +7,47 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class RetrieveFinancialReportsResponseRowsItemGrouping {
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping PLATFORMS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.PLATFORMS, "platforms");
+
     public static final RetrieveFinancialReportsResponseRowsItemGrouping CLAWBACKS =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.CLAWBACKS, "clawbacks");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping PARTNERS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.PARTNERS, "partners");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping DEPOSITS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.DEPOSITS, "deposits");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping AFFILIATES =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.AFFILIATES, "affiliates");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping OPERATIONAL_COSTS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.OPERATIONAL_COSTS, "operational_costs");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping INVEST =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.INVEST, "invest");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping REFUNDS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.REFUNDS, "refunds");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping FEES =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.FEES, "fees");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping SUBACCOUNTS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.SUBACCOUNTS, "subaccounts");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping LEVELS_POINTS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.LEVELS_POINTS, "levels_points");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping LEGACY =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.LEGACY, "legacy");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping MISC =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.MISC, "misc");
+
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping AIRDROPS =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.AIRDROPS, "airdrops");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping RESERVES =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.RESERVES, "reserves");
@@ -25,29 +64,20 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
     public static final RetrieveFinancialReportsResponseRowsItemGrouping WITHDRAWALS =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.WITHDRAWALS, "withdrawals");
 
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping OPERATIONAL_COSTS =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.OPERATIONAL_COSTS, "operational_costs");
-
     public static final RetrieveFinancialReportsResponseRowsItemGrouping CAPITAL =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.CAPITAL, "capital");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping TRANSFERS =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.TRANSFERS, "transfers");
 
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping REFUNDS =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.REFUNDS, "refunds");
-
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping FEES =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.FEES, "fees");
+    public static final RetrieveFinancialReportsResponseRowsItemGrouping CARD_SPEND =
+            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.CARD_SPEND, "card_spend");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping BALANCE =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.BALANCE, "balance");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping OTHER =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.OTHER, "other");
-
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping SUBACCOUNTS =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.SUBACCOUNTS, "subaccounts");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping DISPUTES =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.DISPUTES, "disputes");
@@ -62,20 +92,8 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
             new RetrieveFinancialReportsResponseRowsItemGrouping(
                     Value.AFFILIATES_AND_REVSHARE, "affiliates_and_revshare");
 
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping LEVELS_POINTS =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.LEVELS_POINTS, "levels_points");
-
     public static final RetrieveFinancialReportsResponseRowsItemGrouping FX =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.FX, "fx");
-
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping LEGACY =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.LEGACY, "legacy");
-
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping MISC =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.MISC, "misc");
-
-    public static final RetrieveFinancialReportsResponseRowsItemGrouping AIRDROPS =
-            new RetrieveFinancialReportsResponseRowsItemGrouping(Value.AIRDROPS, "airdrops");
 
     public static final RetrieveFinancialReportsResponseRowsItemGrouping BAD_DEBT =
             new RetrieveFinancialReportsResponseRowsItemGrouping(Value.BAD_DEBT, "bad_debt");
@@ -113,8 +131,34 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case PLATFORMS:
+                return visitor.visitPlatforms();
             case CLAWBACKS:
                 return visitor.visitClawbacks();
+            case PARTNERS:
+                return visitor.visitPartners();
+            case DEPOSITS:
+                return visitor.visitDeposits();
+            case AFFILIATES:
+                return visitor.visitAffiliates();
+            case OPERATIONAL_COSTS:
+                return visitor.visitOperationalCosts();
+            case INVEST:
+                return visitor.visitInvest();
+            case REFUNDS:
+                return visitor.visitRefunds();
+            case FEES:
+                return visitor.visitFees();
+            case SUBACCOUNTS:
+                return visitor.visitSubaccounts();
+            case LEVELS_POINTS:
+                return visitor.visitLevelsPoints();
+            case LEGACY:
+                return visitor.visitLegacy();
+            case MISC:
+                return visitor.visitMisc();
+            case AIRDROPS:
+                return visitor.visitAirdrops();
             case RESERVES:
                 return visitor.visitReserves();
             case CRYPTO:
@@ -125,22 +169,16 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
                 return visitor.visitWalletsAndBalance();
             case WITHDRAWALS:
                 return visitor.visitWithdrawals();
-            case OPERATIONAL_COSTS:
-                return visitor.visitOperationalCosts();
             case CAPITAL:
                 return visitor.visitCapital();
             case TRANSFERS:
                 return visitor.visitTransfers();
-            case REFUNDS:
-                return visitor.visitRefunds();
-            case FEES:
-                return visitor.visitFees();
+            case CARD_SPEND:
+                return visitor.visitCardSpend();
             case BALANCE:
                 return visitor.visitBalance();
             case OTHER:
                 return visitor.visitOther();
-            case SUBACCOUNTS:
-                return visitor.visitSubaccounts();
             case DISPUTES:
                 return visitor.visitDisputes();
             case PAYMENTS:
@@ -149,16 +187,8 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
                 return visitor.visitPlatformCredits();
             case AFFILIATES_AND_REVSHARE:
                 return visitor.visitAffiliatesAndRevshare();
-            case LEVELS_POINTS:
-                return visitor.visitLevelsPoints();
             case FX:
                 return visitor.visitFx();
-            case LEGACY:
-                return visitor.visitLegacy();
-            case MISC:
-                return visitor.visitMisc();
-            case AIRDROPS:
-                return visitor.visitAirdrops();
             case BAD_DEBT:
                 return visitor.visitBadDebt();
             case UNKNOWN:
@@ -170,8 +200,34 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static RetrieveFinancialReportsResponseRowsItemGrouping valueOf(String value) {
         switch (value) {
+            case "platforms":
+                return PLATFORMS;
             case "clawbacks":
                 return CLAWBACKS;
+            case "partners":
+                return PARTNERS;
+            case "deposits":
+                return DEPOSITS;
+            case "affiliates":
+                return AFFILIATES;
+            case "operational_costs":
+                return OPERATIONAL_COSTS;
+            case "invest":
+                return INVEST;
+            case "refunds":
+                return REFUNDS;
+            case "fees":
+                return FEES;
+            case "subaccounts":
+                return SUBACCOUNTS;
+            case "levels_points":
+                return LEVELS_POINTS;
+            case "legacy":
+                return LEGACY;
+            case "misc":
+                return MISC;
+            case "airdrops":
+                return AIRDROPS;
             case "reserves":
                 return RESERVES;
             case "crypto":
@@ -182,22 +238,16 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
                 return WALLETS_AND_BALANCE;
             case "withdrawals":
                 return WITHDRAWALS;
-            case "operational_costs":
-                return OPERATIONAL_COSTS;
             case "capital":
                 return CAPITAL;
             case "transfers":
                 return TRANSFERS;
-            case "refunds":
-                return REFUNDS;
-            case "fees":
-                return FEES;
+            case "card_spend":
+                return CARD_SPEND;
             case "balance":
                 return BALANCE;
             case "other":
                 return OTHER;
-            case "subaccounts":
-                return SUBACCOUNTS;
             case "disputes":
                 return DISPUTES;
             case "payments":
@@ -206,16 +256,8 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
                 return PLATFORM_CREDITS;
             case "affiliates_and_revshare":
                 return AFFILIATES_AND_REVSHARE;
-            case "levels_points":
-                return LEVELS_POINTS;
             case "fx":
                 return FX;
-            case "legacy":
-                return LEGACY;
-            case "misc":
-                return MISC;
-            case "airdrops":
-                return AIRDROPS;
             case "bad_debt":
                 return BAD_DEBT;
             default:
@@ -225,6 +267,8 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
     public enum Value {
         ADVERTISING,
+
+        AFFILIATES,
 
         AFFILIATES_AND_REVSHARE,
 
@@ -236,15 +280,21 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
         CAPITAL,
 
+        CARD_SPEND,
+
         CLAWBACKS,
 
         CRYPTO,
+
+        DEPOSITS,
 
         DISPUTES,
 
         FEES,
 
         FX,
+
+        INVEST,
 
         LEGACY,
 
@@ -256,9 +306,13 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
         OTHER,
 
+        PARTNERS,
+
         PAYMENTS,
 
         PLATFORM_CREDITS,
+
+        PLATFORMS,
 
         REFUNDS,
 
@@ -278,6 +332,8 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
     public interface Visitor<T> {
         T visitAdvertising();
 
+        T visitAffiliates();
+
         T visitAffiliatesAndRevshare();
 
         T visitAirdrops();
@@ -288,15 +344,21 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
         T visitCapital();
 
+        T visitCardSpend();
+
         T visitClawbacks();
 
         T visitCrypto();
+
+        T visitDeposits();
 
         T visitDisputes();
 
         T visitFees();
 
         T visitFx();
+
+        T visitInvest();
 
         T visitLegacy();
 
@@ -308,9 +370,13 @@ public final class RetrieveFinancialReportsResponseRowsItemGrouping {
 
         T visitOther();
 
+        T visitPartners();
+
         T visitPayments();
 
         T visitPlatformCredits();
+
+        T visitPlatforms();
 
         T visitRefunds();
 

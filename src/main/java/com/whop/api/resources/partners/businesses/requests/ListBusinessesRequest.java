@@ -33,6 +33,8 @@ public final class ListBusinessesRequest {
 
     private final Optional<Boolean> hasEarnings;
 
+    private final Optional<Boolean> countedInNetworkVolume;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -72,6 +74,7 @@ public final class ListBusinessesRequest {
             Optional<ListBusinessesRequestAdvanceStatus> advanceStatus,
             Optional<ListBusinessesRequestStatus> status,
             Optional<Boolean> hasEarnings,
+            Optional<Boolean> countedInNetworkVolume,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
@@ -93,6 +96,7 @@ public final class ListBusinessesRequest {
         this.advanceStatus = advanceStatus;
         this.status = status;
         this.hasEarnings = hasEarnings;
+        this.countedInNetworkVolume = countedInNetworkVolume;
         this.first = first;
         this.after = after;
         this.last = last;
@@ -142,6 +146,14 @@ public final class ListBusinessesRequest {
     @JsonProperty("has_earnings")
     public Optional<Boolean> getHasEarnings() {
         return hasEarnings;
+    }
+
+    /**
+     * @return When true, only the referrals that the <code>partner_network_volume</code> series count today. A referral whose window has ended is left out. Requires <code>referring_account_id</code>.
+     */
+    @JsonProperty("counted_in_network_volume")
+    public Optional<Boolean> getCountedInNetworkVolume() {
+        return countedInNetworkVolume;
     }
 
     /**
@@ -288,6 +300,7 @@ public final class ListBusinessesRequest {
                 && advanceStatus.equals(other.advanceStatus)
                 && status.equals(other.status)
                 && hasEarnings.equals(other.hasEarnings)
+                && countedInNetworkVolume.equals(other.countedInNetworkVolume)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
@@ -313,6 +326,7 @@ public final class ListBusinessesRequest {
                 this.advanceStatus,
                 this.status,
                 this.hasEarnings,
+                this.countedInNetworkVolume,
                 this.first,
                 this.after,
                 this.last,
@@ -349,6 +363,8 @@ public final class ListBusinessesRequest {
         private Optional<ListBusinessesRequestStatus> status = Optional.empty();
 
         private Optional<Boolean> hasEarnings = Optional.empty();
+
+        private Optional<Boolean> countedInNetworkVolume = Optional.empty();
 
         private Optional<Integer> first = Optional.empty();
 
@@ -391,6 +407,7 @@ public final class ListBusinessesRequest {
             advanceStatus(other.getAdvanceStatus());
             status(other.getStatus());
             hasEarnings(other.getHasEarnings());
+            countedInNetworkVolume(other.getCountedInNetworkVolume());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
@@ -463,6 +480,20 @@ public final class ListBusinessesRequest {
 
         public Builder hasEarnings(Boolean hasEarnings) {
             this.hasEarnings = Optional.ofNullable(hasEarnings);
+            return this;
+        }
+
+        /**
+         * <p>When true, only the referrals that the <code>partner_network_volume</code> series count today. A referral whose window has ended is left out. Requires <code>referring_account_id</code>.</p>
+         */
+        @JsonSetter(value = "counted_in_network_volume", nulls = Nulls.SKIP)
+        public Builder countedInNetworkVolume(Optional<Boolean> countedInNetworkVolume) {
+            this.countedInNetworkVolume = countedInNetworkVolume;
+            return this;
+        }
+
+        public Builder countedInNetworkVolume(Boolean countedInNetworkVolume) {
+            this.countedInNetworkVolume = Optional.ofNullable(countedInNetworkVolume);
             return this;
         }
 
@@ -696,6 +727,7 @@ public final class ListBusinessesRequest {
                     advanceStatus,
                     status,
                     hasEarnings,
+                    countedInNetworkVolume,
                     first,
                     after,
                     last,
@@ -721,6 +753,7 @@ public final class ListBusinessesRequest {
                     || key.equalsIgnoreCase("advance_status")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("has_earnings")
+                    || key.equalsIgnoreCase("counted_in_network_volume")
                     || key.equalsIgnoreCase("first")
                     || key.equalsIgnoreCase("after")
                     || key.equalsIgnoreCase("last")

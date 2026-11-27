@@ -31,14 +31,14 @@ public class ChannelMembersClient {
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public SyncPagingIterable<ChannelMember> list(ListChannelMembersRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public SyncPagingIterable<ChannelMember> list(ListChannelMembersRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();

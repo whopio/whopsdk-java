@@ -60,28 +60,28 @@ public class RawPaymentsClient {
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Payment>> list() {
         return list(ListPaymentsRequest.builder().build());
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(RequestOptions requestOptions) {
         return list(ListPaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(ListPaymentsRequest request) {
         return list(request, null);
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public WhopApiHttpResponse<SyncPagingIterable<Payment>> list(
             ListPaymentsRequest request, RequestOptions requestOptions) {
@@ -589,28 +589,28 @@ public class RawPaymentsClient {
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public WhopApiHttpResponse<Payment> retrieve(String id) {
         return retrieve(id, RetrievePaymentsRequest.builder().build());
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public WhopApiHttpResponse<Payment> retrieve(String id, RequestOptions requestOptions) {
         return retrieve(id, RetrievePaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public WhopApiHttpResponse<Payment> retrieve(String id, RetrievePaymentsRequest request) {
         return retrieve(id, request, null);
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public WhopApiHttpResponse<Payment> retrieve(
             String id, RetrievePaymentsRequest request, RequestOptions requestOptions) {
@@ -774,28 +774,28 @@ public class RawPaymentsClient {
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public WhopApiHttpResponse<PaymentStatus> capture(String id) {
         return capture(id, CapturePaymentsRequest.builder().build());
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public WhopApiHttpResponse<PaymentStatus> capture(String id, RequestOptions requestOptions) {
         return capture(id, CapturePaymentsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public WhopApiHttpResponse<PaymentStatus> capture(String id, CapturePaymentsRequest request) {
         return capture(id, request, null);
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public WhopApiHttpResponse<PaymentStatus> capture(
             String id, CapturePaymentsRequest request, RequestOptions requestOptions) {
@@ -809,16 +809,22 @@ public class RawPaymentsClient {
                 httpUrl.addQueryParameter(_key, _value);
             });
         }
-        Request.Builder _requestBuilder = new Request.Builder()
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(BodyProperties.merge(
+                            request, requestOptions != null ? requestOptions.getBodyProperties() : null)),
+                    MediaTypes.APPLICATION_JSON);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to serialize request", e);
+        }
+        Request okhttpRequest = new Request.Builder()
                 .url(httpUrl.build())
-                .method(
-                        "POST",
-                        BodyProperties.toRequestBody(
-                                requestOptions != null ? requestOptions.getBodyProperties() : null,
-                                RequestBody.create("", null)))
+                .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
-                .addHeader("Accept", "application/json");
-        Request okhttpRequest = _requestBuilder.build();
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);

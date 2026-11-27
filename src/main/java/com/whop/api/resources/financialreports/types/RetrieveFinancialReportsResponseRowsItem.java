@@ -105,7 +105,7 @@ public final class RetrieveFinancialReportsResponseRowsItem {
     }
 
     /**
-     * @return The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead.
+     * @return The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead. A <code>savings_revaluation</code> row is the change in the value of savings shares above one dollar each.
      */
     @JsonProperty("line_category")
     public RetrieveFinancialReportsResponseRowsItemLineCategory getLineCategory() {
@@ -231,7 +231,7 @@ public final class RetrieveFinancialReportsResponseRowsItem {
 
     public interface LineCategoryStage {
         /**
-         * <p>The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead.</p>
+         * <p>The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead. A <code>savings_revaluation</code> row is the change in the value of savings shares above one dollar each.</p>
          */
         PeriodStage lineCategory(@NotNull RetrieveFinancialReportsResponseRowsItemLineCategory lineCategory);
     }
@@ -346,7 +346,7 @@ public final class RetrieveFinancialReportsResponseRowsItem {
         }
 
         /**
-         * <p>The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead.</p>
+         * <p>The ledger line category the row aggregates. Balance summary rows carry the balance bucket instead. A <code>savings_revaluation</code> row is the change in the value of savings shares above one dollar each.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

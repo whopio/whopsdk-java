@@ -56,6 +56,9 @@ public final class DomainIssueCode {
     public static final DomainIssueCode TRANSFER_REJECTED =
             new DomainIssueCode(Value.TRANSFER_REJECTED, "transfer_rejected");
 
+    public static final DomainIssueCode TRANSFER_OUT_LOCKED =
+            new DomainIssueCode(Value.TRANSFER_OUT_LOCKED, "transfer_out_locked");
+
     public static final DomainIssueCode PIXEL_QUIET = new DomainIssueCode(Value.PIXEL_QUIET, "pixel_quiet");
 
     public static final DomainIssueCode CHECK_FAILED = new DomainIssueCode(Value.CHECK_FAILED, "check_failed");
@@ -95,6 +98,9 @@ public final class DomainIssueCode {
 
     public static final DomainIssueCode EMAIL_VERIFICATION_FAILED =
             new DomainIssueCode(Value.EMAIL_VERIFICATION_FAILED, "email_verification_failed");
+
+    public static final DomainIssueCode REGISTRAR_UNAVAILABLE =
+            new DomainIssueCode(Value.REGISTRAR_UNAVAILABLE, "registrar_unavailable");
 
     public static final DomainIssueCode OWNERSHIP_LOST = new DomainIssueCode(Value.OWNERSHIP_LOST, "ownership_lost");
 
@@ -173,6 +179,8 @@ public final class DomainIssueCode {
                 return visitor.visitProviderValidation();
             case TRANSFER_REJECTED:
                 return visitor.visitTransferRejected();
+            case TRANSFER_OUT_LOCKED:
+                return visitor.visitTransferOutLocked();
             case PIXEL_QUIET:
                 return visitor.visitPixelQuiet();
             case CHECK_FAILED:
@@ -205,6 +213,8 @@ public final class DomainIssueCode {
                 return visitor.visitTransferAuthCodeRejected();
             case EMAIL_VERIFICATION_FAILED:
                 return visitor.visitEmailVerificationFailed();
+            case REGISTRAR_UNAVAILABLE:
+                return visitor.visitRegistrarUnavailable();
             case OWNERSHIP_LOST:
                 return visitor.visitOwnershipLost();
             case REGISTRATION_FAILED:
@@ -256,6 +266,8 @@ public final class DomainIssueCode {
                 return PROVIDER_VALIDATION;
             case "transfer_rejected":
                 return TRANSFER_REJECTED;
+            case "transfer_out_locked":
+                return TRANSFER_OUT_LOCKED;
             case "pixel_quiet":
                 return PIXEL_QUIET;
             case "check_failed":
@@ -288,6 +300,8 @@ public final class DomainIssueCode {
                 return TRANSFER_AUTH_CODE_REJECTED;
             case "email_verification_failed":
                 return EMAIL_VERIFICATION_FAILED;
+            case "registrar_unavailable":
+                return REGISTRAR_UNAVAILABLE;
             case "ownership_lost":
                 return OWNERSHIP_LOST;
             case "registration_failed":
@@ -349,6 +363,10 @@ public final class DomainIssueCode {
         TRANSFER_NOT_CANCELLABLE,
 
         DOMAIN_TRANSFER_FAILED,
+
+        TRANSFER_OUT_LOCKED,
+
+        REGISTRAR_UNAVAILABLE,
 
         APPLE_PAY_UNVERIFIED,
 
@@ -427,6 +445,10 @@ public final class DomainIssueCode {
         T visitTransferNotCancellable();
 
         T visitDomainTransferFailed();
+
+        T visitTransferOutLocked();
+
+        T visitRegistrarUnavailable();
 
         T visitApplePayUnverified();
 

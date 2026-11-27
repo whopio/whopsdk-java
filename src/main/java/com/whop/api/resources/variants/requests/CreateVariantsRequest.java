@@ -258,7 +258,7 @@ public final class CreateVariantsRequest {
     }
 
     /**
-     * @return An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.
+     * @return An array of custom field definitions to collect from customers at checkout. On update, omitting this field leaves existing custom fields unchanged. Send an empty array to clear them.
      */
     @JsonIgnore
     public Optional<List<CreateVariantsRequestCustomFieldsItem>> getCustomFields() {
@@ -1014,7 +1014,7 @@ public final class CreateVariantsRequest {
         }
 
         /**
-         * <p>An array of custom field definitions to collect from customers at checkout. Omitting this field clears existing custom fields.</p>
+         * <p>An array of custom field definitions to collect from customers at checkout. On update, omitting this field leaves existing custom fields unchanged. Send an empty array to clear them.</p>
          */
         @JsonSetter(value = "custom_fields", nulls = Nulls.SKIP)
         public Builder customFields(Optional<List<CreateVariantsRequestCustomFieldsItem>> customFields) {

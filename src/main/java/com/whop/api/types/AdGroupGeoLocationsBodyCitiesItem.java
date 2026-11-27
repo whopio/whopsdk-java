@@ -35,7 +35,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
     }
 
     /**
-     * @return The city's key in the location taxonomy.
+     * @return The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.
      */
     @JsonProperty("key")
     public String getKey() {
@@ -81,7 +81,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
 
     public interface KeyStage {
         /**
-         * <p>The city's key in the location taxonomy.</p>
+         * <p>The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.</p>
          */
         _FinalStage key(@NotNull String key);
 
@@ -121,7 +121,7 @@ public final class AdGroupGeoLocationsBodyCitiesItem {
         }
 
         /**
-         * <p>The city's key in the location taxonomy.</p>
+         * <p>The city's key: its US state or country, then its name, such as <code>US-TX:Austin</code>. An older ad group can hold a numeric key, which stays valid.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

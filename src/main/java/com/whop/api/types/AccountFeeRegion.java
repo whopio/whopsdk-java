@@ -15,11 +15,15 @@ public final class AccountFeeRegion {
 
     public static final AccountFeeRegion PH = new AccountFeeRegion(Value.PH, "ph");
 
+    public static final AccountFeeRegion EC = new AccountFeeRegion(Value.EC, "ec");
+
     public static final AccountFeeRegion MX = new AccountFeeRegion(Value.MX, "mx");
 
     public static final AccountFeeRegion AR = new AccountFeeRegion(Value.AR, "ar");
 
     public static final AccountFeeRegion CL = new AccountFeeRegion(Value.CL, "cl");
+
+    public static final AccountFeeRegion HN = new AccountFeeRegion(Value.HN, "hn");
 
     public static final AccountFeeRegion CA = new AccountFeeRegion(Value.CA, "ca");
 
@@ -42,6 +46,8 @@ public final class AccountFeeRegion {
     public static final AccountFeeRegion SV = new AccountFeeRegion(Value.SV, "sv");
 
     public static final AccountFeeRegion EU = new AccountFeeRegion(Value.EU, "eu");
+
+    public static final AccountFeeRegion PY = new AccountFeeRegion(Value.PY, "py");
 
     public static final AccountFeeRegion PE = new AccountFeeRegion(Value.PE, "pe");
 
@@ -87,12 +93,16 @@ public final class AccountFeeRegion {
                 return visitor.visitGt();
             case PH:
                 return visitor.visitPh();
+            case EC:
+                return visitor.visitEc();
             case MX:
                 return visitor.visitMx();
             case AR:
                 return visitor.visitAr();
             case CL:
                 return visitor.visitCl();
+            case HN:
+                return visitor.visitHn();
             case CA:
                 return visitor.visitCa();
             case MY:
@@ -115,6 +125,8 @@ public final class AccountFeeRegion {
                 return visitor.visitSv();
             case EU:
                 return visitor.visitEu();
+            case PY:
+                return visitor.visitPy();
             case PE:
                 return visitor.visitPe();
             case CR:
@@ -136,12 +148,16 @@ public final class AccountFeeRegion {
                 return GT;
             case "ph":
                 return PH;
+            case "ec":
+                return EC;
             case "mx":
                 return MX;
             case "ar":
                 return AR;
             case "cl":
                 return CL;
+            case "hn":
+                return HN;
             case "ca":
                 return CA;
             case "my":
@@ -164,6 +180,8 @@ public final class AccountFeeRegion {
                 return SV;
             case "eu":
                 return EU;
+            case "py":
+                return PY;
             case "pe":
                 return PE;
             case "cr":
@@ -214,6 +232,12 @@ public final class AccountFeeRegion {
 
         SV,
 
+        HN,
+
+        EC,
+
+        PY,
+
         UNKNOWN
     }
 
@@ -257,6 +281,12 @@ public final class AccountFeeRegion {
         T visitDo();
 
         T visitSv();
+
+        T visitHn();
+
+        T visitEc();
+
+        T visitPy();
 
         T visitUnknown(String unknownType);
     }

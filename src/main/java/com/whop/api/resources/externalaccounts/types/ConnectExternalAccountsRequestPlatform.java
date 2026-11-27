@@ -22,6 +22,9 @@ public final class ConnectExternalAccountsRequestPlatform {
     public static final ConnectExternalAccountsRequestPlatform TIKTOK =
             new ConnectExternalAccountsRequestPlatform(Value.TIKTOK, "tiktok");
 
+    public static final ConnectExternalAccountsRequestPlatform STRIPE =
+            new ConnectExternalAccountsRequestPlatform(Value.STRIPE, "stripe");
+
     private final Value value;
 
     private final String string;
@@ -65,6 +68,8 @@ public final class ConnectExternalAccountsRequestPlatform {
                 return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -84,6 +89,8 @@ public final class ConnectExternalAccountsRequestPlatform {
                 return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new ConnectExternalAccountsRequestPlatform(Value.UNKNOWN, value);
         }
@@ -100,6 +107,8 @@ public final class ConnectExternalAccountsRequestPlatform {
 
         QUICKBOOKS,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -113,6 +122,8 @@ public final class ConnectExternalAccountsRequestPlatform {
         T visitX();
 
         T visitQuickbooks();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

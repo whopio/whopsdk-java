@@ -41,6 +41,8 @@ public final class ListVariantsRequest {
 
     private final Optional<ListVariantsRequestOrder> order;
 
+    private final Optional<String> sku;
+
     private final Optional<String> createdBefore;
 
     private final Optional<String> createdAfter;
@@ -69,6 +71,7 @@ public final class ListVariantsRequest {
             Optional<String> accountId,
             Optional<ListVariantsRequestDirection> direction,
             Optional<ListVariantsRequestOrder> order,
+            Optional<String> sku,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
             Optional<String> presentmentCurrency,
@@ -86,6 +89,7 @@ public final class ListVariantsRequest {
         this.accountId = accountId;
         this.direction = direction;
         this.order = order;
+        this.sku = sku;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
         this.presentmentCurrency = presentmentCurrency;
@@ -152,6 +156,14 @@ public final class ListVariantsRequest {
     @JsonProperty("order")
     public Optional<ListVariantsRequestOrder> getOrder() {
         return order;
+    }
+
+    /**
+     * @return Filter to only variants with this stock keeping unit. The match is on the full value and is not case-sensitive.
+     */
+    @JsonProperty("sku")
+    public Optional<String> getSku() {
+        return sku;
     }
 
     /**
@@ -272,6 +284,7 @@ public final class ListVariantsRequest {
                 && accountId.equals(other.accountId)
                 && direction.equals(other.direction)
                 && order.equals(other.order)
+                && sku.equals(other.sku)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && presentmentCurrency.equals(other.presentmentCurrency)
@@ -293,6 +306,7 @@ public final class ListVariantsRequest {
                 this.accountId,
                 this.direction,
                 this.order,
+                this.sku,
                 this.createdBefore,
                 this.createdAfter,
                 this.presentmentCurrency,
@@ -329,6 +343,8 @@ public final class ListVariantsRequest {
 
         private Optional<ListVariantsRequestOrder> order = Optional.empty();
 
+        private Optional<String> sku = Optional.empty();
+
         private Optional<String> createdBefore = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
@@ -359,6 +375,7 @@ public final class ListVariantsRequest {
             accountId(other.getAccountId());
             direction(other.getDirection());
             order(other.getOrder());
+            sku(other.getSku());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
             presentmentCurrency(other.getPresentmentCurrency());
@@ -486,6 +503,20 @@ public final class ListVariantsRequest {
 
         public Builder order(ListVariantsRequestOrder order) {
             this.order = Optional.ofNullable(order);
+            return this;
+        }
+
+        /**
+         * <p>Filter to only variants with this stock keeping unit. The match is on the full value and is not case-sensitive.</p>
+         */
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public Builder sku(Optional<String> sku) {
+            this.sku = sku;
+            return this;
+        }
+
+        public Builder sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
             return this;
         }
 
@@ -657,6 +688,7 @@ public final class ListVariantsRequest {
                     accountId,
                     direction,
                     order,
+                    sku,
                     createdBefore,
                     createdAfter,
                     presentmentCurrency,
@@ -678,6 +710,7 @@ public final class ListVariantsRequest {
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("direction")
                     || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("sku")
                     || key.equalsIgnoreCase("created_before")
                     || key.equalsIgnoreCase("created_after")
                     || key.equalsIgnoreCase("presentment_currency")

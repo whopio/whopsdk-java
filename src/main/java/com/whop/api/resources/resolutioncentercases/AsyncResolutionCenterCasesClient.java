@@ -41,7 +41,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list() {
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
@@ -57,7 +57,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
@@ -73,7 +73,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(ListResolutionCenterCasesRequest request) {
         CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ResolutionCenterCase>>> rawFuture =
@@ -89,7 +89,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read — the ones you opened as a buyer and every account you are a team member of; the filters narrow that list.
+     * Lists resolution center cases. Without <code>account_id</code> you get every case you can read: cases you opened as a buyer, and cases on accounts where you are on the team. The filters narrow that list.
      */
     public CompletableFuture<SyncPagingIterable<ResolutionCenterCase>> list(
             ListResolutionCenterCasesRequest request, RequestOptions requestOptions) {
@@ -106,7 +106,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public CompletableFuture<ResolutionCenterCase> create(CreateResolutionCenterCasesRequest request) {
         CompletableFuture<WhopApiHttpResponse<ResolutionCenterCase>> rawFuture = this.rawClient.create(request);
@@ -120,7 +120,7 @@ public class AsyncResolutionCenterCasesClient {
     }
 
     /**
-     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>.
+     * Opens a case, as the customer, against one of your own payments. Provide the payment (<code>receipt_id</code>), the <code>reason</code>, and a <code>message</code>. Send <code>answers</code> to record the customer's answers to the questions for that reason.
      */
     public CompletableFuture<ResolutionCenterCase> create(
             CreateResolutionCenterCasesRequest request, RequestOptions requestOptions) {

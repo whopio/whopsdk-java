@@ -21,13 +21,14 @@ import org.jetbrains.annotations.NotNull;
 public final class AutomationActor {
     private final String id;
 
-    private final AutomationActorObject object;
+    private final AutomationActorResourceType resourceType;
 
     private final Map<String, Object> additionalProperties;
 
-    private AutomationActor(String id, AutomationActorObject object, Map<String, Object> additionalProperties) {
+    private AutomationActor(
+            String id, AutomationActorResourceType resourceType, Map<String, Object> additionalProperties) {
         this.id = id;
-        this.object = object;
+        this.resourceType = resourceType;
         this.additionalProperties = additionalProperties;
     }
 
@@ -42,9 +43,9 @@ public final class AutomationActor {
     /**
      * @return What acted: a <code>user</code>, an <code>account</code> through one of its API keys, or an <code>app</code>.
      */
-    @JsonProperty("object")
-    public AutomationActorObject getObject() {
-        return object;
+    @JsonProperty("resource_type")
+    public AutomationActorResourceType getResourceType() {
+        return resourceType;
     }
 
     @java.lang.Override
@@ -59,12 +60,12 @@ public final class AutomationActor {
     }
 
     private boolean equalTo(AutomationActor other) {
-        return id.equals(other.id) && object.equals(other.object);
+        return id.equals(other.id) && resourceType.equals(other.resourceType);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.object);
+        return Objects.hash(this.id, this.resourceType);
     }
 
     @java.lang.Override
@@ -80,16 +81,16 @@ public final class AutomationActor {
         /**
          * <p>ID of the user, account or app, prefixed <code>user_</code>, <code>biz_</code> or <code>app_</code>.</p>
          */
-        ObjectStage id(@NotNull String id);
+        ResourceTypeStage id(@NotNull String id);
 
         Builder from(AutomationActor other);
     }
 
-    public interface ObjectStage {
+    public interface ResourceTypeStage {
         /**
          * <p>What acted: a <code>user</code>, an <code>account</code> through one of its API keys, or an <code>app</code>.</p>
          */
-        _FinalStage object(@NotNull AutomationActorObject object);
+        _FinalStage resourceType(@NotNull AutomationActorResourceType resourceType);
     }
 
     public interface _FinalStage {
@@ -101,10 +102,10 @@ public final class AutomationActor {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements IdStage, ObjectStage, _FinalStage {
+    public static final class Builder implements IdStage, ResourceTypeStage, _FinalStage {
         private String id;
 
-        private AutomationActorObject object;
+        private AutomationActorResourceType resourceType;
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -113,7 +114,7 @@ public final class AutomationActor {
         @java.lang.Override
         public Builder from(AutomationActor other) {
             id(other.getId());
-            object(other.getObject());
+            resourceType(other.getResourceType());
             return this;
         }
 
@@ -123,7 +124,7 @@ public final class AutomationActor {
          */
         @java.lang.Override
         @JsonSetter("id")
-        public ObjectStage id(@NotNull String id) {
+        public ResourceTypeStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
@@ -133,20 +134,20 @@ public final class AutomationActor {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("object")
-        public _FinalStage object(@NotNull AutomationActorObject object) {
-            this.object = Objects.requireNonNull(object, "object must not be null");
+        @JsonSetter("resource_type")
+        public _FinalStage resourceType(@NotNull AutomationActorResourceType resourceType) {
+            this.resourceType = Objects.requireNonNull(resourceType, "resourceType must not be null");
             return this;
         }
 
         @java.lang.Override
         public AutomationActor build() {
-            return new AutomationActor(id, object, additionalProperties);
+            return new AutomationActor(id, resourceType, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("object")) {
+            if (key.equalsIgnoreCase("id") || key.equalsIgnoreCase("resource_type")) {
                 return;
             }
             this.additionalProperties.put(key, value);

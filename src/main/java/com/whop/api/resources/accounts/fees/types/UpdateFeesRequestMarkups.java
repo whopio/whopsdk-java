@@ -23,6 +23,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateFeesRequestMarkups.Builder.class)
 public final class UpdateFeesRequestMarkups {
+    private final Optional<Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>>> cardRegions;
+
     private final Optional<UpdateFeesRequestMarkupsCardSpend> cardSpend;
 
     private final Optional<UpdateFeesRequestMarkupsCryptoSwaps> cryptoSwaps;
@@ -40,6 +42,7 @@ public final class UpdateFeesRequestMarkups {
     private final Map<String, Object> additionalProperties;
 
     private UpdateFeesRequestMarkups(
+            Optional<Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>>> cardRegions,
             Optional<UpdateFeesRequestMarkupsCardSpend> cardSpend,
             Optional<UpdateFeesRequestMarkupsCryptoSwaps> cryptoSwaps,
             Optional<Map<String, Optional<UpdateFeesRequestMarkupsDepositsValue>>> deposits,
@@ -48,6 +51,7 @@ public final class UpdateFeesRequestMarkups {
             Optional<Map<String, Optional<UpdateFeesRequestMarkupsPayoutsValue>>> payouts,
             Optional<UpdateFeesRequestMarkupsTransfers> transfers,
             Map<String, Object> additionalProperties) {
+        this.cardRegions = cardRegions;
         this.cardSpend = cardSpend;
         this.cryptoSwaps = cryptoSwaps;
         this.deposits = deposits;
@@ -56,6 +60,14 @@ public final class UpdateFeesRequestMarkups {
         this.payouts = payouts;
         this.transfers = transfers;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Markups on card payments, keyed by acquiring region: <code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>. <code>null</code> clears a region's markup so it uses <code>payment_methods.card</code>.
+     */
+    @JsonProperty("card_regions")
+    public Optional<Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>>> getCardRegions() {
+        return cardRegions;
     }
 
     /**
@@ -162,7 +174,8 @@ public final class UpdateFeesRequestMarkups {
     }
 
     private boolean equalTo(UpdateFeesRequestMarkups other) {
-        return cardSpend.equals(other.cardSpend)
+        return cardRegions.equals(other.cardRegions)
+                && cardSpend.equals(other.cardSpend)
                 && cryptoSwaps.equals(other.cryptoSwaps)
                 && deposits.equals(other.deposits)
                 && paymentMethods.equals(other.paymentMethods)
@@ -174,6 +187,7 @@ public final class UpdateFeesRequestMarkups {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.cardRegions,
                 this.cardSpend,
                 this.cryptoSwaps,
                 this.deposits,
@@ -194,6 +208,9 @@ public final class UpdateFeesRequestMarkups {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>>> cardRegions =
+                Optional.empty();
+
         private Optional<UpdateFeesRequestMarkupsCardSpend> cardSpend = Optional.empty();
 
         private Optional<UpdateFeesRequestMarkupsCryptoSwaps> cryptoSwaps = Optional.empty();
@@ -214,6 +231,7 @@ public final class UpdateFeesRequestMarkups {
         private Builder() {}
 
         public Builder from(UpdateFeesRequestMarkups other) {
+            cardRegions(other.getCardRegions());
             cardSpend(other.getCardSpend());
             cryptoSwaps(other.getCryptoSwaps());
             deposits(other.getDeposits());
@@ -221,6 +239,21 @@ public final class UpdateFeesRequestMarkups {
             payments(other.getPayments());
             payouts(other.getPayouts());
             transfers(other.getTransfers());
+            return this;
+        }
+
+        /**
+         * <p>Markups on card payments, keyed by acquiring region: <code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>. <code>null</code> clears a region's markup so it uses <code>payment_methods.card</code>.</p>
+         */
+        @JsonSetter(value = "card_regions", nulls = Nulls.SKIP)
+        public Builder cardRegions(
+                Optional<Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>>> cardRegions) {
+            this.cardRegions = cardRegions;
+            return this;
+        }
+
+        public Builder cardRegions(Map<String, Optional<UpdateFeesRequestMarkupsCardRegionsValue>> cardRegions) {
+            this.cardRegions = Optional.ofNullable(cardRegions);
             return this;
         }
 
@@ -370,6 +403,7 @@ public final class UpdateFeesRequestMarkups {
 
         public UpdateFeesRequestMarkups build() {
             return new UpdateFeesRequestMarkups(
+                    cardRegions,
                     cardSpend,
                     cryptoSwaps,
                     deposits,
@@ -382,7 +416,8 @@ public final class UpdateFeesRequestMarkups {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("card_spend")
+            if (key.equalsIgnoreCase("card_regions")
+                    || key.equalsIgnoreCase("card_spend")
                     || key.equalsIgnoreCase("crypto_swaps")
                     || key.equalsIgnoreCase("deposits")
                     || key.equalsIgnoreCase("payment_methods")

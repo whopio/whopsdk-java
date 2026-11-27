@@ -93,6 +93,9 @@ public class AsyncRawPlansClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "order", request.getOrder().get(), false);
         }
+        if (request.getSku().isPresent()) {
+            QueryStringMapper.addQueryParameter(httpUrl, "sku", request.getSku().get(), false);
+        }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_before", request.getCreatedBefore().get(), false);

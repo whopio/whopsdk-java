@@ -17,9 +17,13 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAdsPaymentMethods;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAdsTripleWhaleIntegration;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAffiliateProgram;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestAppleIapFeePayer;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestCardSurcharge;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestCustomerTracking;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestEconomicIntelligenceDurationKey;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestFeedbackOptionsItem;
+import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestMerchantOfRecord;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestPreferredSettlementCurrency;
 import com.whop.api.resources.accounts.preferences.types.UpdatePreferencesRequestSubscriptionFailureBehavior;
 import java.util.HashMap;
@@ -39,7 +43,13 @@ public final class UpdatePreferencesRequest {
 
     private final Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration;
 
+    private final Optional<UpdatePreferencesRequestAffiliateProgram> affiliateProgram;
+
+    private final Optional<UpdatePreferencesRequestAppleIapFeePayer> appleIapFeePayer;
+
     private final Optional<Boolean> cancellationEmails;
+
+    private final Optional<UpdatePreferencesRequestCardSurcharge> cardSurcharge;
 
     private final Optional<Boolean> cardsAutoTopUp;
 
@@ -58,6 +68,10 @@ public final class UpdatePreferencesRequest {
     private final Optional<Boolean> failedPaymentEmails;
 
     private final Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions;
+
+    private final Optional<UpdatePreferencesRequestMerchantOfRecord> merchantOfRecord;
+
+    private final Optional<Boolean> offSessionPaymentRules;
 
     private final Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency;
 
@@ -78,7 +92,10 @@ public final class UpdatePreferencesRequest {
             Optional<String> adsReportingCurrency,
             Optional<String> adsSchedulingTimezone,
             Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration,
+            Optional<UpdatePreferencesRequestAffiliateProgram> affiliateProgram,
+            Optional<UpdatePreferencesRequestAppleIapFeePayer> appleIapFeePayer,
             Optional<Boolean> cancellationEmails,
+            Optional<UpdatePreferencesRequestCardSurcharge> cardSurcharge,
             Optional<Boolean> cardsAutoTopUp,
             Optional<Boolean> cardsNotifications,
             Optional<Boolean> coversSubaccountNegativeBalances,
@@ -88,6 +105,8 @@ public final class UpdatePreferencesRequest {
             Optional<UpdatePreferencesRequestEconomicIntelligenceDurationKey> economicIntelligenceDurationKey,
             Optional<Boolean> failedPaymentEmails,
             Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions,
+            Optional<UpdatePreferencesRequestMerchantOfRecord> merchantOfRecord,
+            Optional<Boolean> offSessionPaymentRules,
             Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency,
             Optional<Boolean> renewalReminderEmails,
             Optional<Boolean> reviewRequestEmails,
@@ -99,7 +118,10 @@ public final class UpdatePreferencesRequest {
         this.adsReportingCurrency = adsReportingCurrency;
         this.adsSchedulingTimezone = adsSchedulingTimezone;
         this.adsTripleWhaleIntegration = adsTripleWhaleIntegration;
+        this.affiliateProgram = affiliateProgram;
+        this.appleIapFeePayer = appleIapFeePayer;
         this.cancellationEmails = cancellationEmails;
+        this.cardSurcharge = cardSurcharge;
         this.cardsAutoTopUp = cardsAutoTopUp;
         this.cardsNotifications = cardsNotifications;
         this.coversSubaccountNegativeBalances = coversSubaccountNegativeBalances;
@@ -109,6 +131,8 @@ public final class UpdatePreferencesRequest {
         this.economicIntelligenceDurationKey = economicIntelligenceDurationKey;
         this.failedPaymentEmails = failedPaymentEmails;
         this.feedbackOptions = feedbackOptions;
+        this.merchantOfRecord = merchantOfRecord;
+        this.offSessionPaymentRules = offSessionPaymentRules;
         this.preferredSettlementCurrency = preferredSettlementCurrency;
         this.renewalReminderEmails = renewalReminderEmails;
         this.reviewRequestEmails = reviewRequestEmails;
@@ -151,11 +175,35 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
+     * @return The account's affiliate program. Only the fields you send change, and fields left out keep their current values. To clear a field, set it to <code>null</code>. To turn affiliates on or off, set <code>global_affiliate_status</code> and <code>member_affiliate_status</code> on each product with <code>PATCH /products/{id}</code>. Requires the <code>affiliate:update</code> scope on your API key.
+     */
+    @JsonProperty("affiliate_program")
+    public Optional<UpdatePreferencesRequestAffiliateProgram> getAffiliateProgram() {
+        return affiliateProgram;
+    }
+
+    /**
+     * @return Who pays Apple's 30% fee on one-time purchases made in the Whop iOS app. Set it to <code>company</code> to sell at the product's own price and pay the fee from the sale. Set it to <code>buyer</code> to add about 43% to the iOS price, so the buyer pays the fee. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("apple_iap_fee_payer")
+    public Optional<UpdatePreferencesRequestAppleIapFeePayer> getAppleIapFeePayer() {
+        return appleIapFeePayer;
+    }
+
+    /**
      * @return Whether Whop emails members when their membership is canceled or terminated. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Requires the <code>company:update</code> scope on your API key.
      */
     @JsonProperty("cancellation_emails")
     public Optional<Boolean> getCancellationEmails() {
         return cancellationEmails;
+    }
+
+    /**
+     * @return The card surcharge a point of sale adds to credit card payments, replaced as a whole. You can always turn it off. You can turn it on only when <code>card_surcharge.maximum_percentage</code> is not null. Requires the <code>company:update</code> scope on your API key.
+     */
+    @JsonProperty("card_surcharge")
+    public Optional<UpdatePreferencesRequestCardSurcharge> getCardSurcharge() {
+        return cardSurcharge;
     }
 
     /**
@@ -226,11 +274,27 @@ public final class UpdatePreferencesRequest {
     }
 
     /**
-     * @return Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it; options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.
+     * @return Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it. Options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.
      */
     @JsonProperty("feedback_options")
     public Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> getFeedbackOptions() {
         return feedbackOptions;
+    }
+
+    /**
+     * @return Set it to <code>account</code> to make the account the merchant of record. Only some business categories can switch. A subaccount can also switch when Whop has approved its platform. Its business category must not be prohibited. The business must be verified. The switch cannot be undone. The response shows <code>pending</code> until approval. Checkout takes no payments until then. After the switch, the account accepts only card, Apple Pay, Google Pay and crypto payments. PayPal, buy now pay later and local payment methods stop. Requires the <code>payout:account:update</code> scope on your API key.
+     */
+    @JsonProperty("merchant_of_record")
+    public Optional<UpdatePreferencesRequestMerchantOfRecord> getMerchantOfRecord() {
+        return merchantOfRecord;
+    }
+
+    /**
+     * @return Whether this account's active payment rules apply to future off-session charges, including renewals. Off by default. Requires the payment:manage scope on your API key.
+     */
+    @JsonProperty("off_session_payment_rules")
+    public Optional<Boolean> getOffSessionPaymentRules() {
+        return offSessionPaymentRules;
     }
 
     /**
@@ -312,7 +376,10 @@ public final class UpdatePreferencesRequest {
                 && adsReportingCurrency.equals(other.adsReportingCurrency)
                 && adsSchedulingTimezone.equals(other.adsSchedulingTimezone)
                 && adsTripleWhaleIntegration.equals(other.adsTripleWhaleIntegration)
+                && affiliateProgram.equals(other.affiliateProgram)
+                && appleIapFeePayer.equals(other.appleIapFeePayer)
                 && cancellationEmails.equals(other.cancellationEmails)
+                && cardSurcharge.equals(other.cardSurcharge)
                 && cardsAutoTopUp.equals(other.cardsAutoTopUp)
                 && cardsNotifications.equals(other.cardsNotifications)
                 && coversSubaccountNegativeBalances.equals(other.coversSubaccountNegativeBalances)
@@ -322,6 +389,8 @@ public final class UpdatePreferencesRequest {
                 && economicIntelligenceDurationKey.equals(other.economicIntelligenceDurationKey)
                 && failedPaymentEmails.equals(other.failedPaymentEmails)
                 && feedbackOptions.equals(other.feedbackOptions)
+                && merchantOfRecord.equals(other.merchantOfRecord)
+                && offSessionPaymentRules.equals(other.offSessionPaymentRules)
                 && preferredSettlementCurrency.equals(other.preferredSettlementCurrency)
                 && renewalReminderEmails.equals(other.renewalReminderEmails)
                 && reviewRequestEmails.equals(other.reviewRequestEmails)
@@ -337,7 +406,10 @@ public final class UpdatePreferencesRequest {
                 this.adsReportingCurrency,
                 this.adsSchedulingTimezone,
                 this.adsTripleWhaleIntegration,
+                this.affiliateProgram,
+                this.appleIapFeePayer,
                 this.cancellationEmails,
+                this.cardSurcharge,
                 this.cardsAutoTopUp,
                 this.cardsNotifications,
                 this.coversSubaccountNegativeBalances,
@@ -347,6 +419,8 @@ public final class UpdatePreferencesRequest {
                 this.economicIntelligenceDurationKey,
                 this.failedPaymentEmails,
                 this.feedbackOptions,
+                this.merchantOfRecord,
+                this.offSessionPaymentRules,
                 this.preferredSettlementCurrency,
                 this.renewalReminderEmails,
                 this.reviewRequestEmails,
@@ -375,7 +449,13 @@ public final class UpdatePreferencesRequest {
         private Optional<UpdatePreferencesRequestAdsTripleWhaleIntegration> adsTripleWhaleIntegration =
                 Optional.empty();
 
+        private Optional<UpdatePreferencesRequestAffiliateProgram> affiliateProgram = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestAppleIapFeePayer> appleIapFeePayer = Optional.empty();
+
         private Optional<Boolean> cancellationEmails = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestCardSurcharge> cardSurcharge = Optional.empty();
 
         private Optional<Boolean> cardsAutoTopUp = Optional.empty();
 
@@ -395,6 +475,10 @@ public final class UpdatePreferencesRequest {
         private Optional<Boolean> failedPaymentEmails = Optional.empty();
 
         private Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions = Optional.empty();
+
+        private Optional<UpdatePreferencesRequestMerchantOfRecord> merchantOfRecord = Optional.empty();
+
+        private Optional<Boolean> offSessionPaymentRules = Optional.empty();
 
         private Optional<UpdatePreferencesRequestPreferredSettlementCurrency> preferredSettlementCurrency =
                 Optional.empty();
@@ -419,7 +503,10 @@ public final class UpdatePreferencesRequest {
             adsReportingCurrency(other.getAdsReportingCurrency());
             adsSchedulingTimezone(other.getAdsSchedulingTimezone());
             adsTripleWhaleIntegration(other.getAdsTripleWhaleIntegration());
+            affiliateProgram(other.getAffiliateProgram());
+            appleIapFeePayer(other.getAppleIapFeePayer());
             cancellationEmails(other.getCancellationEmails());
+            cardSurcharge(other.getCardSurcharge());
             cardsAutoTopUp(other.getCardsAutoTopUp());
             cardsNotifications(other.getCardsNotifications());
             coversSubaccountNegativeBalances(other.getCoversSubaccountNegativeBalances());
@@ -429,6 +516,8 @@ public final class UpdatePreferencesRequest {
             economicIntelligenceDurationKey(other.getEconomicIntelligenceDurationKey());
             failedPaymentEmails(other.getFailedPaymentEmails());
             feedbackOptions(other.getFeedbackOptions());
+            merchantOfRecord(other.getMerchantOfRecord());
+            offSessionPaymentRules(other.getOffSessionPaymentRules());
             preferredSettlementCurrency(other.getPreferredSettlementCurrency());
             renewalReminderEmails(other.getRenewalReminderEmails());
             reviewRequestEmails(other.getReviewRequestEmails());
@@ -497,6 +586,34 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
+         * <p>The account's affiliate program. Only the fields you send change, and fields left out keep their current values. To clear a field, set it to <code>null</code>. To turn affiliates on or off, set <code>global_affiliate_status</code> and <code>member_affiliate_status</code> on each product with <code>PATCH /products/{id}</code>. Requires the <code>affiliate:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "affiliate_program", nulls = Nulls.SKIP)
+        public Builder affiliateProgram(Optional<UpdatePreferencesRequestAffiliateProgram> affiliateProgram) {
+            this.affiliateProgram = affiliateProgram;
+            return this;
+        }
+
+        public Builder affiliateProgram(UpdatePreferencesRequestAffiliateProgram affiliateProgram) {
+            this.affiliateProgram = Optional.ofNullable(affiliateProgram);
+            return this;
+        }
+
+        /**
+         * <p>Who pays Apple's 30% fee on one-time purchases made in the Whop iOS app. Set it to <code>company</code> to sell at the product's own price and pay the fee from the sale. Set it to <code>buyer</code> to add about 43% to the iOS price, so the buyer pays the fee. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "apple_iap_fee_payer", nulls = Nulls.SKIP)
+        public Builder appleIapFeePayer(Optional<UpdatePreferencesRequestAppleIapFeePayer> appleIapFeePayer) {
+            this.appleIapFeePayer = appleIapFeePayer;
+            return this;
+        }
+
+        public Builder appleIapFeePayer(UpdatePreferencesRequestAppleIapFeePayer appleIapFeePayer) {
+            this.appleIapFeePayer = Optional.ofNullable(appleIapFeePayer);
+            return this;
+        }
+
+        /**
          * <p>Whether Whop emails members when their membership is canceled or terminated. Set it to <code>false</code> to stop these emails while keeping the account's other customer emails. Requires the <code>company:update</code> scope on your API key.</p>
          */
         @JsonSetter(value = "cancellation_emails", nulls = Nulls.SKIP)
@@ -507,6 +624,20 @@ public final class UpdatePreferencesRequest {
 
         public Builder cancellationEmails(Boolean cancellationEmails) {
             this.cancellationEmails = Optional.ofNullable(cancellationEmails);
+            return this;
+        }
+
+        /**
+         * <p>The card surcharge a point of sale adds to credit card payments, replaced as a whole. You can always turn it off. You can turn it on only when <code>card_surcharge.maximum_percentage</code> is not null. Requires the <code>company:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "card_surcharge", nulls = Nulls.SKIP)
+        public Builder cardSurcharge(Optional<UpdatePreferencesRequestCardSurcharge> cardSurcharge) {
+            this.cardSurcharge = cardSurcharge;
+            return this;
+        }
+
+        public Builder cardSurcharge(UpdatePreferencesRequestCardSurcharge cardSurcharge) {
+            this.cardSurcharge = Optional.ofNullable(cardSurcharge);
             return this;
         }
 
@@ -636,7 +767,7 @@ public final class UpdatePreferencesRequest {
         }
 
         /**
-         * <p>Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it; options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.</p>
+         * <p>Replaces the account's own cancel reasons, shown to members in this order when they cancel. Pass an option's <code>id</code> to keep it, for example when renaming it. Options without an <code>id</code> are added, and options left out are removed. Pass an empty array to go back to Whop's default reasons. Members who already picked an option keep the label they saw. Requires the <code>company:manage_checkout</code> scope on your API key.</p>
          */
         @JsonSetter(value = "feedback_options", nulls = Nulls.SKIP)
         public Builder feedbackOptions(Optional<List<UpdatePreferencesRequestFeedbackOptionsItem>> feedbackOptions) {
@@ -646,6 +777,34 @@ public final class UpdatePreferencesRequest {
 
         public Builder feedbackOptions(List<UpdatePreferencesRequestFeedbackOptionsItem> feedbackOptions) {
             this.feedbackOptions = Optional.ofNullable(feedbackOptions);
+            return this;
+        }
+
+        /**
+         * <p>Set it to <code>account</code> to make the account the merchant of record. Only some business categories can switch. A subaccount can also switch when Whop has approved its platform. Its business category must not be prohibited. The business must be verified. The switch cannot be undone. The response shows <code>pending</code> until approval. Checkout takes no payments until then. After the switch, the account accepts only card, Apple Pay, Google Pay and crypto payments. PayPal, buy now pay later and local payment methods stop. Requires the <code>payout:account:update</code> scope on your API key.</p>
+         */
+        @JsonSetter(value = "merchant_of_record", nulls = Nulls.SKIP)
+        public Builder merchantOfRecord(Optional<UpdatePreferencesRequestMerchantOfRecord> merchantOfRecord) {
+            this.merchantOfRecord = merchantOfRecord;
+            return this;
+        }
+
+        public Builder merchantOfRecord(UpdatePreferencesRequestMerchantOfRecord merchantOfRecord) {
+            this.merchantOfRecord = Optional.ofNullable(merchantOfRecord);
+            return this;
+        }
+
+        /**
+         * <p>Whether this account's active payment rules apply to future off-session charges, including renewals. Off by default. Requires the payment:manage scope on your API key.</p>
+         */
+        @JsonSetter(value = "off_session_payment_rules", nulls = Nulls.SKIP)
+        public Builder offSessionPaymentRules(Optional<Boolean> offSessionPaymentRules) {
+            this.offSessionPaymentRules = offSessionPaymentRules;
+            return this;
+        }
+
+        public Builder offSessionPaymentRules(Boolean offSessionPaymentRules) {
+            this.offSessionPaymentRules = Optional.ofNullable(offSessionPaymentRules);
             return this;
         }
 
@@ -755,7 +914,10 @@ public final class UpdatePreferencesRequest {
                     adsReportingCurrency,
                     adsSchedulingTimezone,
                     adsTripleWhaleIntegration,
+                    affiliateProgram,
+                    appleIapFeePayer,
                     cancellationEmails,
+                    cardSurcharge,
                     cardsAutoTopUp,
                     cardsNotifications,
                     coversSubaccountNegativeBalances,
@@ -765,6 +927,8 @@ public final class UpdatePreferencesRequest {
                     economicIntelligenceDurationKey,
                     failedPaymentEmails,
                     feedbackOptions,
+                    merchantOfRecord,
+                    offSessionPaymentRules,
                     preferredSettlementCurrency,
                     renewalReminderEmails,
                     reviewRequestEmails,
@@ -780,7 +944,10 @@ public final class UpdatePreferencesRequest {
                     || key.equalsIgnoreCase("ads_reporting_currency")
                     || key.equalsIgnoreCase("ads_scheduling_timezone")
                     || key.equalsIgnoreCase("ads_triple_whale_integration")
+                    || key.equalsIgnoreCase("affiliate_program")
+                    || key.equalsIgnoreCase("apple_iap_fee_payer")
                     || key.equalsIgnoreCase("cancellation_emails")
+                    || key.equalsIgnoreCase("card_surcharge")
                     || key.equalsIgnoreCase("cards_auto_top_up")
                     || key.equalsIgnoreCase("cards_notifications")
                     || key.equalsIgnoreCase("covers_subaccount_negative_balances")
@@ -790,6 +957,8 @@ public final class UpdatePreferencesRequest {
                     || key.equalsIgnoreCase("economic_intelligence_duration_key")
                     || key.equalsIgnoreCase("failed_payment_emails")
                     || key.equalsIgnoreCase("feedback_options")
+                    || key.equalsIgnoreCase("merchant_of_record")
+                    || key.equalsIgnoreCase("off_session_payment_rules")
                     || key.equalsIgnoreCase("preferred_settlement_currency")
                     || key.equalsIgnoreCase("renewal_reminder_emails")
                     || key.equalsIgnoreCase("review_request_emails")

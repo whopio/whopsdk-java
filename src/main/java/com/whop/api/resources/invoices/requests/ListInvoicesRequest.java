@@ -15,8 +15,11 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.invoices.types.ListInvoicesRequestDirection;
 import com.whop.api.resources.invoices.types.ListInvoicesRequestOrder;
 import com.whop.api.resources.invoices.types.ListInvoicesRequestStatus;
+import com.whop.api.resources.invoices.types.ListInvoicesRequestStatusesItem;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +27,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListInvoicesRequest.Builder.class)
 public final class ListInvoicesRequest {
+    private final Optional<List<ListInvoicesRequestStatusesItem>> statuses;
+
     private final Optional<String> accountId;
 
     private final Optional<ListInvoicesRequestStatus> status;
@@ -35,6 +40,10 @@ public final class ListInvoicesRequest {
     private final Optional<String> memberId;
 
     private final Optional<String> productId;
+
+    private final Optional<String> variantId;
+
+    private final Optional<String> query;
 
     private final Optional<OffsetDateTime> createdAfter;
 
@@ -57,12 +66,15 @@ public final class ListInvoicesRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListInvoicesRequest(
+            Optional<List<ListInvoicesRequestStatusesItem>> statuses,
             Optional<String> accountId,
             Optional<ListInvoicesRequestStatus> status,
             Optional<Boolean> overdue,
             Optional<Boolean> scheduled,
             Optional<String> memberId,
             Optional<String> productId,
+            Optional<String> variantId,
+            Optional<String> query,
             Optional<OffsetDateTime> createdAfter,
             Optional<OffsetDateTime> createdBefore,
             Optional<ListInvoicesRequestOrder> order,
@@ -73,12 +85,15 @@ public final class ListInvoicesRequest {
             Optional<String> before,
             Optional<Boolean> includeTotalCount,
             Map<String, Object> additionalProperties) {
+        this.statuses = statuses;
         this.accountId = accountId;
         this.status = status;
         this.overdue = overdue;
         this.scheduled = scheduled;
         this.memberId = memberId;
         this.productId = productId;
+        this.variantId = variantId;
+        this.query = query;
         this.createdAfter = createdAfter;
         this.createdBefore = createdBefore;
         this.order = order;
@@ -89,6 +104,14 @@ public final class ListInvoicesRequest {
         this.before = before;
         this.includeTotalCount = includeTotalCount;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only invoices in any of these statuses. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.
+     */
+    @JsonProperty("statuses")
+    public Optional<List<ListInvoicesRequestStatusesItem>> getStatuses() {
+        return statuses;
     }
 
     @JsonProperty("account_id")
@@ -122,6 +145,22 @@ public final class ListInvoicesRequest {
     @JsonProperty("product_id")
     public Optional<String> getProductId() {
         return productId;
+    }
+
+    /**
+     * @return Only invoices that bill this variant, prefixed <code>plan_</code>. An invoice matches when the variant is any of its items.
+     */
+    @JsonProperty("variant_id")
+    public Optional<String> getVariantId() {
+        return variantId;
+    }
+
+    /**
+     * @return Text to find invoices by. It matches the invoice number, the invoice ID, and the customer's name, username, or email address. A number matches with or without its prefix and leading zeros. A name matches on any part. An email address matches from its start. The match ignores letter case. <code>%</code> and <code>_</code> match literally. Combined with the other filters. Name matches need <code>member:basic:read</code>. Email matches need <code>member:email:read</code>.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
     }
 
     @JsonProperty("created_after")
@@ -199,12 +238,15 @@ public final class ListInvoicesRequest {
     }
 
     private boolean equalTo(ListInvoicesRequest other) {
-        return accountId.equals(other.accountId)
+        return statuses.equals(other.statuses)
+                && accountId.equals(other.accountId)
                 && status.equals(other.status)
                 && overdue.equals(other.overdue)
                 && scheduled.equals(other.scheduled)
                 && memberId.equals(other.memberId)
                 && productId.equals(other.productId)
+                && variantId.equals(other.variantId)
+                && query.equals(other.query)
                 && createdAfter.equals(other.createdAfter)
                 && createdBefore.equals(other.createdBefore)
                 && order.equals(other.order)
@@ -219,12 +261,15 @@ public final class ListInvoicesRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.statuses,
                 this.accountId,
                 this.status,
                 this.overdue,
                 this.scheduled,
                 this.memberId,
                 this.productId,
+                this.variantId,
+                this.query,
                 this.createdAfter,
                 this.createdBefore,
                 this.order,
@@ -247,6 +292,8 @@ public final class ListInvoicesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<ListInvoicesRequestStatusesItem>> statuses = Optional.empty();
+
         private Optional<String> accountId = Optional.empty();
 
         private Optional<ListInvoicesRequestStatus> status = Optional.empty();
@@ -258,6 +305,10 @@ public final class ListInvoicesRequest {
         private Optional<String> memberId = Optional.empty();
 
         private Optional<String> productId = Optional.empty();
+
+        private Optional<String> variantId = Optional.empty();
+
+        private Optional<String> query = Optional.empty();
 
         private Optional<OffsetDateTime> createdAfter = Optional.empty();
 
@@ -282,12 +333,15 @@ public final class ListInvoicesRequest {
         private Builder() {}
 
         public Builder from(ListInvoicesRequest other) {
+            statuses(other.getStatuses());
             accountId(other.getAccountId());
             status(other.getStatus());
             overdue(other.getOverdue());
             scheduled(other.getScheduled());
             memberId(other.getMemberId());
             productId(other.getProductId());
+            variantId(other.getVariantId());
+            query(other.getQuery());
             createdAfter(other.getCreatedAfter());
             createdBefore(other.getCreatedBefore());
             order(other.getOrder());
@@ -297,6 +351,25 @@ public final class ListInvoicesRequest {
             last(other.getLast());
             before(other.getBefore());
             includeTotalCount(other.getIncludeTotalCount());
+            return this;
+        }
+
+        /**
+         * <p>Only invoices in any of these statuses. Repeat the parameter to pass several. Combined with <code>status</code> when both are sent.</p>
+         */
+        @JsonSetter(value = "statuses", nulls = Nulls.SKIP)
+        public Builder statuses(Optional<List<ListInvoicesRequestStatusesItem>> statuses) {
+            this.statuses = statuses;
+            return this;
+        }
+
+        public Builder statuses(List<ListInvoicesRequestStatusesItem> statuses) {
+            this.statuses = Optional.ofNullable(statuses);
+            return this;
+        }
+
+        public Builder statuses(ListInvoicesRequestStatusesItem statuses) {
+            this.statuses = Optional.of(Collections.singletonList(statuses));
             return this;
         }
 
@@ -366,6 +439,34 @@ public final class ListInvoicesRequest {
 
         public Builder productId(String productId) {
             this.productId = Optional.ofNullable(productId);
+            return this;
+        }
+
+        /**
+         * <p>Only invoices that bill this variant, prefixed <code>plan_</code>. An invoice matches when the variant is any of its items.</p>
+         */
+        @JsonSetter(value = "variant_id", nulls = Nulls.SKIP)
+        public Builder variantId(Optional<String> variantId) {
+            this.variantId = variantId;
+            return this;
+        }
+
+        public Builder variantId(String variantId) {
+            this.variantId = Optional.ofNullable(variantId);
+            return this;
+        }
+
+        /**
+         * <p>Text to find invoices by. It matches the invoice number, the invoice ID, and the customer's name, username, or email address. A number matches with or without its prefix and leading zeros. A name matches on any part. An email address matches from its start. The match ignores letter case. <code>%</code> and <code>_</code> match literally. Combined with the other filters. Name matches need <code>member:basic:read</code>. Email matches need <code>member:email:read</code>.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
             return this;
         }
 
@@ -488,12 +589,15 @@ public final class ListInvoicesRequest {
 
         public ListInvoicesRequest build() {
             return new ListInvoicesRequest(
+                    statuses,
                     accountId,
                     status,
                     overdue,
                     scheduled,
                     memberId,
                     productId,
+                    variantId,
+                    query,
                     createdAfter,
                     createdBefore,
                     order,
@@ -508,12 +612,15 @@ public final class ListInvoicesRequest {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("account_id")
+            if (key.equalsIgnoreCase("statuses")
+                    || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("overdue")
                     || key.equalsIgnoreCase("scheduled")
                     || key.equalsIgnoreCase("member_id")
                     || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("variant_id")
+                    || key.equalsIgnoreCase("query")
                     || key.equalsIgnoreCase("created_after")
                     || key.equalsIgnoreCase("created_before")
                     || key.equalsIgnoreCase("order")

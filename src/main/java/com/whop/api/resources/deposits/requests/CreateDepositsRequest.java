@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.deposits.types.CreateDepositsRequestCurrency;
 import com.whop.api.resources.deposits.types.CreateDepositsRequestMetadataValue;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonDeserialize(builder = CreateDepositsRequest.Builder.class)
 public final class CreateDepositsRequest {
     private final Optional<Double> amount;
+
+    private final Optional<CreateDepositsRequestCurrency> currency;
 
     private final String destination;
 
@@ -39,12 +42,14 @@ public final class CreateDepositsRequest {
 
     private CreateDepositsRequest(
             Optional<Double> amount,
+            Optional<CreateDepositsRequestCurrency> currency,
             String destination,
             Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata,
             Optional<String> originBic,
             Optional<String> paymentMethodId,
             Map<String, Object> additionalProperties) {
         this.amount = amount;
+        this.currency = currency;
         this.destination = destination;
         this.metadata = metadata;
         this.originBic = originBic;
@@ -58,6 +63,14 @@ public final class CreateDepositsRequest {
     @JsonProperty("amount")
     public Optional<Double> getAmount() {
         return amount;
+    }
+
+    /**
+     * @return Bank account currency to set up for the destination. A USD account is always set up. Pass <code>cad</code> once to also set up a CAD account. After that, every request returns the details of all set-up currencies.
+     */
+    @JsonProperty("currency")
+    public Optional<CreateDepositsRequestCurrency> getCurrency() {
+        return currency;
     }
 
     /**
@@ -114,6 +127,7 @@ public final class CreateDepositsRequest {
 
     private boolean equalTo(CreateDepositsRequest other) {
         return amount.equals(other.amount)
+                && currency.equals(other.currency)
                 && destination.equals(other.destination)
                 && metadata.equals(other.metadata)
                 && originBic.equals(other.originBic)
@@ -122,7 +136,8 @@ public final class CreateDepositsRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.amount, this.destination, this.metadata, this.originBic, this.paymentMethodId);
+        return Objects.hash(
+                this.amount, this.currency, this.destination, this.metadata, this.originBic, this.paymentMethodId);
     }
 
     @java.lang.Override
@@ -158,6 +173,13 @@ public final class CreateDepositsRequest {
         _FinalStage amount(Double amount);
 
         /**
+         * <p>Bank account currency to set up for the destination. A USD account is always set up. Pass <code>cad</code> once to also set up a CAD account. After that, every request returns the details of all set-up currencies.</p>
+         */
+        _FinalStage currency(Optional<CreateDepositsRequestCurrency> currency);
+
+        _FinalStage currency(CreateDepositsRequestCurrency currency);
+
+        /**
          * <p>Custom metadata to attach to the payment the charge creates. Ignored unless <code>payment_method_id</code> is provided.</p>
          */
         _FinalStage metadata(Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata);
@@ -191,6 +213,8 @@ public final class CreateDepositsRequest {
 
         private Optional<Map<String, Optional<CreateDepositsRequestMetadataValue>>> metadata = Optional.empty();
 
+        private Optional<CreateDepositsRequestCurrency> currency = Optional.empty();
+
         private Optional<Double> amount = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -200,6 +224,7 @@ public final class CreateDepositsRequest {
         @java.lang.Override
         public Builder from(CreateDepositsRequest other) {
             amount(other.getAmount());
+            currency(other.getCurrency());
             destination(other.getDestination());
             metadata(other.getMetadata());
             originBic(other.getOriginBic());
@@ -295,6 +320,26 @@ public final class CreateDepositsRequest {
         }
 
         /**
+         * <p>Bank account currency to set up for the destination. A USD account is always set up. Pass <code>cad</code> once to also set up a CAD account. After that, every request returns the details of all set-up currencies.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage currency(CreateDepositsRequestCurrency currency) {
+            this.currency = Optional.ofNullable(currency);
+            return this;
+        }
+
+        /**
+         * <p>Bank account currency to set up for the destination. A USD account is always set up. Pass <code>cad</code> once to also set up a CAD account. After that, every request returns the details of all set-up currencies.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "currency", nulls = Nulls.SKIP)
+        public _FinalStage currency(Optional<CreateDepositsRequestCurrency> currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        /**
          * <p>Amount to prefill on hosted deposit page. Crypto deposits require a $10 minimum. With <code>payment_method_id</code>, the amount in USD to charge, and required.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -317,12 +362,13 @@ public final class CreateDepositsRequest {
         @java.lang.Override
         public CreateDepositsRequest build() {
             return new CreateDepositsRequest(
-                    amount, destination, metadata, originBic, paymentMethodId, additionalProperties);
+                    amount, currency, destination, metadata, originBic, paymentMethodId, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("currency")
                     || key.equalsIgnoreCase("destination")
                     || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("origin_bic")

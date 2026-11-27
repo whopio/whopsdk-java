@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,6 +46,8 @@ public final class CreateAccountsRequest {
 
     private final Optional<String> title;
 
+    private final Optional<List<String>> verificationIds;
+
     private final Optional<String> website;
 
     private final Map<String, Object> additionalProperties;
@@ -61,6 +64,7 @@ public final class CreateAccountsRequest {
             Optional<Boolean> reassignExternalId,
             Optional<Boolean> sendCustomerEmails,
             Optional<String> title,
+            Optional<List<String>> verificationIds,
             Optional<String> website,
             Map<String, Object> additionalProperties) {
         this.affiliateCode = affiliateCode;
@@ -74,6 +78,7 @@ public final class CreateAccountsRequest {
         this.reassignExternalId = reassignExternalId;
         this.sendCustomerEmails = sendCustomerEmails;
         this.title = title;
+        this.verificationIds = verificationIds;
         this.website = website;
         this.additionalProperties = additionalProperties;
     }
@@ -176,6 +181,14 @@ public final class CreateAccountsRequest {
     }
 
     /**
+     * @return IDs of <code>approved</code> verifications to reuse on the new account, each prefixed <code>idpf_</code>. Send at most one <code>individual</code> verification and one <code>business</code> verification. Each one becomes the account's current verification for its kind, and its payout account carries across. A user token can reuse the verifications that user started. Requires the <code>identity:write</code> permission. It cannot be set when creating a subaccount.
+     */
+    @JsonProperty("verification_ids")
+    public Optional<List<String>> getVerificationIds() {
+        return verificationIds;
+    }
+
+    /**
      * @return The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry.
      */
     @JsonIgnore
@@ -233,6 +246,7 @@ public final class CreateAccountsRequest {
                 && reassignExternalId.equals(other.reassignExternalId)
                 && sendCustomerEmails.equals(other.sendCustomerEmails)
                 && title.equals(other.title)
+                && verificationIds.equals(other.verificationIds)
                 && website.equals(other.website);
     }
 
@@ -250,6 +264,7 @@ public final class CreateAccountsRequest {
                 this.reassignExternalId,
                 this.sendCustomerEmails,
                 this.title,
+                this.verificationIds,
                 this.website);
     }
 
@@ -286,6 +301,8 @@ public final class CreateAccountsRequest {
 
         private Optional<String> title = Optional.empty();
 
+        private Optional<List<String>> verificationIds = Optional.empty();
+
         private Optional<String> website = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -304,6 +321,7 @@ public final class CreateAccountsRequest {
             reassignExternalId(other.getReassignExternalId());
             sendCustomerEmails(other.getSendCustomerEmails());
             title(other.getTitle());
+            verificationIds(other.getVerificationIds());
             website(other.getWebsite());
             return this;
         }
@@ -496,6 +514,20 @@ public final class CreateAccountsRequest {
         }
 
         /**
+         * <p>IDs of <code>approved</code> verifications to reuse on the new account, each prefixed <code>idpf_</code>. Send at most one <code>individual</code> verification and one <code>business</code> verification. Each one becomes the account's current verification for its kind, and its payout account carries across. A user token can reuse the verifications that user started. Requires the <code>identity:write</code> permission. It cannot be set when creating a subaccount.</p>
+         */
+        @JsonSetter(value = "verification_ids", nulls = Nulls.SKIP)
+        public Builder verificationIds(Optional<List<String>> verificationIds) {
+            this.verificationIds = verificationIds;
+            return this;
+        }
+
+        public Builder verificationIds(List<String> verificationIds) {
+            this.verificationIds = Optional.ofNullable(verificationIds);
+            return this;
+        }
+
+        /**
          * <p>The account's business website, as an <code>http</code> or <code>https</code> URL of at most 255 characters. Also added to the account's <code>social_links</code> as a <code>website</code> entry.</p>
          */
         @JsonSetter(value = "website", nulls = Nulls.SKIP)
@@ -533,6 +565,7 @@ public final class CreateAccountsRequest {
                     reassignExternalId,
                     sendCustomerEmails,
                     title,
+                    verificationIds,
                     website,
                     additionalProperties);
         }
@@ -550,6 +583,7 @@ public final class CreateAccountsRequest {
                     || key.equalsIgnoreCase("reassign_external_id")
                     || key.equalsIgnoreCase("send_customer_emails")
                     || key.equalsIgnoreCase("title")
+                    || key.equalsIgnoreCase("verification_ids")
                     || key.equalsIgnoreCase("website")) {
                 return;
             }

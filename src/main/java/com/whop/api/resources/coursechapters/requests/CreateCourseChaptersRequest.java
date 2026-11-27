@@ -38,7 +38,7 @@ public final class CreateCourseChaptersRequest {
     }
 
     /**
-     * @return The unique identifier of the course to create the chapter in (e.g., &quot;course_XXXXX&quot;).
+     * @return The unique identifier of the course to create the chapter in (for example, &quot;cors_XXXXX&quot;).
      */
     @JsonProperty("course_id")
     public String getCourseId() {
@@ -93,7 +93,7 @@ public final class CreateCourseChaptersRequest {
 
     public interface CourseIdStage {
         /**
-         * <p>The unique identifier of the course to create the chapter in (e.g., &quot;course_XXXXX&quot;).</p>
+         * <p>The unique identifier of the course to create the chapter in (for example, &quot;cors_XXXXX&quot;).</p>
          */
         _FinalStage courseId(@NotNull String courseId);
 
@@ -135,7 +135,7 @@ public final class CreateCourseChaptersRequest {
         }
 
         /**
-         * <p>The unique identifier of the course to create the chapter in (e.g., &quot;course_XXXXX&quot;).</p>
+         * <p>The unique identifier of the course to create the chapter in (for example, &quot;cors_XXXXX&quot;).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

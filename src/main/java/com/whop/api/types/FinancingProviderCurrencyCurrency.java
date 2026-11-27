@@ -104,6 +104,8 @@ public final class FinancingProviderCurrencyCurrency {
 
     public static final FinancingProviderCurrencyCurrency MUR = new FinancingProviderCurrencyCurrency(Value.MUR, "mur");
 
+    public static final FinancingProviderCurrencyCurrency HNL = new FinancingProviderCurrencyCurrency(Value.HNL, "hnl");
+
     public static final FinancingProviderCurrencyCurrency PEN = new FinancingProviderCurrencyCurrency(Value.PEN, "pen");
 
     public static final FinancingProviderCurrencyCurrency USD = new FinancingProviderCurrencyCurrency(Value.USD, "usd");
@@ -318,6 +320,8 @@ public final class FinancingProviderCurrencyCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -507,6 +511,8 @@ public final class FinancingProviderCurrencyCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -777,6 +783,8 @@ public final class FinancingProviderCurrencyCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -960,6 +968,8 @@ public final class FinancingProviderCurrencyCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

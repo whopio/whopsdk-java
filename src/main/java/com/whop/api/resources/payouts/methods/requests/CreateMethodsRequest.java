@@ -82,7 +82,7 @@ public final class CreateMethodsRequest {
     }
 
     /**
-     * @return The supported payout method's required field values, keyed by field id — list them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode; they never change for a given field. A Basis Theory token id may be passed in place of a raw value. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.
+     * @return The supported payout method's required field values, keyed by field id. List them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode. They never change for a given field. Card-number fields require a Basis Theory token id. Other fields retain their documented required-field formats. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.
      */
     @JsonProperty("fields")
     public Optional<Map<String, String>> getFields() {
@@ -114,7 +114,7 @@ public final class CreateMethodsRequest {
     }
 
     /**
-     * @return Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.
+     * @return Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, Whop account, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.
      */
     @JsonProperty("recipient")
     public Optional<CreateMethodsRequestRecipient> getRecipient() {
@@ -214,7 +214,7 @@ public final class CreateMethodsRequest {
         _FinalStage destinationCurrency(String destinationCurrency);
 
         /**
-         * <p>The supported payout method's required field values, keyed by field id — list them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode; they never change for a given field. A Basis Theory token id may be passed in place of a raw value. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
+         * <p>The supported payout method's required field values, keyed by field id. List them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode. They never change for a given field. Card-number fields require a Basis Theory token id. Other fields retain their documented required-field formats. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
          */
         _FinalStage fields(Optional<Map<String, String>> fields);
 
@@ -242,7 +242,7 @@ public final class CreateMethodsRequest {
         _FinalStage paypalLinkToken(String paypalLinkToken);
 
         /**
-         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, Whop account, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
          */
         _FinalStage recipient(Optional<CreateMethodsRequestRecipient> recipient);
 
@@ -327,7 +327,7 @@ public final class CreateMethodsRequest {
         }
 
         /**
-         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, Whop account, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -337,7 +337,7 @@ public final class CreateMethodsRequest {
         }
 
         /**
-         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, company, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
+         * <p>Creates a recipient payout account linked to the funding ledger as a non-default account, then saves the bank method on it. No Whop user, Whop account, or recipient ledger is created. A valid recipient email is required. Recipient methods cannot be default or recurring methods and cannot use Plaid.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "recipient", nulls = Nulls.SKIP)
@@ -407,7 +407,7 @@ public final class CreateMethodsRequest {
         }
 
         /**
-         * <p>The supported payout method's required field values, keyed by field id — list them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode; they never change for a given field. A Basis Theory token id may be passed in place of a raw value. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
+         * <p>The supported payout method's required field values, keyed by field id. List them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode. They never change for a given field. Card-number fields require a Basis Theory token id. Other fields retain their documented required-field formats. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -417,7 +417,7 @@ public final class CreateMethodsRequest {
         }
 
         /**
-         * <p>The supported payout method's required field values, keyed by field id — list them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode; they never change for a given field. A Basis Theory token id may be passed in place of a raw value. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
+         * <p>The supported payout method's required field values, keyed by field id. List them with <code>GET /payouts/supported_methods?supported_payout_method_id=...</code>. Field ids are stable <code>fld_</code> identifiers you may hardcode. They never change for a given field. Card-number fields require a Basis Theory token id. Other fields retain their documented required-field formats. For a U.S. bank routing-number field, a raw nine-digit value must also pass the ABA checksum. A validation failure returns the method's full required_fields schema alongside the error. Required whenever the account details are supplied directly.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "fields", nulls = Nulls.SKIP)

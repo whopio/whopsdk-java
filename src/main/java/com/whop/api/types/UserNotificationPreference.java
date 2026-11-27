@@ -25,9 +25,9 @@ public final class UserNotificationPreference {
 
     private final UserNotificationPreferenceLevel level;
 
-    private final UserNotificationPreferenceObject object;
-
     private final NotificationPreferenceScope scope;
+
+    private final UserNotificationPreferenceType type;
 
     private final String updatedAt;
 
@@ -37,15 +37,15 @@ public final class UserNotificationPreference {
             String createdAt,
             String id,
             UserNotificationPreferenceLevel level,
-            UserNotificationPreferenceObject object,
             NotificationPreferenceScope scope,
+            UserNotificationPreferenceType type,
             String updatedAt,
             Map<String, Object> additionalProperties) {
         this.createdAt = createdAt;
         this.id = id;
         this.level = level;
-        this.object = object;
         this.scope = scope;
+        this.type = type;
         this.updatedAt = updatedAt;
         this.additionalProperties = additionalProperties;
     }
@@ -75,19 +75,19 @@ public final class UserNotificationPreference {
     }
 
     /**
-     * @return The type of object. Always <code>notification_preference</code>.
-     */
-    @JsonProperty("object")
-    public UserNotificationPreferenceObject getObject() {
-        return object;
-    }
-
-    /**
      * @return What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.
      */
     @JsonProperty("scope")
     public NotificationPreferenceScope getScope() {
         return scope;
+    }
+
+    /**
+     * @return Always <code>notification_preference</code>.
+     */
+    @JsonProperty("type")
+    public UserNotificationPreferenceType getType() {
+        return type;
     }
 
     /**
@@ -113,14 +113,14 @@ public final class UserNotificationPreference {
         return createdAt.equals(other.createdAt)
                 && id.equals(other.id)
                 && level.equals(other.level)
-                && object.equals(other.object)
                 && scope.equals(other.scope)
+                && type.equals(other.type)
                 && updatedAt.equals(other.updatedAt);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.createdAt, this.id, this.level, this.object, this.scope, this.updatedAt);
+        return Objects.hash(this.createdAt, this.id, this.level, this.scope, this.type, this.updatedAt);
     }
 
     @java.lang.Override
@@ -152,21 +152,21 @@ public final class UserNotificationPreference {
         /**
          * <p>What the user is notified about in this scope: <code>all</code> or <code>nothing</code>.</p>
          */
-        ObjectStage level(@NotNull UserNotificationPreferenceLevel level);
-    }
-
-    public interface ObjectStage {
-        /**
-         * <p>The type of object. Always <code>notification_preference</code>.</p>
-         */
-        ScopeStage object(@NotNull UserNotificationPreferenceObject object);
+        ScopeStage level(@NotNull UserNotificationPreferenceLevel level);
     }
 
     public interface ScopeStage {
         /**
          * <p>What the preference applies to. Echo it back to <code>PATCH /users/me/preferences/notifications</code> to change this preference.</p>
          */
-        UpdatedAtStage scope(@NotNull NotificationPreferenceScope scope);
+        TypeStage scope(@NotNull NotificationPreferenceScope scope);
+    }
+
+    public interface TypeStage {
+        /**
+         * <p>Always <code>notification_preference</code>.</p>
+         */
+        UpdatedAtStage type(@NotNull UserNotificationPreferenceType type);
     }
 
     public interface UpdatedAtStage {
@@ -186,16 +186,16 @@ public final class UserNotificationPreference {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements CreatedAtStage, IdStage, LevelStage, ObjectStage, ScopeStage, UpdatedAtStage, _FinalStage {
+            implements CreatedAtStage, IdStage, LevelStage, ScopeStage, TypeStage, UpdatedAtStage, _FinalStage {
         private String createdAt;
 
         private String id;
 
         private UserNotificationPreferenceLevel level;
 
-        private UserNotificationPreferenceObject object;
-
         private NotificationPreferenceScope scope;
+
+        private UserNotificationPreferenceType type;
 
         private String updatedAt;
 
@@ -208,8 +208,8 @@ public final class UserNotificationPreference {
             createdAt(other.getCreatedAt());
             id(other.getId());
             level(other.getLevel());
-            object(other.getObject());
             scope(other.getScope());
+            type(other.getType());
             updatedAt(other.getUpdatedAt());
             return this;
         }
@@ -242,19 +242,8 @@ public final class UserNotificationPreference {
          */
         @java.lang.Override
         @JsonSetter("level")
-        public ObjectStage level(@NotNull UserNotificationPreferenceLevel level) {
+        public ScopeStage level(@NotNull UserNotificationPreferenceLevel level) {
             this.level = Objects.requireNonNull(level, "level must not be null");
-            return this;
-        }
-
-        /**
-         * <p>The type of object. Always <code>notification_preference</code>.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        @JsonSetter("object")
-        public ScopeStage object(@NotNull UserNotificationPreferenceObject object) {
-            this.object = Objects.requireNonNull(object, "object must not be null");
             return this;
         }
 
@@ -264,8 +253,19 @@ public final class UserNotificationPreference {
          */
         @java.lang.Override
         @JsonSetter("scope")
-        public UpdatedAtStage scope(@NotNull NotificationPreferenceScope scope) {
+        public TypeStage scope(@NotNull NotificationPreferenceScope scope) {
             this.scope = Objects.requireNonNull(scope, "scope must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Always <code>notification_preference</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("type")
+        public UpdatedAtStage type(@NotNull UserNotificationPreferenceType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
@@ -282,7 +282,7 @@ public final class UserNotificationPreference {
 
         @java.lang.Override
         public UserNotificationPreference build() {
-            return new UserNotificationPreference(createdAt, id, level, object, scope, updatedAt, additionalProperties);
+            return new UserNotificationPreference(createdAt, id, level, scope, type, updatedAt, additionalProperties);
         }
 
         @JsonAnySetter
@@ -290,8 +290,8 @@ public final class UserNotificationPreference {
             if (key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("level")
-                    || key.equalsIgnoreCase("object")
                     || key.equalsIgnoreCase("scope")
+                    || key.equalsIgnoreCase("type")
                     || key.equalsIgnoreCase("updated_at")) {
                 return;
             }

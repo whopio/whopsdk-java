@@ -34,6 +34,8 @@ public final class AdCreative {
 
     private final Optional<String> mediaType;
 
+    private final Optional<String> sourceId;
+
     private final Optional<String> url;
 
     private final Map<String, Object> additionalProperties;
@@ -44,6 +46,7 @@ public final class AdCreative {
             String id,
             Optional<String> language,
             Optional<String> mediaType,
+            Optional<String> sourceId,
             Optional<String> url,
             Map<String, Object> additionalProperties) {
         this.crop = crop;
@@ -51,6 +54,7 @@ public final class AdCreative {
         this.id = id;
         this.language = language;
         this.mediaType = mediaType;
+        this.sourceId = sourceId;
         this.url = url;
         this.additionalProperties = additionalProperties;
     }
@@ -108,6 +112,17 @@ public final class AdCreative {
     }
 
     /**
+     * @return The file this format was cut out of, prefixed <code>file_</code>. Null for the original asset or a format uploaded as it is.
+     */
+    @JsonIgnore
+    public Optional<String> getSourceId() {
+        if (sourceId == null) {
+            return Optional.empty();
+        }
+        return sourceId;
+    }
+
+    /**
      * @return CDN url of the asset.
      */
     @JsonIgnore
@@ -143,6 +158,12 @@ public final class AdCreative {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("source_id")
+    private Optional<String> _getSourceId() {
+        return sourceId;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("url")
     private Optional<String> _getUrl() {
         return url;
@@ -165,12 +186,13 @@ public final class AdCreative {
                 && id.equals(other.id)
                 && language.equals(other.language)
                 && mediaType.equals(other.mediaType)
+                && sourceId.equals(other.sourceId)
                 && url.equals(other.url);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.crop, this.format, this.id, this.language, this.mediaType, this.url);
+        return Objects.hash(this.crop, this.format, this.id, this.language, this.mediaType, this.sourceId, this.url);
     }
 
     @java.lang.Override
@@ -235,6 +257,15 @@ public final class AdCreative {
         _FinalStage mediaType(Nullable<String> mediaType);
 
         /**
+         * <p>The file this format was cut out of, prefixed <code>file_</code>. Null for the original asset or a format uploaded as it is.</p>
+         */
+        _FinalStage sourceId(Optional<String> sourceId);
+
+        _FinalStage sourceId(String sourceId);
+
+        _FinalStage sourceId(Nullable<String> sourceId);
+
+        /**
          * <p>CDN url of the asset.</p>
          */
         _FinalStage url(Optional<String> url);
@@ -249,6 +280,8 @@ public final class AdCreative {
         private String id;
 
         private Optional<String> url = Optional.empty();
+
+        private Optional<String> sourceId = Optional.empty();
 
         private Optional<String> mediaType = Optional.empty();
 
@@ -269,6 +302,7 @@ public final class AdCreative {
             id(other.getId());
             language(other.getLanguage());
             mediaType(other.getMediaType());
+            sourceId(other.getSourceId());
             url(other.getUrl());
             return this;
         }
@@ -317,6 +351,42 @@ public final class AdCreative {
         @JsonSetter(value = "url", nulls = Nulls.SKIP)
         public _FinalStage url(Optional<String> url) {
             this.url = url;
+            return this;
+        }
+
+        /**
+         * <p>The file this format was cut out of, prefixed <code>file_</code>. Null for the original asset or a format uploaded as it is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sourceId(Nullable<String> sourceId) {
+            if (sourceId.isNull()) {
+                this.sourceId = null;
+            } else if (sourceId.isEmpty()) {
+                this.sourceId = Optional.empty();
+            } else {
+                this.sourceId = Optional.of(sourceId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The file this format was cut out of, prefixed <code>file_</code>. Null for the original asset or a format uploaded as it is.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sourceId(String sourceId) {
+            this.sourceId = Optional.ofNullable(sourceId);
+            return this;
+        }
+
+        /**
+         * <p>The file this format was cut out of, prefixed <code>file_</code>. Null for the original asset or a format uploaded as it is.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "source_id", nulls = Nulls.SKIP)
+        public _FinalStage sourceId(Optional<String> sourceId) {
+            this.sourceId = sourceId;
             return this;
         }
 
@@ -466,7 +536,7 @@ public final class AdCreative {
 
         @java.lang.Override
         public AdCreative build() {
-            return new AdCreative(crop, format, id, language, mediaType, url, additionalProperties);
+            return new AdCreative(crop, format, id, language, mediaType, sourceId, url, additionalProperties);
         }
 
         @JsonAnySetter
@@ -476,6 +546,7 @@ public final class AdCreative {
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("language")
                     || key.equalsIgnoreCase("media_type")
+                    || key.equalsIgnoreCase("source_id")
                     || key.equalsIgnoreCase("url")) {
                 return;
             }

@@ -139,6 +139,9 @@ public final class CreateTransfersRequestBodyClaimLinkCurrency {
     public static final CreateTransfersRequestBodyClaimLinkCurrency MUR =
             new CreateTransfersRequestBodyClaimLinkCurrency(Value.MUR, "mur");
 
+    public static final CreateTransfersRequestBodyClaimLinkCurrency HNL =
+            new CreateTransfersRequestBodyClaimLinkCurrency(Value.HNL, "hnl");
+
     public static final CreateTransfersRequestBodyClaimLinkCurrency PEN =
             new CreateTransfersRequestBodyClaimLinkCurrency(Value.PEN, "pen");
 
@@ -380,6 +383,8 @@ public final class CreateTransfersRequestBodyClaimLinkCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -557,6 +562,8 @@ public final class CreateTransfersRequestBodyClaimLinkCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -811,6 +818,8 @@ public final class CreateTransfersRequestBodyClaimLinkCurrency {
 
         AWG,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -982,6 +991,8 @@ public final class CreateTransfersRequestBodyClaimLinkCurrency {
         T visitKzt();
 
         T visitAwg();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

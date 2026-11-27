@@ -15,6 +15,8 @@ public final class MembershipStatus {
 
     public static final MembershipStatus EXPIRED = new MembershipStatus(Value.EXPIRED, "expired");
 
+    public static final MembershipStatus SCHEDULED = new MembershipStatus(Value.SCHEDULED, "scheduled");
+
     public static final MembershipStatus DRAFTED = new MembershipStatus(Value.DRAFTED, "drafted");
 
     public static final MembershipStatus CANCELING = new MembershipStatus(Value.CANCELING, "canceling");
@@ -65,6 +67,8 @@ public final class MembershipStatus {
                 return visitor.visitCompleted();
             case EXPIRED:
                 return visitor.visitExpired();
+            case SCHEDULED:
+                return visitor.visitScheduled();
             case DRAFTED:
                 return visitor.visitDrafted();
             case CANCELING:
@@ -92,6 +96,8 @@ public final class MembershipStatus {
                 return COMPLETED;
             case "expired":
                 return EXPIRED;
+            case "scheduled":
+                return SCHEDULED;
             case "drafted":
                 return DRAFTED;
             case "canceling":
@@ -122,6 +128,8 @@ public final class MembershipStatus {
 
         UNRESOLVED,
 
+        SCHEDULED,
+
         DRAFTED,
 
         CANCELING,
@@ -143,6 +151,8 @@ public final class MembershipStatus {
         T visitExpired();
 
         T visitUnresolved();
+
+        T visitScheduled();
 
         T visitDrafted();
 

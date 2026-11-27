@@ -78,7 +78,7 @@ public final class AccountReserveType {
     }
 
     /**
-     * @return Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve; <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement; <code>preshipment_hold</code> covers a physical order that has not shipped yet; <code>fraud_hold</code> is held while activity is reviewed.
+     * @return Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve. <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement. <code>preshipment_hold</code> covers a physical order that has not shipped yet. <code>fraud_hold</code> is held while activity is reviewed. <code>subaccount_negative_balances</code> is held by a platform for the negative balances of its sub-accounts.
      */
     @JsonProperty("type")
     public AccountReserveTypeType getType() {
@@ -140,7 +140,7 @@ public final class AccountReserveType {
 
     public interface TypeStage {
         /**
-         * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve; <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement; <code>preshipment_hold</code> covers a physical order that has not shipped yet; <code>fraud_hold</code> is held while activity is reviewed.</p>
+         * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve. <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement. <code>preshipment_hold</code> covers a physical order that has not shipped yet. <code>fraud_hold</code> is held while activity is reviewed. <code>subaccount_negative_balances</code> is held by a platform for the negative balances of its sub-accounts.</p>
          */
         _FinalStage type(@NotNull AccountReserveTypeType type);
     }
@@ -206,7 +206,7 @@ public final class AccountReserveType {
         }
 
         /**
-         * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve; <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement; <code>preshipment_hold</code> covers a physical order that has not shipped yet; <code>fraud_hold</code> is held while activity is reviewed.</p>
+         * <p>Why this part of the balance is held. <code>regular</code> is the account's standing risk reserve. <code>bnpl</code> and <code>sequra</code> cover buy-now-pay-later settlement. <code>preshipment_hold</code> covers a physical order that has not shipped yet. <code>fraud_hold</code> is held while activity is reviewed. <code>subaccount_negative_balances</code> is held by a platform for the negative balances of its sub-accounts.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

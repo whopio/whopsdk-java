@@ -54,28 +54,28 @@ public class PaymentsClient {
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public SyncPagingIterable<Payment> list() {
         return this.rawClient.list().body();
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public SyncPagingIterable<Payment> list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public SyncPagingIterable<Payment> list(ListPaymentsRequest request) {
         return this.rawClient.list(request).body();
     }
 
     /**
-     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account.
+     * Lists payments, newest first. By default, returns sales for the accounts your credential can read: an account credential's own account, or every account a user can read payments for. Set <code>mode</code> to <code>user_sales</code> to list the sales the signed-in user received personally, outside any account. With a user credential, set <code>user_id</code> to <code>me</code> to list the user's own payments, including their purchases from any account; a purchase leaves out the account's side of the payment, such as <code>amount_after_fees</code>, <code>metadata</code> and the risk fields.
      */
     public SyncPagingIterable<Payment> list(ListPaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.list(request, requestOptions).body();
@@ -124,28 +124,28 @@ public class PaymentsClient {
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public Payment retrieve(String id) {
         return this.rawClient.retrieve(id).body();
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public Payment retrieve(String id, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, requestOptions).body();
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public Payment retrieve(String id, RetrievePaymentsRequest request) {
         return this.rawClient.retrieve(id, request).body();
     }
 
     /**
-     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>.
+     * Returns one payment, including every purchased line item with its quantity and subtotal. Related records are ids — resolve a variant, membership, member or shipment on its own endpoint, and list this payment's refunds, disputes or Resolution Center cases with <code>?payment_id=</code>. A buyer can retrieve their own payment with a user credential; it leaves out the account's side of the payment, as the list does.
      */
     public Payment retrieve(String id, RetrievePaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.retrieve(id, request, requestOptions).body();
@@ -180,28 +180,28 @@ public class PaymentsClient {
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public PaymentStatus capture(String id) {
         return this.rawClient.capture(id).body();
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public PaymentStatus capture(String id, RequestOptions requestOptions) {
         return this.rawClient.capture(id, requestOptions).body();
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public PaymentStatus capture(String id, CapturePaymentsRequest request) {
         return this.rawClient.capture(id, request).body();
     }
 
     /**
-     * Captures the full amount of a card payment created with <code>capture: false</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. Partial capture, multiple captures, capturing more than the authorized amount, and tips are not supported.
+     * Captures a card payment created with <code>capture: false</code> for its <code>total</code>. The payment must still be in <code>requires_capture</code> before <code>capture_expires_at</code>. An in-person payment's total can move away from its authorized amount when its line items change after the card was authorized. Above it, Whop captures the difference where Stripe allows it for the merchant's category, and otherwise raises the authorization first, which the card can decline. Capturing more or less than the authorized amount is off by default. Contact Whop support to turn it on for your account. Multiple captures are not supported.
      */
     public PaymentStatus capture(String id, CapturePaymentsRequest request, RequestOptions requestOptions) {
         return this.rawClient.capture(id, request, requestOptions).body();

@@ -60,6 +60,13 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_VARIABLE_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_VARIABLE_FEE, "psp_variable_fee");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory FEE_REBATE =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.FEE_REBATE, "fee_rebate");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory
+            INTERNAL_BALANCE_TRANSFER_OUTGOING_REVERSAL = new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.INTERNAL_BALANCE_TRANSFER_OUTGOING_REVERSAL, "internal_balance_transfer_outgoing_reversal");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory AD_AFFILIATE_PAYOUT =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.AD_AFFILIATE_PAYOUT, "ad_affiliate_payout");
 
@@ -116,6 +123,9 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_PROCESSING_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_PROCESSING_FEE, "psp_processing_fee");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory SAVINGS_REVALUATION =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.SAVINGS_REVALUATION, "savings_revaluation");
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory TOPUP_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.TOPUP_REVERSAL, "topup_reversal");
@@ -210,6 +220,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_CORRECTION =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_CORRECTION, "psp_correction");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PLATFORM_INTERCHANGE_SHARE_REVERSAL =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_INTERCHANGE_SHARE_REVERSAL, "platform_interchange_share_reversal");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_CURRENCY_CONVERSION_RECEIVABLE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.PSP_CURRENCY_CONVERSION_RECEIVABLE, "psp_currency_conversion_receivable");
@@ -270,6 +284,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PAYMENT_RETURN_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PAYMENT_RETURN_FEE, "payment_return_fee");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PLATFORM_INTERCHANGE_SHARE =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_INTERCHANGE_SHARE, "platform_interchange_share");
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory RECIPIENT_WALLET_LOAD =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
@@ -474,6 +492,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.TRADING_ACCOUNT_WITHDRAWAL_OFFSET, "trading_account_withdrawal_offset");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PLATFORM_INTERCHANGE_SHARE_PAYABLE =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_INTERCHANGE_SHARE_PAYABLE, "platform_interchange_share_payable");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_RISK_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_RISK_FEE, "psp_risk_fee");
 
@@ -508,9 +530,17 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.SOFTWARE_RENTAL_TRANSACTION, "software_rental_transaction");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory
+            INTERNAL_BALANCE_TRANSFER_INCOMING_REVERSAL = new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.INTERNAL_BALANCE_TRANSFER_INCOMING_REVERSAL, "internal_balance_transfer_incoming_reversal");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory WITHDRAWAL_FEE_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.WITHDRAWAL_FEE_REVERSAL, "withdrawal_fee_reversal");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory LEVELS_POINTS_ACTION =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.LEVELS_POINTS_ACTION, "levels_points_action");
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_PAYOUT_SETTLEMENT_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
@@ -822,6 +852,9 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory ONCHAIN_SWAP_SOURCE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.ONCHAIN_SWAP_SOURCE, "onchain_swap_source");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_ERROR_LOSS =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_ERROR_LOSS, "psp_error_loss");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PAYMENT_GROSS_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.PAYMENT_GROSS_REVERSAL, "payment_gross_reversal");
@@ -980,6 +1013,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory WITHDRAWAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.WITHDRAWAL, "withdrawal");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory
+            PLATFORM_BALANCE_TRANSFER_INCOMING_REVERSAL = new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_BALANCE_TRANSFER_INCOMING_REVERSAL, "platform_balance_transfer_incoming_reversal");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory SETTLEMENT_ROUNDING_VARIANCE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.SETTLEMENT_ROUNDING_VARIANCE, "settlement_rounding_variance");
@@ -1032,6 +1069,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.INTERNAL_WITHDRAWAL_FEE_REVERSAL, "internal_withdrawal_fee_reversal");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PLATFORM_BALANCE_TRANSFER_FEE_REVERSAL =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_BALANCE_TRANSFER_FEE_REVERSAL, "platform_balance_transfer_fee_reversal");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_COLLECTION_SETTLEMENT =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.PSP_COLLECTION_SETTLEMENT, "psp_collection_settlement");
@@ -1049,6 +1090,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_PAYIN_CLEARING =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PSP_PAYIN_CLEARING, "psp_payin_clearing");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PLATFORM_INTERCHANGE_SHARE_EXPENSE =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_INTERCHANGE_SHARE_EXPENSE, "platform_interchange_share_expense");
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory MARKETPLACE_AFFILIATE_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
@@ -1098,6 +1143,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PAYMENT_GROSS =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.PAYMENT_GROSS, "payment_gross");
+
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory
+            PLATFORM_BALANCE_TRANSFER_OUTGOING_REVERSAL = new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PLATFORM_BALANCE_TRANSFER_OUTGOING_REVERSAL, "platform_balance_transfer_outgoing_reversal");
 
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory PSP_TRANSFER_SETTLEMENT_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
@@ -1269,6 +1318,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitWithdrawalMarkupFeePayout();
             case PSP_VARIABLE_FEE:
                 return visitor.visitPspVariableFee();
+            case FEE_REBATE:
+                return visitor.visitFeeRebate();
+            case INTERNAL_BALANCE_TRANSFER_OUTGOING_REVERSAL:
+                return visitor.visitInternalBalanceTransferOutgoingReversal();
             case AD_AFFILIATE_PAYOUT:
                 return visitor.visitAdAffiliatePayout();
             case PAYOUT_FEE:
@@ -1301,6 +1354,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitFxMarkup();
             case PSP_PROCESSING_FEE:
                 return visitor.visitPspProcessingFee();
+            case SAVINGS_REVALUATION:
+                return visitor.visitSavingsRevaluation();
             case TOPUP_REVERSAL:
                 return visitor.visitTopupReversal();
             case DISPUTE_PAYABLE_CLEARING:
@@ -1353,6 +1408,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitOnchainWithdrawal();
             case PSP_CORRECTION:
                 return visitor.visitPspCorrection();
+            case PLATFORM_INTERCHANGE_SHARE_REVERSAL:
+                return visitor.visitPlatformInterchangeShareReversal();
             case PSP_CURRENCY_CONVERSION_RECEIVABLE:
                 return visitor.visitPspCurrencyConversionReceivable();
             case PSP_SERVICE_FEE:
@@ -1387,6 +1444,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitConnectedAccountNegativeBalance();
             case PAYMENT_RETURN_FEE:
                 return visitor.visitPaymentReturnFee();
+            case PLATFORM_INTERCHANGE_SHARE:
+                return visitor.visitPlatformInterchangeShare();
             case RECIPIENT_WALLET_LOAD:
                 return visitor.visitRecipientWalletLoad();
             case PSP_CURRENCY_CONVERSION_OUTGOING:
@@ -1499,6 +1558,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitAdIncomeExpense();
             case TRADING_ACCOUNT_WITHDRAWAL_OFFSET:
                 return visitor.visitTradingAccountWithdrawalOffset();
+            case PLATFORM_INTERCHANGE_SHARE_PAYABLE:
+                return visitor.visitPlatformInterchangeSharePayable();
             case PSP_RISK_FEE:
                 return visitor.visitPspRiskFee();
             case BALANCE_RESERVATION_RELEASE:
@@ -1517,8 +1578,12 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitOnchainSwapOffset();
             case SOFTWARE_RENTAL_TRANSACTION:
                 return visitor.visitSoftwareRentalTransaction();
+            case INTERNAL_BALANCE_TRANSFER_INCOMING_REVERSAL:
+                return visitor.visitInternalBalanceTransferIncomingReversal();
             case WITHDRAWAL_FEE_REVERSAL:
                 return visitor.visitWithdrawalFeeReversal();
+            case LEVELS_POINTS_ACTION:
+                return visitor.visitLevelsPointsAction();
             case PSP_PAYOUT_SETTLEMENT_REVERSAL:
                 return visitor.visitPspPayoutSettlementReversal();
             case PAYOUT_RECEIVABLE:
@@ -1693,6 +1758,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitAffiliateFee();
             case ONCHAIN_SWAP_SOURCE:
                 return visitor.visitOnchainSwapSource();
+            case PSP_ERROR_LOSS:
+                return visitor.visitPspErrorLoss();
             case PAYMENT_GROSS_REVERSAL:
                 return visitor.visitPaymentGrossReversal();
             case PERPS_FEE:
@@ -1783,6 +1850,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitCashbackExpense();
             case WITHDRAWAL:
                 return visitor.visitWithdrawal();
+            case PLATFORM_BALANCE_TRANSFER_INCOMING_REVERSAL:
+                return visitor.visitPlatformBalanceTransferIncomingReversal();
             case SETTLEMENT_ROUNDING_VARIANCE:
                 return visitor.visitSettlementRoundingVariance();
             case PSP_NETWORK_TOKEN_FEE:
@@ -1813,6 +1882,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitFxGainLoss();
             case INTERNAL_WITHDRAWAL_FEE_REVERSAL:
                 return visitor.visitInternalWithdrawalFeeReversal();
+            case PLATFORM_BALANCE_TRANSFER_FEE_REVERSAL:
+                return visitor.visitPlatformBalanceTransferFeeReversal();
             case PSP_COLLECTION_SETTLEMENT:
                 return visitor.visitPspCollectionSettlement();
             case IDENTITY_VERIFICATION_FEE:
@@ -1823,6 +1894,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitOnchainDeposit();
             case PSP_PAYIN_CLEARING:
                 return visitor.visitPspPayinClearing();
+            case PLATFORM_INTERCHANGE_SHARE_EXPENSE:
+                return visitor.visitPlatformInterchangeShareExpense();
             case MARKETPLACE_AFFILIATE_FEE:
                 return visitor.visitMarketplaceAffiliateFee();
             case CARD_SPEND_REFUND_OFFSET:
@@ -1849,6 +1922,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitDisputeHoldAdjustment();
             case PAYMENT_GROSS:
                 return visitor.visitPaymentGross();
+            case PLATFORM_BALANCE_TRANSFER_OUTGOING_REVERSAL:
+                return visitor.visitPlatformBalanceTransferOutgoingReversal();
             case PSP_TRANSFER_SETTLEMENT_REVERSAL:
                 return visitor.visitPspTransferSettlementReversal();
             case AGGREGATED_FEE:
@@ -1948,6 +2023,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return WITHDRAWAL_MARKUP_FEE_PAYOUT;
             case "psp_variable_fee":
                 return PSP_VARIABLE_FEE;
+            case "fee_rebate":
+                return FEE_REBATE;
+            case "internal_balance_transfer_outgoing_reversal":
+                return INTERNAL_BALANCE_TRANSFER_OUTGOING_REVERSAL;
             case "ad_affiliate_payout":
                 return AD_AFFILIATE_PAYOUT;
             case "payout_fee":
@@ -1980,6 +2059,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return FX_MARKUP;
             case "psp_processing_fee":
                 return PSP_PROCESSING_FEE;
+            case "savings_revaluation":
+                return SAVINGS_REVALUATION;
             case "topup_reversal":
                 return TOPUP_REVERSAL;
             case "dispute_payable_clearing":
@@ -2032,6 +2113,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return ONCHAIN_WITHDRAWAL;
             case "psp_correction":
                 return PSP_CORRECTION;
+            case "platform_interchange_share_reversal":
+                return PLATFORM_INTERCHANGE_SHARE_REVERSAL;
             case "psp_currency_conversion_receivable":
                 return PSP_CURRENCY_CONVERSION_RECEIVABLE;
             case "psp_service_fee":
@@ -2066,6 +2149,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return CONNECTED_ACCOUNT_NEGATIVE_BALANCE;
             case "payment_return_fee":
                 return PAYMENT_RETURN_FEE;
+            case "platform_interchange_share":
+                return PLATFORM_INTERCHANGE_SHARE;
             case "recipient_wallet_load":
                 return RECIPIENT_WALLET_LOAD;
             case "psp_currency_conversion_outgoing":
@@ -2178,6 +2263,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return AD_INCOME_EXPENSE;
             case "trading_account_withdrawal_offset":
                 return TRADING_ACCOUNT_WITHDRAWAL_OFFSET;
+            case "platform_interchange_share_payable":
+                return PLATFORM_INTERCHANGE_SHARE_PAYABLE;
             case "psp_risk_fee":
                 return PSP_RISK_FEE;
             case "balance_reservation_release":
@@ -2196,8 +2283,12 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return ONCHAIN_SWAP_OFFSET;
             case "software_rental_transaction":
                 return SOFTWARE_RENTAL_TRANSACTION;
+            case "internal_balance_transfer_incoming_reversal":
+                return INTERNAL_BALANCE_TRANSFER_INCOMING_REVERSAL;
             case "withdrawal_fee_reversal":
                 return WITHDRAWAL_FEE_REVERSAL;
+            case "levels_points_action":
+                return LEVELS_POINTS_ACTION;
             case "psp_payout_settlement_reversal":
                 return PSP_PAYOUT_SETTLEMENT_REVERSAL;
             case "payout_receivable":
@@ -2372,6 +2463,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return AFFILIATE_FEE;
             case "onchain_swap_source":
                 return ONCHAIN_SWAP_SOURCE;
+            case "psp_error_loss":
+                return PSP_ERROR_LOSS;
             case "payment_gross_reversal":
                 return PAYMENT_GROSS_REVERSAL;
             case "perps_fee":
@@ -2462,6 +2555,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return CASHBACK_EXPENSE;
             case "withdrawal":
                 return WITHDRAWAL;
+            case "platform_balance_transfer_incoming_reversal":
+                return PLATFORM_BALANCE_TRANSFER_INCOMING_REVERSAL;
             case "settlement_rounding_variance":
                 return SETTLEMENT_ROUNDING_VARIANCE;
             case "psp_network_token_fee":
@@ -2492,6 +2587,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return FX_GAIN_LOSS;
             case "internal_withdrawal_fee_reversal":
                 return INTERNAL_WITHDRAWAL_FEE_REVERSAL;
+            case "platform_balance_transfer_fee_reversal":
+                return PLATFORM_BALANCE_TRANSFER_FEE_REVERSAL;
             case "psp_collection_settlement":
                 return PSP_COLLECTION_SETTLEMENT;
             case "identity_verification_fee":
@@ -2502,6 +2599,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return ONCHAIN_DEPOSIT;
             case "psp_payin_clearing":
                 return PSP_PAYIN_CLEARING;
+            case "platform_interchange_share_expense":
+                return PLATFORM_INTERCHANGE_SHARE_EXPENSE;
             case "marketplace_affiliate_fee":
                 return MARKETPLACE_AFFILIATE_FEE;
             case "card_spend_refund_offset":
@@ -2528,6 +2627,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return DISPUTE_HOLD_ADJUSTMENT;
             case "payment_gross":
                 return PAYMENT_GROSS;
+            case "platform_balance_transfer_outgoing_reversal":
+                return PLATFORM_BALANCE_TRANSFER_OUTGOING_REVERSAL;
             case "psp_transfer_settlement_reversal":
                 return PSP_TRANSFER_SETTLEMENT_REVERSAL;
             case "aggregated_fee":
@@ -2780,6 +2881,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         EXTERNAL_CARD_LOAD_OFFSET,
 
+        FEE_REBATE,
+
         FRAUD_PREVENTION_FEE,
 
         FX_GAIN_LOSS,
@@ -2798,7 +2901,11 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         INTERNAL_BALANCE_TRANSFER_INCOMING,
 
+        INTERNAL_BALANCE_TRANSFER_INCOMING_REVERSAL,
+
         INTERNAL_BALANCE_TRANSFER_OUTGOING,
+
+        INTERNAL_BALANCE_TRANSFER_OUTGOING_REVERSAL,
 
         INTERNAL_WITHDRAWAL,
 
@@ -2831,6 +2938,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         LEGACY_PAYMENT,
 
         LEGACY_PAYMENT_REFUND,
+
+        LEVELS_POINTS_ACTION,
 
         LEVELS_POINTS_ADS,
 
@@ -2992,9 +3101,15 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         PLATFORM_BALANCE_TRANSFER_FEE,
 
+        PLATFORM_BALANCE_TRANSFER_FEE_REVERSAL,
+
         PLATFORM_BALANCE_TRANSFER_INCOMING,
 
+        PLATFORM_BALANCE_TRANSFER_INCOMING_REVERSAL,
+
         PLATFORM_BALANCE_TRANSFER_OUTGOING,
+
+        PLATFORM_BALANCE_TRANSFER_OUTGOING_REVERSAL,
 
         PLATFORM_COVERED_DISPUTE,
 
@@ -3009,6 +3124,14 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         PLATFORM_EARNING_SETTLEMENT,
 
         PLATFORM_EARNING_UNRECONCILED_CLEARING,
+
+        PLATFORM_INTERCHANGE_SHARE,
+
+        PLATFORM_INTERCHANGE_SHARE_EXPENSE,
+
+        PLATFORM_INTERCHANGE_SHARE_PAYABLE,
+
+        PLATFORM_INTERCHANGE_SHARE_REVERSAL,
 
         PLATFORM_MARKUP_FEE,
 
@@ -3063,6 +3186,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         PSP_DISPUTE_MANAGEMENT_FEE,
 
         PSP_DISPUTE_PAYABLE,
+
+        PSP_ERROR_LOSS,
 
         PSP_EXTERNAL_ACCOUNT_CONNECTION_FEE,
 
@@ -3187,6 +3312,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         SALES_TAX_REMITTANCE_REVERSAL,
 
         SALES_TAX_REMITTED,
+
+        SAVINGS_REVALUATION,
 
         SETTLEMENT_ROUNDING_VARIANCE,
 
@@ -3454,6 +3581,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         T visitExternalCardLoadOffset();
 
+        T visitFeeRebate();
+
         T visitFraudPreventionFee();
 
         T visitFxGainLoss();
@@ -3472,7 +3601,11 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         T visitInternalBalanceTransferIncoming();
 
+        T visitInternalBalanceTransferIncomingReversal();
+
         T visitInternalBalanceTransferOutgoing();
+
+        T visitInternalBalanceTransferOutgoingReversal();
 
         T visitInternalWithdrawal();
 
@@ -3505,6 +3638,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         T visitLegacyPayment();
 
         T visitLegacyPaymentRefund();
+
+        T visitLevelsPointsAction();
 
         T visitLevelsPointsAds();
 
@@ -3666,9 +3801,15 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
 
         T visitPlatformBalanceTransferFee();
 
+        T visitPlatformBalanceTransferFeeReversal();
+
         T visitPlatformBalanceTransferIncoming();
 
+        T visitPlatformBalanceTransferIncomingReversal();
+
         T visitPlatformBalanceTransferOutgoing();
+
+        T visitPlatformBalanceTransferOutgoingReversal();
 
         T visitPlatformCoveredDispute();
 
@@ -3683,6 +3824,14 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         T visitPlatformEarningSettlement();
 
         T visitPlatformEarningUnreconciledClearing();
+
+        T visitPlatformInterchangeShare();
+
+        T visitPlatformInterchangeShareExpense();
+
+        T visitPlatformInterchangeSharePayable();
+
+        T visitPlatformInterchangeShareReversal();
 
         T visitPlatformMarkupFee();
 
@@ -3737,6 +3886,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         T visitPspDisputeManagementFee();
 
         T visitPspDisputePayable();
+
+        T visitPspErrorLoss();
 
         T visitPspExternalAccountConnectionFee();
 
@@ -3861,6 +4012,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         T visitSalesTaxRemittanceReversal();
 
         T visitSalesTaxRemitted();
+
+        T visitSavingsRevaluation();
 
         T visitSettlementRoundingVariance();
 

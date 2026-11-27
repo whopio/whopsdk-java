@@ -404,6 +404,9 @@ public final class PermissionAction {
     public static final PermissionAction COMPANY_CREATE_CHILD =
             new PermissionAction(Value.COMPANY_CREATE_CHILD, "company:create_child");
 
+    public static final PermissionAction WEBHOOK_RECEIVE_CAPITAL =
+            new PermissionAction(Value.WEBHOOK_RECEIVE_CAPITAL, "webhook_receive:capital");
+
     public static final PermissionAction REVIEW_DELETE = new PermissionAction(Value.REVIEW_DELETE, "review:delete");
 
     public static final PermissionAction APP_AUTHORIZATION_CREATE =
@@ -828,6 +831,9 @@ public final class PermissionAction {
     public static final PermissionAction COURSE_LESSON_INTERACTION_READ =
             new PermissionAction(Value.COURSE_LESSON_INTERACTION_READ, "course_lesson_interaction:read");
 
+    public static final PermissionAction SOCIAL_MENTION_READ =
+            new PermissionAction(Value.SOCIAL_MENTION_READ, "social_mention:read");
+
     public static final PermissionAction MEMBER_STATS_READ =
             new PermissionAction(Value.MEMBER_STATS_READ, "member:stats:read");
 
@@ -1170,6 +1176,8 @@ public final class PermissionAction {
                 return visitor.visitMemberBasicExport();
             case COMPANY_CREATE_CHILD:
                 return visitor.visitCompanyCreateChild();
+            case WEBHOOK_RECEIVE_CAPITAL:
+                return visitor.visitWebhookReceiveCapital();
             case REVIEW_DELETE:
                 return visitor.visitReviewDelete();
             case APP_AUTHORIZATION_CREATE:
@@ -1462,6 +1470,8 @@ public final class PermissionAction {
                 return visitor.visitWebhookReceiveResolutions();
             case COURSE_LESSON_INTERACTION_READ:
                 return visitor.visitCourseLessonInteractionRead();
+            case SOCIAL_MENTION_READ:
+                return visitor.visitSocialMentionRead();
             case MEMBER_STATS_READ:
                 return visitor.visitMemberStatsRead();
             case BOUNTY_SUBMISSION_VOTE:
@@ -1773,6 +1783,8 @@ public final class PermissionAction {
                 return MEMBER_BASIC_EXPORT;
             case "company:create_child":
                 return COMPANY_CREATE_CHILD;
+            case "webhook_receive:capital":
+                return WEBHOOK_RECEIVE_CAPITAL;
             case "review:delete":
                 return REVIEW_DELETE;
             case "app_authorization:create":
@@ -2065,6 +2077,8 @@ public final class PermissionAction {
                 return WEBHOOK_RECEIVE_RESOLUTIONS;
             case "course_lesson_interaction:read":
                 return COURSE_LESSON_INTERACTION_READ;
+            case "social_mention:read":
+                return SOCIAL_MENTION_READ;
             case "member:stats:read":
                 return MEMBER_STATS_READ;
             case "bounty:submission:vote":
@@ -2563,6 +2577,8 @@ public final class PermissionAction {
 
         SOCIAL_LINK_UPDATE,
 
+        SOCIAL_MENTION_READ,
+
         STATS_READ,
 
         SUPPORT_CHAT_CREATE,
@@ -2624,6 +2640,8 @@ public final class PermissionAction {
         WEBHOOK_RECEIVE_APP_MEMBERSHIPS,
 
         WEBHOOK_RECEIVE_APP_PAYMENTS,
+
+        WEBHOOK_RECEIVE_CAPITAL,
 
         WEBHOOK_RECEIVE_CARD_APPLICATIONS,
 
@@ -3161,6 +3179,8 @@ public final class PermissionAction {
 
         T visitSocialLinkUpdate();
 
+        T visitSocialMentionRead();
+
         T visitStatsRead();
 
         T visitSupportChatCreate();
@@ -3222,6 +3242,8 @@ public final class PermissionAction {
         T visitWebhookReceiveAppMemberships();
 
         T visitWebhookReceiveAppPayments();
+
+        T visitWebhookReceiveCapital();
 
         T visitWebhookReceiveCardApplications();
 

@@ -19,6 +19,9 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
     public static final CreateDepositsResponseMethodsCryptoItemName POLYGON =
             new CreateDepositsResponseMethodsCryptoItemName(Value.POLYGON, "Polygon");
 
+    public static final CreateDepositsResponseMethodsCryptoItemName TRON =
+            new CreateDepositsResponseMethodsCryptoItemName(Value.TRON, "Tron");
+
     public static final CreateDepositsResponseMethodsCryptoItemName HYPERLIQUID =
             new CreateDepositsResponseMethodsCryptoItemName(Value.HYPERLIQUID, "Hyperliquid");
 
@@ -81,6 +84,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
                 return visitor.visitMegaEth();
             case POLYGON:
                 return visitor.visitPolygon();
+            case TRON:
+                return visitor.visitTron();
             case HYPERLIQUID:
                 return visitor.visitHyperliquid();
             case ETHEREUM:
@@ -112,6 +117,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
                 return MEGA_ETH;
             case "Polygon":
                 return POLYGON;
+            case "Tron":
+                return TRON;
             case "Hyperliquid":
                 return HYPERLIQUID;
             case "Ethereum":
@@ -138,6 +145,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
 
         BITCOIN,
 
+        TRON,
+
         BASE,
 
         BNB_SMART_CHAIN,
@@ -163,6 +172,8 @@ public final class CreateDepositsResponseMethodsCryptoItemName {
         T visitSolana();
 
         T visitBitcoin();
+
+        T visitTron();
 
         T visitBase();
 

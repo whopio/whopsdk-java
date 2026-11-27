@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ExternalAccount.Builder.class)
 public final class ExternalAccount {
-    private final Optional<String> error;
+    private final Optional<ExternalAccountConnectionStatus> connectionStatus;
 
     private final Optional<String> externalId;
 
@@ -53,7 +53,7 @@ public final class ExternalAccount {
     private final Map<String, Object> additionalProperties;
 
     private ExternalAccount(
-            Optional<String> error,
+            Optional<ExternalAccountConnectionStatus> connectionStatus,
             Optional<String> externalId,
             String id,
             Optional<String> name,
@@ -66,7 +66,7 @@ public final class ExternalAccount {
             Optional<String> username,
             boolean verified,
             Map<String, Object> additionalProperties) {
-        this.error = error;
+        this.connectionStatus = connectionStatus;
         this.externalId = externalId;
         this.id = id;
         this.name = name;
@@ -82,14 +82,14 @@ public final class ExternalAccount {
     }
 
     /**
-     * @return Why this external account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.
+     * @return Connection health of the external account. <code>reconnect_required</code> means the platform refused Whop's access, and the owner must connect the account again. <code>active</code> means Whop has not seen a refusal. Whop checks only Stripe connections for a refusal. <code>null</code> when Whop holds no access for the account, for example a claimed profile.
      */
     @JsonIgnore
-    public Optional<String> getError() {
-        if (error == null) {
+    public Optional<ExternalAccountConnectionStatus> getConnectionStatus() {
+        if (connectionStatus == null) {
             return Optional.empty();
         }
-        return error;
+        return connectionStatus;
     }
 
     /**
@@ -199,9 +199,9 @@ public final class ExternalAccount {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("error")
-    private Optional<String> _getError() {
-        return error;
+    @JsonProperty("connection_status")
+    private Optional<ExternalAccountConnectionStatus> _getConnectionStatus() {
+        return connectionStatus;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -258,7 +258,7 @@ public final class ExternalAccount {
     }
 
     private boolean equalTo(ExternalAccount other) {
-        return error.equals(other.error)
+        return connectionStatus.equals(other.connectionStatus)
                 && externalId.equals(other.externalId)
                 && id.equals(other.id)
                 && name.equals(other.name)
@@ -275,7 +275,7 @@ public final class ExternalAccount {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.error,
+                this.connectionStatus,
                 this.externalId,
                 this.id,
                 this.name,
@@ -329,13 +329,13 @@ public final class ExternalAccount {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Why this external account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
+         * <p>Connection health of the external account. <code>reconnect_required</code> means the platform refused Whop's access, and the owner must connect the account again. <code>active</code> means Whop has not seen a refusal. Whop checks only Stripe connections for a refusal. <code>null</code> when Whop holds no access for the account, for example a claimed profile.</p>
          */
-        _FinalStage error(Optional<String> error);
+        _FinalStage connectionStatus(Optional<ExternalAccountConnectionStatus> connectionStatus);
 
-        _FinalStage error(String error);
+        _FinalStage connectionStatus(ExternalAccountConnectionStatus connectionStatus);
 
-        _FinalStage error(Nullable<String> error);
+        _FinalStage connectionStatus(Nullable<ExternalAccountConnectionStatus> connectionStatus);
 
         /**
          * <p>The platform-specific ID for this external account.</p>
@@ -431,7 +431,7 @@ public final class ExternalAccount {
 
         private Optional<String> externalId = Optional.empty();
 
-        private Optional<String> error = Optional.empty();
+        private Optional<ExternalAccountConnectionStatus> connectionStatus = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -439,7 +439,7 @@ public final class ExternalAccount {
 
         @java.lang.Override
         public Builder from(ExternalAccount other) {
-            error(other.getError());
+            connectionStatus(other.getConnectionStatus());
             externalId(other.getExternalId());
             id(other.getId());
             name(other.getName());
@@ -764,45 +764,45 @@ public final class ExternalAccount {
         }
 
         /**
-         * <p>Why this external account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
+         * <p>Connection health of the external account. <code>reconnect_required</code> means the platform refused Whop's access, and the owner must connect the account again. <code>active</code> means Whop has not seen a refusal. Whop checks only Stripe connections for a refusal. <code>null</code> when Whop holds no access for the account, for example a claimed profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage error(Nullable<String> error) {
-            if (error.isNull()) {
-                this.error = null;
-            } else if (error.isEmpty()) {
-                this.error = Optional.empty();
+        public _FinalStage connectionStatus(Nullable<ExternalAccountConnectionStatus> connectionStatus) {
+            if (connectionStatus.isNull()) {
+                this.connectionStatus = null;
+            } else if (connectionStatus.isEmpty()) {
+                this.connectionStatus = Optional.empty();
             } else {
-                this.error = Optional.of(error.get());
+                this.connectionStatus = Optional.of(connectionStatus.get());
             }
             return this;
         }
 
         /**
-         * <p>Why this external account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
+         * <p>Connection health of the external account. <code>reconnect_required</code> means the platform refused Whop's access, and the owner must connect the account again. <code>active</code> means Whop has not seen a refusal. Whop checks only Stripe connections for a refusal. <code>null</code> when Whop holds no access for the account, for example a claimed profile.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage error(String error) {
-            this.error = Optional.ofNullable(error);
+        public _FinalStage connectionStatus(ExternalAccountConnectionStatus connectionStatus) {
+            this.connectionStatus = Optional.ofNullable(connectionStatus);
             return this;
         }
 
         /**
-         * <p>Why this external account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
+         * <p>Connection health of the external account. <code>reconnect_required</code> means the platform refused Whop's access, and the owner must connect the account again. <code>active</code> means Whop has not seen a refusal. Whop checks only Stripe connections for a refusal. <code>null</code> when Whop holds no access for the account, for example a claimed profile.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "error", nulls = Nulls.SKIP)
-        public _FinalStage error(Optional<String> error) {
-            this.error = error;
+        @JsonSetter(value = "connection_status", nulls = Nulls.SKIP)
+        public _FinalStage connectionStatus(Optional<ExternalAccountConnectionStatus> connectionStatus) {
+            this.connectionStatus = connectionStatus;
             return this;
         }
 
         @java.lang.Override
         public ExternalAccount build() {
             return new ExternalAccount(
-                    error,
+                    connectionStatus,
                     externalId,
                     id,
                     name,
@@ -819,7 +819,7 @@ public final class ExternalAccount {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("error")
+            if (key.equalsIgnoreCase("connection_status")
                     || key.equalsIgnoreCase("external_id")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("name")

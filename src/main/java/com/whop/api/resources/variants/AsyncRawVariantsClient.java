@@ -98,6 +98,9 @@ public class AsyncRawVariantsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "order", request.getOrder().get(), false);
         }
+        if (request.getSku().isPresent()) {
+            QueryStringMapper.addQueryParameter(httpUrl, "sku", request.getSku().get(), false);
+        }
         if (request.getCreatedBefore().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_before", request.getCreatedBefore().get(), false);
@@ -602,28 +605,28 @@ public class AsyncRawVariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<Variant>> update(String id) {
         return update(id, UpdateVariantsRequest.builder().build());
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<Variant>> update(String id, RequestOptions requestOptions) {
         return update(id, UpdateVariantsRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<Variant>> update(String id, UpdateVariantsRequest request) {
         return update(id, request, null);
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<WhopApiHttpResponse<Variant>> update(
             String id, UpdateVariantsRequest request, RequestOptions requestOptions) {
@@ -678,10 +681,17 @@ public class AsyncRawVariantsClient {
                         return;
                     }
                     try {
-                        if (response.code() == 401) {
-                            future.completeExceptionally(new UnauthorizedError(
-                                    ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response));
-                            return;
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 401:
+                                future.completeExceptionally(new UnauthorizedError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
                         }
                     } catch (JsonProcessingException ignored) {
                         // unable to map error response, throwing generic error

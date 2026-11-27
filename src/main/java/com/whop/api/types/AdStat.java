@@ -103,7 +103,7 @@ public final class AdStat {
     }
 
     /**
-     * @return The spend recorded and paid for the ad in the hour, exactly as reported.
+     * @return The spend recorded for the ad in the hour, exactly as reported.
      */
     @JsonProperty("spend")
     public Money getSpend() {
@@ -198,7 +198,7 @@ public final class AdStat {
 
     public interface SpendStage {
         /**
-         * <p>The spend recorded and paid for the ad in the hour, exactly as reported.</p>
+         * <p>The spend recorded for the ad in the hour, exactly as reported.</p>
          */
         _FinalStage spend(@NotNull Money spend);
     }
@@ -318,7 +318,7 @@ public final class AdStat {
         }
 
         /**
-         * <p>The spend recorded and paid for the ad in the hour, exactly as reported.</p>
+         * <p>The spend recorded for the ad in the hour, exactly as reported.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

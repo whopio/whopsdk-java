@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class SocialAccountParentPlatform {
-    public static final SocialAccountParentPlatform INSTAGRAM =
-            new SocialAccountParentPlatform(Value.INSTAGRAM, "instagram");
-
     public static final SocialAccountParentPlatform FACEBOOK =
             new SocialAccountParentPlatform(Value.FACEBOOK, "facebook");
 
@@ -22,10 +19,15 @@ public final class SocialAccountParentPlatform {
 
     public static final SocialAccountParentPlatform KLAVIYO = new SocialAccountParentPlatform(Value.KLAVIYO, "klaviyo");
 
-    public static final SocialAccountParentPlatform AIMERCE = new SocialAccountParentPlatform(Value.AIMERCE, "aimerce");
-
     public static final SocialAccountParentPlatform TELEGRAM =
             new SocialAccountParentPlatform(Value.TELEGRAM, "telegram");
+
+    public static final SocialAccountParentPlatform X = new SocialAccountParentPlatform(Value.X, "x");
+
+    public static final SocialAccountParentPlatform INSTAGRAM =
+            new SocialAccountParentPlatform(Value.INSTAGRAM, "instagram");
+
+    public static final SocialAccountParentPlatform AIMERCE = new SocialAccountParentPlatform(Value.AIMERCE, "aimerce");
 
     public static final SocialAccountParentPlatform QUICKBOOKS =
             new SocialAccountParentPlatform(Value.QUICKBOOKS, "quickbooks");
@@ -33,9 +35,9 @@ public final class SocialAccountParentPlatform {
     public static final SocialAccountParentPlatform LINKEDIN =
             new SocialAccountParentPlatform(Value.LINKEDIN, "linkedin");
 
-    public static final SocialAccountParentPlatform X = new SocialAccountParentPlatform(Value.X, "x");
-
     public static final SocialAccountParentPlatform TIKTOK = new SocialAccountParentPlatform(Value.TIKTOK, "tiktok");
+
+    public static final SocialAccountParentPlatform STRIPE = new SocialAccountParentPlatform(Value.STRIPE, "stripe");
 
     private final Value value;
 
@@ -70,8 +72,6 @@ public final class SocialAccountParentPlatform {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case INSTAGRAM:
-                return visitor.visitInstagram();
             case FACEBOOK:
                 return visitor.visitFacebook();
             case YOUTUBE:
@@ -82,18 +82,22 @@ public final class SocialAccountParentPlatform {
                 return visitor.visitSnapchat();
             case KLAVIYO:
                 return visitor.visitKlaviyo();
-            case AIMERCE:
-                return visitor.visitAimerce();
             case TELEGRAM:
                 return visitor.visitTelegram();
+            case X:
+                return visitor.visitX();
+            case INSTAGRAM:
+                return visitor.visitInstagram();
+            case AIMERCE:
+                return visitor.visitAimerce();
             case QUICKBOOKS:
                 return visitor.visitQuickbooks();
             case LINKEDIN:
                 return visitor.visitLinkedin();
-            case X:
-                return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -103,8 +107,6 @@ public final class SocialAccountParentPlatform {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static SocialAccountParentPlatform valueOf(String value) {
         switch (value) {
-            case "instagram":
-                return INSTAGRAM;
             case "facebook":
                 return FACEBOOK;
             case "youtube":
@@ -115,18 +117,22 @@ public final class SocialAccountParentPlatform {
                 return SNAPCHAT;
             case "klaviyo":
                 return KLAVIYO;
-            case "aimerce":
-                return AIMERCE;
             case "telegram":
                 return TELEGRAM;
+            case "x":
+                return X;
+            case "instagram":
+                return INSTAGRAM;
+            case "aimerce":
+                return AIMERCE;
             case "quickbooks":
                 return QUICKBOOKS;
             case "linkedin":
                 return LINKEDIN;
-            case "x":
-                return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new SocialAccountParentPlatform(Value.UNKNOWN, value);
         }
@@ -157,6 +163,8 @@ public final class SocialAccountParentPlatform {
 
         AIMERCE,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -184,6 +192,8 @@ public final class SocialAccountParentPlatform {
         T visitQuickbooks();
 
         T visitAimerce();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

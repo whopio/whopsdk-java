@@ -228,7 +228,7 @@ public final class PostAdGroupUpdatedPayloadData {
     }
 
     /**
-     * @return Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
+     * @return Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.
      */
     @JsonIgnore
     public Optional<AdGroupDeliverySchedule> getDeliverySchedule() {
@@ -255,7 +255,7 @@ public final class PostAdGroupUpdatedPayloadData {
     }
 
     /**
-     * @return Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.
+     * @return The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.
      */
     @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
@@ -637,7 +637,7 @@ public final class PostAdGroupUpdatedPayloadData {
         _FinalStage conversionEvent(Nullable<ConversionEvent> conversionEvent);
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         _FinalStage deliverySchedule(Optional<AdGroupDeliverySchedule> deliverySchedule);
 
@@ -646,7 +646,7 @@ public final class PostAdGroupUpdatedPayloadData {
         _FinalStage deliverySchedule(Nullable<AdGroupDeliverySchedule> deliverySchedule);
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
@@ -1132,7 +1132,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1148,7 +1148,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1158,7 +1158,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
@@ -1168,7 +1168,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1184,7 +1184,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1194,7 +1194,7 @@ public final class PostAdGroupUpdatedPayloadData {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)

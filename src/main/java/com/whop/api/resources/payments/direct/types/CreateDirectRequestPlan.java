@@ -50,6 +50,8 @@ public final class CreateDirectRequestPlan {
 
     private final Optional<String> productId;
 
+    private final Optional<String> redirectUrl;
+
     private final Optional<Double> renewalPrice;
 
     private final Optional<Integer> splitPayRequiredPayments;
@@ -76,6 +78,7 @@ public final class CreateDirectRequestPlan {
             Optional<CreateDirectRequestPlanPlanType> planType,
             Optional<CreateDirectRequestPlanProduct> product,
             Optional<String> productId,
+            Optional<String> redirectUrl,
             Optional<Double> renewalPrice,
             Optional<Integer> splitPayRequiredPayments,
             Optional<String> title,
@@ -95,6 +98,7 @@ public final class CreateDirectRequestPlan {
         this.planType = planType;
         this.product = product;
         this.productId = productId;
+        this.redirectUrl = redirectUrl;
         this.renewalPrice = renewalPrice;
         this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.title = title;
@@ -244,6 +248,17 @@ public final class CreateDirectRequestPlan {
     }
 
     /**
+     * @return Where the customer is sent after paying for this variant. Must be a valid URL that is not another Whop checkout link.
+     */
+    @JsonIgnore
+    public Optional<String> getRedirectUrl() {
+        if (redirectUrl == null) {
+            return Optional.empty();
+        }
+        return redirectUrl;
+    }
+
+    /**
      * @return Recurring price in the variant currency.
      */
     @JsonIgnore
@@ -371,6 +386,12 @@ public final class CreateDirectRequestPlan {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("redirect_url")
+    private Optional<String> _getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("renewal_price")
     private Optional<Double> _getRenewalPrice() {
         return renewalPrice;
@@ -425,6 +446,7 @@ public final class CreateDirectRequestPlan {
                 && planType.equals(other.planType)
                 && product.equals(other.product)
                 && productId.equals(other.productId)
+                && redirectUrl.equals(other.redirectUrl)
                 && renewalPrice.equals(other.renewalPrice)
                 && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && title.equals(other.title)
@@ -448,6 +470,7 @@ public final class CreateDirectRequestPlan {
                 this.planType,
                 this.product,
                 this.productId,
+                this.redirectUrl,
                 this.renewalPrice,
                 this.splitPayRequiredPayments,
                 this.title,
@@ -589,6 +612,15 @@ public final class CreateDirectRequestPlan {
         _FinalStage productId(Nullable<String> productId);
 
         /**
+         * <p>Where the customer is sent after paying for this variant. Must be a valid URL that is not another Whop checkout link.</p>
+         */
+        _FinalStage redirectUrl(Optional<String> redirectUrl);
+
+        _FinalStage redirectUrl(String redirectUrl);
+
+        _FinalStage redirectUrl(Nullable<String> redirectUrl);
+
+        /**
          * <p>Recurring price in the variant currency.</p>
          */
         _FinalStage renewalPrice(Optional<Double> renewalPrice);
@@ -648,6 +680,8 @@ public final class CreateDirectRequestPlan {
 
         private Optional<Double> renewalPrice = Optional.empty();
 
+        private Optional<String> redirectUrl = Optional.empty();
+
         private Optional<String> productId = Optional.empty();
 
         private Optional<CreateDirectRequestPlanProduct> product = Optional.empty();
@@ -691,6 +725,7 @@ public final class CreateDirectRequestPlan {
             planType(other.getPlanType());
             product(other.getProduct());
             productId(other.getProductId());
+            redirectUrl(other.getRedirectUrl());
             renewalPrice(other.getRenewalPrice());
             splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             title(other.getTitle());
@@ -887,6 +922,42 @@ public final class CreateDirectRequestPlan {
         @JsonSetter(value = "renewal_price", nulls = Nulls.SKIP)
         public _FinalStage renewalPrice(Optional<Double> renewalPrice) {
             this.renewalPrice = renewalPrice;
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. Must be a valid URL that is not another Whop checkout link.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(Nullable<String> redirectUrl) {
+            if (redirectUrl.isNull()) {
+                this.redirectUrl = null;
+            } else if (redirectUrl.isEmpty()) {
+                this.redirectUrl = Optional.empty();
+            } else {
+                this.redirectUrl = Optional.of(redirectUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. Must be a valid URL that is not another Whop checkout link.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage redirectUrl(String redirectUrl) {
+            this.redirectUrl = Optional.ofNullable(redirectUrl);
+            return this;
+        }
+
+        /**
+         * <p>Where the customer is sent after paying for this variant. Must be a valid URL that is not another Whop checkout link.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "redirect_url", nulls = Nulls.SKIP)
+        public _FinalStage redirectUrl(Optional<String> redirectUrl) {
+            this.redirectUrl = redirectUrl;
             return this;
         }
 
@@ -1338,6 +1409,7 @@ public final class CreateDirectRequestPlan {
                     planType,
                     product,
                     productId,
+                    redirectUrl,
                     renewalPrice,
                     splitPayRequiredPayments,
                     title,
@@ -1361,6 +1433,7 @@ public final class CreateDirectRequestPlan {
                     || key.equalsIgnoreCase("plan_type")
                     || key.equalsIgnoreCase("product")
                     || key.equalsIgnoreCase("product_id")
+                    || key.equalsIgnoreCase("redirect_url")
                     || key.equalsIgnoreCase("renewal_price")
                     || key.equalsIgnoreCase("split_pay_required_payments")
                     || key.equalsIgnoreCase("title")

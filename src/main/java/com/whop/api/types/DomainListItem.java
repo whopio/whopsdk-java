@@ -279,7 +279,7 @@ public final class DomainListItem {
     }
 
     /**
-     * @return Moving the domain to another Whop account. <code>null</code> when not turned on or not visible to you.
+     * @return Moving the domain out of this account, to another Whop account or another registrar. <code>null</code> when not turned on or not visible to you.
      */
     @JsonIgnore
     public Optional<DomainTransfer> getTransfer() {
@@ -641,7 +641,7 @@ public final class DomainListItem {
         _FinalStage subdomain(Nullable<DomainSubdomain> subdomain);
 
         /**
-         * <p>Moving the domain to another Whop account. <code>null</code> when not turned on or not visible to you.</p>
+         * <p>Moving the domain out of this account, to another Whop account or another registrar. <code>null</code> when not turned on or not visible to you.</p>
          */
         _FinalStage transfer(Optional<DomainTransfer> transfer);
 
@@ -868,7 +868,7 @@ public final class DomainListItem {
         }
 
         /**
-         * <p>Moving the domain to another Whop account. <code>null</code> when not turned on or not visible to you.</p>
+         * <p>Moving the domain out of this account, to another Whop account or another registrar. <code>null</code> when not turned on or not visible to you.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -884,7 +884,7 @@ public final class DomainListItem {
         }
 
         /**
-         * <p>Moving the domain to another Whop account. <code>null</code> when not turned on or not visible to you.</p>
+         * <p>Moving the domain out of this account, to another Whop account or another registrar. <code>null</code> when not turned on or not visible to you.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -894,7 +894,7 @@ public final class DomainListItem {
         }
 
         /**
-         * <p>Moving the domain to another Whop account. <code>null</code> when not turned on or not visible to you.</p>
+         * <p>Moving the domain out of this account, to another Whop account or another registrar. <code>null</code> when not turned on or not visible to you.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "transfer", nulls = Nulls.SKIP)

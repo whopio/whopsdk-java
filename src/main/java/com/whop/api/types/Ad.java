@@ -35,6 +35,8 @@ public final class Ad {
 
     private final double addedToCarts;
 
+    private final Optional<String> appealAvailableAt;
+
     private final Optional<AdCallToAction> callToAction;
 
     private final double clickThroughRate;
@@ -158,6 +160,7 @@ public final class Ad {
             AdEntityReference adGroup,
             double addedToCartValue,
             double addedToCarts,
+            Optional<String> appealAvailableAt,
             Optional<AdCallToAction> callToAction,
             double clickThroughRate,
             double clicks,
@@ -221,6 +224,7 @@ public final class Ad {
         this.adGroup = adGroup;
         this.addedToCartValue = addedToCartValue;
         this.addedToCarts = addedToCarts;
+        this.appealAvailableAt = appealAvailableAt;
         this.callToAction = callToAction;
         this.clickThroughRate = clickThroughRate;
         this.clicks = clicks;
@@ -315,6 +319,17 @@ public final class Ad {
     }
 
     /**
+     * @return When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.
+     */
+    @JsonIgnore
+    public Optional<String> getAppealAvailableAt() {
+        if (appealAvailableAt == null) {
+            return Optional.empty();
+        }
+        return appealAvailableAt;
+    }
+
+    /**
      * @return The call-to-action button shown on the ad.
      */
     @JsonIgnore
@@ -374,7 +389,7 @@ public final class Ad {
     }
 
     /**
-     * @return Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.
+     * @return Whop's content review of this ad: whether it has finished and the content rules it breaks.
      */
     @JsonProperty("content_review")
     public AdContentReview getContentReview() {
@@ -453,7 +468,7 @@ public final class Ad {
     }
 
     /**
-     * @return Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.
+     * @return Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.
      */
     @JsonIgnore
     public Optional<Double> getCostPerResult() {
@@ -648,7 +663,7 @@ public final class Ad {
     }
 
     /**
-     * @return The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.
+     * @return The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.
      */
     @JsonIgnore
     public Optional<AdResultEvent> getResultEvent() {
@@ -821,6 +836,12 @@ public final class Ad {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("appeal_available_at")
+    private Optional<String> _getAppealAvailableAt() {
+        return appealAvailableAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("call_to_action")
     private Optional<AdCallToAction> _getCallToAction() {
         return callToAction;
@@ -950,6 +971,7 @@ public final class Ad {
                 && adGroup.equals(other.adGroup)
                 && addedToCartValue == other.addedToCartValue
                 && addedToCarts == other.addedToCarts
+                && appealAvailableAt.equals(other.appealAvailableAt)
                 && callToAction.equals(other.callToAction)
                 && clickThroughRate == other.clickThroughRate
                 && clicks == other.clicks
@@ -1017,6 +1039,7 @@ public final class Ad {
                 this.adGroup,
                 this.addedToCartValue,
                 this.addedToCarts,
+                this.appealAvailableAt,
                 this.callToAction,
                 this.clickThroughRate,
                 this.clicks,
@@ -1160,7 +1183,7 @@ public final class Ad {
 
     public interface ContentReviewStage {
         /**
-         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         * <p>Whop's content review of this ad: whether it has finished and the content rules it breaks.</p>
          */
         CostPerClickStage contentReview(@NotNull AdContentReview contentReview);
     }
@@ -1341,6 +1364,15 @@ public final class Ad {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         */
+        _FinalStage appealAvailableAt(Optional<String> appealAvailableAt);
+
+        _FinalStage appealAvailableAt(String appealAvailableAt);
+
+        _FinalStage appealAvailableAt(Nullable<String> appealAvailableAt);
+
+        /**
          * <p>The call-to-action button shown on the ad.</p>
          */
         _FinalStage callToAction(Optional<AdCallToAction> callToAction);
@@ -1395,7 +1427,7 @@ public final class Ad {
         _FinalStage costPerPurchase(Nullable<Double> costPerPurchase);
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          */
         _FinalStage costPerResult(Optional<Double> costPerResult);
 
@@ -1497,7 +1529,7 @@ public final class Ad {
         _FinalStage addAllPrimaryTexts(List<AdText> primaryTexts);
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          */
         _FinalStage resultEvent(Optional<AdResultEvent> resultEvent);
 
@@ -1731,6 +1763,8 @@ public final class Ad {
 
         private Optional<AdCallToAction> callToAction = Optional.empty();
 
+        private Optional<String> appealAvailableAt = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -1741,6 +1775,7 @@ public final class Ad {
             adGroup(other.getAdGroup());
             addedToCartValue(other.getAddedToCartValue());
             addedToCarts(other.getAddedToCarts());
+            appealAvailableAt(other.getAppealAvailableAt());
             callToAction(other.getCallToAction());
             clickThroughRate(other.getClickThroughRate());
             clicks(other.getClicks());
@@ -1913,7 +1948,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Whop's content review of this ad: whether it has finished, which ad networks it is recommended for, and the content rules it breaks.</p>
+         * <p>Whop's content review of this ad: whether it has finished and the content rules it breaks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2439,7 +2474,7 @@ public final class Ad {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2455,7 +2490,7 @@ public final class Ad {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2465,7 +2500,7 @@ public final class Ad {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "result_event", nulls = Nulls.SKIP)
@@ -2845,7 +2880,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2861,7 +2896,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2871,7 +2906,7 @@ public final class Ad {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "cost_per_result", nulls = Nulls.SKIP)
@@ -3096,6 +3131,42 @@ public final class Ad {
             return this;
         }
 
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appealAvailableAt(Nullable<String> appealAvailableAt) {
+            if (appealAvailableAt.isNull()) {
+                this.appealAvailableAt = null;
+            } else if (appealAvailableAt.isEmpty()) {
+                this.appealAvailableAt = Optional.empty();
+            } else {
+                this.appealAvailableAt = Optional.of(appealAvailableAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage appealAvailableAt(String appealAvailableAt) {
+            this.appealAvailableAt = Optional.ofNullable(appealAvailableAt);
+            return this;
+        }
+
+        /**
+         * <p>When the ad can next be appealed, as an ISO 8601 timestamp. <code>null</code> when it can be appealed now.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "appeal_available_at", nulls = Nulls.SKIP)
+        public _FinalStage appealAvailableAt(Optional<String> appealAvailableAt) {
+            this.appealAvailableAt = appealAvailableAt;
+            return this;
+        }
+
         @java.lang.Override
         public Ad build() {
             return new Ad(
@@ -3103,6 +3174,7 @@ public final class Ad {
                     adGroup,
                     addedToCartValue,
                     addedToCarts,
+                    appealAvailableAt,
                     callToAction,
                     clickThroughRate,
                     clicks,
@@ -3170,6 +3242,7 @@ public final class Ad {
                     || key.equalsIgnoreCase("ad_group")
                     || key.equalsIgnoreCase("added_to_cart_value")
                     || key.equalsIgnoreCase("added_to_carts")
+                    || key.equalsIgnoreCase("appeal_available_at")
                     || key.equalsIgnoreCase("call_to_action")
                     || key.equalsIgnoreCase("click_through_rate")
                     || key.equalsIgnoreCase("clicks")

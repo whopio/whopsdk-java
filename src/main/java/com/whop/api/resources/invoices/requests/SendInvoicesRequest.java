@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.invoices.types.SendInvoicesRequestCollectionMethod;
+import com.whop.api.resources.invoices.types.SendInvoicesRequestSendAs;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,14 @@ public final class SendInvoicesRequest {
 
     private final Optional<SendInvoicesRequestCollectionMethod> collectionMethod;
 
+    private final Optional<String> message;
+
+    private final Optional<Double> quoteDepositAmount;
+
+    private final Optional<Double> quoteDepositPercentage;
+
+    private final Optional<SendInvoicesRequestSendAs> sendAs;
+
     private final Optional<OffsetDateTime> sendAt;
 
     private final Map<String, Object> additionalProperties;
@@ -36,10 +45,18 @@ public final class SendInvoicesRequest {
     private SendInvoicesRequest(
             Optional<OffsetDateTime> chargeAt,
             Optional<SendInvoicesRequestCollectionMethod> collectionMethod,
+            Optional<String> message,
+            Optional<Double> quoteDepositAmount,
+            Optional<Double> quoteDepositPercentage,
+            Optional<SendInvoicesRequestSendAs> sendAs,
             Optional<OffsetDateTime> sendAt,
             Map<String, Object> additionalProperties) {
         this.chargeAt = chargeAt;
         this.collectionMethod = collectionMethod;
+        this.message = message;
+        this.quoteDepositAmount = quoteDepositAmount;
+        this.quoteDepositPercentage = quoteDepositPercentage;
+        this.sendAs = sendAs;
         this.sendAt = sendAt;
         this.additionalProperties = additionalProperties;
     }
@@ -67,6 +84,47 @@ public final class SendInvoicesRequest {
     }
 
     /**
+     * @return A note to the customer in the quote email. It is not stored. Only with <code>send_as</code> set to <code>quote</code>. Defaults to &quot;Please review and accept this quote&quot; when it is blank or left out.
+     */
+    @JsonIgnore
+    public Optional<String> getMessage() {
+        if (message == null) {
+            return Optional.empty();
+        }
+        return message;
+    }
+
+    /**
+     * @return A fixed amount in the invoice's currency to bill as a deposit when the customer signs, such as <code>200</code> for $200.00. It must be less than the quote total. Mutually exclusive with <code>quote_deposit_percentage</code>. Only with <code>send_as</code> set to <code>quote</code>.
+     */
+    @JsonIgnore
+    public Optional<Double> getQuoteDepositAmount() {
+        if (quoteDepositAmount == null) {
+            return Optional.empty();
+        }
+        return quoteDepositAmount;
+    }
+
+    /**
+     * @return The share of the quote to bill as a deposit when the customer signs, such as <code>30</code> for 30%. The customer is then taken to pay it. Only with <code>send_as</code> set to <code>quote</code>.
+     */
+    @JsonIgnore
+    public Optional<Double> getQuoteDepositPercentage() {
+        if (quoteDepositPercentage == null) {
+            return Optional.empty();
+        }
+        return quoteDepositPercentage;
+    }
+
+    /**
+     * @return How to send the draft. <code>invoice</code> issues it and emails it to be paid. <code>quote</code> emails it as a quote and keeps it a draft. Defaults to <code>invoice</code>.
+     */
+    @JsonProperty("send_as")
+    public Optional<SendInvoicesRequestSendAs> getSendAs() {
+        return sendAs;
+    }
+
+    /**
      * @return When to send the draft, as an ISO 8601 timestamp in the future. Omit to send now.
      */
     @JsonIgnore
@@ -90,6 +148,24 @@ public final class SendInvoicesRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("message")
+    private Optional<String> _getMessage() {
+        return message;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_deposit_amount")
+    private Optional<Double> _getQuoteDepositAmount() {
+        return quoteDepositAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("quote_deposit_percentage")
+    private Optional<Double> _getQuoteDepositPercentage() {
+        return quoteDepositPercentage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("send_at")
     private Optional<OffsetDateTime> _getSendAt() {
         return sendAt;
@@ -109,12 +185,23 @@ public final class SendInvoicesRequest {
     private boolean equalTo(SendInvoicesRequest other) {
         return chargeAt.equals(other.chargeAt)
                 && collectionMethod.equals(other.collectionMethod)
+                && message.equals(other.message)
+                && quoteDepositAmount.equals(other.quoteDepositAmount)
+                && quoteDepositPercentage.equals(other.quoteDepositPercentage)
+                && sendAs.equals(other.sendAs)
                 && sendAt.equals(other.sendAt);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.chargeAt, this.collectionMethod, this.sendAt);
+        return Objects.hash(
+                this.chargeAt,
+                this.collectionMethod,
+                this.message,
+                this.quoteDepositAmount,
+                this.quoteDepositPercentage,
+                this.sendAs,
+                this.sendAt);
     }
 
     @java.lang.Override
@@ -132,6 +219,14 @@ public final class SendInvoicesRequest {
 
         private Optional<SendInvoicesRequestCollectionMethod> collectionMethod = Optional.empty();
 
+        private Optional<String> message = Optional.empty();
+
+        private Optional<Double> quoteDepositAmount = Optional.empty();
+
+        private Optional<Double> quoteDepositPercentage = Optional.empty();
+
+        private Optional<SendInvoicesRequestSendAs> sendAs = Optional.empty();
+
         private Optional<OffsetDateTime> sendAt = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -141,6 +236,10 @@ public final class SendInvoicesRequest {
         public Builder from(SendInvoicesRequest other) {
             chargeAt(other.getChargeAt());
             collectionMethod(other.getCollectionMethod());
+            message(other.getMessage());
+            quoteDepositAmount(other.getQuoteDepositAmount());
+            quoteDepositPercentage(other.getQuoteDepositPercentage());
+            sendAs(other.getSendAs());
             sendAt(other.getSendAt());
             return this;
         }
@@ -196,6 +295,95 @@ public final class SendInvoicesRequest {
         }
 
         /**
+         * <p>A note to the customer in the quote email. It is not stored. Only with <code>send_as</code> set to <code>quote</code>. Defaults to &quot;Please review and accept this quote&quot; when it is blank or left out.</p>
+         */
+        @JsonSetter(value = "message", nulls = Nulls.SKIP)
+        public Builder message(Optional<String> message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder message(String message) {
+            this.message = Optional.ofNullable(message);
+            return this;
+        }
+
+        public Builder message(Nullable<String> message) {
+            if (message.isNull()) {
+                this.message = null;
+            } else if (message.isEmpty()) {
+                this.message = Optional.empty();
+            } else {
+                this.message = Optional.of(message.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A fixed amount in the invoice's currency to bill as a deposit when the customer signs, such as <code>200</code> for $200.00. It must be less than the quote total. Mutually exclusive with <code>quote_deposit_percentage</code>. Only with <code>send_as</code> set to <code>quote</code>.</p>
+         */
+        @JsonSetter(value = "quote_deposit_amount", nulls = Nulls.SKIP)
+        public Builder quoteDepositAmount(Optional<Double> quoteDepositAmount) {
+            this.quoteDepositAmount = quoteDepositAmount;
+            return this;
+        }
+
+        public Builder quoteDepositAmount(Double quoteDepositAmount) {
+            this.quoteDepositAmount = Optional.ofNullable(quoteDepositAmount);
+            return this;
+        }
+
+        public Builder quoteDepositAmount(Nullable<Double> quoteDepositAmount) {
+            if (quoteDepositAmount.isNull()) {
+                this.quoteDepositAmount = null;
+            } else if (quoteDepositAmount.isEmpty()) {
+                this.quoteDepositAmount = Optional.empty();
+            } else {
+                this.quoteDepositAmount = Optional.of(quoteDepositAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The share of the quote to bill as a deposit when the customer signs, such as <code>30</code> for 30%. The customer is then taken to pay it. Only with <code>send_as</code> set to <code>quote</code>.</p>
+         */
+        @JsonSetter(value = "quote_deposit_percentage", nulls = Nulls.SKIP)
+        public Builder quoteDepositPercentage(Optional<Double> quoteDepositPercentage) {
+            this.quoteDepositPercentage = quoteDepositPercentage;
+            return this;
+        }
+
+        public Builder quoteDepositPercentage(Double quoteDepositPercentage) {
+            this.quoteDepositPercentage = Optional.ofNullable(quoteDepositPercentage);
+            return this;
+        }
+
+        public Builder quoteDepositPercentage(Nullable<Double> quoteDepositPercentage) {
+            if (quoteDepositPercentage.isNull()) {
+                this.quoteDepositPercentage = null;
+            } else if (quoteDepositPercentage.isEmpty()) {
+                this.quoteDepositPercentage = Optional.empty();
+            } else {
+                this.quoteDepositPercentage = Optional.of(quoteDepositPercentage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>How to send the draft. <code>invoice</code> issues it and emails it to be paid. <code>quote</code> emails it as a quote and keeps it a draft. Defaults to <code>invoice</code>.</p>
+         */
+        @JsonSetter(value = "send_as", nulls = Nulls.SKIP)
+        public Builder sendAs(Optional<SendInvoicesRequestSendAs> sendAs) {
+            this.sendAs = sendAs;
+            return this;
+        }
+
+        public Builder sendAs(SendInvoicesRequestSendAs sendAs) {
+            this.sendAs = Optional.ofNullable(sendAs);
+            return this;
+        }
+
+        /**
          * <p>When to send the draft, as an ISO 8601 timestamp in the future. Omit to send now.</p>
          */
         @JsonSetter(value = "send_at", nulls = Nulls.SKIP)
@@ -221,13 +409,25 @@ public final class SendInvoicesRequest {
         }
 
         public SendInvoicesRequest build() {
-            return new SendInvoicesRequest(chargeAt, collectionMethod, sendAt, additionalProperties);
+            return new SendInvoicesRequest(
+                    chargeAt,
+                    collectionMethod,
+                    message,
+                    quoteDepositAmount,
+                    quoteDepositPercentage,
+                    sendAs,
+                    sendAt,
+                    additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("charge_at")
                     || key.equalsIgnoreCase("collection_method")
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("quote_deposit_amount")
+                    || key.equalsIgnoreCase("quote_deposit_percentage")
+                    || key.equalsIgnoreCase("send_as")
                     || key.equalsIgnoreCase("send_at")) {
                 return;
             }

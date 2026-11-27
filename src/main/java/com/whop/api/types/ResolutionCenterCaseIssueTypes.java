@@ -19,6 +19,9 @@ public final class ResolutionCenterCaseIssueTypes {
     public static final ResolutionCenterCaseIssueTypes PRODUCT_UNACCEPTABLE =
             new ResolutionCenterCaseIssueTypes(Value.PRODUCT_UNACCEPTABLE, "product_unacceptable");
 
+    public static final ResolutionCenterCaseIssueTypes CREDIT_NOT_PROCESSED =
+            new ResolutionCenterCaseIssueTypes(Value.CREDIT_NOT_PROCESSED, "credit_not_processed");
+
     public static final ResolutionCenterCaseIssueTypes FORGOT_TO_CANCEL =
             new ResolutionCenterCaseIssueTypes(Value.FORGOT_TO_CANCEL, "forgot_to_cancel");
 
@@ -63,6 +66,8 @@ public final class ResolutionCenterCaseIssueTypes {
                 return visitor.visitUnauthorizedTransaction();
             case PRODUCT_UNACCEPTABLE:
                 return visitor.visitProductUnacceptable();
+            case CREDIT_NOT_PROCESSED:
+                return visitor.visitCreditNotProcessed();
             case FORGOT_TO_CANCEL:
                 return visitor.visitForgotToCancel();
             case UNKNOWN:
@@ -82,6 +87,8 @@ public final class ResolutionCenterCaseIssueTypes {
                 return UNAUTHORIZED_TRANSACTION;
             case "product_unacceptable":
                 return PRODUCT_UNACCEPTABLE;
+            case "credit_not_processed":
+                return CREDIT_NOT_PROCESSED;
             case "forgot_to_cancel":
                 return FORGOT_TO_CANCEL;
             default:
@@ -100,6 +107,8 @@ public final class ResolutionCenterCaseIssueTypes {
 
         PRODUCT_UNACCEPTABLE,
 
+        CREDIT_NOT_PROCESSED,
+
         UNKNOWN
     }
 
@@ -113,6 +122,8 @@ public final class ResolutionCenterCaseIssueTypes {
         T visitUnauthorizedTransaction();
 
         T visitProductUnacceptable();
+
+        T visitCreditNotProcessed();
 
         T visitUnknown(String unknownType);
     }

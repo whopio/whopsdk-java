@@ -220,7 +220,7 @@ public class AsyncExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<ExternalAccount> refresh(String id) {
         CompletableFuture<WhopApiHttpResponse<ExternalAccount>> rawFuture = this.rawClient.refresh(id);
@@ -234,7 +234,7 @@ public class AsyncExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<ExternalAccount> refresh(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<ExternalAccount>> rawFuture = this.rawClient.refresh(id, requestOptions);
@@ -248,7 +248,7 @@ public class AsyncExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<ExternalAccount> refresh(String id, RefreshExternalAccountsRequest request) {
         CompletableFuture<WhopApiHttpResponse<ExternalAccount>> rawFuture = this.rawClient.refresh(id, request);
@@ -262,7 +262,7 @@ public class AsyncExternalAccountsClient {
     }
 
     /**
-     * Refreshes the state of an external account. Use it to clear an <code>error</code> that has been resolved.
+     * Deprecated. Returns the external account unchanged.
      */
     public CompletableFuture<ExternalAccount> refresh(
             String id, RefreshExternalAccountsRequest request, RequestOptions requestOptions) {

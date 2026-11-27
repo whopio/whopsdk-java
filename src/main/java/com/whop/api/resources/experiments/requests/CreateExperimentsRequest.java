@@ -17,9 +17,11 @@ import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.experiments.types.CreateExperimentsRequestBucketBy;
 import com.whop.api.resources.experiments.types.CreateExperimentsRequestControl;
-import com.whop.api.resources.experiments.types.CreateExperimentsRequestTargetingRulesItem;
+import com.whop.api.resources.experiments.types.CreateExperimentsRequestDecisionMode;
+import com.whop.api.resources.experiments.types.CreateExperimentsRequestKind;
 import com.whop.api.resources.experiments.types.CreateExperimentsRequestVariantsItem;
 import com.whop.api.types.ExperimentResourceReference;
+import com.whop.api.types.ExperimentStat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +38,13 @@ public final class CreateExperimentsRequest {
 
     private final Optional<CreateExperimentsRequestControl> control;
 
-    private final Optional<Boolean> featureFlagOnly;
+    private final Optional<CreateExperimentsRequestDecisionMode> decisionMode;
 
     private final String flagKey;
 
     private final Optional<String> hypothesis;
+
+    private final Optional<CreateExperimentsRequestKind> kind;
 
     private final Optional<Map<String, String>> metadata;
 
@@ -48,7 +52,7 @@ public final class CreateExperimentsRequest {
 
     private final Optional<ExperimentResourceReference> relatedResource;
 
-    private final Optional<List<CreateExperimentsRequestTargetingRulesItem>> targetingRules;
+    private final Optional<List<ExperimentStat>> targetStats;
 
     private final Optional<List<CreateExperimentsRequestVariantsItem>> variants;
 
@@ -58,25 +62,27 @@ public final class CreateExperimentsRequest {
             String accountId,
             Optional<CreateExperimentsRequestBucketBy> bucketBy,
             Optional<CreateExperimentsRequestControl> control,
-            Optional<Boolean> featureFlagOnly,
+            Optional<CreateExperimentsRequestDecisionMode> decisionMode,
             String flagKey,
             Optional<String> hypothesis,
+            Optional<CreateExperimentsRequestKind> kind,
             Optional<Map<String, String>> metadata,
             Optional<String> name,
             Optional<ExperimentResourceReference> relatedResource,
-            Optional<List<CreateExperimentsRequestTargetingRulesItem>> targetingRules,
+            Optional<List<ExperimentStat>> targetStats,
             Optional<List<CreateExperimentsRequestVariantsItem>> variants,
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.bucketBy = bucketBy;
         this.control = control;
-        this.featureFlagOnly = featureFlagOnly;
+        this.decisionMode = decisionMode;
         this.flagKey = flagKey;
         this.hypothesis = hypothesis;
+        this.kind = kind;
         this.metadata = metadata;
         this.name = name;
         this.relatedResource = relatedResource;
-        this.targetingRules = targetingRules;
+        this.targetStats = targetStats;
         this.variants = variants;
         this.additionalProperties = additionalProperties;
     }
@@ -103,11 +109,14 @@ public final class CreateExperimentsRequest {
     }
 
     /**
-     * @return When <code>true</code>, creates a binary feature flag rather than a full experiment. Feature flags expose the same evaluation API but do not collect metric results. Defaults to <code>false</code>.
+     * @return How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Omit to leave it to the owner. Not accepted on feature flags.
      */
-    @JsonProperty("feature_flag_only")
-    public Optional<Boolean> getFeatureFlagOnly() {
-        return featureFlagOnly;
+    @JsonIgnore
+    public Optional<CreateExperimentsRequestDecisionMode> getDecisionMode() {
+        if (decisionMode == null) {
+            return Optional.empty();
+        }
+        return decisionMode;
     }
 
     /**
@@ -127,6 +136,14 @@ public final class CreateExperimentsRequest {
             return Optional.empty();
         }
         return hypothesis;
+    }
+
+    /**
+     * @return <code>experiment</code> assigns its subjects to arms and takes <code>variants</code>. <code>beforeafter</code> compares a change with the period before it: it assigns nobody and needs <code>target_stats</code>. Defaults to <code>experiment</code>.
+     */
+    @JsonProperty("kind")
+    public Optional<CreateExperimentsRequestKind> getKind() {
+        return kind;
     }
 
     /**
@@ -154,11 +171,11 @@ public final class CreateExperimentsRequest {
     }
 
     /**
-     * @return Rules that determine which subjects qualify for the experiment.
+     * @return The measures the experiment sets out to move, as the stats API reads them. Only an account's experiment takes them.
      */
-    @JsonProperty("targeting_rules")
-    public Optional<List<CreateExperimentsRequestTargetingRulesItem>> getTargetingRules() {
-        return targetingRules;
+    @JsonProperty("target_stats")
+    public Optional<List<ExperimentStat>> getTargetStats() {
+        return targetStats;
     }
 
     /**
@@ -167,6 +184,12 @@ public final class CreateExperimentsRequest {
     @JsonProperty("variants")
     public Optional<List<CreateExperimentsRequestVariantsItem>> getVariants() {
         return variants;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("decision_mode")
+    private Optional<CreateExperimentsRequestDecisionMode> _getDecisionMode() {
+        return decisionMode;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -190,13 +213,14 @@ public final class CreateExperimentsRequest {
         return accountId.equals(other.accountId)
                 && bucketBy.equals(other.bucketBy)
                 && control.equals(other.control)
-                && featureFlagOnly.equals(other.featureFlagOnly)
+                && decisionMode.equals(other.decisionMode)
                 && flagKey.equals(other.flagKey)
                 && hypothesis.equals(other.hypothesis)
+                && kind.equals(other.kind)
                 && metadata.equals(other.metadata)
                 && name.equals(other.name)
                 && relatedResource.equals(other.relatedResource)
-                && targetingRules.equals(other.targetingRules)
+                && targetStats.equals(other.targetStats)
                 && variants.equals(other.variants);
     }
 
@@ -206,13 +230,14 @@ public final class CreateExperimentsRequest {
                 this.accountId,
                 this.bucketBy,
                 this.control,
-                this.featureFlagOnly,
+                this.decisionMode,
                 this.flagKey,
                 this.hypothesis,
+                this.kind,
                 this.metadata,
                 this.name,
                 this.relatedResource,
-                this.targetingRules,
+                this.targetStats,
                 this.variants);
     }
 
@@ -260,11 +285,13 @@ public final class CreateExperimentsRequest {
         _FinalStage control(CreateExperimentsRequestControl control);
 
         /**
-         * <p>When <code>true</code>, creates a binary feature flag rather than a full experiment. Feature flags expose the same evaluation API but do not collect metric results. Defaults to <code>false</code>.</p>
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Omit to leave it to the owner. Not accepted on feature flags.</p>
          */
-        _FinalStage featureFlagOnly(Optional<Boolean> featureFlagOnly);
+        _FinalStage decisionMode(Optional<CreateExperimentsRequestDecisionMode> decisionMode);
 
-        _FinalStage featureFlagOnly(Boolean featureFlagOnly);
+        _FinalStage decisionMode(CreateExperimentsRequestDecisionMode decisionMode);
+
+        _FinalStage decisionMode(Nullable<CreateExperimentsRequestDecisionMode> decisionMode);
 
         /**
          * <p>Required for full experiments; rejected on feature flags. Structure it as &quot;If we [change] for [cohort], then [measurable behavior] will [increase/decrease], resulting in [business outcome], because [evidence]. Created by [name].&quot; Evidence should be something real — a baseline number, a funnel breakdown — not a guess, and [name] is you, not something to leave blank.</p>
@@ -274,6 +301,13 @@ public final class CreateExperimentsRequest {
         _FinalStage hypothesis(String hypothesis);
 
         _FinalStage hypothesis(Nullable<String> hypothesis);
+
+        /**
+         * <p><code>experiment</code> assigns its subjects to arms and takes <code>variants</code>. <code>beforeafter</code> compares a change with the period before it: it assigns nobody and needs <code>target_stats</code>. Defaults to <code>experiment</code>.</p>
+         */
+        _FinalStage kind(Optional<CreateExperimentsRequestKind> kind);
+
+        _FinalStage kind(CreateExperimentsRequestKind kind);
 
         /**
          * <p>Up to 20 key-value pairs you can attach to the experiment for your own use, such as which pages it changes. Keys are at most 40 characters and values at most 500.</p>
@@ -297,11 +331,11 @@ public final class CreateExperimentsRequest {
         _FinalStage relatedResource(ExperimentResourceReference relatedResource);
 
         /**
-         * <p>Rules that determine which subjects qualify for the experiment.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. Only an account's experiment takes them.</p>
          */
-        _FinalStage targetingRules(Optional<List<CreateExperimentsRequestTargetingRulesItem>> targetingRules);
+        _FinalStage targetStats(Optional<List<ExperimentStat>> targetStats);
 
-        _FinalStage targetingRules(List<CreateExperimentsRequestTargetingRulesItem> targetingRules);
+        _FinalStage targetStats(List<ExperimentStat> targetStats);
 
         /**
          * <p>Treatment arms to create. Users outside every arm form the implicit <code>control</code> group. Required unless <code>feature_flag_only</code> is <code>true</code>.</p>
@@ -319,7 +353,7 @@ public final class CreateExperimentsRequest {
 
         private Optional<List<CreateExperimentsRequestVariantsItem>> variants = Optional.empty();
 
-        private Optional<List<CreateExperimentsRequestTargetingRulesItem>> targetingRules = Optional.empty();
+        private Optional<List<ExperimentStat>> targetStats = Optional.empty();
 
         private Optional<ExperimentResourceReference> relatedResource = Optional.empty();
 
@@ -327,9 +361,11 @@ public final class CreateExperimentsRequest {
 
         private Optional<Map<String, String>> metadata = Optional.empty();
 
+        private Optional<CreateExperimentsRequestKind> kind = Optional.empty();
+
         private Optional<String> hypothesis = Optional.empty();
 
-        private Optional<Boolean> featureFlagOnly = Optional.empty();
+        private Optional<CreateExperimentsRequestDecisionMode> decisionMode = Optional.empty();
 
         private Optional<CreateExperimentsRequestControl> control = Optional.empty();
 
@@ -344,13 +380,14 @@ public final class CreateExperimentsRequest {
             accountId(other.getAccountId());
             bucketBy(other.getBucketBy());
             control(other.getControl());
-            featureFlagOnly(other.getFeatureFlagOnly());
+            decisionMode(other.getDecisionMode());
             flagKey(other.getFlagKey());
             hypothesis(other.getHypothesis());
+            kind(other.getKind());
             metadata(other.getMetadata());
             name(other.getName());
             relatedResource(other.getRelatedResource());
-            targetingRules(other.getTargetingRules());
+            targetStats(other.getTargetStats());
             variants(other.getVariants());
             return this;
         }
@@ -398,22 +435,22 @@ public final class CreateExperimentsRequest {
         }
 
         /**
-         * <p>Rules that determine which subjects qualify for the experiment.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. Only an account's experiment takes them.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage targetingRules(List<CreateExperimentsRequestTargetingRulesItem> targetingRules) {
-            this.targetingRules = Optional.ofNullable(targetingRules);
+        public _FinalStage targetStats(List<ExperimentStat> targetStats) {
+            this.targetStats = Optional.ofNullable(targetStats);
             return this;
         }
 
         /**
-         * <p>Rules that determine which subjects qualify for the experiment.</p>
+         * <p>The measures the experiment sets out to move, as the stats API reads them. Only an account's experiment takes them.</p>
          */
         @java.lang.Override
-        @JsonSetter(value = "targeting_rules", nulls = Nulls.SKIP)
-        public _FinalStage targetingRules(Optional<List<CreateExperimentsRequestTargetingRulesItem>> targetingRules) {
-            this.targetingRules = targetingRules;
+        @JsonSetter(value = "target_stats", nulls = Nulls.SKIP)
+        public _FinalStage targetStats(Optional<List<ExperimentStat>> targetStats) {
+            this.targetStats = targetStats;
             return this;
         }
 
@@ -478,6 +515,26 @@ public final class CreateExperimentsRequest {
         }
 
         /**
+         * <p><code>experiment</code> assigns its subjects to arms and takes <code>variants</code>. <code>beforeafter</code> compares a change with the period before it: it assigns nobody and needs <code>target_stats</code>. Defaults to <code>experiment</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage kind(CreateExperimentsRequestKind kind) {
+            this.kind = Optional.ofNullable(kind);
+            return this;
+        }
+
+        /**
+         * <p><code>experiment</code> assigns its subjects to arms and takes <code>variants</code>. <code>beforeafter</code> compares a change with the period before it: it assigns nobody and needs <code>target_stats</code>. Defaults to <code>experiment</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "kind", nulls = Nulls.SKIP)
+        public _FinalStage kind(Optional<CreateExperimentsRequestKind> kind) {
+            this.kind = kind;
+            return this;
+        }
+
+        /**
          * <p>Required for full experiments; rejected on feature flags. Structure it as &quot;If we [change] for [cohort], then [measurable behavior] will [increase/decrease], resulting in [business outcome], because [evidence]. Created by [name].&quot; Evidence should be something real — a baseline number, a funnel breakdown — not a guess, and [name] is you, not something to leave blank.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -514,22 +571,38 @@ public final class CreateExperimentsRequest {
         }
 
         /**
-         * <p>When <code>true</code>, creates a binary feature flag rather than a full experiment. Feature flags expose the same evaluation API but do not collect metric results. Defaults to <code>false</code>.</p>
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Omit to leave it to the owner. Not accepted on feature flags.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        public _FinalStage featureFlagOnly(Boolean featureFlagOnly) {
-            this.featureFlagOnly = Optional.ofNullable(featureFlagOnly);
+        public _FinalStage decisionMode(Nullable<CreateExperimentsRequestDecisionMode> decisionMode) {
+            if (decisionMode.isNull()) {
+                this.decisionMode = null;
+            } else if (decisionMode.isEmpty()) {
+                this.decisionMode = Optional.empty();
+            } else {
+                this.decisionMode = Optional.of(decisionMode.get());
+            }
             return this;
         }
 
         /**
-         * <p>When <code>true</code>, creates a binary feature flag rather than a full experiment. Feature flags expose the same evaluation API but do not collect metric results. Defaults to <code>false</code>.</p>
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Omit to leave it to the owner. Not accepted on feature flags.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter(value = "feature_flag_only", nulls = Nulls.SKIP)
-        public _FinalStage featureFlagOnly(Optional<Boolean> featureFlagOnly) {
-            this.featureFlagOnly = featureFlagOnly;
+        public _FinalStage decisionMode(CreateExperimentsRequestDecisionMode decisionMode) {
+            this.decisionMode = Optional.ofNullable(decisionMode);
+            return this;
+        }
+
+        /**
+         * <p>How the experiment is decided. <code>autopilot</code> ends it as soon as a result is outside the margin of error, shipping the arm that won or keeping control if it lost. If its window passes with no clear result, <code>autopilot</code> keeps control. <code>require_approval</code> leaves every arm serving for the owner to end. Omit to leave it to the owner. Not accepted on feature flags.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "decision_mode", nulls = Nulls.SKIP)
+        public _FinalStage decisionMode(Optional<CreateExperimentsRequestDecisionMode> decisionMode) {
+            this.decisionMode = decisionMode;
             return this;
         }
 
@@ -572,13 +645,14 @@ public final class CreateExperimentsRequest {
                     accountId,
                     bucketBy,
                     control,
-                    featureFlagOnly,
+                    decisionMode,
                     flagKey,
                     hypothesis,
+                    kind,
                     metadata,
                     name,
                     relatedResource,
-                    targetingRules,
+                    targetStats,
                     variants,
                     additionalProperties);
         }
@@ -588,13 +662,14 @@ public final class CreateExperimentsRequest {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("bucket_by")
                     || key.equalsIgnoreCase("control")
-                    || key.equalsIgnoreCase("feature_flag_only")
+                    || key.equalsIgnoreCase("decision_mode")
                     || key.equalsIgnoreCase("flag_key")
                     || key.equalsIgnoreCase("hypothesis")
+                    || key.equalsIgnoreCase("kind")
                     || key.equalsIgnoreCase("metadata")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("related_resource")
-                    || key.equalsIgnoreCase("targeting_rules")
+                    || key.equalsIgnoreCase("target_stats")
                     || key.equalsIgnoreCase("variants")) {
                 return;
             }

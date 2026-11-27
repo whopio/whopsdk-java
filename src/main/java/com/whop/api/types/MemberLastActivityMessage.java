@@ -32,9 +32,9 @@ public final class MemberLastActivityMessage {
 
     private final String id;
 
-    private final MemberLastActivityMessageObject object;
-
     private final Optional<String> plainContent;
+
+    private final MemberLastActivityMessageType type;
 
     private final Map<String, Object> additionalProperties;
 
@@ -43,15 +43,15 @@ public final class MemberLastActivityMessage {
             String channelId,
             String createdAt,
             String id,
-            MemberLastActivityMessageObject object,
             Optional<String> plainContent,
+            MemberLastActivityMessageType type,
             Map<String, Object> additionalProperties) {
         this.author = author;
         this.channelId = channelId;
         this.createdAt = createdAt;
         this.id = id;
-        this.object = object;
         this.plainContent = plainContent;
+        this.type = type;
         this.additionalProperties = additionalProperties;
     }
 
@@ -91,14 +91,6 @@ public final class MemberLastActivityMessage {
     }
 
     /**
-     * @return Always <code>message</code>.
-     */
-    @JsonProperty("object")
-    public MemberLastActivityMessageObject getObject() {
-        return object;
-    }
-
-    /**
      * @return The message text without formatting. <code>null</code> when the message has no text, such as an attachment on its own.
      */
     @JsonIgnore
@@ -107,6 +99,14 @@ public final class MemberLastActivityMessage {
             return Optional.empty();
         }
         return plainContent;
+    }
+
+    /**
+     * @return Always <code>message</code>.
+     */
+    @JsonProperty("type")
+    public MemberLastActivityMessageType getType() {
+        return type;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -137,13 +137,13 @@ public final class MemberLastActivityMessage {
                 && channelId.equals(other.channelId)
                 && createdAt.equals(other.createdAt)
                 && id.equals(other.id)
-                && object.equals(other.object)
-                && plainContent.equals(other.plainContent);
+                && plainContent.equals(other.plainContent)
+                && type.equals(other.type);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.author, this.channelId, this.createdAt, this.id, this.object, this.plainContent);
+        return Objects.hash(this.author, this.channelId, this.createdAt, this.id, this.plainContent, this.type);
     }
 
     @java.lang.Override
@@ -175,14 +175,14 @@ public final class MemberLastActivityMessage {
         /**
          * <p>The message ID.</p>
          */
-        ObjectStage id(@NotNull String id);
+        TypeStage id(@NotNull String id);
     }
 
-    public interface ObjectStage {
+    public interface TypeStage {
         /**
          * <p>Always <code>message</code>.</p>
          */
-        _FinalStage object(@NotNull MemberLastActivityMessageObject object);
+        _FinalStage type(@NotNull MemberLastActivityMessageType type);
     }
 
     public interface _FinalStage {
@@ -212,14 +212,14 @@ public final class MemberLastActivityMessage {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static final class Builder implements ChannelIdStage, CreatedAtStage, IdStage, ObjectStage, _FinalStage {
+    public static final class Builder implements ChannelIdStage, CreatedAtStage, IdStage, TypeStage, _FinalStage {
         private String channelId;
 
         private String createdAt;
 
         private String id;
 
-        private MemberLastActivityMessageObject object;
+        private MemberLastActivityMessageType type;
 
         private Optional<String> plainContent = Optional.empty();
 
@@ -235,8 +235,8 @@ public final class MemberLastActivityMessage {
             channelId(other.getChannelId());
             createdAt(other.getCreatedAt());
             id(other.getId());
-            object(other.getObject());
             plainContent(other.getPlainContent());
+            type(other.getType());
             return this;
         }
 
@@ -268,7 +268,7 @@ public final class MemberLastActivityMessage {
          */
         @java.lang.Override
         @JsonSetter("id")
-        public ObjectStage id(@NotNull String id) {
+        public TypeStage id(@NotNull String id) {
             this.id = Objects.requireNonNull(id, "id must not be null");
             return this;
         }
@@ -278,9 +278,9 @@ public final class MemberLastActivityMessage {
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
-        @JsonSetter("object")
-        public _FinalStage object(@NotNull MemberLastActivityMessageObject object) {
-            this.object = Objects.requireNonNull(object, "object must not be null");
+        @JsonSetter("type")
+        public _FinalStage type(@NotNull MemberLastActivityMessageType type) {
+            this.type = Objects.requireNonNull(type, "type must not be null");
             return this;
         }
 
@@ -359,7 +359,7 @@ public final class MemberLastActivityMessage {
         @java.lang.Override
         public MemberLastActivityMessage build() {
             return new MemberLastActivityMessage(
-                    author, channelId, createdAt, id, object, plainContent, additionalProperties);
+                    author, channelId, createdAt, id, plainContent, type, additionalProperties);
         }
 
         @JsonAnySetter
@@ -368,8 +368,8 @@ public final class MemberLastActivityMessage {
                     || key.equalsIgnoreCase("channel_id")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("id")
-                    || key.equalsIgnoreCase("object")
-                    || key.equalsIgnoreCase("plain_content")) {
+                    || key.equalsIgnoreCase("plain_content")
+                    || key.equalsIgnoreCase("type")) {
                 return;
             }
             this.additionalProperties.put(key, value);

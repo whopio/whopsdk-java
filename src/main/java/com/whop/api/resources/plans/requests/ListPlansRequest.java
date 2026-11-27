@@ -38,6 +38,8 @@ public final class ListPlansRequest {
 
     private final Optional<ListPlansRequestOrder> order;
 
+    private final Optional<String> sku;
+
     private final Optional<String> createdBefore;
 
     private final Optional<String> createdAfter;
@@ -60,6 +62,7 @@ public final class ListPlansRequest {
             Optional<String> accountId,
             Optional<ListPlansRequestDirection> direction,
             Optional<ListPlansRequestOrder> order,
+            Optional<String> sku,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
             Optional<Integer> first,
@@ -74,6 +77,7 @@ public final class ListPlansRequest {
         this.accountId = accountId;
         this.direction = direction;
         this.order = order;
+        this.sku = sku;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
         this.first = first;
@@ -116,6 +120,11 @@ public final class ListPlansRequest {
     @JsonProperty("order")
     public Optional<ListPlansRequestOrder> getOrder() {
         return order;
+    }
+
+    @JsonProperty("sku")
+    public Optional<String> getSku() {
+        return sku;
     }
 
     @JsonProperty("created_before")
@@ -179,6 +188,7 @@ public final class ListPlansRequest {
                 && accountId.equals(other.accountId)
                 && direction.equals(other.direction)
                 && order.equals(other.order)
+                && sku.equals(other.sku)
                 && createdBefore.equals(other.createdBefore)
                 && createdAfter.equals(other.createdAfter)
                 && first.equals(other.first)
@@ -197,6 +207,7 @@ public final class ListPlansRequest {
                 this.accountId,
                 this.direction,
                 this.order,
+                this.sku,
                 this.createdBefore,
                 this.createdAfter,
                 this.first,
@@ -230,6 +241,8 @@ public final class ListPlansRequest {
 
         private Optional<ListPlansRequestOrder> order = Optional.empty();
 
+        private Optional<String> sku = Optional.empty();
+
         private Optional<String> createdBefore = Optional.empty();
 
         private Optional<String> createdAfter = Optional.empty();
@@ -254,6 +267,7 @@ public final class ListPlansRequest {
             accountId(other.getAccountId());
             direction(other.getDirection());
             order(other.getOrder());
+            sku(other.getSku());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
             first(other.getFirst());
@@ -360,6 +374,17 @@ public final class ListPlansRequest {
             return this;
         }
 
+        @JsonSetter(value = "sku", nulls = Nulls.SKIP)
+        public Builder sku(Optional<String> sku) {
+            this.sku = sku;
+            return this;
+        }
+
+        public Builder sku(String sku) {
+            this.sku = Optional.ofNullable(sku);
+            return this;
+        }
+
         @JsonSetter(value = "created_before", nulls = Nulls.SKIP)
         public Builder createdBefore(Optional<String> createdBefore) {
             this.createdBefore = createdBefore;
@@ -447,6 +472,7 @@ public final class ListPlansRequest {
                     accountId,
                     direction,
                     order,
+                    sku,
                     createdBefore,
                     createdAfter,
                     first,
@@ -465,6 +491,7 @@ public final class ListPlansRequest {
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("direction")
                     || key.equalsIgnoreCase("order")
+                    || key.equalsIgnoreCase("sku")
                     || key.equalsIgnoreCase("created_before")
                     || key.equalsIgnoreCase("created_after")
                     || key.equalsIgnoreCase("first")

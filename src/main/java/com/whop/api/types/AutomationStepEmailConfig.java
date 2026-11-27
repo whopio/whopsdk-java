@@ -16,6 +16,7 @@ import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,13 +24,22 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = AutomationStepEmailConfig.Builder.class)
 public final class AutomationStepEmailConfig {
+    private final Optional<List<String>> attachmentIds;
+
     private final Optional<String> senderId;
 
     private final Map<String, Object> additionalProperties;
 
-    private AutomationStepEmailConfig(Optional<String> senderId, Map<String, Object> additionalProperties) {
+    private AutomationStepEmailConfig(
+            Optional<List<String>> attachmentIds, Optional<String> senderId, Map<String, Object> additionalProperties) {
+        this.attachmentIds = attachmentIds;
         this.senderId = senderId;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("attachment_ids")
+    public Optional<List<String>> getAttachmentIds() {
+        return attachmentIds;
     }
 
     /**
@@ -61,12 +71,12 @@ public final class AutomationStepEmailConfig {
     }
 
     private boolean equalTo(AutomationStepEmailConfig other) {
-        return senderId.equals(other.senderId);
+        return attachmentIds.equals(other.attachmentIds) && senderId.equals(other.senderId);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.senderId);
+        return Objects.hash(this.attachmentIds, this.senderId);
     }
 
     @java.lang.Override
@@ -80,6 +90,8 @@ public final class AutomationStepEmailConfig {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<String>> attachmentIds = Optional.empty();
+
         private Optional<String> senderId = Optional.empty();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
@@ -87,7 +99,19 @@ public final class AutomationStepEmailConfig {
         private Builder() {}
 
         public Builder from(AutomationStepEmailConfig other) {
+            attachmentIds(other.getAttachmentIds());
             senderId(other.getSenderId());
+            return this;
+        }
+
+        @JsonSetter(value = "attachment_ids", nulls = Nulls.SKIP)
+        public Builder attachmentIds(Optional<List<String>> attachmentIds) {
+            this.attachmentIds = attachmentIds;
+            return this;
+        }
+
+        public Builder attachmentIds(List<String> attachmentIds) {
+            this.attachmentIds = Optional.ofNullable(attachmentIds);
             return this;
         }
 
@@ -117,12 +141,12 @@ public final class AutomationStepEmailConfig {
         }
 
         public AutomationStepEmailConfig build() {
-            return new AutomationStepEmailConfig(senderId, additionalProperties);
+            return new AutomationStepEmailConfig(attachmentIds, senderId, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("sender_id")) {
+            if (key.equalsIgnoreCase("attachment_ids") || key.equalsIgnoreCase("sender_id")) {
                 return;
             }
             this.additionalProperties.put(key, value);

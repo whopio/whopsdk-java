@@ -7,29 +7,55 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = WithdrawResolutionCenterCasesRequest.Builder.class)
 public final class WithdrawResolutionCenterCasesRequest {
+    private final Optional<String> message;
+
     private final Map<String, Object> additionalProperties;
 
-    private WithdrawResolutionCenterCasesRequest(Map<String, Object> additionalProperties) {
+    private WithdrawResolutionCenterCasesRequest(Optional<String> message, Map<String, Object> additionalProperties) {
+        this.message = message;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Why you are withdrawing the case, recorded on the case timeline where the merchant can read it. Without one, the timeline says the customer withdrew.
+     */
+    @JsonProperty("message")
+    public Optional<String> getMessage() {
+        return message;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof WithdrawResolutionCenterCasesRequest;
+        return other instanceof WithdrawResolutionCenterCasesRequest
+                && equalTo((WithdrawResolutionCenterCasesRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(WithdrawResolutionCenterCasesRequest other) {
+        return message.equals(other.message);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.message);
     }
 
     @java.lang.Override
@@ -43,20 +69,40 @@ public final class WithdrawResolutionCenterCasesRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> message = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(WithdrawResolutionCenterCasesRequest other) {
+            message(other.getMessage());
+            return this;
+        }
+
+        /**
+         * <p>Why you are withdrawing the case, recorded on the case timeline where the merchant can read it. Without one, the timeline says the customer withdrew.</p>
+         */
+        @JsonSetter(value = "message", nulls = Nulls.SKIP)
+        public Builder message(Optional<String> message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder message(String message) {
+            this.message = Optional.ofNullable(message);
             return this;
         }
 
         public WithdrawResolutionCenterCasesRequest build() {
-            return new WithdrawResolutionCenterCasesRequest(additionalProperties);
+            return new WithdrawResolutionCenterCasesRequest(message, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("message")) {
+                return;
+            }
             this.additionalProperties.put(key, value);
         }
 

@@ -5,8 +5,10 @@ package com.whop.api.resources.stats.reports;
 
 import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
+import com.whop.api.resources.stats.reports.requests.PartnerRevenueLinesReportsRequest;
 import com.whop.api.resources.stats.reports.requests.PlatformTrendsReportsRequest;
 import com.whop.api.resources.stats.reports.types.ListReportsResponse;
+import com.whop.api.resources.stats.reports.types.PartnerRevenueLinesReportsResponse;
 import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsResponse;
 
 public class ReportsClient {
@@ -38,6 +40,21 @@ public class ReportsClient {
      */
     public ListReportsResponse list(RequestOptions requestOptions) {
         return this.rawClient.list(requestOptions).body();
+    }
+
+    /**
+     * The revenue lines charged to the businesses that the team of a partner business referred. Each row shows the commission paid to the partner business on that line. Lines that share an income source show the whole commission of that source. A team member who is not an owner sees only the referrals of their own team. While a day of the window is still being read, <code>commission</code> and <code>paid</code> are <code>null</code> on every row. A line may be missing. The days fill within minutes, so read the report again.
+     */
+    public PartnerRevenueLinesReportsResponse partnerRevenueLines(PartnerRevenueLinesReportsRequest request) {
+        return this.rawClient.partnerRevenueLines(request).body();
+    }
+
+    /**
+     * The revenue lines charged to the businesses that the team of a partner business referred. Each row shows the commission paid to the partner business on that line. Lines that share an income source show the whole commission of that source. A team member who is not an owner sees only the referrals of their own team. While a day of the window is still being read, <code>commission</code> and <code>paid</code> are <code>null</code> on every row. A line may be missing. The days fill within minutes, so read the report again.
+     */
+    public PartnerRevenueLinesReportsResponse partnerRevenueLines(
+            PartnerRevenueLinesReportsRequest request, RequestOptions requestOptions) {
+        return this.rawClient.partnerRevenueLines(request, requestOptions).body();
     }
 
     /**

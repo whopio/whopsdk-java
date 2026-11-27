@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UserSummary.Builder.class)
 public final class UserSummary {
+    private final List<UserBadge> badges;
+
     private final String id;
 
     private final Optional<String> name;
@@ -35,16 +39,23 @@ public final class UserSummary {
     private final Map<String, Object> additionalProperties;
 
     private UserSummary(
+            List<UserBadge> badges,
             String id,
             Optional<String> name,
             UserProfilePicture profilePicture,
             String username,
             Map<String, Object> additionalProperties) {
+        this.badges = badges;
         this.id = id;
         this.name = name;
         this.profilePicture = profilePicture;
         this.username = username;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("badges")
+    public List<UserBadge> getBadges() {
+        return badges;
     }
 
     /**
@@ -100,7 +111,8 @@ public final class UserSummary {
     }
 
     private boolean equalTo(UserSummary other) {
-        return id.equals(other.id)
+        return badges.equals(other.badges)
+                && id.equals(other.id)
                 && name.equals(other.name)
                 && profilePicture.equals(other.profilePicture)
                 && username.equals(other.username);
@@ -108,7 +120,7 @@ public final class UserSummary {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.profilePicture, this.username);
+        return Objects.hash(this.badges, this.id, this.name, this.profilePicture, this.username);
     }
 
     @java.lang.Override
@@ -150,6 +162,12 @@ public final class UserSummary {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
+        _FinalStage badges(List<UserBadge> badges);
+
+        _FinalStage addBadges(UserBadge badges);
+
+        _FinalStage addAllBadges(List<UserBadge> badges);
+
         /**
          * <p>Display name.</p>
          */
@@ -170,12 +188,15 @@ public final class UserSummary {
 
         private Optional<String> name = Optional.empty();
 
+        private List<UserBadge> badges = new ArrayList<>();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(UserSummary other) {
+            badges(other.getBadges());
             id(other.getId());
             name(other.getName());
             profilePicture(other.getProfilePicture());
@@ -253,13 +274,38 @@ public final class UserSummary {
         }
 
         @java.lang.Override
+        public _FinalStage addAllBadges(List<UserBadge> badges) {
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addBadges(UserBadge badges) {
+            this.badges.add(badges);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "badges", nulls = Nulls.SKIP)
+        public _FinalStage badges(List<UserBadge> badges) {
+            this.badges.clear();
+            if (badges != null) {
+                this.badges.addAll(badges);
+            }
+            return this;
+        }
+
+        @java.lang.Override
         public UserSummary build() {
-            return new UserSummary(id, name, profilePicture, username, additionalProperties);
+            return new UserSummary(badges, id, name, profilePicture, username, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("id")
+            if (key.equalsIgnoreCase("badges")
+                    || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("profile_picture")
                     || key.equalsIgnoreCase("username")) {

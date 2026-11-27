@@ -15,6 +15,7 @@ import com.whop.api.core.ObjectMappers;
 import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestDirection;
 import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestOrder;
 import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestOutcomeItem;
+import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestPaymentMethodsItem;
 import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestReasonItem;
 import com.whop.api.resources.resolutioncentercases.types.ListResolutionCenterCasesRequestStatusItem;
 import java.util.Collections;
@@ -32,6 +33,12 @@ public final class ListResolutionCenterCasesRequest {
     private final Optional<List<ListResolutionCenterCasesRequestReasonItem>> reason;
 
     private final Optional<List<ListResolutionCenterCasesRequestOutcomeItem>> outcome;
+
+    private final Optional<List<String>> productIds;
+
+    private final Optional<List<String>> paymentId;
+
+    private final Optional<List<ListResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods;
 
     private final Optional<String> accountId;
 
@@ -53,12 +60,17 @@ public final class ListResolutionCenterCasesRequest {
 
     private final Optional<String> createdAfter;
 
+    private final Optional<String> query;
+
     private final Map<String, Object> additionalProperties;
 
     private ListResolutionCenterCasesRequest(
             Optional<List<ListResolutionCenterCasesRequestStatusItem>> status,
             Optional<List<ListResolutionCenterCasesRequestReasonItem>> reason,
             Optional<List<ListResolutionCenterCasesRequestOutcomeItem>> outcome,
+            Optional<List<String>> productIds,
+            Optional<List<String>> paymentId,
+            Optional<List<ListResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods,
             Optional<String> accountId,
             Optional<String> userId,
             Optional<Integer> first,
@@ -69,10 +81,14 @@ public final class ListResolutionCenterCasesRequest {
             Optional<ListResolutionCenterCasesRequestDirection> direction,
             Optional<String> createdBefore,
             Optional<String> createdAfter,
+            Optional<String> query,
             Map<String, Object> additionalProperties) {
         this.status = status;
         this.reason = reason;
         this.outcome = outcome;
+        this.productIds = productIds;
+        this.paymentId = paymentId;
+        this.paymentMethods = paymentMethods;
         this.accountId = accountId;
         this.userId = userId;
         this.first = first;
@@ -83,11 +99,12 @@ public final class ListResolutionCenterCasesRequest {
         this.direction = direction;
         this.createdBefore = createdBefore;
         this.createdAfter = createdAfter;
+        this.query = query;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Only cases in these statuses. Repeat the parameter to pass several — one paginated list covers all of them.
+     * @return Only cases in these statuses. Repeat the parameter to pass several. One paginated list covers all of them.
      */
     @JsonProperty("status")
     public Optional<List<ListResolutionCenterCasesRequestStatusItem>> getStatus() {
@@ -111,6 +128,30 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
+     * @return Only cases about a payment for these products, each prefixed <code>prod_</code>. A case matches when any item on its payment is one of them. Repeat the parameter to pass several.
+     */
+    @JsonProperty("product_ids")
+    public Optional<List<String>> getProductIds() {
+        return productIds;
+    }
+
+    /**
+     * @return Only cases opened on these payments, each prefixed <code>pay_</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("payment_id")
+    public Optional<List<String>> getPaymentId() {
+        return paymentId;
+    }
+
+    /**
+     * @return Only cases about a payment made with one of these methods. Takes card brands such as <code>amex</code>, wallets such as <code>apple_pay</code>, and types such as <code>paypal</code>. Repeat the parameter to pass several.
+     */
+    @JsonProperty("payment_methods")
+    public Optional<List<ListResolutionCenterCasesRequestPaymentMethodsItem>> getPaymentMethods() {
+        return paymentMethods;
+    }
+
+    /**
      * @return Only cases filed against this account (<code>biz_</code> tag). With read access to the account this lists its whole queue; without, only the cases you opened against it.
      */
     @JsonProperty("account_id")
@@ -119,7 +160,7 @@ public final class ListResolutionCenterCasesRequest {
     }
 
     /**
-     * @return Only cases opened by this customer — a <code>user_</code> tag, or <code>me</code> for the calling user. It narrows what you can already read, so <code>me</code> lists the cases you opened without the ones on accounts you are a team member of.
+     * @return Only cases opened by this customer: a <code>user_</code> tag, or <code>me</code> for the calling user. It narrows what you can already read, so <code>me</code> lists the cases you opened without the ones on accounts you are a team member of.
      */
     @JsonProperty("user_id")
     public Optional<String> getUserId() {
@@ -190,6 +231,14 @@ public final class ListResolutionCenterCasesRequest {
         return createdAfter;
     }
 
+    /**
+     * @return Search cases by case ID, payment ID, user ID, membership ID, user email, name, or username. Email search requires the member:email:read permission.
+     */
+    @JsonProperty("query")
+    public Optional<String> getQuery() {
+        return query;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -205,6 +254,9 @@ public final class ListResolutionCenterCasesRequest {
         return status.equals(other.status)
                 && reason.equals(other.reason)
                 && outcome.equals(other.outcome)
+                && productIds.equals(other.productIds)
+                && paymentId.equals(other.paymentId)
+                && paymentMethods.equals(other.paymentMethods)
                 && accountId.equals(other.accountId)
                 && userId.equals(other.userId)
                 && first.equals(other.first)
@@ -214,7 +266,8 @@ public final class ListResolutionCenterCasesRequest {
                 && order.equals(other.order)
                 && direction.equals(other.direction)
                 && createdBefore.equals(other.createdBefore)
-                && createdAfter.equals(other.createdAfter);
+                && createdAfter.equals(other.createdAfter)
+                && query.equals(other.query);
     }
 
     @java.lang.Override
@@ -223,6 +276,9 @@ public final class ListResolutionCenterCasesRequest {
                 this.status,
                 this.reason,
                 this.outcome,
+                this.productIds,
+                this.paymentId,
+                this.paymentMethods,
                 this.accountId,
                 this.userId,
                 this.first,
@@ -232,7 +288,8 @@ public final class ListResolutionCenterCasesRequest {
                 this.order,
                 this.direction,
                 this.createdBefore,
-                this.createdAfter);
+                this.createdAfter,
+                this.query);
     }
 
     @java.lang.Override
@@ -251,6 +308,12 @@ public final class ListResolutionCenterCasesRequest {
         private Optional<List<ListResolutionCenterCasesRequestReasonItem>> reason = Optional.empty();
 
         private Optional<List<ListResolutionCenterCasesRequestOutcomeItem>> outcome = Optional.empty();
+
+        private Optional<List<String>> productIds = Optional.empty();
+
+        private Optional<List<String>> paymentId = Optional.empty();
+
+        private Optional<List<ListResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods = Optional.empty();
 
         private Optional<String> accountId = Optional.empty();
 
@@ -272,6 +335,8 @@ public final class ListResolutionCenterCasesRequest {
 
         private Optional<String> createdAfter = Optional.empty();
 
+        private Optional<String> query = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -280,6 +345,9 @@ public final class ListResolutionCenterCasesRequest {
             status(other.getStatus());
             reason(other.getReason());
             outcome(other.getOutcome());
+            productIds(other.getProductIds());
+            paymentId(other.getPaymentId());
+            paymentMethods(other.getPaymentMethods());
             accountId(other.getAccountId());
             userId(other.getUserId());
             first(other.getFirst());
@@ -290,11 +358,12 @@ public final class ListResolutionCenterCasesRequest {
             direction(other.getDirection());
             createdBefore(other.getCreatedBefore());
             createdAfter(other.getCreatedAfter());
+            query(other.getQuery());
             return this;
         }
 
         /**
-         * <p>Only cases in these statuses. Repeat the parameter to pass several — one paginated list covers all of them.</p>
+         * <p>Only cases in these statuses. Repeat the parameter to pass several. One paginated list covers all of them.</p>
          */
         @JsonSetter(value = "status", nulls = Nulls.SKIP)
         public Builder status(Optional<List<ListResolutionCenterCasesRequestStatusItem>> status) {
@@ -351,6 +420,64 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
+         * <p>Only cases about a payment for these products, each prefixed <code>prod_</code>. A case matches when any item on its payment is one of them. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "product_ids", nulls = Nulls.SKIP)
+        public Builder productIds(Optional<List<String>> productIds) {
+            this.productIds = productIds;
+            return this;
+        }
+
+        public Builder productIds(List<String> productIds) {
+            this.productIds = Optional.ofNullable(productIds);
+            return this;
+        }
+
+        public Builder productIds(String productIds) {
+            this.productIds = Optional.of(Collections.singletonList(productIds));
+            return this;
+        }
+
+        /**
+         * <p>Only cases opened on these payments, each prefixed <code>pay_</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "payment_id", nulls = Nulls.SKIP)
+        public Builder paymentId(Optional<List<String>> paymentId) {
+            this.paymentId = paymentId;
+            return this;
+        }
+
+        public Builder paymentId(List<String> paymentId) {
+            this.paymentId = Optional.ofNullable(paymentId);
+            return this;
+        }
+
+        public Builder paymentId(String paymentId) {
+            this.paymentId = Optional.of(Collections.singletonList(paymentId));
+            return this;
+        }
+
+        /**
+         * <p>Only cases about a payment made with one of these methods. Takes card brands such as <code>amex</code>, wallets such as <code>apple_pay</code>, and types such as <code>paypal</code>. Repeat the parameter to pass several.</p>
+         */
+        @JsonSetter(value = "payment_methods", nulls = Nulls.SKIP)
+        public Builder paymentMethods(
+                Optional<List<ListResolutionCenterCasesRequestPaymentMethodsItem>> paymentMethods) {
+            this.paymentMethods = paymentMethods;
+            return this;
+        }
+
+        public Builder paymentMethods(List<ListResolutionCenterCasesRequestPaymentMethodsItem> paymentMethods) {
+            this.paymentMethods = Optional.ofNullable(paymentMethods);
+            return this;
+        }
+
+        public Builder paymentMethods(ListResolutionCenterCasesRequestPaymentMethodsItem paymentMethods) {
+            this.paymentMethods = Optional.of(Collections.singletonList(paymentMethods));
+            return this;
+        }
+
+        /**
          * <p>Only cases filed against this account (<code>biz_</code> tag). With read access to the account this lists its whole queue; without, only the cases you opened against it.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
@@ -365,7 +492,7 @@ public final class ListResolutionCenterCasesRequest {
         }
 
         /**
-         * <p>Only cases opened by this customer — a <code>user_</code> tag, or <code>me</code> for the calling user. It narrows what you can already read, so <code>me</code> lists the cases you opened without the ones on accounts you are a team member of.</p>
+         * <p>Only cases opened by this customer: a <code>user_</code> tag, or <code>me</code> for the calling user. It narrows what you can already read, so <code>me</code> lists the cases you opened without the ones on accounts you are a team member of.</p>
          */
         @JsonSetter(value = "user_id", nulls = Nulls.SKIP)
         public Builder userId(Optional<String> userId) {
@@ -490,11 +617,28 @@ public final class ListResolutionCenterCasesRequest {
             return this;
         }
 
+        /**
+         * <p>Search cases by case ID, payment ID, user ID, membership ID, user email, name, or username. Email search requires the member:email:read permission.</p>
+         */
+        @JsonSetter(value = "query", nulls = Nulls.SKIP)
+        public Builder query(Optional<String> query) {
+            this.query = query;
+            return this;
+        }
+
+        public Builder query(String query) {
+            this.query = Optional.ofNullable(query);
+            return this;
+        }
+
         public ListResolutionCenterCasesRequest build() {
             return new ListResolutionCenterCasesRequest(
                     status,
                     reason,
                     outcome,
+                    productIds,
+                    paymentId,
+                    paymentMethods,
                     accountId,
                     userId,
                     first,
@@ -505,6 +649,7 @@ public final class ListResolutionCenterCasesRequest {
                     direction,
                     createdBefore,
                     createdAfter,
+                    query,
                     additionalProperties);
         }
 
@@ -513,6 +658,9 @@ public final class ListResolutionCenterCasesRequest {
             if (key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("reason")
                     || key.equalsIgnoreCase("outcome")
+                    || key.equalsIgnoreCase("product_ids")
+                    || key.equalsIgnoreCase("payment_id")
+                    || key.equalsIgnoreCase("payment_methods")
                     || key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("user_id")
                     || key.equalsIgnoreCase("first")
@@ -522,7 +670,8 @@ public final class ListResolutionCenterCasesRequest {
                     || key.equalsIgnoreCase("order")
                     || key.equalsIgnoreCase("direction")
                     || key.equalsIgnoreCase("created_before")
-                    || key.equalsIgnoreCase("created_after")) {
+                    || key.equalsIgnoreCase("created_after")
+                    || key.equalsIgnoreCase("query")) {
                 return;
             }
             this.additionalProperties.put(key, value);

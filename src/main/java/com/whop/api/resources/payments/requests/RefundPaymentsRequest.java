@@ -23,6 +23,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = RefundPaymentsRequest.Builder.class)
 public final class RefundPaymentsRequest {
+    private final Optional<String> destinationWallet;
+
     private final Optional<Map<String, Optional<String>>> metadata;
 
     private final Optional<Double> partialAmount;
@@ -30,12 +32,25 @@ public final class RefundPaymentsRequest {
     private final Map<String, Object> additionalProperties;
 
     private RefundPaymentsRequest(
+            Optional<String> destinationWallet,
             Optional<Map<String, Optional<String>>> metadata,
             Optional<Double> partialAmount,
             Map<String, Object> additionalProperties) {
+        this.destinationWallet = destinationWallet;
         this.metadata = metadata;
         this.partialAmount = partialAmount;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The buyer's Solana wallet address, for a crypto payment only. A crypto payment is refunded to the wallet it came from when that wallet is known. When it is not known, the refund is refused until you send this address. The refund then goes to this address as USDC on Solana and cannot be reversed. Not accepted for any other payment.
+     */
+    @JsonIgnore
+    public Optional<String> getDestinationWallet() {
+        if (destinationWallet == null) {
+            return Optional.empty();
+        }
+        return destinationWallet;
     }
 
     /**
@@ -58,6 +73,12 @@ public final class RefundPaymentsRequest {
             return Optional.empty();
         }
         return partialAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("destination_wallet")
+    private Optional<String> _getDestinationWallet() {
+        return destinationWallet;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -84,12 +105,14 @@ public final class RefundPaymentsRequest {
     }
 
     private boolean equalTo(RefundPaymentsRequest other) {
-        return metadata.equals(other.metadata) && partialAmount.equals(other.partialAmount);
+        return destinationWallet.equals(other.destinationWallet)
+                && metadata.equals(other.metadata)
+                && partialAmount.equals(other.partialAmount);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.metadata, this.partialAmount);
+        return Objects.hash(this.destinationWallet, this.metadata, this.partialAmount);
     }
 
     @java.lang.Override
@@ -103,6 +126,8 @@ public final class RefundPaymentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> destinationWallet = Optional.empty();
+
         private Optional<Map<String, Optional<String>>> metadata = Optional.empty();
 
         private Optional<Double> partialAmount = Optional.empty();
@@ -112,8 +137,34 @@ public final class RefundPaymentsRequest {
         private Builder() {}
 
         public Builder from(RefundPaymentsRequest other) {
+            destinationWallet(other.getDestinationWallet());
             metadata(other.getMetadata());
             partialAmount(other.getPartialAmount());
+            return this;
+        }
+
+        /**
+         * <p>The buyer's Solana wallet address, for a crypto payment only. A crypto payment is refunded to the wallet it came from when that wallet is known. When it is not known, the refund is refused until you send this address. The refund then goes to this address as USDC on Solana and cannot be reversed. Not accepted for any other payment.</p>
+         */
+        @JsonSetter(value = "destination_wallet", nulls = Nulls.SKIP)
+        public Builder destinationWallet(Optional<String> destinationWallet) {
+            this.destinationWallet = destinationWallet;
+            return this;
+        }
+
+        public Builder destinationWallet(String destinationWallet) {
+            this.destinationWallet = Optional.ofNullable(destinationWallet);
+            return this;
+        }
+
+        public Builder destinationWallet(Nullable<String> destinationWallet) {
+            if (destinationWallet.isNull()) {
+                this.destinationWallet = null;
+            } else if (destinationWallet.isEmpty()) {
+                this.destinationWallet = Optional.empty();
+            } else {
+                this.destinationWallet = Optional.of(destinationWallet.get());
+            }
             return this;
         }
 
@@ -168,12 +219,14 @@ public final class RefundPaymentsRequest {
         }
 
         public RefundPaymentsRequest build() {
-            return new RefundPaymentsRequest(metadata, partialAmount, additionalProperties);
+            return new RefundPaymentsRequest(destinationWallet, metadata, partialAmount, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("metadata") || key.equalsIgnoreCase("partial_amount")) {
+            if (key.equalsIgnoreCase("destination_wallet")
+                    || key.equalsIgnoreCase("metadata")
+                    || key.equalsIgnoreCase("partial_amount")) {
                 return;
             }
             this.additionalProperties.put(key, value);

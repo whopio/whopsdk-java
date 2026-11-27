@@ -45,7 +45,7 @@ public final class ListRecipientsTransfersRequest {
     }
 
     /**
-     * @return The account sending the money: a company account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.
+     * @return The account sending the money: an account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.
      */
     @JsonProperty("origin_id")
     public String getOriginId() {
@@ -53,7 +53,7 @@ public final class ListRecipientsTransfersRequest {
     }
 
     /**
-     * @return Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.
+     * @return Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact account ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first. An ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to an account or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single account is the exception to the search itself: it only ever sees that account's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.
      */
     @JsonProperty("query")
     public Optional<String> getQuery() {
@@ -110,7 +110,7 @@ public final class ListRecipientsTransfersRequest {
 
     public interface OriginIdStage {
         /**
-         * <p>The account sending the money: a company account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
+         * <p>The account sending the money: an account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
          */
         _FinalStage originId(@NotNull String originId);
 
@@ -125,7 +125,7 @@ public final class ListRecipientsTransfersRequest {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact account ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first. An ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to an account or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single account is the exception to the search itself: it only ever sees that account's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          */
         _FinalStage query(Optional<String> query);
 
@@ -170,7 +170,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>The account sending the money: a company account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
+         * <p>The account sending the money: an account ID (<code>biz_</code>), or a user ID (<code>user_</code>) for that user's own personal balance.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -221,7 +221,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact account ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first. An ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to an account or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single account is the exception to the search itself: it only ever sees that account's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -231,7 +231,7 @@ public final class ListRecipientsTransfersRequest {
         }
 
         /**
-         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact business ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first; an ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to a company or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single company is the exception to the search itself: it only ever sees that company's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
+         * <p>Search anyone on Whop by name or username, plus your own accounts by name or ID. An exact account ID (<code>biz_</code>), user ID (<code>user_</code>), or username returns that recipient first. An ID or an <code>@username</code> returns only that recipient. Omit it to get the team around the balance, the people you follow, and your own accounts. The list is the same whether the balance belongs to an account or to you. Searching from a <code>biz_</code> origin additionally requires the member:basic:read scope. A credential scoped to a single account is the exception to the search itself: it only ever sees that account's own people. Complete email addresses return no matches. Search results are limited to 20 recipients.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "query", nulls = Nulls.SKIP)

@@ -85,6 +85,13 @@ public class RawMessagesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "include_deleted", request.getIncludeDeleted().get(), false);
         }
+        if (request.getIncludeReplyingToMessage().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_replying_to_message",
+                    request.getIncludeReplyingToMessage().get(),
+                    false);
+        }
         if (request.getCreatedAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "created_after", request.getCreatedAfter().get(), false);
@@ -320,6 +327,13 @@ public class RawMessagesClient {
                 .newBuilder()
                 .addPathSegments("messages")
                 .addPathSegment(PathSegments.validate(id));
+        if (request.getIncludeReplyingToMessage().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "include_replying_to_message",
+                    request.getIncludeReplyingToMessage().get(),
+                    false);
+        }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
                 httpUrl.addQueryParameter(_key, _value);

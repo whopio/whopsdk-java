@@ -24,6 +24,7 @@ import com.whop.api.resources.accounts.types.UpdateAccountsRequestLogo;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOnboardingType;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOpengraphImage;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestOpengraphImageVariant;
+import com.whop.api.resources.accounts.types.UpdateAccountsRequestPaymentControls;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestPrivacyPolicy;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestReturnPolicy;
 import com.whop.api.resources.accounts.types.UpdateAccountsRequestShippingPolicy;
@@ -89,6 +90,8 @@ public final class UpdateAccountsRequest {
 
     private final Optional<String> otherIndustryDescription;
 
+    private final Optional<UpdateAccountsRequestPaymentControls> paymentControls;
+
     private final Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy;
 
     private final Optional<String> productTaxCodeId;
@@ -110,6 +113,8 @@ public final class UpdateAccountsRequest {
     private final Optional<Boolean> showUserDirectory;
 
     private final Optional<List<Map<String, Object>>> socialLinks;
+
+    private final Optional<String> statementDescriptor;
 
     private final Optional<UpdateAccountsRequestStorePageConfig> storePageConfig;
 
@@ -163,6 +168,7 @@ public final class UpdateAccountsRequest {
             Optional<Boolean> orchestrationEnabled,
             Optional<String> otherBusinessDescription,
             Optional<String> otherIndustryDescription,
+            Optional<UpdateAccountsRequestPaymentControls> paymentControls,
             Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy,
             Optional<String> productTaxCodeId,
             Optional<Boolean> require2Fa,
@@ -174,6 +180,7 @@ public final class UpdateAccountsRequest {
             Optional<Boolean> showReviewsDtc,
             Optional<Boolean> showUserDirectory,
             Optional<List<Map<String, Object>>> socialLinks,
+            Optional<String> statementDescriptor,
             Optional<UpdateAccountsRequestStorePageConfig> storePageConfig,
             Optional<String> targetAudience,
             Optional<List<UpdateAccountsRequestTaxCollectionEnabledStatesItem>> taxCollectionEnabledStates,
@@ -211,6 +218,7 @@ public final class UpdateAccountsRequest {
         this.orchestrationEnabled = orchestrationEnabled;
         this.otherBusinessDescription = otherBusinessDescription;
         this.otherIndustryDescription = otherIndustryDescription;
+        this.paymentControls = paymentControls;
         this.privacyPolicy = privacyPolicy;
         this.productTaxCodeId = productTaxCodeId;
         this.require2Fa = require2Fa;
@@ -222,6 +230,7 @@ public final class UpdateAccountsRequest {
         this.showReviewsDtc = showReviewsDtc;
         this.showUserDirectory = showUserDirectory;
         this.socialLinks = socialLinks;
+        this.statementDescriptor = statementDescriptor;
         this.storePageConfig = storePageConfig;
         this.targetAudience = targetAudience;
         this.taxCollectionEnabledStates = taxCollectionEnabledStates;
@@ -299,7 +308,7 @@ public final class UpdateAccountsRequest {
     }
 
     /**
-     * @return Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.
+     * @return The account's saved preference for offering optional buyer VAT/tax ID entry. Checkouts where Whop collects and remits tax offer entry automatically, regardless of this preference. Does not require a VAT ID to purchase.
      */
     @JsonProperty("collect_vat_id")
     public Optional<Boolean> getCollectVatId() {
@@ -471,6 +480,14 @@ public final class UpdateAccountsRequest {
     }
 
     /**
+     * @return Payment controls to change. Only <code>resolution_center_auto_refund</code> can change. Whop ignores the other fields, so you can send back the object from <code>GET</code>. Requires the <code>payment:resolution_center</code> and <code>company:balance:read</code> scopes.
+     */
+    @JsonProperty("payment_controls")
+    public Optional<UpdateAccountsRequestPaymentControls> getPaymentControls() {
+        return paymentControls;
+    }
+
+    /**
      * @return The account's privacy policy document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.
      */
     @JsonIgnore
@@ -571,6 +588,17 @@ public final class UpdateAccountsRequest {
     @JsonProperty("social_links")
     public Optional<List<Map<String, Object>>> getSocialLinks() {
         return socialLinks;
+    }
+
+    /**
+     * @return The text on buyers' card statements for this account's payments. It must be 5 to 22 characters with at least one letter, using only A-Z and 0-9 after any <code>WHOP*</code> prefix. It must start with <code>WHOP*</code> while Whop is the merchant of record. Once the account has switched to being its own merchant of record (<code>merchant_of_record</code> in account preferences), it can be set without the prefix. <code>null</code> clears it. Requires the <code>payout:account:update</code> scope.
+     */
+    @JsonIgnore
+    public Optional<String> getStatementDescriptor() {
+        if (statementDescriptor == null) {
+            return Optional.empty();
+        }
+        return statementDescriptor;
     }
 
     /**
@@ -819,6 +847,12 @@ public final class UpdateAccountsRequest {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("statement_descriptor")
+    private Optional<String> _getStatementDescriptor() {
+        return statementDescriptor;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("store_page_config")
     private Optional<UpdateAccountsRequestStorePageConfig> _getStorePageConfig() {
         return storePageConfig;
@@ -889,6 +923,7 @@ public final class UpdateAccountsRequest {
                 && orchestrationEnabled.equals(other.orchestrationEnabled)
                 && otherBusinessDescription.equals(other.otherBusinessDescription)
                 && otherIndustryDescription.equals(other.otherIndustryDescription)
+                && paymentControls.equals(other.paymentControls)
                 && privacyPolicy.equals(other.privacyPolicy)
                 && productTaxCodeId.equals(other.productTaxCodeId)
                 && require2Fa.equals(other.require2Fa)
@@ -900,6 +935,7 @@ public final class UpdateAccountsRequest {
                 && showReviewsDtc.equals(other.showReviewsDtc)
                 && showUserDirectory.equals(other.showUserDirectory)
                 && socialLinks.equals(other.socialLinks)
+                && statementDescriptor.equals(other.statementDescriptor)
                 && storePageConfig.equals(other.storePageConfig)
                 && targetAudience.equals(other.targetAudience)
                 && taxCollectionEnabledStates.equals(other.taxCollectionEnabledStates)
@@ -941,6 +977,7 @@ public final class UpdateAccountsRequest {
                 this.orchestrationEnabled,
                 this.otherBusinessDescription,
                 this.otherIndustryDescription,
+                this.paymentControls,
                 this.privacyPolicy,
                 this.productTaxCodeId,
                 this.require2Fa,
@@ -952,6 +989,7 @@ public final class UpdateAccountsRequest {
                 this.showReviewsDtc,
                 this.showUserDirectory,
                 this.socialLinks,
+                this.statementDescriptor,
                 this.storePageConfig,
                 this.targetAudience,
                 this.taxCollectionEnabledStates,
@@ -1024,6 +1062,8 @@ public final class UpdateAccountsRequest {
 
         private Optional<String> otherIndustryDescription = Optional.empty();
 
+        private Optional<UpdateAccountsRequestPaymentControls> paymentControls = Optional.empty();
+
         private Optional<UpdateAccountsRequestPrivacyPolicy> privacyPolicy = Optional.empty();
 
         private Optional<String> productTaxCodeId = Optional.empty();
@@ -1045,6 +1085,8 @@ public final class UpdateAccountsRequest {
         private Optional<Boolean> showUserDirectory = Optional.empty();
 
         private Optional<List<Map<String, Object>>> socialLinks = Optional.empty();
+
+        private Optional<String> statementDescriptor = Optional.empty();
 
         private Optional<UpdateAccountsRequestStorePageConfig> storePageConfig = Optional.empty();
 
@@ -1101,6 +1143,7 @@ public final class UpdateAccountsRequest {
             orchestrationEnabled(other.getOrchestrationEnabled());
             otherBusinessDescription(other.getOtherBusinessDescription());
             otherIndustryDescription(other.getOtherIndustryDescription());
+            paymentControls(other.getPaymentControls());
             privacyPolicy(other.getPrivacyPolicy());
             productTaxCodeId(other.getProductTaxCodeId());
             require2Fa(other.getRequire2Fa());
@@ -1112,6 +1155,7 @@ public final class UpdateAccountsRequest {
             showReviewsDtc(other.getShowReviewsDtc());
             showUserDirectory(other.getShowUserDirectory());
             socialLinks(other.getSocialLinks());
+            statementDescriptor(other.getStatementDescriptor());
             storePageConfig(other.getStorePageConfig());
             targetAudience(other.getTargetAudience());
             taxCollectionEnabledStates(other.getTaxCollectionEnabledStates());
@@ -1257,7 +1301,7 @@ public final class UpdateAccountsRequest {
         }
 
         /**
-         * <p>Whether checkout shows a VAT/tax ID field for buyers to optionally enter. Does not require a VAT ID to purchase.</p>
+         * <p>The account's saved preference for offering optional buyer VAT/tax ID entry. Checkouts where Whop collects and remits tax offer entry automatically, regardless of this preference. Does not require a VAT ID to purchase.</p>
          */
         @JsonSetter(value = "collect_vat_id", nulls = Nulls.SKIP)
         public Builder collectVatId(Optional<Boolean> collectVatId) {
@@ -1629,6 +1673,20 @@ public final class UpdateAccountsRequest {
         }
 
         /**
+         * <p>Payment controls to change. Only <code>resolution_center_auto_refund</code> can change. Whop ignores the other fields, so you can send back the object from <code>GET</code>. Requires the <code>payment:resolution_center</code> and <code>company:balance:read</code> scopes.</p>
+         */
+        @JsonSetter(value = "payment_controls", nulls = Nulls.SKIP)
+        public Builder paymentControls(Optional<UpdateAccountsRequestPaymentControls> paymentControls) {
+            this.paymentControls = paymentControls;
+            return this;
+        }
+
+        public Builder paymentControls(UpdateAccountsRequestPaymentControls paymentControls) {
+            this.paymentControls = Optional.ofNullable(paymentControls);
+            return this;
+        }
+
+        /**
          * <p>The account's privacy policy document. PDF only. Pass a JSON object containing an <code>id</code> from <a href="/api-reference/files/create-file">Create File</a>, or <code>null</code> to remove it.</p>
          */
         @JsonSetter(value = "privacy_policy", nulls = Nulls.SKIP)
@@ -1834,6 +1892,31 @@ public final class UpdateAccountsRequest {
 
         public Builder socialLinks(List<Map<String, Object>> socialLinks) {
             this.socialLinks = Optional.ofNullable(socialLinks);
+            return this;
+        }
+
+        /**
+         * <p>The text on buyers' card statements for this account's payments. It must be 5 to 22 characters with at least one letter, using only A-Z and 0-9 after any <code>WHOP*</code> prefix. It must start with <code>WHOP*</code> while Whop is the merchant of record. Once the account has switched to being its own merchant of record (<code>merchant_of_record</code> in account preferences), it can be set without the prefix. <code>null</code> clears it. Requires the <code>payout:account:update</code> scope.</p>
+         */
+        @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
+        public Builder statementDescriptor(Optional<String> statementDescriptor) {
+            this.statementDescriptor = statementDescriptor;
+            return this;
+        }
+
+        public Builder statementDescriptor(String statementDescriptor) {
+            this.statementDescriptor = Optional.ofNullable(statementDescriptor);
+            return this;
+        }
+
+        public Builder statementDescriptor(Nullable<String> statementDescriptor) {
+            if (statementDescriptor.isNull()) {
+                this.statementDescriptor = null;
+            } else if (statementDescriptor.isEmpty()) {
+                this.statementDescriptor = Optional.empty();
+            } else {
+                this.statementDescriptor = Optional.of(statementDescriptor.get());
+            }
             return this;
         }
 
@@ -2109,6 +2192,7 @@ public final class UpdateAccountsRequest {
                     orchestrationEnabled,
                     otherBusinessDescription,
                     otherIndustryDescription,
+                    paymentControls,
                     privacyPolicy,
                     productTaxCodeId,
                     require2Fa,
@@ -2120,6 +2204,7 @@ public final class UpdateAccountsRequest {
                     showReviewsDtc,
                     showUserDirectory,
                     socialLinks,
+                    statementDescriptor,
                     storePageConfig,
                     targetAudience,
                     taxCollectionEnabledStates,
@@ -2161,6 +2246,7 @@ public final class UpdateAccountsRequest {
                     || key.equalsIgnoreCase("orchestration_enabled")
                     || key.equalsIgnoreCase("other_business_description")
                     || key.equalsIgnoreCase("other_industry_description")
+                    || key.equalsIgnoreCase("payment_controls")
                     || key.equalsIgnoreCase("privacy_policy")
                     || key.equalsIgnoreCase("product_tax_code_id")
                     || key.equalsIgnoreCase("require_2fa")
@@ -2172,6 +2258,7 @@ public final class UpdateAccountsRequest {
                     || key.equalsIgnoreCase("show_reviews_dtc")
                     || key.equalsIgnoreCase("show_user_directory")
                     || key.equalsIgnoreCase("social_links")
+                    || key.equalsIgnoreCase("statement_descriptor")
                     || key.equalsIgnoreCase("store_page_config")
                     || key.equalsIgnoreCase("target_audience")
                     || key.equalsIgnoreCase("tax_collection_enabled_states")

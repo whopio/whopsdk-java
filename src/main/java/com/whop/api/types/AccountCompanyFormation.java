@@ -69,7 +69,7 @@ public final class AccountCompanyFormation {
     }
 
     /**
-     * @return Registered company name including the entity ending, for example <code>Acme, LLC</code>. Present once <code>status</code> leaves <code>draft</code>.
+     * @return Registered company name including the entity ending, for example <code>Shine Time Auto Detailing, LLC</code>. Present once <code>status</code> leaves <code>draft</code>.
      */
     @JsonIgnore
     public Optional<String> getLegalName() {
@@ -195,7 +195,7 @@ public final class AccountCompanyFormation {
         }
 
         /**
-         * <p>Registered company name including the entity ending, for example <code>Acme, LLC</code>. Present once <code>status</code> leaves <code>draft</code>.</p>
+         * <p>Registered company name including the entity ending, for example <code>Shine Time Auto Detailing, LLC</code>. Present once <code>status</code> leaves <code>draft</code>.</p>
          */
         @JsonSetter(value = "legal_name", nulls = Nulls.SKIP)
         public Builder legalName(Optional<String> legalName) {

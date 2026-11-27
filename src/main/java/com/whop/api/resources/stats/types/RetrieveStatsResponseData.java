@@ -29,6 +29,8 @@ public final class RetrieveStatsResponseData {
 
     private final Optional<String> currency;
 
+    private final Optional<String> dataAsOf;
+
     private final List<RetrieveStatsResponseDataPointsItem> points;
 
     private final Optional<List<RetrieveStatsResponseDataTotalsItem>> totals;
@@ -38,11 +40,13 @@ public final class RetrieveStatsResponseData {
     private RetrieveStatsResponseData(
             Optional<Boolean> complete,
             Optional<String> currency,
+            Optional<String> dataAsOf,
             List<RetrieveStatsResponseDataPointsItem> points,
             Optional<List<RetrieveStatsResponseDataTotalsItem>> totals,
             Map<String, Object> additionalProperties) {
         this.complete = complete;
         this.currency = currency;
+        this.dataAsOf = dataAsOf;
         this.points = points;
         this.totals = totals;
         this.additionalProperties = additionalProperties;
@@ -71,6 +75,17 @@ public final class RetrieveStatsResponseData {
     }
 
     /**
+     * @return Present for metrics computed on a schedule. When the values were computed, as an ISO 8601 timestamp.
+     */
+    @JsonIgnore
+    public Optional<String> getDataAsOf() {
+        if (dataAsOf == null) {
+            return Optional.empty();
+        }
+        return dataAsOf;
+    }
+
+    /**
      * @return One entry per period, oldest first.
      */
     @JsonProperty("points")
@@ -79,7 +94,7 @@ public final class RetrieveStatsResponseData {
     }
 
     /**
-     * @return Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and whole-window unique people are distinct across every bucket.
+     * @return Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>. A rate is measured across the whole window, not averaged across its points. Whole-window unique people are distinct across every bucket.
      */
     @JsonIgnore
     public Optional<List<RetrieveStatsResponseDataTotalsItem>> getTotals() {
@@ -102,6 +117,12 @@ public final class RetrieveStatsResponseData {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("data_as_of")
+    private Optional<String> _getDataAsOf() {
+        return dataAsOf;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("totals")
     private Optional<List<RetrieveStatsResponseDataTotalsItem>> _getTotals() {
         return totals;
@@ -121,13 +142,14 @@ public final class RetrieveStatsResponseData {
     private boolean equalTo(RetrieveStatsResponseData other) {
         return complete.equals(other.complete)
                 && currency.equals(other.currency)
+                && dataAsOf.equals(other.dataAsOf)
                 && points.equals(other.points)
                 && totals.equals(other.totals);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.complete, this.currency, this.points, this.totals);
+        return Objects.hash(this.complete, this.currency, this.dataAsOf, this.points, this.totals);
     }
 
     @java.lang.Override
@@ -145,6 +167,8 @@ public final class RetrieveStatsResponseData {
 
         private Optional<String> currency = Optional.empty();
 
+        private Optional<String> dataAsOf = Optional.empty();
+
         private List<RetrieveStatsResponseDataPointsItem> points = new ArrayList<>();
 
         private Optional<List<RetrieveStatsResponseDataTotalsItem>> totals = Optional.empty();
@@ -156,6 +180,7 @@ public final class RetrieveStatsResponseData {
         public Builder from(RetrieveStatsResponseData other) {
             complete(other.getComplete());
             currency(other.getCurrency());
+            dataAsOf(other.getDataAsOf());
             points(other.getPoints());
             totals(other.getTotals());
             return this;
@@ -212,6 +237,31 @@ public final class RetrieveStatsResponseData {
         }
 
         /**
+         * <p>Present for metrics computed on a schedule. When the values were computed, as an ISO 8601 timestamp.</p>
+         */
+        @JsonSetter(value = "data_as_of", nulls = Nulls.SKIP)
+        public Builder dataAsOf(Optional<String> dataAsOf) {
+            this.dataAsOf = dataAsOf;
+            return this;
+        }
+
+        public Builder dataAsOf(String dataAsOf) {
+            this.dataAsOf = Optional.ofNullable(dataAsOf);
+            return this;
+        }
+
+        public Builder dataAsOf(Nullable<String> dataAsOf) {
+            if (dataAsOf.isNull()) {
+                this.dataAsOf = null;
+            } else if (dataAsOf.isEmpty()) {
+                this.dataAsOf = Optional.empty();
+            } else {
+                this.dataAsOf = Optional.of(dataAsOf.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>One entry per period, oldest first.</p>
          */
         @JsonSetter(value = "points", nulls = Nulls.SKIP)
@@ -236,7 +286,7 @@ public final class RetrieveStatsResponseData {
         }
 
         /**
-         * <p>Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>: a rate is measured across the whole window, not averaged across its points, and whole-window unique people are distinct across every bucket.</p>
+         * <p>Whole-window aggregates, present when the metric computes them. Don't derive these from <code>points</code>. A rate is measured across the whole window, not averaged across its points. Whole-window unique people are distinct across every bucket.</p>
          */
         @JsonSetter(value = "totals", nulls = Nulls.SKIP)
         public Builder totals(Optional<List<RetrieveStatsResponseDataTotalsItem>> totals) {
@@ -261,13 +311,14 @@ public final class RetrieveStatsResponseData {
         }
 
         public RetrieveStatsResponseData build() {
-            return new RetrieveStatsResponseData(complete, currency, points, totals, additionalProperties);
+            return new RetrieveStatsResponseData(complete, currency, dataAsOf, points, totals, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("complete")
                     || key.equalsIgnoreCase("currency")
+                    || key.equalsIgnoreCase("data_as_of")
                     || key.equalsIgnoreCase("points")
                     || key.equalsIgnoreCase("totals")) {
                 return;

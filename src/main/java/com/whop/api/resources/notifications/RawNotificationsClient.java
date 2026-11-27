@@ -290,6 +290,10 @@ public class RawNotificationsClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "last_fetched_at", request.getLastFetchedAt().get(), false);
         }
+        if (request.getUnread().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "unread", request.getUnread().get(), false);
+        }
         if (request.getExperienceIds().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "experience_ids", request.getExperienceIds().get(), true);

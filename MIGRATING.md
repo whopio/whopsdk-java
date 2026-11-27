@@ -1,6 +1,6 @@
 # Moving to the regenerated Java client
 
-The client follows the public API contract dated `2026-11-13-1`. Review generated request and response types when updating an existing integration. The package stays at the unreleased `0.0.0` version until a separate release decision sets a real version.
+The client follows the public API contract dated `2026-11-13-1`. Review generated request and response types when updating an existing integration.
 
 ## Choosing an environment
 
@@ -29,7 +29,7 @@ Import `com.whop.api.core.Environment`. Use the same environment setter on `Asyn
 
 ## OIDC authentication
 
-Tristan's `OidcToken`, `IdentityTokens`, and `WhopOidc` entrypoints remain available. Apply API environment settings to the returned builder; an OIDC token exchange with a custom host also needs its own `OidcToken.Builder.baseUrl(...)`.
+The `OidcToken`, `IdentityTokens`, and `WhopOidc` entrypoints remain available. Apply API environment settings to the returned builder; an OIDC token exchange with a custom host also needs its own `OidcToken.Builder.baseUrl(...)`.
 
 ```java
 try (AsyncWhopApiClient client = WhopOidc.asyncClientBuilder(token)
@@ -55,8 +55,6 @@ Without the filter rule, an optimized app can read API responses but fail while 
 
 See [INSTALL.md](INSTALL.md) for public Gradle and Maven installation. The coordinate is `com.whop.api:whop-java`, served without credentials from `https://whopio.github.io/whopsdk-java/`.
 
-Release with a separate pull request that changes only the version property in `gradle.properties`. The placeholder `0.0.0` never publishes. The workflow stamps source headers, metadata, and artifact version from that file, runs the SDK tests and an installed Maven consumer, preserves the immutable bundle on the `maven` branch, and deploys the repository to GitHub Pages. An anonymous consumer must pass before the release is tagged. Pull request runs rehearse without write permissions or uploads. Java releases use an explicit version and are outside the shared SDK release train.
+This repository is built and delivered by the SDK pipeline in whop-monorepo (`sdks/java` there), one commit per delivery to `main`. A release is a reviewed bump of `sdks/fern/sdk-version.txt` in whop-monorepo: the delivery carries the version into `build.gradle`, and `publish-main.yml` publishes a version this Maven repository does not have yet. It runs the SDK tests and an installed Maven consumer, preserves the immutable bundle on the `maven` branch, deploys the repository to GitHub Pages from the `main`-only `github-pages` Environment, and verifies an anonymous consumer before `.github/release/cli.ts` creates the GitHub release and tag. A push that changes no version publishes nothing.
 
-Configure GitHub Pages with the GitHub Actions publishing source and a `github-pages` Environment restricted to `main` before the first release. A retry from the same source commit reuses verified stored artifact bytes. It refuses to replace an existing version from another commit or publish a version older than an existing one.
-
-The optional GitHub Packages target uses `https://maven.pkg.github.com/whopio/whopsdk-java` and requires package-read credentials for consumers. The optional Maven Central target additionally needs verified ownership of the `com.whop` namespace and signing/publishing credentials in a main-only `maven-central` GitHub Environment. Select that target only after those prerequisites are configured.
+A retry from the same source commit reuses verified stored artifact bytes. The workflow refuses to replace an existing version from another commit or publish a version older than an existing one.

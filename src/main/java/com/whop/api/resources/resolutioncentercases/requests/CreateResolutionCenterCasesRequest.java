@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.resolutioncentercases.types.CreateResolutionCenterCasesRequestAnswersItem;
 import com.whop.api.resources.resolutioncentercases.types.CreateResolutionCenterCasesRequestAttachmentsItem;
 import com.whop.api.resources.resolutioncentercases.types.CreateResolutionCenterCasesRequestReason;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CreateResolutionCenterCasesRequest.Builder.class)
 public final class CreateResolutionCenterCasesRequest {
+    private final Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> answers;
+
     private final Optional<List<CreateResolutionCenterCasesRequestAttachmentsItem>> attachments;
 
     private final String message;
@@ -35,16 +38,26 @@ public final class CreateResolutionCenterCasesRequest {
     private final Map<String, Object> additionalProperties;
 
     private CreateResolutionCenterCasesRequest(
+            Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> answers,
             Optional<List<CreateResolutionCenterCasesRequestAttachmentsItem>> attachments,
             String message,
             CreateResolutionCenterCasesRequestReason reason,
             String receiptId,
             Map<String, Object> additionalProperties) {
+        this.answers = answers;
         this.attachments = attachments;
         this.message = message;
         this.reason = reason;
         this.receiptId = receiptId;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The customer's answers to the questions for this <code>reason</code>. Every required question needs an answer, and a question the reason does not ask is refused.
+     */
+    @JsonProperty("answers")
+    public Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> getAnswers() {
+        return answers;
     }
 
     @JsonProperty("attachments")
@@ -89,7 +102,8 @@ public final class CreateResolutionCenterCasesRequest {
     }
 
     private boolean equalTo(CreateResolutionCenterCasesRequest other) {
-        return attachments.equals(other.attachments)
+        return answers.equals(other.answers)
+                && attachments.equals(other.attachments)
                 && message.equals(other.message)
                 && reason.equals(other.reason)
                 && receiptId.equals(other.receiptId);
@@ -97,7 +111,7 @@ public final class CreateResolutionCenterCasesRequest {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.attachments, this.message, this.reason, this.receiptId);
+        return Objects.hash(this.answers, this.attachments, this.message, this.reason, this.receiptId);
     }
 
     @java.lang.Override
@@ -139,6 +153,13 @@ public final class CreateResolutionCenterCasesRequest {
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
+        /**
+         * <p>The customer's answers to the questions for this <code>reason</code>. Every required question needs an answer, and a question the reason does not ask is refused.</p>
+         */
+        _FinalStage answers(Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> answers);
+
+        _FinalStage answers(List<CreateResolutionCenterCasesRequestAnswersItem> answers);
+
         _FinalStage attachments(Optional<List<CreateResolutionCenterCasesRequestAttachmentsItem>> attachments);
 
         _FinalStage attachments(List<CreateResolutionCenterCasesRequestAttachmentsItem> attachments);
@@ -154,12 +175,15 @@ public final class CreateResolutionCenterCasesRequest {
 
         private Optional<List<CreateResolutionCenterCasesRequestAttachmentsItem>> attachments = Optional.empty();
 
+        private Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> answers = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(CreateResolutionCenterCasesRequest other) {
+            answers(other.getAnswers());
             attachments(other.getAttachments());
             message(other.getMessage());
             reason(other.getReason());
@@ -213,15 +237,36 @@ public final class CreateResolutionCenterCasesRequest {
             return this;
         }
 
+        /**
+         * <p>The customer's answers to the questions for this <code>reason</code>. Every required question needs an answer, and a question the reason does not ask is refused.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage answers(List<CreateResolutionCenterCasesRequestAnswersItem> answers) {
+            this.answers = Optional.ofNullable(answers);
+            return this;
+        }
+
+        /**
+         * <p>The customer's answers to the questions for this <code>reason</code>. Every required question needs an answer, and a question the reason does not ask is refused.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "answers", nulls = Nulls.SKIP)
+        public _FinalStage answers(Optional<List<CreateResolutionCenterCasesRequestAnswersItem>> answers) {
+            this.answers = answers;
+            return this;
+        }
+
         @java.lang.Override
         public CreateResolutionCenterCasesRequest build() {
             return new CreateResolutionCenterCasesRequest(
-                    attachments, message, reason, receiptId, additionalProperties);
+                    answers, attachments, message, reason, receiptId, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("attachments")
+            if (key.equalsIgnoreCase("answers")
+                    || key.equalsIgnoreCase("attachments")
                     || key.equalsIgnoreCase("message")
                     || key.equalsIgnoreCase("reason")
                     || key.equalsIgnoreCase("receipt_id")) {

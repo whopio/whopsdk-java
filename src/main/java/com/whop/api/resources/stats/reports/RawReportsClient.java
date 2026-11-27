@@ -15,8 +15,10 @@ import com.whop.api.core.WhopApiHttpResponse;
 import com.whop.api.errors.BadRequestError;
 import com.whop.api.errors.ForbiddenError;
 import com.whop.api.errors.UnauthorizedError;
+import com.whop.api.resources.stats.reports.requests.PartnerRevenueLinesReportsRequest;
 import com.whop.api.resources.stats.reports.requests.PlatformTrendsReportsRequest;
 import com.whop.api.resources.stats.reports.types.ListReportsResponse;
+import com.whop.api.resources.stats.reports.types.PartnerRevenueLinesReportsResponse;
 import com.whop.api.resources.stats.reports.types.PlatformTrendsReportsResponse;
 import java.io.IOException;
 import okhttp3.Headers;
@@ -82,6 +84,126 @@ public class RawReportsClient {
                 if (response.code() == 401) {
                     throw new UnauthorizedError(
                             ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new WhopApiApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new WhopApiException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WhopApiException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * The revenue lines charged to the businesses that the team of a partner business referred. Each row shows the commission paid to the partner business on that line. Lines that share an income source show the whole commission of that source. A team member who is not an owner sees only the referrals of their own team. While a day of the window is still being read, <code>commission</code> and <code>paid</code> are <code>null</code> on every row. A line may be missing. The days fill within minutes, so read the report again.
+     */
+    public WhopApiHttpResponse<PartnerRevenueLinesReportsResponse> partnerRevenueLines(
+            PartnerRevenueLinesReportsRequest request) {
+        return partnerRevenueLines(request, null);
+    }
+
+    /**
+     * The revenue lines charged to the businesses that the team of a partner business referred. Each row shows the commission paid to the partner business on that line. Lines that share an income source show the whole commission of that source. A team member who is not an owner sees only the referrals of their own team. While a day of the window is still being read, <code>commission</code> and <code>paid</code> are <code>null</code> on every row. A line may be missing. The days fill within minutes, so read the report again.
+     */
+    public WhopApiHttpResponse<PartnerRevenueLinesReportsResponse> partnerRevenueLines(
+            PartnerRevenueLinesReportsRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getApiURL())
+                .newBuilder()
+                .addPathSegments("stats/reports/partner_revenue_lines");
+        QueryStringMapper.addQueryParameter(httpUrl, "referring_account_id", request.getReferringAccountId(), false);
+        if (request.getBreakdownBy().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "breakdown_by", request.getBreakdownBy().get(), false);
+        }
+        if (request.getColumns().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "columns", request.getColumns().get(), false);
+        }
+        if (request.getWindows().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "windows", request.getWindows().get(), false);
+        }
+        if (request.getTimeZone().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "time_zone", request.getTimeZone().get(), false);
+        }
+        if (request.getRevenueLine().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "revenue_line", request.getRevenueLine().get(), false);
+        }
+        if (request.getIncomeSource().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "income_source", request.getIncomeSource().get(), false);
+        }
+        if (request.getOrder().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "order", request.getOrder().get(), false);
+        }
+        if (request.getDirection().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "direction", request.getDirection().get(), false);
+        }
+        if (request.getConvertTo().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "convert_to", request.getConvertTo().get(), false);
+        }
+        if (request.getFirst().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "first", request.getFirst().get(), false);
+        }
+        if (request.getAfter().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getMode().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "mode", request.getMode().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new WhopApiHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(
+                                responseBodyString, PartnerRevenueLinesReportsResponse.class),
+                        response);
+            }
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {
                 // unable to map error response, throwing generic error
@@ -184,6 +306,10 @@ public class RawReportsClient {
         if (request.getAfter().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "after", request.getAfter().get(), false);
+        }
+        if (request.getMode().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "mode", request.getMode().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {

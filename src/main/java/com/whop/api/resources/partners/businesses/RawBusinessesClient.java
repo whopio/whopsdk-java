@@ -98,6 +98,13 @@ public class RawBusinessesClient {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "has_earnings", request.getHasEarnings().get(), false);
         }
+        if (request.getCountedInNetworkVolume().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl,
+                    "counted_in_network_volume",
+                    request.getCountedInNetworkVolume().get(),
+                    false);
+        }
         if (request.getFirst().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "first", request.getFirst().get(), false);

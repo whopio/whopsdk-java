@@ -7,38 +7,26 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class AdGroupDeliveryStatus {
+    public static final AdGroupDeliveryStatus REVISE_CONTENT =
+            new AdGroupDeliveryStatus(Value.REVISE_CONTENT, "revise_content");
+
     public static final AdGroupDeliveryStatus PROCESSING = new AdGroupDeliveryStatus(Value.PROCESSING, "processing");
 
     public static final AdGroupDeliveryStatus COMPLETED = new AdGroupDeliveryStatus(Value.COMPLETED, "completed");
 
-    public static final AdGroupDeliveryStatus ADS_OFF = new AdGroupDeliveryStatus(Value.ADS_OFF, "ads_off");
-
-    public static final AdGroupDeliveryStatus ALL_ADS_REJECTED =
-            new AdGroupDeliveryStatus(Value.ALL_ADS_REJECTED, "all_ads_rejected");
+    public static final AdGroupDeliveryStatus PAUSED = new AdGroupDeliveryStatus(Value.PAUSED, "paused");
 
     public static final AdGroupDeliveryStatus SCHEDULED = new AdGroupDeliveryStatus(Value.SCHEDULED, "scheduled");
+
+    public static final AdGroupDeliveryStatus ISSUES = new AdGroupDeliveryStatus(Value.ISSUES, "issues");
+
+    public static final AdGroupDeliveryStatus REJECTED = new AdGroupDeliveryStatus(Value.REJECTED, "rejected");
 
     public static final AdGroupDeliveryStatus DRAFT = new AdGroupDeliveryStatus(Value.DRAFT, "draft");
 
     public static final AdGroupDeliveryStatus LEARNING = new AdGroupDeliveryStatus(Value.LEARNING, "learning");
 
     public static final AdGroupDeliveryStatus IN_REVIEW = new AdGroupDeliveryStatus(Value.IN_REVIEW, "in_review");
-
-    public static final AdGroupDeliveryStatus NO_ADS = new AdGroupDeliveryStatus(Value.NO_ADS, "no_ads");
-
-    public static final AdGroupDeliveryStatus IN_APPEAL = new AdGroupDeliveryStatus(Value.IN_APPEAL, "in_appeal");
-
-    public static final AdGroupDeliveryStatus CAMPAIGN_PAUSED =
-            new AdGroupDeliveryStatus(Value.CAMPAIGN_PAUSED, "campaign_paused");
-
-    public static final AdGroupDeliveryStatus PAUSED = new AdGroupDeliveryStatus(Value.PAUSED, "paused");
-
-    public static final AdGroupDeliveryStatus ISSUES = new AdGroupDeliveryStatus(Value.ISSUES, "issues");
-
-    public static final AdGroupDeliveryStatus REJECTED = new AdGroupDeliveryStatus(Value.REJECTED, "rejected");
-
-    public static final AdGroupDeliveryStatus LEARNING_LIMITED =
-            new AdGroupDeliveryStatus(Value.LEARNING_LIMITED, "learning_limited");
 
     public static final AdGroupDeliveryStatus ACTIVE = new AdGroupDeliveryStatus(Value.ACTIVE, "active");
 
@@ -75,36 +63,26 @@ public final class AdGroupDeliveryStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case REVISE_CONTENT:
+                return visitor.visitReviseContent();
             case PROCESSING:
                 return visitor.visitProcessing();
             case COMPLETED:
                 return visitor.visitCompleted();
-            case ADS_OFF:
-                return visitor.visitAdsOff();
-            case ALL_ADS_REJECTED:
-                return visitor.visitAllAdsRejected();
+            case PAUSED:
+                return visitor.visitPaused();
             case SCHEDULED:
                 return visitor.visitScheduled();
+            case ISSUES:
+                return visitor.visitIssues();
+            case REJECTED:
+                return visitor.visitRejected();
             case DRAFT:
                 return visitor.visitDraft();
             case LEARNING:
                 return visitor.visitLearning();
             case IN_REVIEW:
                 return visitor.visitInReview();
-            case NO_ADS:
-                return visitor.visitNoAds();
-            case IN_APPEAL:
-                return visitor.visitInAppeal();
-            case CAMPAIGN_PAUSED:
-                return visitor.visitCampaignPaused();
-            case PAUSED:
-                return visitor.visitPaused();
-            case ISSUES:
-                return visitor.visitIssues();
-            case REJECTED:
-                return visitor.visitRejected();
-            case LEARNING_LIMITED:
-                return visitor.visitLearningLimited();
             case ACTIVE:
                 return visitor.visitActive();
             case UNKNOWN:
@@ -116,36 +94,26 @@ public final class AdGroupDeliveryStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static AdGroupDeliveryStatus valueOf(String value) {
         switch (value) {
+            case "revise_content":
+                return REVISE_CONTENT;
             case "processing":
                 return PROCESSING;
             case "completed":
                 return COMPLETED;
-            case "ads_off":
-                return ADS_OFF;
-            case "all_ads_rejected":
-                return ALL_ADS_REJECTED;
+            case "paused":
+                return PAUSED;
             case "scheduled":
                 return SCHEDULED;
+            case "issues":
+                return ISSUES;
+            case "rejected":
+                return REJECTED;
             case "draft":
                 return DRAFT;
             case "learning":
                 return LEARNING;
             case "in_review":
                 return IN_REVIEW;
-            case "no_ads":
-                return NO_ADS;
-            case "in_appeal":
-                return IN_APPEAL;
-            case "campaign_paused":
-                return CAMPAIGN_PAUSED;
-            case "paused":
-                return PAUSED;
-            case "issues":
-                return ISSUES;
-            case "rejected":
-                return REJECTED;
-            case "learning_limited":
-                return LEARNING_LIMITED;
             case "active":
                 return ACTIVE;
             default:
@@ -154,17 +122,9 @@ public final class AdGroupDeliveryStatus {
     }
 
     public enum Value {
-        IN_APPEAL,
-
-        ALL_ADS_REJECTED,
-
         REJECTED,
 
         DRAFT,
-
-        NO_ADS,
-
-        CAMPAIGN_PAUSED,
 
         PAUSED,
 
@@ -172,15 +132,13 @@ public final class AdGroupDeliveryStatus {
 
         PROCESSING,
 
+        REVISE_CONTENT,
+
         ISSUES,
 
         SCHEDULED,
 
         COMPLETED,
-
-        ADS_OFF,
-
-        LEARNING_LIMITED,
 
         LEARNING,
 
@@ -190,17 +148,9 @@ public final class AdGroupDeliveryStatus {
     }
 
     public interface Visitor<T> {
-        T visitInAppeal();
-
-        T visitAllAdsRejected();
-
         T visitRejected();
 
         T visitDraft();
-
-        T visitNoAds();
-
-        T visitCampaignPaused();
 
         T visitPaused();
 
@@ -208,15 +158,13 @@ public final class AdGroupDeliveryStatus {
 
         T visitProcessing();
 
+        T visitReviseContent();
+
         T visitIssues();
 
         T visitScheduled();
 
         T visitCompleted();
-
-        T visitAdsOff();
-
-        T visitLearningLimited();
 
         T visitLearning();
 

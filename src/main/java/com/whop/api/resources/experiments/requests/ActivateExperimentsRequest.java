@@ -37,7 +37,7 @@ public final class ActivateExperimentsRequest {
     }
 
     /**
-     * @return Owning account ID. Required when id is a flag key; optional for an expt_ ID.
+     * @return Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.
      */
     @JsonIgnore
     public Optional<String> getAccountId() {
@@ -45,7 +45,7 @@ public final class ActivateExperimentsRequest {
     }
 
     /**
-     * @return Reporting window length in days. Omit to use the default. This does not automatically end the experiment.
+     * @return Reporting window length in days, at most 7. Omit to use the default of 7 days. This does not automatically end the experiment.
      */
     @JsonIgnore
     public Optional<Integer> getDurationDays() {
@@ -107,7 +107,7 @@ public final class ActivateExperimentsRequest {
         }
 
         /**
-         * <p>Owning account ID. Required when id is a flag key; optional for an expt_ ID.</p>
+         * <p>Owning account ID. Required when <code>id</code> is a flag key, optional for an <code>expt_</code> ID.</p>
          */
         @JsonSetter(value = "account_id", nulls = Nulls.SKIP)
         public Builder accountId(Optional<String> accountId) {
@@ -121,7 +121,7 @@ public final class ActivateExperimentsRequest {
         }
 
         /**
-         * <p>Reporting window length in days. Omit to use the default. This does not automatically end the experiment.</p>
+         * <p>Reporting window length in days, at most 7. Omit to use the default of 7 days. This does not automatically end the experiment.</p>
          */
         @JsonSetter(value = "duration_days", nulls = Nulls.SKIP)
         public Builder durationDays(Optional<Integer> durationDays) {

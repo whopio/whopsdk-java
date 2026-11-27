@@ -37,6 +37,8 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
 
     private final Optional<UpdateVerificationsRequestBodyPersonalAddressPersonalAddress> personalAddress;
 
+    private final Optional<String> phone;
+
     private final Optional<List<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem>>
             requestedInformation;
 
@@ -53,6 +55,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
             Optional<String> firstName,
             Optional<String> lastName,
             Optional<UpdateVerificationsRequestBodyPersonalAddressPersonalAddress> personalAddress,
+            Optional<String> phone,
             Optional<List<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem>> requestedInformation,
             Optional<String> taxIdentificationNumber,
             Map<String, Object> additionalProperties) {
@@ -64,6 +67,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
         this.firstName = firstName;
         this.lastName = lastName;
         this.personalAddress = personalAddress;
+        this.phone = phone;
         this.requestedInformation = requestedInformation;
         this.taxIdentificationNumber = taxIdentificationNumber;
         this.additionalProperties = additionalProperties;
@@ -86,7 +90,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
     }
 
     /**
-     * @return The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
+     * @return The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
      */
     @JsonProperty("business_tax_identification_number")
     public Optional<String> getBusinessTaxIdentificationNumber() {
@@ -128,6 +132,14 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
     }
 
     /**
+     * @return Phone number of the person, with country code.
+     */
+    @JsonProperty("phone")
+    public Optional<String> getPhone() {
+        return phone;
+    }
+
+    /**
      * @return Answers to items in <code>requested_information</code>. Each entry pairs the item <code>id</code> with one answer payload matching its <code>type</code>.
      */
     @JsonProperty("requested_information")
@@ -165,6 +177,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
                 && firstName.equals(other.firstName)
                 && lastName.equals(other.lastName)
                 && personalAddress.equals(other.personalAddress)
+                && phone.equals(other.phone)
                 && requestedInformation.equals(other.requestedInformation)
                 && taxIdentificationNumber.equals(other.taxIdentificationNumber);
     }
@@ -180,6 +193,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
                 this.firstName,
                 this.lastName,
                 this.personalAddress,
+                this.phone,
                 this.requestedInformation,
                 this.taxIdentificationNumber);
     }
@@ -212,6 +226,8 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
         private Optional<UpdateVerificationsRequestBodyPersonalAddressPersonalAddress> personalAddress =
                 Optional.empty();
 
+        private Optional<String> phone = Optional.empty();
+
         private Optional<List<UpdateVerificationsRequestBodyPersonalAddressRequestedInformationItem>>
                 requestedInformation = Optional.empty();
 
@@ -230,6 +246,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
             firstName(other.getFirstName());
             lastName(other.getLastName());
             personalAddress(other.getPersonalAddress());
+            phone(other.getPhone());
             requestedInformation(other.getRequestedInformation());
             taxIdentificationNumber(other.getTaxIdentificationNumber());
             return this;
@@ -264,7 +281,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
         }
 
         /**
-         * <p>The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
+         * <p>The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
          */
         @JsonSetter(value = "business_tax_identification_number", nulls = Nulls.SKIP)
         public Builder businessTaxIdentificationNumber(Optional<String> businessTaxIdentificationNumber) {
@@ -343,6 +360,20 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
         }
 
         /**
+         * <p>Phone number of the person, with country code.</p>
+         */
+        @JsonSetter(value = "phone", nulls = Nulls.SKIP)
+        public Builder phone(Optional<String> phone) {
+            this.phone = phone;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            this.phone = Optional.ofNullable(phone);
+            return this;
+        }
+
+        /**
          * <p>Answers to items in <code>requested_information</code>. Each entry pairs the item <code>id</code> with one answer payload matching its <code>type</code>.</p>
          */
         @JsonSetter(value = "requested_information", nulls = Nulls.SKIP)
@@ -383,6 +414,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
                     firstName,
                     lastName,
                     personalAddress,
+                    phone,
                     requestedInformation,
                     taxIdentificationNumber,
                     additionalProperties);
@@ -398,6 +430,7 @@ public final class UpdateVerificationsRequestBodyPersonalAddress {
                     || key.equalsIgnoreCase("first_name")
                     || key.equalsIgnoreCase("last_name")
                     || key.equalsIgnoreCase("personal_address")
+                    || key.equalsIgnoreCase("phone")
                     || key.equalsIgnoreCase("requested_information")
                     || key.equalsIgnoreCase("tax_identification_number")) {
                 return;

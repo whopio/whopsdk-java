@@ -103,6 +103,8 @@ public final class PromoCodeCurrency {
 
     public static final PromoCodeCurrency MUR = new PromoCodeCurrency(Value.MUR, "mur");
 
+    public static final PromoCodeCurrency HNL = new PromoCodeCurrency(Value.HNL, "hnl");
+
     public static final PromoCodeCurrency PEN = new PromoCodeCurrency(Value.PEN, "pen");
 
     public static final PromoCodeCurrency USD = new PromoCodeCurrency(Value.USD, "usd");
@@ -315,6 +317,8 @@ public final class PromoCodeCurrency {
                 return visitor.visitTnd();
             case MUR:
                 return visitor.visitMur();
+            case HNL:
+                return visitor.visitHnl();
             case PEN:
                 return visitor.visitPen();
             case USD:
@@ -504,6 +508,8 @@ public final class PromoCodeCurrency {
                 return TND;
             case "mur":
                 return MUR;
+            case "hnl":
+                return HNL;
             case "pen":
                 return PEN;
             case "usd":
@@ -774,6 +780,8 @@ public final class PromoCodeCurrency {
 
         XAU,
 
+        HNL,
+
         UNKNOWN
     }
 
@@ -957,6 +965,8 @@ public final class PromoCodeCurrency {
         T visitWhopUsd();
 
         T visitXau();
+
+        T visitHnl();
 
         T visitUnknown(String unknownType);
     }

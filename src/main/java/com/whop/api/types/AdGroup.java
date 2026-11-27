@@ -526,7 +526,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.
+     * @return Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.
      */
     @JsonIgnore
     public Optional<Double> getCostPerResult() {
@@ -613,7 +613,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
+     * @return Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.
      */
     @JsonIgnore
     public Optional<AdGroupDeliverySchedule> getDeliverySchedule() {
@@ -640,7 +640,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.
+     * @return The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.
      */
     @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
@@ -779,7 +779,7 @@ public final class AdGroup {
     }
 
     /**
-     * @return The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.
+     * @return The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.
      */
     @JsonIgnore
     public Optional<AdGroupResultEvent> getResultEvent() {
@@ -1636,7 +1636,7 @@ public final class AdGroup {
         _FinalStage costPerPurchase(Nullable<Double> costPerPurchase);
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          */
         _FinalStage costPerResult(Optional<Double> costPerResult);
 
@@ -1699,7 +1699,7 @@ public final class AdGroup {
         _FinalStage customEventValues(String key, Object value);
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         _FinalStage deliverySchedule(Optional<AdGroupDeliverySchedule> deliverySchedule);
 
@@ -1708,7 +1708,7 @@ public final class AdGroup {
         _FinalStage deliverySchedule(Nullable<AdGroupDeliverySchedule> deliverySchedule);
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
@@ -1760,7 +1760,7 @@ public final class AdGroup {
         _FinalStage learningProgress(Nullable<AdGroupLearningProgress> learningProgress);
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          */
         _FinalStage resultEvent(Optional<AdGroupResultEvent> resultEvent);
 
@@ -2718,7 +2718,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2734,7 +2734,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2744,7 +2744,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>The Whop pixel conversion event whose attributed count represents results — the optimization goal, or the highest-volume attributed event for campaigns that budget per ad group. Null when the goal isn't a Whop-attributed event.</p>
+         * <p>The Whop pixel event whose attributed count represents results. It's the optimization goal, or the highest-volume attributed event for a campaign that budgets per ad group. <code>impressions</code> counts reported impressions. <code>null</code> when the goal isn't a Whop-attributed event.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "result_event", nulls = Nulls.SKIP)
@@ -2923,7 +2923,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2939,7 +2939,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2949,7 +2949,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>). <code>null</code> for <code>minimum_cost</code> bidding.</p>
+         * <p>The cost per result the advertiser wants for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> when the ad group uses its campaign's <code>desired_cost_per_result</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
@@ -2959,7 +2959,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2975,7 +2975,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -2985,7 +2985,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Days it doesn't deliver are omitted. <code>null</code> when it delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)
@@ -3209,7 +3209,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3225,7 +3225,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -3235,7 +3235,7 @@ public final class AdGroup {
         }
 
         /**
-         * <p>Spend divided by Whop pixel-attributed results; null when nothing Whop-attributable is being optimized for.</p>
+         * <p>Spend divided by Whop pixel-attributed results. For <code>impressions</code>, it's the spend per 1,000 impressions. <code>null</code> when nothing Whop-attributable is being optimized for.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "cost_per_result", nulls = Nulls.SKIP)

@@ -23,6 +23,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ReceiptLineItem.Builder.class)
 public final class ReceiptLineItem {
+    private final Optional<Money> discountAmount;
+
     private final Optional<String> id;
 
     private final Optional<String> label;
@@ -44,6 +46,7 @@ public final class ReceiptLineItem {
     private final Map<String, Object> additionalProperties;
 
     private ReceiptLineItem(
+            Optional<Money> discountAmount,
             Optional<String> id,
             Optional<String> label,
             Optional<String> productId,
@@ -54,6 +57,7 @@ public final class ReceiptLineItem {
             Optional<String> variantId,
             Optional<String> variantTitle,
             Map<String, Object> additionalProperties) {
+        this.discountAmount = discountAmount;
         this.id = id;
         this.label = label;
         this.productId = productId;
@@ -64,6 +68,17 @@ public final class ReceiptLineItem {
         this.variantId = variantId;
         this.variantTitle = variantTitle;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The amount taken off this item's <code>subtotal</code> by discounts and the promo code, before tax. Returns <code>null</code> when no discount was recorded for the item.
+     */
+    @JsonIgnore
+    public Optional<Money> getDiscountAmount() {
+        if (discountAmount == null) {
+            return Optional.empty();
+        }
+        return discountAmount;
     }
 
     /**
@@ -163,6 +178,12 @@ public final class ReceiptLineItem {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("discount_amount")
+    private Optional<Money> _getDiscountAmount() {
+        return discountAmount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("id")
     private Optional<String> _getId() {
         return id;
@@ -222,7 +243,8 @@ public final class ReceiptLineItem {
     }
 
     private boolean equalTo(ReceiptLineItem other) {
-        return id.equals(other.id)
+        return discountAmount.equals(other.discountAmount)
+                && id.equals(other.id)
                 && label.equals(other.label)
                 && productId.equals(other.productId)
                 && productTitle.equals(other.productTitle)
@@ -236,6 +258,7 @@ public final class ReceiptLineItem {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.discountAmount,
                 this.id,
                 this.label,
                 this.productId,
@@ -271,6 +294,15 @@ public final class ReceiptLineItem {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
+
+        /**
+         * <p>The amount taken off this item's <code>subtotal</code> by discounts and the promo code, before tax. Returns <code>null</code> when no discount was recorded for the item.</p>
+         */
+        _FinalStage discountAmount(Optional<Money> discountAmount);
+
+        _FinalStage discountAmount(Money discountAmount);
+
+        _FinalStage discountAmount(Nullable<Money> discountAmount);
 
         /**
          * <p>Line item ID, prefixed <code>li_</code>. Null when the payment predates item snapshots and the item is read from the payment's variant.</p>
@@ -365,12 +397,15 @@ public final class ReceiptLineItem {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<Money> discountAmount = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(ReceiptLineItem other) {
+            discountAmount(other.getDiscountAmount());
             id(other.getId());
             label(other.getLabel());
             productId(other.getProductId());
@@ -682,9 +717,46 @@ public final class ReceiptLineItem {
             return this;
         }
 
+        /**
+         * <p>The amount taken off this item's <code>subtotal</code> by discounts and the promo code, before tax. Returns <code>null</code> when no discount was recorded for the item.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage discountAmount(Nullable<Money> discountAmount) {
+            if (discountAmount.isNull()) {
+                this.discountAmount = null;
+            } else if (discountAmount.isEmpty()) {
+                this.discountAmount = Optional.empty();
+            } else {
+                this.discountAmount = Optional.of(discountAmount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The amount taken off this item's <code>subtotal</code> by discounts and the promo code, before tax. Returns <code>null</code> when no discount was recorded for the item.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage discountAmount(Money discountAmount) {
+            this.discountAmount = Optional.ofNullable(discountAmount);
+            return this;
+        }
+
+        /**
+         * <p>The amount taken off this item's <code>subtotal</code> by discounts and the promo code, before tax. Returns <code>null</code> when no discount was recorded for the item.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "discount_amount", nulls = Nulls.SKIP)
+        public _FinalStage discountAmount(Optional<Money> discountAmount) {
+            this.discountAmount = discountAmount;
+            return this;
+        }
+
         @java.lang.Override
         public ReceiptLineItem build() {
             return new ReceiptLineItem(
+                    discountAmount,
                     id,
                     label,
                     productId,
@@ -699,7 +771,8 @@ public final class ReceiptLineItem {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("id")
+            if (key.equalsIgnoreCase("discount_amount")
+                    || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("label")
                     || key.equalsIgnoreCase("product_id")
                     || key.equalsIgnoreCase("product_title")

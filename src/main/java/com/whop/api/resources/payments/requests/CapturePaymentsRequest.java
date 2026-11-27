@@ -5,31 +5,91 @@ package com.whop.api.resources.payments.requests;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.whop.api.core.Nullable;
+import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = CapturePaymentsRequest.Builder.class)
 public final class CapturePaymentsRequest {
+    private final Optional<Double> amount;
+
+    private final Optional<Map<String, Optional<String>>> metadata;
+
     private final Map<String, Object> additionalProperties;
 
-    private CapturePaymentsRequest(Map<String, Object> additionalProperties) {
+    private CapturePaymentsRequest(
+            Optional<Double> amount,
+            Optional<Map<String, Optional<String>>> metadata,
+            Map<String, Object> additionalProperties) {
+        this.amount = amount;
+        this.metadata = metadata;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return The amount to capture, in the payment's currency. It must equal the payment's <code>total</code>, and defaults to it. The total moves away from the authorized amount only when a <code>card_present</code> payment's line items change after the card was authorized.
+     */
+    @JsonIgnore
+    public Optional<Double> getAmount() {
+        if (amount == null) {
+            return Optional.empty();
+        }
+        return amount;
+    }
+
+    /**
+     * @return Keys and values added to the payment's <code>metadata</code> once it is captured, such as the file of the buyer's signature. Only for an in-person payment created with <code>capture: false</code>.
+     */
+    @JsonIgnore
+    public Optional<Map<String, Optional<String>>> getMetadata() {
+        if (metadata == null) {
+            return Optional.empty();
+        }
+        return metadata;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("amount")
+    private Optional<Double> _getAmount() {
+        return amount;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("metadata")
+    private Optional<Map<String, Optional<String>>> _getMetadata() {
+        return metadata;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof CapturePaymentsRequest;
+        return other instanceof CapturePaymentsRequest && equalTo((CapturePaymentsRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(CapturePaymentsRequest other) {
+        return amount.equals(other.amount) && metadata.equals(other.metadata);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.amount, this.metadata);
     }
 
     @java.lang.Override
@@ -43,20 +103,79 @@ public final class CapturePaymentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Double> amount = Optional.empty();
+
+        private Optional<Map<String, Optional<String>>> metadata = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(CapturePaymentsRequest other) {
+            amount(other.getAmount());
+            metadata(other.getMetadata());
+            return this;
+        }
+
+        /**
+         * <p>The amount to capture, in the payment's currency. It must equal the payment's <code>total</code>, and defaults to it. The total moves away from the authorized amount only when a <code>card_present</code> payment's line items change after the card was authorized.</p>
+         */
+        @JsonSetter(value = "amount", nulls = Nulls.SKIP)
+        public Builder amount(Optional<Double> amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder amount(Double amount) {
+            this.amount = Optional.ofNullable(amount);
+            return this;
+        }
+
+        public Builder amount(Nullable<Double> amount) {
+            if (amount.isNull()) {
+                this.amount = null;
+            } else if (amount.isEmpty()) {
+                this.amount = Optional.empty();
+            } else {
+                this.amount = Optional.of(amount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Keys and values added to the payment's <code>metadata</code> once it is captured, such as the file of the buyer's signature. Only for an in-person payment created with <code>capture: false</code>.</p>
+         */
+        @JsonSetter(value = "metadata", nulls = Nulls.SKIP)
+        public Builder metadata(Optional<Map<String, Optional<String>>> metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
+        public Builder metadata(Map<String, Optional<String>> metadata) {
+            this.metadata = Optional.ofNullable(metadata);
+            return this;
+        }
+
+        public Builder metadata(Nullable<Map<String, Optional<String>>> metadata) {
+            if (metadata.isNull()) {
+                this.metadata = null;
+            } else if (metadata.isEmpty()) {
+                this.metadata = Optional.empty();
+            } else {
+                this.metadata = Optional.of(metadata.get());
+            }
             return this;
         }
 
         public CapturePaymentsRequest build() {
-            return new CapturePaymentsRequest(additionalProperties);
+            return new CapturePaymentsRequest(amount, metadata, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("amount") || key.equalsIgnoreCase("metadata")) {
+                return;
+            }
             this.additionalProperties.put(key, value);
         }
 

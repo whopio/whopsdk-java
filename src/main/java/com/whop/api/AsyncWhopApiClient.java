@@ -31,7 +31,6 @@ import com.whop.api.resources.cardtransactions.AsyncCardTransactionsClient;
 import com.whop.api.resources.cashbackrules.AsyncCashbackRulesClient;
 import com.whop.api.resources.channelmembers.AsyncChannelMembersClient;
 import com.whop.api.resources.channels.AsyncChannelsClient;
-import com.whop.api.resources.chatchannels.AsyncChatChannelsClient;
 import com.whop.api.resources.checkoutconfigurations.AsyncCheckoutConfigurationsClient;
 import com.whop.api.resources.claimlinks.AsyncClaimLinksClient;
 import com.whop.api.resources.companytokentransactions.AsyncCompanyTokenTransactionsClient;
@@ -44,8 +43,6 @@ import com.whop.api.resources.coursestudents.AsyncCourseStudentsClient;
 import com.whop.api.resources.deposits.AsyncDepositsClient;
 import com.whop.api.resources.disputealerts.AsyncDisputeAlertsClient;
 import com.whop.api.resources.disputes.AsyncDisputesClient;
-import com.whop.api.resources.dmchannels.AsyncDmChannelsClient;
-import com.whop.api.resources.dmmembers.AsyncDmMembersClient;
 import com.whop.api.resources.domains.AsyncDomainsClient;
 import com.whop.api.resources.economicintelligence.AsyncEconomicIntelligenceClient;
 import com.whop.api.resources.emailaddresses.AsyncEmailAddressesClient;
@@ -88,6 +85,7 @@ import com.whop.api.resources.productaffiliates.AsyncProductAffiliatesClient;
 import com.whop.api.resources.products.AsyncProductsClient;
 import com.whop.api.resources.promocodes.AsyncPromoCodesClient;
 import com.whop.api.resources.reactions.AsyncReactionsClient;
+import com.whop.api.resources.recommendedactions.AsyncRecommendedActionsClient;
 import com.whop.api.resources.refunds.AsyncRefundsClient;
 import com.whop.api.resources.resolutioncentercases.AsyncResolutionCenterCasesClient;
 import com.whop.api.resources.reviewreports.AsyncReviewReportsClient;
@@ -97,7 +95,7 @@ import com.whop.api.resources.setupintents.AsyncSetupIntentsClient;
 import com.whop.api.resources.shipments.AsyncShipmentsClient;
 import com.whop.api.resources.socialaccounts.AsyncSocialAccountsClient;
 import com.whop.api.resources.stats.AsyncStatsClient;
-import com.whop.api.resources.supportchannels.AsyncSupportChannelsClient;
+import com.whop.api.resources.suspensionappeals.AsyncSuspensionAppealsClient;
 import com.whop.api.resources.swaps.AsyncSwapsClient;
 import com.whop.api.resources.teammembers.AsyncTeamMembersClient;
 import com.whop.api.resources.trades.AsyncTradesClient;
@@ -164,8 +162,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     protected final Supplier<AsyncChannelsClient> channelsClient;
 
-    protected final Supplier<AsyncChatChannelsClient> chatChannelsClient;
-
     protected final Supplier<AsyncCheckoutConfigurationsClient> checkoutConfigurationsClient;
 
     protected final Supplier<AsyncClaimLinksClient> claimLinksClient;
@@ -189,10 +185,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
     protected final Supplier<AsyncDisputeAlertsClient> disputeAlertsClient;
 
     protected final Supplier<AsyncDisputesClient> disputesClient;
-
-    protected final Supplier<AsyncDmChannelsClient> dmChannelsClient;
-
-    protected final Supplier<AsyncDmMembersClient> dmMembersClient;
 
     protected final Supplier<AsyncDomainsClient> domainsClient;
 
@@ -278,6 +270,8 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     protected final Supplier<AsyncReactionsClient> reactionsClient;
 
+    protected final Supplier<AsyncRecommendedActionsClient> recommendedActionsClient;
+
     protected final Supplier<AsyncRefundsClient> refundsClient;
 
     protected final Supplier<AsyncResolutionCenterCasesClient> resolutionCenterCasesClient;
@@ -296,7 +290,7 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     protected final Supplier<AsyncStatsClient> statsClient;
 
-    protected final Supplier<AsyncSupportChannelsClient> supportChannelsClient;
+    protected final Supplier<AsyncSuspensionAppealsClient> suspensionAppealsClient;
 
     protected final Supplier<AsyncSwapsClient> swapsClient;
 
@@ -344,7 +338,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
         this.cashbackRulesClient = Suppliers.memoize(() -> new AsyncCashbackRulesClient(clientOptions));
         this.channelMembersClient = Suppliers.memoize(() -> new AsyncChannelMembersClient(clientOptions));
         this.channelsClient = Suppliers.memoize(() -> new AsyncChannelsClient(clientOptions));
-        this.chatChannelsClient = Suppliers.memoize(() -> new AsyncChatChannelsClient(clientOptions));
         this.checkoutConfigurationsClient =
                 Suppliers.memoize(() -> new AsyncCheckoutConfigurationsClient(clientOptions));
         this.claimLinksClient = Suppliers.memoize(() -> new AsyncClaimLinksClient(clientOptions));
@@ -360,8 +353,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
         this.depositsClient = Suppliers.memoize(() -> new AsyncDepositsClient(clientOptions));
         this.disputeAlertsClient = Suppliers.memoize(() -> new AsyncDisputeAlertsClient(clientOptions));
         this.disputesClient = Suppliers.memoize(() -> new AsyncDisputesClient(clientOptions));
-        this.dmChannelsClient = Suppliers.memoize(() -> new AsyncDmChannelsClient(clientOptions));
-        this.dmMembersClient = Suppliers.memoize(() -> new AsyncDmMembersClient(clientOptions));
         this.domainsClient = Suppliers.memoize(() -> new AsyncDomainsClient(clientOptions));
         this.economicIntelligenceClient = Suppliers.memoize(() -> new AsyncEconomicIntelligenceClient(clientOptions));
         this.emailAddressesClient = Suppliers.memoize(() -> new AsyncEmailAddressesClient(clientOptions));
@@ -405,6 +396,7 @@ public class AsyncWhopApiClient implements AutoCloseable {
         this.productsClient = Suppliers.memoize(() -> new AsyncProductsClient(clientOptions));
         this.promoCodesClient = Suppliers.memoize(() -> new AsyncPromoCodesClient(clientOptions));
         this.reactionsClient = Suppliers.memoize(() -> new AsyncReactionsClient(clientOptions));
+        this.recommendedActionsClient = Suppliers.memoize(() -> new AsyncRecommendedActionsClient(clientOptions));
         this.refundsClient = Suppliers.memoize(() -> new AsyncRefundsClient(clientOptions));
         this.resolutionCenterCasesClient = Suppliers.memoize(() -> new AsyncResolutionCenterCasesClient(clientOptions));
         this.reviewReportsClient = Suppliers.memoize(() -> new AsyncReviewReportsClient(clientOptions));
@@ -414,7 +406,7 @@ public class AsyncWhopApiClient implements AutoCloseable {
         this.shipmentsClient = Suppliers.memoize(() -> new AsyncShipmentsClient(clientOptions));
         this.socialAccountsClient = Suppliers.memoize(() -> new AsyncSocialAccountsClient(clientOptions));
         this.statsClient = Suppliers.memoize(() -> new AsyncStatsClient(clientOptions));
-        this.supportChannelsClient = Suppliers.memoize(() -> new AsyncSupportChannelsClient(clientOptions));
+        this.suspensionAppealsClient = Suppliers.memoize(() -> new AsyncSuspensionAppealsClient(clientOptions));
         this.swapsClient = Suppliers.memoize(() -> new AsyncSwapsClient(clientOptions));
         this.teamMembersClient = Suppliers.memoize(() -> new AsyncTeamMembersClient(clientOptions));
         this.tradesClient = Suppliers.memoize(() -> new AsyncTradesClient(clientOptions));
@@ -530,10 +522,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
         return this.channelsClient.get();
     }
 
-    public AsyncChatChannelsClient chatChannels() {
-        return this.chatChannelsClient.get();
-    }
-
     public AsyncCheckoutConfigurationsClient checkoutConfigurations() {
         return this.checkoutConfigurationsClient.get();
     }
@@ -580,14 +568,6 @@ public class AsyncWhopApiClient implements AutoCloseable {
 
     public AsyncDisputesClient disputes() {
         return this.disputesClient.get();
-    }
-
-    public AsyncDmChannelsClient dmChannels() {
-        return this.dmChannelsClient.get();
-    }
-
-    public AsyncDmMembersClient dmMembers() {
-        return this.dmMembersClient.get();
     }
 
     public AsyncDomainsClient domains() {
@@ -758,6 +738,10 @@ public class AsyncWhopApiClient implements AutoCloseable {
         return this.reactionsClient.get();
     }
 
+    public AsyncRecommendedActionsClient recommendedActions() {
+        return this.recommendedActionsClient.get();
+    }
+
     public AsyncRefundsClient refunds() {
         return this.refundsClient.get();
     }
@@ -794,8 +778,8 @@ public class AsyncWhopApiClient implements AutoCloseable {
         return this.statsClient.get();
     }
 
-    public AsyncSupportChannelsClient supportChannels() {
-        return this.supportChannelsClient.get();
+    public AsyncSuspensionAppealsClient suspensionAppeals() {
+        return this.suspensionAppealsClient.get();
     }
 
     public AsyncSwapsClient swaps() {

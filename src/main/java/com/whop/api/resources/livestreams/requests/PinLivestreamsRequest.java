@@ -7,29 +7,66 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = PinLivestreamsRequest.Builder.class)
 public final class PinLivestreamsRequest {
+    private final Optional<String> experienceId;
+
+    private final Optional<Integer> position;
+
     private final Map<String, Object> additionalProperties;
 
-    private PinLivestreamsRequest(Map<String, Object> additionalProperties) {
+    private PinLivestreamsRequest(
+            Optional<String> experienceId, Optional<Integer> position, Map<String, Object> additionalProperties) {
+        this.experienceId = experienceId;
+        this.position = position;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return ID of the livestreams experience that <code>position</code> counts in, prefixed <code>exp_</code>. Required with <code>position</code> when the livestream is in more than one experience.
+     */
+    @JsonProperty("experience_id")
+    public Optional<String> getExperienceId() {
+        return experienceId;
+    }
+
+    /**
+     * @return Zero-based index in the experience's pinned livestreams after the change. Omit it to put a new pin first or keep an existing pin in place.
+     */
+    @JsonProperty("position")
+    public Optional<Integer> getPosition() {
+        return position;
     }
 
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
-        return other instanceof PinLivestreamsRequest;
+        return other instanceof PinLivestreamsRequest && equalTo((PinLivestreamsRequest) other);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    private boolean equalTo(PinLivestreamsRequest other) {
+        return experienceId.equals(other.experienceId) && position.equals(other.position);
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+        return Objects.hash(this.experienceId, this.position);
     }
 
     @java.lang.Override
@@ -43,20 +80,57 @@ public final class PinLivestreamsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> experienceId = Optional.empty();
+
+        private Optional<Integer> position = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         public Builder from(PinLivestreamsRequest other) {
+            experienceId(other.getExperienceId());
+            position(other.getPosition());
+            return this;
+        }
+
+        /**
+         * <p>ID of the livestreams experience that <code>position</code> counts in, prefixed <code>exp_</code>. Required with <code>position</code> when the livestream is in more than one experience.</p>
+         */
+        @JsonSetter(value = "experience_id", nulls = Nulls.SKIP)
+        public Builder experienceId(Optional<String> experienceId) {
+            this.experienceId = experienceId;
+            return this;
+        }
+
+        public Builder experienceId(String experienceId) {
+            this.experienceId = Optional.ofNullable(experienceId);
+            return this;
+        }
+
+        /**
+         * <p>Zero-based index in the experience's pinned livestreams after the change. Omit it to put a new pin first or keep an existing pin in place.</p>
+         */
+        @JsonSetter(value = "position", nulls = Nulls.SKIP)
+        public Builder position(Optional<Integer> position) {
+            this.position = position;
+            return this;
+        }
+
+        public Builder position(Integer position) {
+            this.position = Optional.ofNullable(position);
             return this;
         }
 
         public PinLivestreamsRequest build() {
-            return new PinLivestreamsRequest(additionalProperties);
+            return new PinLivestreamsRequest(experienceId, position, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
+            if (key.equalsIgnoreCase("experience_id") || key.equalsIgnoreCase("position")) {
+                return;
+            }
             this.additionalProperties.put(key, value);
         }
 

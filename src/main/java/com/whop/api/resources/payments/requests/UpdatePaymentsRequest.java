@@ -15,8 +15,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.Nullable;
 import com.whop.api.core.NullableNonemptyFilter;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.resources.payments.types.UpdatePaymentsRequestLineItemsItem;
 import com.whop.api.resources.payments.types.UpdatePaymentsRequestShippingAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdatePaymentsRequest.Builder.class)
 public final class UpdatePaymentsRequest {
+    private final Optional<List<UpdatePaymentsRequestLineItemsItem>> lineItems;
+
     private final Optional<String> returnUrl;
 
     private final Optional<UpdatePaymentsRequestShippingAddress> shippingAddress;
@@ -31,12 +35,22 @@ public final class UpdatePaymentsRequest {
     private final Map<String, Object> additionalProperties;
 
     private UpdatePaymentsRequest(
+            Optional<List<UpdatePaymentsRequestLineItemsItem>> lineItems,
             Optional<String> returnUrl,
             Optional<UpdatePaymentsRequestShippingAddress> shippingAddress,
             Map<String, Object> additionalProperties) {
+        this.lineItems = lineItems;
         this.returnUrl = returnUrl;
         this.shippingAddress = shippingAddress;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Only for a <code>card_present</code> payment taken in the US in USD. Replaces an in-person payment's line items after the card is read. On an open payment, update within 30 seconds of the card read, before the reader confirms it. On a <code>capture: false</code> payment, update before you capture it for the new <code>total</code>. Send every purchased line back by <code>id</code>. Added lines can be kept by <code>id</code>, added with <code>variant</code>, or removed by leaving them out. Added lines aren't taxed.
+     */
+    @JsonProperty("line_items")
+    public Optional<List<UpdatePaymentsRequestLineItemsItem>> getLineItems() {
+        return lineItems;
     }
 
     /**
@@ -76,12 +90,14 @@ public final class UpdatePaymentsRequest {
     }
 
     private boolean equalTo(UpdatePaymentsRequest other) {
-        return returnUrl.equals(other.returnUrl) && shippingAddress.equals(other.shippingAddress);
+        return lineItems.equals(other.lineItems)
+                && returnUrl.equals(other.returnUrl)
+                && shippingAddress.equals(other.shippingAddress);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.returnUrl, this.shippingAddress);
+        return Objects.hash(this.lineItems, this.returnUrl, this.shippingAddress);
     }
 
     @java.lang.Override
@@ -95,6 +111,8 @@ public final class UpdatePaymentsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<List<UpdatePaymentsRequestLineItemsItem>> lineItems = Optional.empty();
+
         private Optional<String> returnUrl = Optional.empty();
 
         private Optional<UpdatePaymentsRequestShippingAddress> shippingAddress = Optional.empty();
@@ -104,8 +122,23 @@ public final class UpdatePaymentsRequest {
         private Builder() {}
 
         public Builder from(UpdatePaymentsRequest other) {
+            lineItems(other.getLineItems());
             returnUrl(other.getReturnUrl());
             shippingAddress(other.getShippingAddress());
+            return this;
+        }
+
+        /**
+         * <p>Only for a <code>card_present</code> payment taken in the US in USD. Replaces an in-person payment's line items after the card is read. On an open payment, update within 30 seconds of the card read, before the reader confirms it. On a <code>capture: false</code> payment, update before you capture it for the new <code>total</code>. Send every purchased line back by <code>id</code>. Added lines can be kept by <code>id</code>, added with <code>variant</code>, or removed by leaving them out. Added lines aren't taxed.</p>
+         */
+        @JsonSetter(value = "line_items", nulls = Nulls.SKIP)
+        public Builder lineItems(Optional<List<UpdatePaymentsRequestLineItemsItem>> lineItems) {
+            this.lineItems = lineItems;
+            return this;
+        }
+
+        public Builder lineItems(List<UpdatePaymentsRequestLineItemsItem> lineItems) {
+            this.lineItems = Optional.ofNullable(lineItems);
             return this;
         }
 
@@ -149,12 +182,14 @@ public final class UpdatePaymentsRequest {
         }
 
         public UpdatePaymentsRequest build() {
-            return new UpdatePaymentsRequest(returnUrl, shippingAddress, additionalProperties);
+            return new UpdatePaymentsRequest(lineItems, returnUrl, shippingAddress, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("return_url") || key.equalsIgnoreCase("shipping_address")) {
+            if (key.equalsIgnoreCase("line_items")
+                    || key.equalsIgnoreCase("return_url")
+                    || key.equalsIgnoreCase("shipping_address")) {
                 return;
             }
             this.additionalProperties.put(key, value);

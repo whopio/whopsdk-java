@@ -22,6 +22,7 @@ import com.whop.api.resources.payments.types.CreatePaymentsRequestSetupFutureUsa
 import com.whop.api.resources.payments.types.CreatePaymentsRequestShippingAddress;
 import com.whop.api.types.IPaymentInput;
 import com.whop.api.types.PaymentInputVariant;
+import com.whop.api.types.PaymentRegisterDiscount;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ public final class CreatePaymentsRequest implements IPaymentInput {
 
     private final Optional<String> affiliateCode;
 
+    private final Optional<Boolean> applySurcharge;
+
     private final Optional<Integer> autoCaptureAfterMinutes;
 
     private final Optional<CreatePaymentsRequestBillingAddress> billingAddress;
@@ -51,6 +54,8 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     private final Optional<Boolean> capture;
 
     private final Optional<String> confirmationToken;
+
+    private final Optional<PaymentRegisterDiscount> discount;
 
     private final Optional<String> email;
 
@@ -87,10 +92,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
             Optional<PaymentInputVariant> variant,
             Optional<String> variantId,
             Optional<String> affiliateCode,
+            Optional<Boolean> applySurcharge,
             Optional<Integer> autoCaptureAfterMinutes,
             Optional<CreatePaymentsRequestBillingAddress> billingAddress,
             Optional<Boolean> capture,
             Optional<String> confirmationToken,
+            Optional<PaymentRegisterDiscount> discount,
             Optional<String> email,
             Optional<String> ipAddress,
             Optional<List<CreatePaymentsRequestLineItemsItem>> lineItems,
@@ -111,10 +118,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         this.variant = variant;
         this.variantId = variantId;
         this.affiliateCode = affiliateCode;
+        this.applySurcharge = applySurcharge;
         this.autoCaptureAfterMinutes = autoCaptureAfterMinutes;
         this.billingAddress = billingAddress;
         this.capture = capture;
         this.confirmationToken = confirmationToken;
+        this.discount = discount;
         this.email = email;
         this.ipAddress = ipAddress;
         this.lineItems = lineItems;
@@ -193,7 +202,18 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     /**
-     * @return Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days).
+     * @return Adds the account's card surcharge, set in <code>card_surcharge</code> on the account's preferences, when the card is a credit card. Send it only after you have shown the buyer the surcharge. Whop calculates the amount. You cannot send an amount. With a <code>confirmation_token</code>, the surcharge is a line of its own, calculated on the purchase after discounts and before tax. With a <code>card_present</code> <code>payment_method</code>, the surcharge is added after the reader reads the card, with <code>POST /payments/{id}/apply_surcharge</code>. A debit or prepaid card, or an account that cannot surcharge, pays no surcharge. The payment still goes ahead. Only for a one-time purchase, and not with <code>quote_id</code>. Defaults to false.
+     */
+    @JsonIgnore
+    public Optional<Boolean> getApplySurcharge() {
+        if (applySurcharge == null) {
+            return Optional.empty();
+        }
+        return applySurcharge;
+    }
+
+    /**
+     * @return Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days), or 5 and 1440 (1 day) for <code>card_present</code>.
      */
     @JsonIgnore
     public Optional<Integer> getAutoCaptureAfterMinutes() {
@@ -215,7 +235,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     /**
-     * @return Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>.
+     * @return Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>. With a <code>card_present</code> <code>payment_method</code>, false holds the sale so its line items can change after the tap with <code>PATCH /payments/{id}</code>. Capture it for its total, or Whop captures it after <code>auto_capture_after_minutes</code> (10 by default).
      */
     @JsonIgnore
     public Optional<Boolean> getCapture() {
@@ -234,6 +254,17 @@ public final class CreatePaymentsRequest implements IPaymentInput {
             return Optional.empty();
         }
         return confirmationToken;
+    }
+
+    /**
+     * @return A discount typed at the register for the whole payment. It comes off what the payment costs after line discounts and the promo code, and can't be more than that amount. Discounts can't bring the payment to zero. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.
+     */
+    @JsonIgnore
+    public Optional<PaymentRegisterDiscount> getDiscount() {
+        if (discount == null) {
+            return Optional.empty();
+        }
+        return discount;
     }
 
     /**
@@ -311,7 +342,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     /**
-     * @return The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided.
+     * @return The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided. With a card saved from a tap, Whop treats an inline <code>variant</code> as the sale's tip. It files the tip as a one-time Tip under a hidden Tip product, from the variant's <code>currency</code> and <code>initial_price</code> alone. Charging it needs only <code>payment:charge</code>.
      */
     @JsonIgnore
     public Optional<String> getPaymentMethodId() {
@@ -344,7 +375,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     /**
-     * @return Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with <code>member_id</code> and <code>payment_method_id</code>. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a <code>paypal</code> <code>payment_method</code> is provided.
+     * @return Attests that the buyer was told the payment method will be saved for later charges. A <code>paypal</code> method is saved once the buyer approves on PayPal's page, and can then be charged with <code>member_id</code> and <code>payment_method_id</code>. A <code>card_present</code> method saves the tapped card when the reader collects it. The payment's <code>payment_method_id</code> then names the saved card. The point of sale must also pass the buyer's consent to the Terminal SDK as <code>allow_redisplay</code>. Omit it for a one-time payment that saves nothing. Other payment methods ignore it.
      */
     @JsonIgnore
     public Optional<CreatePaymentsRequestSetupFutureUsage> getSetupFutureUsage() {
@@ -366,7 +397,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     /**
-     * @return Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the <code>WHOP*</code> prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.
+     * @return Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For a business processing as the merchant of record, Whop removes a <code>WHOP*</code> prefix when at least 5 characters, including a letter, remain. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.
      */
     @JsonIgnore
     public Optional<String> getStatementDescriptor() {
@@ -395,6 +426,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("apply_surcharge")
+    private Optional<Boolean> _getApplySurcharge() {
+        return applySurcharge;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("auto_capture_after_minutes")
     private Optional<Integer> _getAutoCaptureAfterMinutes() {
         return autoCaptureAfterMinutes;
@@ -416,6 +453,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
     @JsonProperty("confirmation_token")
     private Optional<String> _getConfirmationToken() {
         return confirmationToken;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("discount")
+    private Optional<PaymentRegisterDiscount> _getDiscount() {
+        return discount;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -508,10 +551,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
                 && variant.equals(other.variant)
                 && variantId.equals(other.variantId)
                 && affiliateCode.equals(other.affiliateCode)
+                && applySurcharge.equals(other.applySurcharge)
                 && autoCaptureAfterMinutes.equals(other.autoCaptureAfterMinutes)
                 && billingAddress.equals(other.billingAddress)
                 && capture.equals(other.capture)
                 && confirmationToken.equals(other.confirmationToken)
+                && discount.equals(other.discount)
                 && email.equals(other.email)
                 && ipAddress.equals(other.ipAddress)
                 && lineItems.equals(other.lineItems)
@@ -536,10 +581,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
                 this.variant,
                 this.variantId,
                 this.affiliateCode,
+                this.applySurcharge,
                 this.autoCaptureAfterMinutes,
                 this.billingAddress,
                 this.capture,
                 this.confirmationToken,
+                this.discount,
                 this.email,
                 this.ipAddress,
                 this.lineItems,
@@ -622,7 +669,16 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage affiliateCode(Nullable<String> affiliateCode);
 
         /**
-         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days).</p>
+         * <p>Adds the account's card surcharge, set in <code>card_surcharge</code> on the account's preferences, when the card is a credit card. Send it only after you have shown the buyer the surcharge. Whop calculates the amount. You cannot send an amount. With a <code>confirmation_token</code>, the surcharge is a line of its own, calculated on the purchase after discounts and before tax. With a <code>card_present</code> <code>payment_method</code>, the surcharge is added after the reader reads the card, with <code>POST /payments/{id}/apply_surcharge</code>. A debit or prepaid card, or an account that cannot surcharge, pays no surcharge. The payment still goes ahead. Only for a one-time purchase, and not with <code>quote_id</code>. Defaults to false.</p>
+         */
+        _FinalStage applySurcharge(Optional<Boolean> applySurcharge);
+
+        _FinalStage applySurcharge(Boolean applySurcharge);
+
+        _FinalStage applySurcharge(Nullable<Boolean> applySurcharge);
+
+        /**
+         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days), or 5 and 1440 (1 day) for <code>card_present</code>.</p>
          */
         _FinalStage autoCaptureAfterMinutes(Optional<Integer> autoCaptureAfterMinutes);
 
@@ -640,7 +696,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage billingAddress(Nullable<CreatePaymentsRequestBillingAddress> billingAddress);
 
         /**
-         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>.</p>
+         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>. With a <code>card_present</code> <code>payment_method</code>, false holds the sale so its line items can change after the tap with <code>PATCH /payments/{id}</code>. Capture it for its total, or Whop captures it after <code>auto_capture_after_minutes</code> (10 by default).</p>
          */
         _FinalStage capture(Optional<Boolean> capture);
 
@@ -656,6 +712,15 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage confirmationToken(String confirmationToken);
 
         _FinalStage confirmationToken(Nullable<String> confirmationToken);
+
+        /**
+         * <p>A discount typed at the register for the whole payment. It comes off what the payment costs after line discounts and the promo code, and can't be more than that amount. Discounts can't bring the payment to zero. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.</p>
+         */
+        _FinalStage discount(Optional<PaymentRegisterDiscount> discount);
+
+        _FinalStage discount(PaymentRegisterDiscount discount);
+
+        _FinalStage discount(Nullable<PaymentRegisterDiscount> discount);
 
         /**
          * <p>The buyer's email, resolving or creating the user the payment belongs to. With <code>confirmation_token</code> it overrides the email the token carries, and is ignored when the token was created by a signed-in buyer; with a <code>card_present</code> <code>payment_method</code> it names a buyer the point of sale already knows, otherwise the sale belongs to a guest until a buyer is attached; with a <code>paypal</code> <code>payment_method</code> it names the buyer, and when it and <code>member_id</code> are both omitted the buyer is the PayPal account that approves the payment. Ignored with <code>member_id</code>.</p>
@@ -719,7 +784,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage paymentMethod(Nullable<CreatePaymentsRequestPaymentMethod> paymentMethod);
 
         /**
-         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided.</p>
+         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided. With a card saved from a tap, Whop treats an inline <code>variant</code> as the sale's tip. It files the tip as a one-time Tip under a hidden Tip product, from the variant's <code>currency</code> and <code>initial_price</code> alone. Charging it needs only <code>payment:charge</code>.</p>
          */
         _FinalStage paymentMethodId(Optional<String> paymentMethodId);
 
@@ -746,7 +811,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage returnUrl(Nullable<String> returnUrl);
 
         /**
-         * <p>Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with <code>member_id</code> and <code>payment_method_id</code>. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a <code>paypal</code> <code>payment_method</code> is provided.</p>
+         * <p>Attests that the buyer was told the payment method will be saved for later charges. A <code>paypal</code> method is saved once the buyer approves on PayPal's page, and can then be charged with <code>member_id</code> and <code>payment_method_id</code>. A <code>card_present</code> method saves the tapped card when the reader collects it. The payment's <code>payment_method_id</code> then names the saved card. The point of sale must also pass the buyer's consent to the Terminal SDK as <code>allow_redisplay</code>. Omit it for a one-time payment that saves nothing. Other payment methods ignore it.</p>
          */
         _FinalStage setupFutureUsage(Optional<CreatePaymentsRequestSetupFutureUsage> setupFutureUsage);
 
@@ -764,7 +829,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         _FinalStage shippingAddress(Nullable<CreatePaymentsRequestShippingAddress> shippingAddress);
 
         /**
-         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the <code>WHOP*</code> prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
+         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For a business processing as the merchant of record, Whop removes a <code>WHOP*</code> prefix when at least 5 characters, including a letter, remain. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
          */
         _FinalStage statementDescriptor(Optional<String> statementDescriptor);
 
@@ -803,6 +868,8 @@ public final class CreatePaymentsRequest implements IPaymentInput {
 
         private Optional<String> email = Optional.empty();
 
+        private Optional<PaymentRegisterDiscount> discount = Optional.empty();
+
         private Optional<String> confirmationToken = Optional.empty();
 
         private Optional<Boolean> capture = Optional.empty();
@@ -810,6 +877,8 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         private Optional<CreatePaymentsRequestBillingAddress> billingAddress = Optional.empty();
 
         private Optional<Integer> autoCaptureAfterMinutes = Optional.empty();
+
+        private Optional<Boolean> applySurcharge = Optional.empty();
 
         private Optional<String> affiliateCode = Optional.empty();
 
@@ -833,10 +902,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
             variant(other.getVariant());
             variantId(other.getVariantId());
             affiliateCode(other.getAffiliateCode());
+            applySurcharge(other.getApplySurcharge());
             autoCaptureAfterMinutes(other.getAutoCaptureAfterMinutes());
             billingAddress(other.getBillingAddress());
             capture(other.getCapture());
             confirmationToken(other.getConfirmationToken());
+            discount(other.getDiscount());
             email(other.getEmail());
             ipAddress(other.getIpAddress());
             lineItems(other.getLineItems());
@@ -865,7 +936,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the <code>WHOP*</code> prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
+         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For a business processing as the merchant of record, Whop removes a <code>WHOP*</code> prefix when at least 5 characters, including a letter, remain. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -881,7 +952,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the <code>WHOP*</code> prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
+         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For a business processing as the merchant of record, Whop removes a <code>WHOP*</code> prefix when at least 5 characters, including a letter, remain. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -891,7 +962,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For businesses processing as the merchant of record, omit the <code>WHOP*</code> prefix; the descriptor appears as provided. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
+         * <p>Overrides the text on the buyer's card statement for this payment only. Takes precedence over the product's and account's custom descriptors, and changes neither. Must start with <code>WHOP*</code> unless the business processes as the merchant of record. For a business processing as the merchant of record, Whop removes a <code>WHOP*</code> prefix when at least 5 characters, including a letter, remain. Must be 5-22 characters, contain at least one letter, and use only Latin letters, numbers, spaces, underscores, hyphens, or asterisks.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "statement_descriptor", nulls = Nulls.SKIP)
@@ -937,7 +1008,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with <code>member_id</code> and <code>payment_method_id</code>. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a <code>paypal</code> <code>payment_method</code> is provided.</p>
+         * <p>Attests that the buyer was told the payment method will be saved for later charges. A <code>paypal</code> method is saved once the buyer approves on PayPal's page, and can then be charged with <code>member_id</code> and <code>payment_method_id</code>. A <code>card_present</code> method saves the tapped card when the reader collects it. The payment's <code>payment_method_id</code> then names the saved card. The point of sale must also pass the buyer's consent to the Terminal SDK as <code>allow_redisplay</code>. Omit it for a one-time payment that saves nothing. Other payment methods ignore it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -953,7 +1024,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with <code>member_id</code> and <code>payment_method_id</code>. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a <code>paypal</code> <code>payment_method</code> is provided.</p>
+         * <p>Attests that the buyer was told the payment method will be saved for later charges. A <code>paypal</code> method is saved once the buyer approves on PayPal's page, and can then be charged with <code>member_id</code> and <code>payment_method_id</code>. A <code>card_present</code> method saves the tapped card when the reader collects it. The payment's <code>payment_method_id</code> then names the saved card. The point of sale must also pass the buyer's consent to the Terminal SDK as <code>allow_redisplay</code>. Omit it for a one-time payment that saves nothing. Other payment methods ignore it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -963,7 +1034,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Attests that the buyer was told the payment method will be saved for later charges, and saves it once they approve, so it can be charged with <code>member_id</code> and <code>payment_method_id</code>. PayPal shows the buyer the agreement to future charges on its approval page. Omit it for a one-time payment that saves nothing. Ignored unless a <code>paypal</code> <code>payment_method</code> is provided.</p>
+         * <p>Attests that the buyer was told the payment method will be saved for later charges. A <code>paypal</code> method is saved once the buyer approves on PayPal's page, and can then be charged with <code>member_id</code> and <code>payment_method_id</code>. A <code>card_present</code> method saves the tapped card when the reader collects it. The payment's <code>payment_method_id</code> then names the saved card. The point of sale must also pass the buyer's consent to the Terminal SDK as <code>allow_redisplay</code>. Omit it for a one-time payment that saves nothing. Other payment methods ignore it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "setup_future_usage", nulls = Nulls.SKIP)
@@ -1045,7 +1116,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided.</p>
+         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided. With a card saved from a tap, Whop treats an inline <code>variant</code> as the sale's tip. It files the tip as a one-time Tip under a hidden Tip product, from the variant's <code>currency</code> and <code>initial_price</code> alone. Charging it needs only <code>payment:charge</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1061,7 +1132,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided.</p>
+         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided. With a card saved from a tap, Whop treats an inline <code>variant</code> as the sale's tip. It files the tip as a one-time Tip under a hidden Tip product, from the variant's <code>currency</code> and <code>initial_price</code> alone. Charging it needs only <code>payment:charge</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1071,7 +1142,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided.</p>
+         * <p>The stored payment method to charge, prefixed <code>payt_</code>. It must belong to the member. Required unless <code>confirmation_token</code> is provided. With a card saved from a tap, Whop treats an inline <code>variant</code> as the sale's tip. It files the tip as a one-time Tip under a hidden Tip product, from the variant's <code>currency</code> and <code>initial_price</code> alone. Charging it needs only <code>payment:charge</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "payment_method_id", nulls = Nulls.SKIP)
@@ -1317,6 +1388,42 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
+         * <p>A discount typed at the register for the whole payment. It comes off what the payment costs after line discounts and the promo code, and can't be more than that amount. Discounts can't bring the payment to zero. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage discount(Nullable<PaymentRegisterDiscount> discount) {
+            if (discount.isNull()) {
+                this.discount = null;
+            } else if (discount.isEmpty()) {
+                this.discount = Optional.empty();
+            } else {
+                this.discount = Optional.of(discount.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>A discount typed at the register for the whole payment. It comes off what the payment costs after line discounts and the promo code, and can't be more than that amount. Discounts can't bring the payment to zero. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage discount(PaymentRegisterDiscount discount) {
+            this.discount = Optional.ofNullable(discount);
+            return this;
+        }
+
+        /**
+         * <p>A discount typed at the register for the whole payment. It comes off what the payment costs after line discounts and the promo code, and can't be more than that amount. Discounts can't bring the payment to zero. Only with a <code>card_present</code> <code>payment_method</code>, and requires <code>payment:manage</code> on the account. Whop takes each line's discount off the line, then the promo code, then the payment's <code>discount</code>. Tax is calculated on the discounted amounts.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "discount", nulls = Nulls.SKIP)
+        public _FinalStage discount(Optional<PaymentRegisterDiscount> discount) {
+            this.discount = discount;
+            return this;
+        }
+
+        /**
          * <p>A confirmation token describing a payment method the buyer just supplied. Provide this instead of <code>member_id</code> and <code>payment_method_id</code>; the buyer is resolved from the token's billing email, or from <code>email</code>. The buyer may still have a step to complete — poll the payment's status for what to do next.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1353,7 +1460,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>.</p>
+         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>. With a <code>card_present</code> <code>payment_method</code>, false holds the sale so its line items can change after the tap with <code>PATCH /payments/{id}</code>. Capture it for its total, or Whop captures it after <code>auto_capture_after_minutes</code> (10 by default).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1369,7 +1476,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>.</p>
+         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>. With a <code>card_present</code> <code>payment_method</code>, false holds the sale so its line items can change after the tap with <code>PATCH /payments/{id}</code>. Capture it for its total, or Whop captures it after <code>auto_capture_after_minutes</code> (10 by default).</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1379,7 +1486,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>.</p>
+         * <p>Whether to capture a card payment immediately. Defaults to true. Pass false to place an authorization hold that must be captured in full within five days via the capture endpoint, or automatically after <code>auto_capture_after_minutes</code>. With a <code>card_present</code> <code>payment_method</code>, false holds the sale so its line items can change after the tap with <code>PATCH /payments/{id}</code>. Capture it for its total, or Whop captures it after <code>auto_capture_after_minutes</code> (10 by default).</p>
          */
         @java.lang.Override
         @JsonSetter(value = "capture", nulls = Nulls.SKIP)
@@ -1425,7 +1532,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days).</p>
+         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days), or 5 and 1440 (1 day) for <code>card_present</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1441,7 +1548,7 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days).</p>
+         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days), or 5 and 1440 (1 day) for <code>card_present</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -1451,12 +1558,48 @@ public final class CreatePaymentsRequest implements IPaymentInput {
         }
 
         /**
-         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days).</p>
+         * <p>Minutes after authorization at which Whop captures the hold automatically unless it has been voided. Requires <code>capture: false</code>. Between 5 and 5760 (4 days), or 5 and 1440 (1 day) for <code>card_present</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "auto_capture_after_minutes", nulls = Nulls.SKIP)
         public _FinalStage autoCaptureAfterMinutes(Optional<Integer> autoCaptureAfterMinutes) {
             this.autoCaptureAfterMinutes = autoCaptureAfterMinutes;
+            return this;
+        }
+
+        /**
+         * <p>Adds the account's card surcharge, set in <code>card_surcharge</code> on the account's preferences, when the card is a credit card. Send it only after you have shown the buyer the surcharge. Whop calculates the amount. You cannot send an amount. With a <code>confirmation_token</code>, the surcharge is a line of its own, calculated on the purchase after discounts and before tax. With a <code>card_present</code> <code>payment_method</code>, the surcharge is added after the reader reads the card, with <code>POST /payments/{id}/apply_surcharge</code>. A debit or prepaid card, or an account that cannot surcharge, pays no surcharge. The payment still goes ahead. Only for a one-time purchase, and not with <code>quote_id</code>. Defaults to false.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage applySurcharge(Nullable<Boolean> applySurcharge) {
+            if (applySurcharge.isNull()) {
+                this.applySurcharge = null;
+            } else if (applySurcharge.isEmpty()) {
+                this.applySurcharge = Optional.empty();
+            } else {
+                this.applySurcharge = Optional.of(applySurcharge.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Adds the account's card surcharge, set in <code>card_surcharge</code> on the account's preferences, when the card is a credit card. Send it only after you have shown the buyer the surcharge. Whop calculates the amount. You cannot send an amount. With a <code>confirmation_token</code>, the surcharge is a line of its own, calculated on the purchase after discounts and before tax. With a <code>card_present</code> <code>payment_method</code>, the surcharge is added after the reader reads the card, with <code>POST /payments/{id}/apply_surcharge</code>. A debit or prepaid card, or an account that cannot surcharge, pays no surcharge. The payment still goes ahead. Only for a one-time purchase, and not with <code>quote_id</code>. Defaults to false.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage applySurcharge(Boolean applySurcharge) {
+            this.applySurcharge = Optional.ofNullable(applySurcharge);
+            return this;
+        }
+
+        /**
+         * <p>Adds the account's card surcharge, set in <code>card_surcharge</code> on the account's preferences, when the card is a credit card. Send it only after you have shown the buyer the surcharge. Whop calculates the amount. You cannot send an amount. With a <code>confirmation_token</code>, the surcharge is a line of its own, calculated on the purchase after discounts and before tax. With a <code>card_present</code> <code>payment_method</code>, the surcharge is added after the reader reads the card, with <code>POST /payments/{id}/apply_surcharge</code>. A debit or prepaid card, or an account that cannot surcharge, pays no surcharge. The payment still goes ahead. Only for a one-time purchase, and not with <code>quote_id</code>. Defaults to false.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "apply_surcharge", nulls = Nulls.SKIP)
+        public _FinalStage applySurcharge(Optional<Boolean> applySurcharge) {
+            this.applySurcharge = applySurcharge;
             return this;
         }
 
@@ -1617,10 +1760,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
                     variant,
                     variantId,
                     affiliateCode,
+                    applySurcharge,
                     autoCaptureAfterMinutes,
                     billingAddress,
                     capture,
                     confirmationToken,
+                    discount,
                     email,
                     ipAddress,
                     lineItems,
@@ -1645,10 +1790,12 @@ public final class CreatePaymentsRequest implements IPaymentInput {
                     || key.equalsIgnoreCase("variant")
                     || key.equalsIgnoreCase("variant_id")
                     || key.equalsIgnoreCase("affiliate_code")
+                    || key.equalsIgnoreCase("apply_surcharge")
                     || key.equalsIgnoreCase("auto_capture_after_minutes")
                     || key.equalsIgnoreCase("billing_address")
                     || key.equalsIgnoreCase("capture")
                     || key.equalsIgnoreCase("confirmation_token")
+                    || key.equalsIgnoreCase("discount")
                     || key.equalsIgnoreCase("email")
                     || key.equalsIgnoreCase("ip_address")
                     || key.equalsIgnoreCase("line_items")

@@ -30,9 +30,13 @@ public final class ResolutionCenterCase {
 
     private final double amount;
 
+    private final List<ResolutionCenterCaseAnswer> answers;
+
     private final List<ResolutionCenterCaseAvailableActionsItem> availableActions;
 
     private final ResolutionBuyer buyer;
+
+    private final Optional<String> closedAt;
 
     private final String createdAt;
 
@@ -69,8 +73,10 @@ public final class ResolutionCenterCase {
     private ResolutionCenterCase(
             Optional<AccountSummary> account,
             double amount,
+            List<ResolutionCenterCaseAnswer> answers,
             List<ResolutionCenterCaseAvailableActionsItem> availableActions,
             ResolutionBuyer buyer,
+            Optional<String> closedAt,
             String createdAt,
             Optional<String> currency,
             boolean customerAppealed,
@@ -89,8 +95,10 @@ public final class ResolutionCenterCase {
             Map<String, Object> additionalProperties) {
         this.account = account;
         this.amount = amount;
+        this.answers = answers;
         this.availableActions = availableActions;
         this.buyer = buyer;
+        this.closedAt = closedAt;
         this.createdAt = createdAt;
         this.currency = currency;
         this.customerAppealed = customerAppealed;
@@ -128,6 +136,11 @@ public final class ResolutionCenterCase {
         return amount;
     }
 
+    @JsonProperty("answers")
+    public List<ResolutionCenterCaseAnswer> getAnswers() {
+        return answers;
+    }
+
     @JsonProperty("available_actions")
     public List<ResolutionCenterCaseAvailableActionsItem> getAvailableActions() {
         return availableActions;
@@ -139,6 +152,17 @@ public final class ResolutionCenterCase {
     @JsonProperty("buyer")
     public ResolutionBuyer getBuyer() {
         return buyer;
+    }
+
+    /**
+     * @return When the case closed, as an ISO 8601 timestamp. <code>null</code> while the case is open, and on older closed cases that predate this being recorded.
+     */
+    @JsonIgnore
+    public Optional<String> getClosedAt() {
+        if (closedAt == null) {
+            return Optional.empty();
+        }
+        return closedAt;
     }
 
     /**
@@ -283,6 +307,12 @@ public final class ResolutionCenterCase {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("closed_at")
+    private Optional<String> _getClosedAt() {
+        return closedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("currency")
     private Optional<String> _getCurrency() {
         return currency;
@@ -332,8 +362,10 @@ public final class ResolutionCenterCase {
     private boolean equalTo(ResolutionCenterCase other) {
         return account.equals(other.account)
                 && amount == other.amount
+                && answers.equals(other.answers)
                 && availableActions.equals(other.availableActions)
                 && buyer.equals(other.buyer)
+                && closedAt.equals(other.closedAt)
                 && createdAt.equals(other.createdAt)
                 && currency.equals(other.currency)
                 && customerAppealed == other.customerAppealed
@@ -356,8 +388,10 @@ public final class ResolutionCenterCase {
         return Objects.hash(
                 this.account,
                 this.amount,
+                this.answers,
                 this.availableActions,
                 this.buyer,
+                this.closedAt,
                 this.createdAt,
                 this.currency,
                 this.customerAppealed,
@@ -472,11 +506,26 @@ public final class ResolutionCenterCase {
 
         _FinalStage account(Nullable<AccountSummary> account);
 
+        _FinalStage answers(List<ResolutionCenterCaseAnswer> answers);
+
+        _FinalStage addAnswers(ResolutionCenterCaseAnswer answers);
+
+        _FinalStage addAllAnswers(List<ResolutionCenterCaseAnswer> answers);
+
         _FinalStage availableActions(List<ResolutionCenterCaseAvailableActionsItem> availableActions);
 
         _FinalStage addAvailableActions(ResolutionCenterCaseAvailableActionsItem availableActions);
 
         _FinalStage addAllAvailableActions(List<ResolutionCenterCaseAvailableActionsItem> availableActions);
+
+        /**
+         * <p>When the case closed, as an ISO 8601 timestamp. <code>null</code> while the case is open, and on older closed cases that predate this being recorded.</p>
+         */
+        _FinalStage closedAt(Optional<String> closedAt);
+
+        _FinalStage closedAt(String closedAt);
+
+        _FinalStage closedAt(Nullable<String> closedAt);
 
         /**
          * <p>Three-letter ISO currency code of the amount.</p>
@@ -586,7 +635,11 @@ public final class ResolutionCenterCase {
 
         private Optional<String> currency = Optional.empty();
 
+        private Optional<String> closedAt = Optional.empty();
+
         private List<ResolutionCenterCaseAvailableActionsItem> availableActions = new ArrayList<>();
+
+        private List<ResolutionCenterCaseAnswer> answers = new ArrayList<>();
 
         private Optional<AccountSummary> account = Optional.empty();
 
@@ -598,8 +651,10 @@ public final class ResolutionCenterCase {
         public Builder from(ResolutionCenterCase other) {
             account(other.getAccount());
             amount(other.getAmount());
+            answers(other.getAnswers());
             availableActions(other.getAvailableActions());
             buyer(other.getBuyer());
+            closedAt(other.getClosedAt());
             createdAt(other.getCreatedAt());
             currency(other.getCurrency());
             customerAppealed(other.getCustomerAppealed());
@@ -968,6 +1023,42 @@ public final class ResolutionCenterCase {
             return this;
         }
 
+        /**
+         * <p>When the case closed, as an ISO 8601 timestamp. <code>null</code> while the case is open, and on older closed cases that predate this being recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage closedAt(Nullable<String> closedAt) {
+            if (closedAt.isNull()) {
+                this.closedAt = null;
+            } else if (closedAt.isEmpty()) {
+                this.closedAt = Optional.empty();
+            } else {
+                this.closedAt = Optional.of(closedAt.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>When the case closed, as an ISO 8601 timestamp. <code>null</code> while the case is open, and on older closed cases that predate this being recorded.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage closedAt(String closedAt) {
+            this.closedAt = Optional.ofNullable(closedAt);
+            return this;
+        }
+
+        /**
+         * <p>When the case closed, as an ISO 8601 timestamp. <code>null</code> while the case is open, and on older closed cases that predate this being recorded.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "closed_at", nulls = Nulls.SKIP)
+        public _FinalStage closedAt(Optional<String> closedAt) {
+            this.closedAt = closedAt;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage addAllAvailableActions(List<ResolutionCenterCaseAvailableActionsItem> availableActions) {
             if (availableActions != null) {
@@ -988,6 +1079,30 @@ public final class ResolutionCenterCase {
             this.availableActions.clear();
             if (availableActions != null) {
                 this.availableActions.addAll(availableActions);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAllAnswers(List<ResolutionCenterCaseAnswer> answers) {
+            if (answers != null) {
+                this.answers.addAll(answers);
+            }
+            return this;
+        }
+
+        @java.lang.Override
+        public _FinalStage addAnswers(ResolutionCenterCaseAnswer answers) {
+            this.answers.add(answers);
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter(value = "answers", nulls = Nulls.SKIP)
+        public _FinalStage answers(List<ResolutionCenterCaseAnswer> answers) {
+            this.answers.clear();
+            if (answers != null) {
+                this.answers.addAll(answers);
             }
             return this;
         }
@@ -1033,8 +1148,10 @@ public final class ResolutionCenterCase {
             return new ResolutionCenterCase(
                     account,
                     amount,
+                    answers,
                     availableActions,
                     buyer,
+                    closedAt,
                     createdAt,
                     currency,
                     customerAppealed,
@@ -1057,8 +1174,10 @@ public final class ResolutionCenterCase {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account")
                     || key.equalsIgnoreCase("amount")
+                    || key.equalsIgnoreCase("answers")
                     || key.equalsIgnoreCase("available_actions")
                     || key.equalsIgnoreCase("buyer")
+                    || key.equalsIgnoreCase("closed_at")
                     || key.equalsIgnoreCase("created_at")
                     || key.equalsIgnoreCase("currency")
                     || key.equalsIgnoreCase("customer_appealed")

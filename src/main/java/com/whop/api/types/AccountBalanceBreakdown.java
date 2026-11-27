@@ -32,6 +32,8 @@ public final class AccountBalanceBreakdown {
 
     private final List<AccountBalanceSettlement> pendingSettlements;
 
+    private final String perps;
+
     private final String reserve;
 
     private final Map<String, Object> additionalProperties;
@@ -42,6 +44,7 @@ public final class AccountBalanceBreakdown {
             String inTransit,
             String pending,
             List<AccountBalanceSettlement> pendingSettlements,
+            String perps,
             String reserve,
             Map<String, Object> additionalProperties) {
         this.available = available;
@@ -49,6 +52,7 @@ public final class AccountBalanceBreakdown {
         this.inTransit = inTransit;
         this.pending = pending;
         this.pendingSettlements = pendingSettlements;
+        this.perps = perps;
         this.reserve = reserve;
         this.additionalProperties = additionalProperties;
     }
@@ -91,6 +95,14 @@ public final class AccountBalanceBreakdown {
     }
 
     /**
+     * @return Amount held for perpetual trading, at what the trading account is worth now, in native units, as a decimal string. It is not part of <code>available</code>.
+     */
+    @JsonProperty("perps")
+    public String getPerps() {
+        return perps;
+    }
+
+    /**
      * @return Amount held back, in native units, as a decimal string. Retrieve the account's reserves for why it is held and when it unlocks.
      */
     @JsonProperty("reserve")
@@ -115,6 +127,7 @@ public final class AccountBalanceBreakdown {
                 && inTransit.equals(other.inTransit)
                 && pending.equals(other.pending)
                 && pendingSettlements.equals(other.pendingSettlements)
+                && perps.equals(other.perps)
                 && reserve.equals(other.reserve);
     }
 
@@ -126,6 +139,7 @@ public final class AccountBalanceBreakdown {
                 this.inTransit,
                 this.pending,
                 this.pendingSettlements,
+                this.perps,
                 this.reserve);
     }
 
@@ -165,7 +179,14 @@ public final class AccountBalanceBreakdown {
         /**
          * <p>Amount from recent payments still settling, in native units, as a decimal string.</p>
          */
-        ReserveStage pending(@NotNull String pending);
+        PerpsStage pending(@NotNull String pending);
+    }
+
+    public interface PerpsStage {
+        /**
+         * <p>Amount held for perpetual trading, at what the trading account is worth now, in native units, as a decimal string. It is not part of <code>available</code>.</p>
+         */
+        ReserveStage perps(@NotNull String perps);
     }
 
     public interface ReserveStage {
@@ -195,6 +216,7 @@ public final class AccountBalanceBreakdown {
                     FinishingSettlementStage,
                     InTransitStage,
                     PendingStage,
+                    PerpsStage,
                     ReserveStage,
                     _FinalStage {
         private String available;
@@ -204,6 +226,8 @@ public final class AccountBalanceBreakdown {
         private String inTransit;
 
         private String pending;
+
+        private String perps;
 
         private String reserve;
 
@@ -220,6 +244,7 @@ public final class AccountBalanceBreakdown {
             inTransit(other.getInTransit());
             pending(other.getPending());
             pendingSettlements(other.getPendingSettlements());
+            perps(other.getPerps());
             reserve(other.getReserve());
             return this;
         }
@@ -264,8 +289,19 @@ public final class AccountBalanceBreakdown {
          */
         @java.lang.Override
         @JsonSetter("pending")
-        public ReserveStage pending(@NotNull String pending) {
+        public PerpsStage pending(@NotNull String pending) {
             this.pending = Objects.requireNonNull(pending, "pending must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Amount held for perpetual trading, at what the trading account is worth now, in native units, as a decimal string. It is not part of <code>available</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("perps")
+        public ReserveStage perps(@NotNull String perps) {
+            this.perps = Objects.requireNonNull(perps, "perps must not be null");
             return this;
         }
 
@@ -312,6 +348,7 @@ public final class AccountBalanceBreakdown {
                     inTransit,
                     pending,
                     pendingSettlements,
+                    perps,
                     reserve,
                     additionalProperties);
         }
@@ -323,6 +360,7 @@ public final class AccountBalanceBreakdown {
                     || key.equalsIgnoreCase("in_transit")
                     || key.equalsIgnoreCase("pending")
                     || key.equalsIgnoreCase("pending_settlements")
+                    || key.equalsIgnoreCase("perps")
                     || key.equalsIgnoreCase("reserve")) {
                 return;
             }

@@ -29,6 +29,8 @@ public final class AccountResolutionCenterAutoRefundControl {
 
     private final boolean locked;
 
+    private final Optional<String> message;
+
     private final Optional<Double> paypalThresholdUsd;
 
     private final Map<String, Object> additionalProperties;
@@ -37,17 +39,19 @@ public final class AccountResolutionCenterAutoRefundControl {
             Optional<Double> cardThresholdUsd,
             Optional<Double> financingThresholdUsd,
             boolean locked,
+            Optional<String> message,
             Optional<Double> paypalThresholdUsd,
             Map<String, Object> additionalProperties) {
         this.cardThresholdUsd = cardThresholdUsd;
         this.financingThresholdUsd = financingThresholdUsd;
         this.locked = locked;
+        this.message = message;
         this.paypalThresholdUsd = paypalThresholdUsd;
         this.additionalProperties = additionalProperties;
     }
 
     /**
-     * @return Maximum card-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for cards.
+     * @return Whop automatically refunds Resolution Center cases on card payments up to this amount in USD. Card payments include Visa, Mastercard, American Express and Discover. <code>null</code> when Whop does not automatically refund card cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.
      */
     @JsonIgnore
     public Optional<Double> getCardThresholdUsd() {
@@ -58,7 +62,7 @@ public final class AccountResolutionCenterAutoRefundControl {
     }
 
     /**
-     * @return Maximum financing-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for financing.
+     * @return Whop automatically refunds Resolution Center cases on financing payments up to this amount in USD. Financing payments include Klarna, Affirm, Zip, Afterpay, Splitit and Sezzle. <code>null</code> when Whop does not automatically refund financing cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.
      */
     @JsonIgnore
     public Optional<Double> getFinancingThresholdUsd() {
@@ -69,7 +73,7 @@ public final class AccountResolutionCenterAutoRefundControl {
     }
 
     /**
-     * @return Whether the account owner is prevented from changing these thresholds.
+     * @return Whether the thresholds are locked. While <code>true</code>, <code>PATCH /accounts/{id}</code> refuses a threshold change with a <code>403</code>. You cannot change this field.
      */
     @JsonProperty("locked")
     public boolean getLocked() {
@@ -77,7 +81,18 @@ public final class AccountResolutionCenterAutoRefundControl {
     }
 
     /**
-     * @return Maximum PayPal-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for PayPal.
+     * @return Message the customer gets when Whop automatically refunds their case. <code>null</code> when no message is set. You can change it with <code>PATCH /accounts/{id}</code>. You can also change it while <code>locked</code> is <code>true</code>.
+     */
+    @JsonIgnore
+    public Optional<String> getMessage() {
+        if (message == null) {
+            return Optional.empty();
+        }
+        return message;
+    }
+
+    /**
+     * @return Whop automatically refunds Resolution Center cases on PayPal and Venmo payments up to this amount in USD. <code>null</code> when Whop does not automatically refund these cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.
      */
     @JsonIgnore
     public Optional<Double> getPaypalThresholdUsd() {
@@ -97,6 +112,12 @@ public final class AccountResolutionCenterAutoRefundControl {
     @JsonProperty("financing_threshold_usd")
     private Optional<Double> _getFinancingThresholdUsd() {
         return financingThresholdUsd;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("message")
+    private Optional<String> _getMessage() {
+        return message;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -121,12 +142,14 @@ public final class AccountResolutionCenterAutoRefundControl {
         return cardThresholdUsd.equals(other.cardThresholdUsd)
                 && financingThresholdUsd.equals(other.financingThresholdUsd)
                 && locked == other.locked
+                && message.equals(other.message)
                 && paypalThresholdUsd.equals(other.paypalThresholdUsd);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.cardThresholdUsd, this.financingThresholdUsd, this.locked, this.paypalThresholdUsd);
+        return Objects.hash(
+                this.cardThresholdUsd, this.financingThresholdUsd, this.locked, this.message, this.paypalThresholdUsd);
     }
 
     @java.lang.Override
@@ -140,7 +163,7 @@ public final class AccountResolutionCenterAutoRefundControl {
 
     public interface LockedStage {
         /**
-         * <p>Whether the account owner is prevented from changing these thresholds.</p>
+         * <p>Whether the thresholds are locked. While <code>true</code>, <code>PATCH /accounts/{id}</code> refuses a threshold change with a <code>403</code>. You cannot change this field.</p>
          */
         _FinalStage locked(boolean locked);
 
@@ -155,7 +178,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
 
         /**
-         * <p>Maximum card-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for cards.</p>
+         * <p>Whop automatically refunds Resolution Center cases on card payments up to this amount in USD. Card payments include Visa, Mastercard, American Express and Discover. <code>null</code> when Whop does not automatically refund card cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         _FinalStage cardThresholdUsd(Optional<Double> cardThresholdUsd);
 
@@ -164,7 +187,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         _FinalStage cardThresholdUsd(Nullable<Double> cardThresholdUsd);
 
         /**
-         * <p>Maximum financing-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for financing.</p>
+         * <p>Whop automatically refunds Resolution Center cases on financing payments up to this amount in USD. Financing payments include Klarna, Affirm, Zip, Afterpay, Splitit and Sezzle. <code>null</code> when Whop does not automatically refund financing cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         _FinalStage financingThresholdUsd(Optional<Double> financingThresholdUsd);
 
@@ -173,7 +196,16 @@ public final class AccountResolutionCenterAutoRefundControl {
         _FinalStage financingThresholdUsd(Nullable<Double> financingThresholdUsd);
 
         /**
-         * <p>Maximum PayPal-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for PayPal.</p>
+         * <p>Message the customer gets when Whop automatically refunds their case. <code>null</code> when no message is set. You can change it with <code>PATCH /accounts/{id}</code>. You can also change it while <code>locked</code> is <code>true</code>.</p>
+         */
+        _FinalStage message(Optional<String> message);
+
+        _FinalStage message(String message);
+
+        _FinalStage message(Nullable<String> message);
+
+        /**
+         * <p>Whop automatically refunds Resolution Center cases on PayPal and Venmo payments up to this amount in USD. <code>null</code> when Whop does not automatically refund these cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         _FinalStage paypalThresholdUsd(Optional<Double> paypalThresholdUsd);
 
@@ -188,6 +220,8 @@ public final class AccountResolutionCenterAutoRefundControl {
 
         private Optional<Double> paypalThresholdUsd = Optional.empty();
 
+        private Optional<String> message = Optional.empty();
+
         private Optional<Double> financingThresholdUsd = Optional.empty();
 
         private Optional<Double> cardThresholdUsd = Optional.empty();
@@ -201,12 +235,13 @@ public final class AccountResolutionCenterAutoRefundControl {
             cardThresholdUsd(other.getCardThresholdUsd());
             financingThresholdUsd(other.getFinancingThresholdUsd());
             locked(other.getLocked());
+            message(other.getMessage());
             paypalThresholdUsd(other.getPaypalThresholdUsd());
             return this;
         }
 
         /**
-         * <p>Whether the account owner is prevented from changing these thresholds.</p>
+         * <p>Whether the thresholds are locked. While <code>true</code>, <code>PATCH /accounts/{id}</code> refuses a threshold change with a <code>403</code>. You cannot change this field.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -217,7 +252,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum PayPal-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for PayPal.</p>
+         * <p>Whop automatically refunds Resolution Center cases on PayPal and Venmo payments up to this amount in USD. <code>null</code> when Whop does not automatically refund these cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -233,7 +268,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum PayPal-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for PayPal.</p>
+         * <p>Whop automatically refunds Resolution Center cases on PayPal and Venmo payments up to this amount in USD. <code>null</code> when Whop does not automatically refund these cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -243,7 +278,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum PayPal-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for PayPal.</p>
+         * <p>Whop automatically refunds Resolution Center cases on PayPal and Venmo payments up to this amount in USD. <code>null</code> when Whop does not automatically refund these cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "paypal_threshold_usd", nulls = Nulls.SKIP)
@@ -253,7 +288,43 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum financing-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for financing.</p>
+         * <p>Message the customer gets when Whop automatically refunds their case. <code>null</code> when no message is set. You can change it with <code>PATCH /accounts/{id}</code>. You can also change it while <code>locked</code> is <code>true</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage message(Nullable<String> message) {
+            if (message.isNull()) {
+                this.message = null;
+            } else if (message.isEmpty()) {
+                this.message = Optional.empty();
+            } else {
+                this.message = Optional.of(message.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Message the customer gets when Whop automatically refunds their case. <code>null</code> when no message is set. You can change it with <code>PATCH /accounts/{id}</code>. You can also change it while <code>locked</code> is <code>true</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage message(String message) {
+            this.message = Optional.ofNullable(message);
+            return this;
+        }
+
+        /**
+         * <p>Message the customer gets when Whop automatically refunds their case. <code>null</code> when no message is set. You can change it with <code>PATCH /accounts/{id}</code>. You can also change it while <code>locked</code> is <code>true</code>.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "message", nulls = Nulls.SKIP)
+        public _FinalStage message(Optional<String> message) {
+            this.message = message;
+            return this;
+        }
+
+        /**
+         * <p>Whop automatically refunds Resolution Center cases on financing payments up to this amount in USD. Financing payments include Klarna, Affirm, Zip, Afterpay, Splitit and Sezzle. <code>null</code> when Whop does not automatically refund financing cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -269,7 +340,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum financing-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for financing.</p>
+         * <p>Whop automatically refunds Resolution Center cases on financing payments up to this amount in USD. Financing payments include Klarna, Affirm, Zip, Afterpay, Splitit and Sezzle. <code>null</code> when Whop does not automatically refund financing cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -279,7 +350,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum financing-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for financing.</p>
+         * <p>Whop automatically refunds Resolution Center cases on financing payments up to this amount in USD. Financing payments include Klarna, Affirm, Zip, Afterpay, Splitit and Sezzle. <code>null</code> when Whop does not automatically refund financing cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "financing_threshold_usd", nulls = Nulls.SKIP)
@@ -289,7 +360,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum card-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for cards.</p>
+         * <p>Whop automatically refunds Resolution Center cases on card payments up to this amount in USD. Card payments include Visa, Mastercard, American Express and Discover. <code>null</code> when Whop does not automatically refund card cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -305,7 +376,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum card-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for cards.</p>
+         * <p>Whop automatically refunds Resolution Center cases on card payments up to this amount in USD. Card payments include Visa, Mastercard, American Express and Discover. <code>null</code> when Whop does not automatically refund card cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -315,7 +386,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         }
 
         /**
-         * <p>Maximum card-funded resolution center case amount automatically refunded in USD. <code>null</code> when automatic refunds are disabled for cards.</p>
+         * <p>Whop automatically refunds Resolution Center cases on card payments up to this amount in USD. Card payments include Visa, Mastercard, American Express and Discover. <code>null</code> when Whop does not automatically refund card cases. You can change it with <code>PATCH /accounts/{id}</code> while <code>locked</code> is <code>false</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "card_threshold_usd", nulls = Nulls.SKIP)
@@ -327,7 +398,7 @@ public final class AccountResolutionCenterAutoRefundControl {
         @java.lang.Override
         public AccountResolutionCenterAutoRefundControl build() {
             return new AccountResolutionCenterAutoRefundControl(
-                    cardThresholdUsd, financingThresholdUsd, locked, paypalThresholdUsd, additionalProperties);
+                    cardThresholdUsd, financingThresholdUsd, locked, message, paypalThresholdUsd, additionalProperties);
         }
 
         @JsonAnySetter
@@ -335,6 +406,7 @@ public final class AccountResolutionCenterAutoRefundControl {
             if (key.equalsIgnoreCase("card_threshold_usd")
                     || key.equalsIgnoreCase("financing_threshold_usd")
                     || key.equalsIgnoreCase("locked")
+                    || key.equalsIgnoreCase("message")
                     || key.equalsIgnoreCase("paypal_threshold_usd")) {
                 return;
             }

@@ -18,6 +18,8 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = SummaryResolutionCenterCasesResponseGroupsReason.Builder.class)
 public final class SummaryResolutionCenterCasesResponseGroupsReason {
+    private final int creditNotProcessed;
+
     private final int fraudulent;
 
     private final int notAsDescribed;
@@ -31,18 +33,25 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
     private final Map<String, Object> additionalProperties;
 
     private SummaryResolutionCenterCasesResponseGroupsReason(
+            int creditNotProcessed,
             int fraudulent,
             int notAsDescribed,
             int productNotReceived,
             int productUnacceptable,
             int subscriptionCanceled,
             Map<String, Object> additionalProperties) {
+        this.creditNotProcessed = creditNotProcessed;
         this.fraudulent = fraudulent;
         this.notAsDescribed = notAsDescribed;
         this.productNotReceived = productNotReceived;
         this.productUnacceptable = productUnacceptable;
         this.subscriptionCanceled = subscriptionCanceled;
         this.additionalProperties = additionalProperties;
+    }
+
+    @JsonProperty("credit_not_processed")
+    public int getCreditNotProcessed() {
+        return creditNotProcessed;
     }
 
     @JsonProperty("fraudulent")
@@ -83,7 +92,8 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
     }
 
     private boolean equalTo(SummaryResolutionCenterCasesResponseGroupsReason other) {
-        return fraudulent == other.fraudulent
+        return creditNotProcessed == other.creditNotProcessed
+                && fraudulent == other.fraudulent
                 && notAsDescribed == other.notAsDescribed
                 && productNotReceived == other.productNotReceived
                 && productUnacceptable == other.productUnacceptable
@@ -93,6 +103,7 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.creditNotProcessed,
                 this.fraudulent,
                 this.notAsDescribed,
                 this.productNotReceived,
@@ -105,14 +116,18 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
         return ObjectMappers.stringify(this);
     }
 
-    public static FraudulentStage builder() {
+    public static CreditNotProcessedStage builder() {
         return new Builder();
+    }
+
+    public interface CreditNotProcessedStage {
+        FraudulentStage creditNotProcessed(int creditNotProcessed);
+
+        Builder from(SummaryResolutionCenterCasesResponseGroupsReason other);
     }
 
     public interface FraudulentStage {
         NotAsDescribedStage fraudulent(int fraudulent);
-
-        Builder from(SummaryResolutionCenterCasesResponseGroupsReason other);
     }
 
     public interface NotAsDescribedStage {
@@ -141,12 +156,15 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements FraudulentStage,
+            implements CreditNotProcessedStage,
+                    FraudulentStage,
                     NotAsDescribedStage,
                     ProductNotReceivedStage,
                     ProductUnacceptableStage,
                     SubscriptionCanceledStage,
                     _FinalStage {
+        private int creditNotProcessed;
+
         private int fraudulent;
 
         private int notAsDescribed;
@@ -163,11 +181,19 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
 
         @java.lang.Override
         public Builder from(SummaryResolutionCenterCasesResponseGroupsReason other) {
+            creditNotProcessed(other.getCreditNotProcessed());
             fraudulent(other.getFraudulent());
             notAsDescribed(other.getNotAsDescribed());
             productNotReceived(other.getProductNotReceived());
             productUnacceptable(other.getProductUnacceptable());
             subscriptionCanceled(other.getSubscriptionCanceled());
+            return this;
+        }
+
+        @java.lang.Override
+        @JsonSetter("credit_not_processed")
+        public FraudulentStage creditNotProcessed(int creditNotProcessed) {
+            this.creditNotProcessed = creditNotProcessed;
             return this;
         }
 
@@ -209,6 +235,7 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
         @java.lang.Override
         public SummaryResolutionCenterCasesResponseGroupsReason build() {
             return new SummaryResolutionCenterCasesResponseGroupsReason(
+                    creditNotProcessed,
                     fraudulent,
                     notAsDescribed,
                     productNotReceived,
@@ -219,7 +246,8 @@ public final class SummaryResolutionCenterCasesResponseGroupsReason {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("fraudulent")
+            if (key.equalsIgnoreCase("credit_not_processed")
+                    || key.equalsIgnoreCase("fraudulent")
                     || key.equalsIgnoreCase("not_as_described")
                     || key.equalsIgnoreCase("product_not_received")
                     || key.equalsIgnoreCase("product_unacceptable")

@@ -13,6 +13,9 @@ public final class CreateResolutionCenterCasesRequestReason {
     public static final CreateResolutionCenterCasesRequestReason PRODUCT_UNACCEPTABLE =
             new CreateResolutionCenterCasesRequestReason(Value.PRODUCT_UNACCEPTABLE, "product_unacceptable");
 
+    public static final CreateResolutionCenterCasesRequestReason CREDIT_NOT_PROCESSED =
+            new CreateResolutionCenterCasesRequestReason(Value.CREDIT_NOT_PROCESSED, "credit_not_processed");
+
     public static final CreateResolutionCenterCasesRequestReason NOT_AS_DESCRIBED =
             new CreateResolutionCenterCasesRequestReason(Value.NOT_AS_DESCRIBED, "not_as_described");
 
@@ -59,6 +62,8 @@ public final class CreateResolutionCenterCasesRequestReason {
                 return visitor.visitFraudulent();
             case PRODUCT_UNACCEPTABLE:
                 return visitor.visitProductUnacceptable();
+            case CREDIT_NOT_PROCESSED:
+                return visitor.visitCreditNotProcessed();
             case NOT_AS_DESCRIBED:
                 return visitor.visitNotAsDescribed();
             case PRODUCT_NOT_RECEIVED:
@@ -78,6 +83,8 @@ public final class CreateResolutionCenterCasesRequestReason {
                 return FRAUDULENT;
             case "product_unacceptable":
                 return PRODUCT_UNACCEPTABLE;
+            case "credit_not_processed":
+                return CREDIT_NOT_PROCESSED;
             case "not_as_described":
                 return NOT_AS_DESCRIBED;
             case "product_not_received":
@@ -100,6 +107,8 @@ public final class CreateResolutionCenterCasesRequestReason {
 
         SUBSCRIPTION_CANCELED,
 
+        CREDIT_NOT_PROCESSED,
+
         UNKNOWN
     }
 
@@ -113,6 +122,8 @@ public final class CreateResolutionCenterCasesRequestReason {
         T visitProductUnacceptable();
 
         T visitSubscriptionCanceled();
+
+        T visitCreditNotProcessed();
 
         T visitUnknown(String unknownType);
     }

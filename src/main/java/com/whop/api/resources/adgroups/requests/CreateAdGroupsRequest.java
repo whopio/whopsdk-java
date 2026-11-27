@@ -155,7 +155,7 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Whether budget_amount is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).
+     * @return Deprecated: lifetime budgets have ended. Leave this out, or send <code>daily</code>. <code>lifetime</code> returns a <code>400</code> unless the ad group already has a lifetime budget.
      */
     @JsonProperty("budget_type")
     public Optional<CreateAdGroupsRequestBudgetType> getBudgetType() {
@@ -171,7 +171,7 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.
+     * @return Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight. A day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. The schedule is replaced as a whole. <code>null</code> delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.
      */
     @JsonIgnore
     public Optional<CreateAdGroupsRequestDeliverySchedule> getDeliverySchedule() {
@@ -190,10 +190,13 @@ public final class CreateAdGroupsRequest {
     }
 
     /**
-     * @return Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>).
+     * @return The cost per result you want for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> uses the campaign's <code>desired_cost_per_result</code>.
      */
-    @JsonProperty("desired_cost_per_result")
+    @JsonIgnore
     public Optional<Double> getDesiredCostPerResult() {
+        if (desiredCostPerResult == null) {
+            return Optional.empty();
+        }
         return desiredCostPerResult;
     }
 
@@ -271,6 +274,12 @@ public final class CreateAdGroupsRequest {
     @JsonProperty("delivery_schedule")
     private Optional<CreateAdGroupsRequestDeliverySchedule> _getDeliverySchedule() {
         return deliverySchedule;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("desired_cost_per_result")
+    private Optional<Double> _getDesiredCostPerResult() {
+        return desiredCostPerResult;
     }
 
     @java.lang.Override
@@ -382,7 +391,7 @@ public final class CreateAdGroupsRequest {
         _FinalStage budgetAmountLocal(Double budgetAmountLocal);
 
         /**
-         * <p>Whether budget_amount is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Deprecated: lifetime budgets have ended. Leave this out, or send <code>daily</code>. <code>lifetime</code> returns a <code>400</code> unless the ad group already has a lifetime budget.</p>
          */
         _FinalStage budgetType(Optional<CreateAdGroupsRequestBudgetType> budgetType);
 
@@ -395,7 +404,7 @@ public final class CreateAdGroupsRequest {
         _FinalStage conversionEvent(Nullable<ConversionEvent> conversionEvent);
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight. A day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. The schedule is replaced as a whole. <code>null</code> delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         _FinalStage deliverySchedule(Optional<CreateAdGroupsRequestDeliverySchedule> deliverySchedule);
 
@@ -411,11 +420,13 @@ public final class CreateAdGroupsRequest {
         _FinalStage demographics(AdGroupDemographicsBody demographics);
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>).</p>
+         * <p>The cost per result you want for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> uses the campaign's <code>desired_cost_per_result</code>.</p>
          */
         _FinalStage desiredCostPerResult(Optional<Double> desiredCostPerResult);
 
         _FinalStage desiredCostPerResult(Double desiredCostPerResult);
+
+        _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult);
 
         /**
          * <p>Device platforms and operating systems to target.</p>
@@ -711,7 +722,23 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>).</p>
+         * <p>The cost per result you want for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> uses the campaign's <code>desired_cost_per_result</code>.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage desiredCostPerResult(Nullable<Double> desiredCostPerResult) {
+            if (desiredCostPerResult.isNull()) {
+                this.desiredCostPerResult = null;
+            } else if (desiredCostPerResult.isEmpty()) {
+                this.desiredCostPerResult = Optional.empty();
+            } else {
+                this.desiredCostPerResult = Optional.of(desiredCostPerResult.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The cost per result you want for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> uses the campaign's <code>desired_cost_per_result</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -721,7 +748,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Cost per result to aim for (<code>average_target</code>) or never exceed (<code>maximum_target</code>).</p>
+         * <p>The cost per result you want for this ad group, in USD. For an <code>awareness</code> campaign, it's the cost per 1,000 impressions. <code>null</code> uses the campaign's <code>desired_cost_per_result</code>.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "desired_cost_per_result", nulls = Nulls.SKIP)
@@ -751,7 +778,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight. A day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. The schedule is replaced as a whole. <code>null</code> delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -767,7 +794,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight. A day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. The schedule is replaced as a whole. <code>null</code> delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -777,7 +804,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight, and a day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. Replaces the whole schedule; <code>null</code> delivers at every hour. Some platforms need a lifetime <code>budget_type</code> for a schedule, on the ad group or on its campaign when the campaign holds the budget.</p>
+         * <p>Hours the ad group delivers in each week, keyed by day. Each window runs from <code>start</code> to <code>end</code> on the hour, with <code>24:00</code> for midnight. A day's windows can't overlap or touch. A day that's empty or left out doesn't deliver. The schedule is replaced as a whole. <code>null</code> delivers at every hour. A schedule needs a lifetime budget on the ad group, or on its campaign when the campaign holds the budget. Only ad groups and campaigns that already have one can use it.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "delivery_schedule", nulls = Nulls.SKIP)
@@ -812,7 +839,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Whether budget_amount is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Deprecated: lifetime budgets have ended. Leave this out, or send <code>daily</code>. <code>lifetime</code> returns a <code>400</code> unless the ad group already has a lifetime budget.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -822,7 +849,7 @@ public final class CreateAdGroupsRequest {
         }
 
         /**
-         * <p>Whether budget_amount is spent per day (<code>daily</code>) or over the ad group's full run (<code>lifetime</code>).</p>
+         * <p>Deprecated: lifetime budgets have ended. Leave this out, or send <code>daily</code>. <code>lifetime</code> returns a <code>400</code> unless the ad group already has a lifetime budget.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "budget_type", nulls = Nulls.SKIP)

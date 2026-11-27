@@ -37,7 +37,7 @@ public class AsyncWhopApiClientBuilder {
 
     private String token = null;
 
-    private String apiVersionDate = "2026-11-13-1";
+    private String apiVersionDate = "2026-11-25";
 
     private String idempotencyKey = null;
 

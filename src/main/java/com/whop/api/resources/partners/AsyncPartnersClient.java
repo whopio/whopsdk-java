@@ -7,15 +7,12 @@ import com.whop.api.core.ClientOptions;
 import com.whop.api.core.RequestOptions;
 import com.whop.api.core.Suppliers;
 import com.whop.api.core.WhopApiHttpResponse;
-import com.whop.api.core.pagination.SyncPagingIterable;
 import com.whop.api.resources.partners.businesses.AsyncBusinessesClient;
 import com.whop.api.resources.partners.requests.LeaderboardPartnersRequest;
-import com.whop.api.resources.partners.requests.ReferredUsersPartnersRequest;
 import com.whop.api.resources.partners.requests.RetrievePartnersRequest;
 import com.whop.api.resources.partners.types.CreatePartnersResponse;
 import com.whop.api.resources.partners.types.FeeOptionsPartnersResponse;
 import com.whop.api.resources.partners.types.LeaderboardPartnersResponse;
-import com.whop.api.resources.partners.types.ReferredUsersPartnersResponseDataItem;
 import com.whop.api.types.Partner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -150,73 +147,6 @@ public class AsyncPartnersClient {
         CompletableFuture<WhopApiHttpResponse<LeaderboardPartnersResponse>> rawFuture =
                 this.rawClient.leaderboard(request, requestOptions);
         CompletableFuture<LeaderboardPartnersResponse> future = rawFuture.thenApply(response -> response.body());
-        future.whenComplete((result_, throwable_) -> {
-            if (future.isCancelled()) {
-                rawFuture.cancel(true);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers() {
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
-                this.rawClient.referredUsers();
-        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
-                rawFuture.thenApply(response -> response.body());
-        future.whenComplete((result_, throwable_) -> {
-            if (future.isCancelled()) {
-                rawFuture.cancel(true);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            RequestOptions requestOptions) {
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
-                this.rawClient.referredUsers(requestOptions);
-        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
-                rawFuture.thenApply(response -> response.body());
-        future.whenComplete((result_, throwable_) -> {
-            if (future.isCancelled()) {
-                rawFuture.cancel(true);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            ReferredUsersPartnersRequest request) {
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
-                this.rawClient.referredUsers(request);
-        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
-                rawFuture.thenApply(response -> response.body());
-        future.whenComplete((result_, throwable_) -> {
-            if (future.isCancelled()) {
-                rawFuture.cancel(true);
-            }
-        });
-        return future;
-    }
-
-    /**
-     * Lists the users the caller referred onto Whop, newest first by default, each with the caller's total affiliate earnings from that user across all tiers. Deprecated: this list is retired and no longer appears in the API reference. It keeps responding for existing integrations and has no replacement.
-     */
-    public CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> referredUsers(
-            ReferredUsersPartnersRequest request, RequestOptions requestOptions) {
-        CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>>> rawFuture =
-                this.rawClient.referredUsers(request, requestOptions);
-        CompletableFuture<SyncPagingIterable<ReferredUsersPartnersResponseDataItem>> future =
-                rawFuture.thenApply(response -> response.body());
         future.whenComplete((result_, throwable_) -> {
             if (future.isCancelled()) {
                 rawFuture.cancel(true);

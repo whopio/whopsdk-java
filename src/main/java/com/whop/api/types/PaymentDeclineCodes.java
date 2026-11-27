@@ -63,6 +63,9 @@ public final class PaymentDeclineCodes {
     public static final PaymentDeclineCodes SUSPECTED_FRAUD =
             new PaymentDeclineCodes(Value.SUSPECTED_FRAUD, "suspected_fraud");
 
+    public static final PaymentDeclineCodes INVALID_BILLING_ADDRESS =
+            new PaymentDeclineCodes(Value.INVALID_BILLING_ADDRESS, "invalid_billing_address");
+
     public static final PaymentDeclineCodes ISSUER_NOT_FOUND =
             new PaymentDeclineCodes(Value.ISSUER_NOT_FOUND, "issuer_not_found");
 
@@ -330,6 +333,8 @@ public final class PaymentDeclineCodes {
                 return visitor.visitRestrictedCard();
             case SUSPECTED_FRAUD:
                 return visitor.visitSuspectedFraud();
+            case INVALID_BILLING_ADDRESS:
+                return visitor.visitInvalidBillingAddress();
             case ISSUER_NOT_FOUND:
                 return visitor.visitIssuerNotFound();
             case BANK_AUTHORIZATION_REVOKED:
@@ -513,6 +518,8 @@ public final class PaymentDeclineCodes {
                 return RESTRICTED_CARD;
             case "suspected_fraud":
                 return SUSPECTED_FRAUD;
+            case "invalid_billing_address":
+                return INVALID_BILLING_ADDRESS;
             case "issuer_not_found":
                 return ISSUER_NOT_FOUND;
             case "bank_authorization_revoked":
@@ -713,6 +720,8 @@ public final class PaymentDeclineCodes {
 
         INVALID_ZIP,
 
+        INVALID_BILLING_ADDRESS,
+
         INVALID_EXPIRY_MONTH,
 
         INVALID_EXPIRY_YEAR,
@@ -890,6 +899,8 @@ public final class PaymentDeclineCodes {
         T visitIssuerUnavailable();
 
         T visitInvalidZip();
+
+        T visitInvalidBillingAddress();
 
         T visitInvalidExpiryMonth();
 

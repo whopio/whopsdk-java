@@ -57,7 +57,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUserId {
     }
 
     /**
-     * @return User to request attribution for, prefixed <code>user_</code>.
+     * @return Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.
      */
     @JsonProperty("target_user_id")
     public String getTargetUserId() {
@@ -98,7 +98,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUserId {
 
     public interface TargetUserIdStage {
         /**
-         * <p>User to request attribution for, prefixed <code>user_</code>.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          */
         _FinalStage targetUserId(@NotNull String targetUserId);
 
@@ -148,7 +148,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUserId {
         }
 
         /**
-         * <p>User to request attribution for, prefixed <code>user_</code>.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

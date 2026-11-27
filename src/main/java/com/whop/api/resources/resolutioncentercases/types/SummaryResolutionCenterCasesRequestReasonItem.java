@@ -13,6 +13,9 @@ public final class SummaryResolutionCenterCasesRequestReasonItem {
     public static final SummaryResolutionCenterCasesRequestReasonItem PRODUCT_UNACCEPTABLE =
             new SummaryResolutionCenterCasesRequestReasonItem(Value.PRODUCT_UNACCEPTABLE, "product_unacceptable");
 
+    public static final SummaryResolutionCenterCasesRequestReasonItem CREDIT_NOT_PROCESSED =
+            new SummaryResolutionCenterCasesRequestReasonItem(Value.CREDIT_NOT_PROCESSED, "credit_not_processed");
+
     public static final SummaryResolutionCenterCasesRequestReasonItem NOT_AS_DESCRIBED =
             new SummaryResolutionCenterCasesRequestReasonItem(Value.NOT_AS_DESCRIBED, "not_as_described");
 
@@ -59,6 +62,8 @@ public final class SummaryResolutionCenterCasesRequestReasonItem {
                 return visitor.visitFraudulent();
             case PRODUCT_UNACCEPTABLE:
                 return visitor.visitProductUnacceptable();
+            case CREDIT_NOT_PROCESSED:
+                return visitor.visitCreditNotProcessed();
             case NOT_AS_DESCRIBED:
                 return visitor.visitNotAsDescribed();
             case PRODUCT_NOT_RECEIVED:
@@ -78,6 +83,8 @@ public final class SummaryResolutionCenterCasesRequestReasonItem {
                 return FRAUDULENT;
             case "product_unacceptable":
                 return PRODUCT_UNACCEPTABLE;
+            case "credit_not_processed":
+                return CREDIT_NOT_PROCESSED;
             case "not_as_described":
                 return NOT_AS_DESCRIBED;
             case "product_not_received":
@@ -100,6 +107,8 @@ public final class SummaryResolutionCenterCasesRequestReasonItem {
 
         SUBSCRIPTION_CANCELED,
 
+        CREDIT_NOT_PROCESSED,
+
         UNKNOWN
     }
 
@@ -113,6 +122,8 @@ public final class SummaryResolutionCenterCasesRequestReasonItem {
         T visitProductUnacceptable();
 
         T visitSubscriptionCanceled();
+
+        T visitCreditNotProcessed();
 
         T visitUnknown(String unknownType);
     }

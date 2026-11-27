@@ -43,6 +43,8 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
     private final Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners;
 
+    private final Optional<String> phone;
+
     private final Optional<String> placeOfIncorporation;
 
     private final Optional<String> registrationNumber;
@@ -66,6 +68,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
             Optional<String> incorporationDate,
             Optional<String> lastName,
             Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners,
+            Optional<String> phone,
             Optional<String> placeOfIncorporation,
             Optional<String> registrationNumber,
             Optional<List<UpdateVerificationsRequestBodyBusinessAddressRequestedInformationItem>> requestedInformation,
@@ -82,6 +85,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         this.incorporationDate = incorporationDate;
         this.lastName = lastName;
         this.owners = owners;
+        this.phone = phone;
         this.placeOfIncorporation = placeOfIncorporation;
         this.registrationNumber = registrationNumber;
         this.requestedInformation = requestedInformation;
@@ -114,7 +118,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
     }
 
     /**
-     * @return The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
+     * @return The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.
      */
     @JsonProperty("business_tax_identification_number")
     public Optional<String> getBusinessTaxIdentificationNumber() {
@@ -170,11 +174,19 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
     }
 
     /**
-     * @return Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.
+     * @return Owners of the business, up to 10 per request. Create Verification sends the business for review when the business details, business documents, and owners are in, and every new owner's documents are sent. It does this in the request that completes the set. It also does this when the last owner's documents finish sending in the background, or when you call it again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.
      */
     @JsonProperty("owners")
     public Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> getOwners() {
         return owners;
+    }
+
+    /**
+     * @return Phone number of the business representative, with country code.
+     */
+    @JsonProperty("phone")
+    public Optional<String> getPhone() {
+        return phone;
     }
 
     /**
@@ -234,6 +246,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                 && incorporationDate.equals(other.incorporationDate)
                 && lastName.equals(other.lastName)
                 && owners.equals(other.owners)
+                && phone.equals(other.phone)
                 && placeOfIncorporation.equals(other.placeOfIncorporation)
                 && registrationNumber.equals(other.registrationNumber)
                 && requestedInformation.equals(other.requestedInformation)
@@ -254,6 +267,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                 this.incorporationDate,
                 this.lastName,
                 this.owners,
+                this.phone,
                 this.placeOfIncorporation,
                 this.registrationNumber,
                 this.requestedInformation,
@@ -294,6 +308,8 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
         private Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners = Optional.empty();
 
+        private Optional<String> phone = Optional.empty();
+
         private Optional<String> placeOfIncorporation = Optional.empty();
 
         private Optional<String> registrationNumber = Optional.empty();
@@ -319,6 +335,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
             incorporationDate(other.getIncorporationDate());
             lastName(other.getLastName());
             owners(other.getOwners());
+            phone(other.getPhone());
             placeOfIncorporation(other.getPlaceOfIncorporation());
             registrationNumber(other.getRegistrationNumber());
             requestedInformation(other.getRequestedInformation());
@@ -370,7 +387,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         }
 
         /**
-         * <p>The business ID number of the company, as appropriate for the company's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
+         * <p>The business ID number, as appropriate for the business's country. Examples are an Employer Identification Number (EIN) in the US, a Business Number in Canada, or a Company Number in the UK.</p>
          */
         @JsonSetter(value = "business_tax_identification_number", nulls = Nulls.SKIP)
         public Builder businessTaxIdentificationNumber(Optional<String> businessTaxIdentificationNumber) {
@@ -468,7 +485,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
         }
 
         /**
-         * <p>Owners of the business, up to 10 per request. Once the company details, the company documents, and the owners are in and every new owner's documents were sent, Create Verification sends the business for review: in the request that completes it, as soon as the last owner's documents finish sending in the background, or when called again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.</p>
+         * <p>Owners of the business, up to 10 per request. Create Verification sends the business for review when the business details, business documents, and owners are in, and every new owner's documents are sent. It does this in the request that completes the set. It also does this when the last owner's documents finish sending in the background, or when you call it again after Update Verification. Owners can still be added, changed, or removed while the review waits on them.</p>
          */
         @JsonSetter(value = "owners", nulls = Nulls.SKIP)
         public Builder owners(Optional<List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem>> owners) {
@@ -478,6 +495,20 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
 
         public Builder owners(List<UpdateVerificationsRequestBodyBusinessAddressOwnersItem> owners) {
             this.owners = Optional.ofNullable(owners);
+            return this;
+        }
+
+        /**
+         * <p>Phone number of the business representative, with country code.</p>
+         */
+        @JsonSetter(value = "phone", nulls = Nulls.SKIP)
+        public Builder phone(Optional<String> phone) {
+            this.phone = phone;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            this.phone = Optional.ofNullable(phone);
             return this;
         }
 
@@ -553,6 +584,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                     incorporationDate,
                     lastName,
                     owners,
+                    phone,
                     placeOfIncorporation,
                     registrationNumber,
                     requestedInformation,
@@ -573,6 +605,7 @@ public final class UpdateVerificationsRequestBodyBusinessAddress {
                     || key.equalsIgnoreCase("incorporation_date")
                     || key.equalsIgnoreCase("last_name")
                     || key.equalsIgnoreCase("owners")
+                    || key.equalsIgnoreCase("phone")
                     || key.equalsIgnoreCase("place_of_incorporation")
                     || key.equalsIgnoreCase("registration_number")
                     || key.equalsIgnoreCase("requested_information")

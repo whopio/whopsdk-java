@@ -36,8 +36,6 @@ public final class CreateExportsRequestResource {
     public static final CreateExportsRequestResource EXTERNAL_ACCOUNTS =
             new CreateExportsRequestResource(Value.EXTERNAL_ACCOUNTS, "external_accounts");
 
-    public static final CreateExportsRequestResource LEADS = new CreateExportsRequestResource(Value.LEADS, "leads");
-
     public static final CreateExportsRequestResource TRACKING_LINKS =
             new CreateExportsRequestResource(Value.TRACKING_LINKS, "tracking_links");
 
@@ -165,8 +163,6 @@ public final class CreateExportsRequestResource {
                 return visitor.visitFinancialActivity();
             case EXTERNAL_ACCOUNTS:
                 return visitor.visitExternalAccounts();
-            case LEADS:
-                return visitor.visitLeads();
             case TRACKING_LINKS:
                 return visitor.visitTrackingLinks();
             case AUDIENCES:
@@ -248,8 +244,6 @@ public final class CreateExportsRequestResource {
                 return FINANCIAL_ACTIVITY;
             case "external_accounts":
                 return EXTERNAL_ACCOUNTS;
-            case "leads":
-                return LEADS;
             case "tracking_links":
                 return TRACKING_LINKS;
             case "audiences":
@@ -374,8 +368,6 @@ public final class CreateExportsRequestResource {
 
         ENTRIES,
 
-        LEADS,
-
         INVOICES,
 
         CANCELATION_REASONS,
@@ -451,8 +443,6 @@ public final class CreateExportsRequestResource {
         T visitResolutions();
 
         T visitEntries();
-
-        T visitLeads();
 
         T visitInvoices();
 

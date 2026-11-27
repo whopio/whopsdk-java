@@ -62,7 +62,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
     }
 
     /**
-     * @return Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel.
+     * @return Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel. Email is the exception when the topic's <code>every_channel_covers_email</code> is <code>false</code>.
      */
     @JsonIgnore
     public Optional<SetNotificationsRequestPreferencesItemScopeChannel> getChannel() {
@@ -220,7 +220,7 @@ public final class SetNotificationsRequestPreferencesItemScope {
         }
 
         /**
-         * <p>Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel.</p>
+         * <p>Delivery channel the preference applies to. Omit it (or pass <code>null</code>) to apply the preference to every channel. Email is the exception when the topic's <code>every_channel_covers_email</code> is <code>false</code>.</p>
          */
         @JsonSetter(value = "channel", nulls = Nulls.SKIP)
         public Builder channel(Optional<SetNotificationsRequestPreferencesItemScopeChannel> channel) {

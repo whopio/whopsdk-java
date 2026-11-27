@@ -27,6 +27,16 @@ public final class UserPreferences {
 
     private final boolean cardsAutoTopUp;
 
+    private final boolean showJoinedWhops;
+
+    private final boolean showLevel;
+
+    private final boolean showLocation;
+
+    private final boolean showOwnedWhops;
+
+    private final boolean showUserRanking;
+
     private final boolean termsAccepted;
 
     private final Optional<String> termsAcceptedAt;
@@ -36,11 +46,21 @@ public final class UserPreferences {
     private UserPreferences(
             boolean bountyWorkerOnboardingDismissed,
             boolean cardsAutoTopUp,
+            boolean showJoinedWhops,
+            boolean showLevel,
+            boolean showLocation,
+            boolean showOwnedWhops,
+            boolean showUserRanking,
             boolean termsAccepted,
             Optional<String> termsAcceptedAt,
             Map<String, Object> additionalProperties) {
         this.bountyWorkerOnboardingDismissed = bountyWorkerOnboardingDismissed;
         this.cardsAutoTopUp = cardsAutoTopUp;
+        this.showJoinedWhops = showJoinedWhops;
+        this.showLevel = showLevel;
+        this.showLocation = showLocation;
+        this.showOwnedWhops = showOwnedWhops;
+        this.showUserRanking = showUserRanking;
         this.termsAccepted = termsAccepted;
         this.termsAcceptedAt = termsAcceptedAt;
         this.additionalProperties = additionalProperties;
@@ -60,6 +80,46 @@ public final class UserPreferences {
     @JsonProperty("cards_auto_top_up")
     public boolean getCardsAutoTopUp() {
         return cardsAutoTopUp;
+    }
+
+    /**
+     * @return Whether to show the whops the user joined on their profile.
+     */
+    @JsonProperty("show_joined_whops")
+    public boolean getShowJoinedWhops() {
+        return showJoinedWhops;
+    }
+
+    /**
+     * @return Whether other people can see the user's Whop Level. Set to <code>false</code> to hide it.
+     */
+    @JsonProperty("show_level")
+    public boolean getShowLevel() {
+        return showLevel;
+    }
+
+    /**
+     * @return Whether to show the user's location on their profile.
+     */
+    @JsonProperty("show_location")
+    public boolean getShowLocation() {
+        return showLocation;
+    }
+
+    /**
+     * @return Whether to show the whops the user owns on their profile.
+     */
+    @JsonProperty("show_owned_whops")
+    public boolean getShowOwnedWhops() {
+        return showOwnedWhops;
+    }
+
+    /**
+     * @return Whether to show the user's ranking on their profile.
+     */
+    @JsonProperty("show_user_ranking")
+    public boolean getShowUserRanking() {
+        return showUserRanking;
     }
 
     /**
@@ -101,6 +161,11 @@ public final class UserPreferences {
     private boolean equalTo(UserPreferences other) {
         return bountyWorkerOnboardingDismissed == other.bountyWorkerOnboardingDismissed
                 && cardsAutoTopUp == other.cardsAutoTopUp
+                && showJoinedWhops == other.showJoinedWhops
+                && showLevel == other.showLevel
+                && showLocation == other.showLocation
+                && showOwnedWhops == other.showOwnedWhops
+                && showUserRanking == other.showUserRanking
                 && termsAccepted == other.termsAccepted
                 && termsAcceptedAt.equals(other.termsAcceptedAt);
     }
@@ -108,7 +173,15 @@ public final class UserPreferences {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.bountyWorkerOnboardingDismissed, this.cardsAutoTopUp, this.termsAccepted, this.termsAcceptedAt);
+                this.bountyWorkerOnboardingDismissed,
+                this.cardsAutoTopUp,
+                this.showJoinedWhops,
+                this.showLevel,
+                this.showLocation,
+                this.showOwnedWhops,
+                this.showUserRanking,
+                this.termsAccepted,
+                this.termsAcceptedAt);
     }
 
     @java.lang.Override
@@ -133,7 +206,42 @@ public final class UserPreferences {
         /**
          * <p>Whether incoming funds, including pending balance, are automatically moved to the user's personal cards balance. <code>false</code> when the user has no cards balance.</p>
          */
-        TermsAcceptedStage cardsAutoTopUp(boolean cardsAutoTopUp);
+        ShowJoinedWhopsStage cardsAutoTopUp(boolean cardsAutoTopUp);
+    }
+
+    public interface ShowJoinedWhopsStage {
+        /**
+         * <p>Whether to show the whops the user joined on their profile.</p>
+         */
+        ShowLevelStage showJoinedWhops(boolean showJoinedWhops);
+    }
+
+    public interface ShowLevelStage {
+        /**
+         * <p>Whether other people can see the user's Whop Level. Set to <code>false</code> to hide it.</p>
+         */
+        ShowLocationStage showLevel(boolean showLevel);
+    }
+
+    public interface ShowLocationStage {
+        /**
+         * <p>Whether to show the user's location on their profile.</p>
+         */
+        ShowOwnedWhopsStage showLocation(boolean showLocation);
+    }
+
+    public interface ShowOwnedWhopsStage {
+        /**
+         * <p>Whether to show the whops the user owns on their profile.</p>
+         */
+        ShowUserRankingStage showOwnedWhops(boolean showOwnedWhops);
+    }
+
+    public interface ShowUserRankingStage {
+        /**
+         * <p>Whether to show the user's ranking on their profile.</p>
+         */
+        TermsAcceptedStage showUserRanking(boolean showUserRanking);
     }
 
     public interface TermsAcceptedStage {
@@ -162,10 +270,28 @@ public final class UserPreferences {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder
-            implements BountyWorkerOnboardingDismissedStage, CardsAutoTopUpStage, TermsAcceptedStage, _FinalStage {
+            implements BountyWorkerOnboardingDismissedStage,
+                    CardsAutoTopUpStage,
+                    ShowJoinedWhopsStage,
+                    ShowLevelStage,
+                    ShowLocationStage,
+                    ShowOwnedWhopsStage,
+                    ShowUserRankingStage,
+                    TermsAcceptedStage,
+                    _FinalStage {
         private boolean bountyWorkerOnboardingDismissed;
 
         private boolean cardsAutoTopUp;
+
+        private boolean showJoinedWhops;
+
+        private boolean showLevel;
+
+        private boolean showLocation;
+
+        private boolean showOwnedWhops;
+
+        private boolean showUserRanking;
 
         private boolean termsAccepted;
 
@@ -179,6 +305,11 @@ public final class UserPreferences {
         public Builder from(UserPreferences other) {
             bountyWorkerOnboardingDismissed(other.getBountyWorkerOnboardingDismissed());
             cardsAutoTopUp(other.getCardsAutoTopUp());
+            showJoinedWhops(other.getShowJoinedWhops());
+            showLevel(other.getShowLevel());
+            showLocation(other.getShowLocation());
+            showOwnedWhops(other.getShowOwnedWhops());
+            showUserRanking(other.getShowUserRanking());
             termsAccepted(other.getTermsAccepted());
             termsAcceptedAt(other.getTermsAcceptedAt());
             return this;
@@ -201,8 +332,63 @@ public final class UserPreferences {
          */
         @java.lang.Override
         @JsonSetter("cards_auto_top_up")
-        public TermsAcceptedStage cardsAutoTopUp(boolean cardsAutoTopUp) {
+        public ShowJoinedWhopsStage cardsAutoTopUp(boolean cardsAutoTopUp) {
             this.cardsAutoTopUp = cardsAutoTopUp;
+            return this;
+        }
+
+        /**
+         * <p>Whether to show the whops the user joined on their profile.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("show_joined_whops")
+        public ShowLevelStage showJoinedWhops(boolean showJoinedWhops) {
+            this.showJoinedWhops = showJoinedWhops;
+            return this;
+        }
+
+        /**
+         * <p>Whether other people can see the user's Whop Level. Set to <code>false</code> to hide it.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("show_level")
+        public ShowLocationStage showLevel(boolean showLevel) {
+            this.showLevel = showLevel;
+            return this;
+        }
+
+        /**
+         * <p>Whether to show the user's location on their profile.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("show_location")
+        public ShowOwnedWhopsStage showLocation(boolean showLocation) {
+            this.showLocation = showLocation;
+            return this;
+        }
+
+        /**
+         * <p>Whether to show the whops the user owns on their profile.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("show_owned_whops")
+        public ShowUserRankingStage showOwnedWhops(boolean showOwnedWhops) {
+            this.showOwnedWhops = showOwnedWhops;
+            return this;
+        }
+
+        /**
+         * <p>Whether to show the user's ranking on their profile.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        @JsonSetter("show_user_ranking")
+        public TermsAcceptedStage showUserRanking(boolean showUserRanking) {
+            this.showUserRanking = showUserRanking;
             return this;
         }
 
@@ -258,6 +444,11 @@ public final class UserPreferences {
             return new UserPreferences(
                     bountyWorkerOnboardingDismissed,
                     cardsAutoTopUp,
+                    showJoinedWhops,
+                    showLevel,
+                    showLocation,
+                    showOwnedWhops,
+                    showUserRanking,
                     termsAccepted,
                     termsAcceptedAt,
                     additionalProperties);
@@ -267,6 +458,11 @@ public final class UserPreferences {
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("bounty_worker_onboarding_dismissed")
                     || key.equalsIgnoreCase("cards_auto_top_up")
+                    || key.equalsIgnoreCase("show_joined_whops")
+                    || key.equalsIgnoreCase("show_level")
+                    || key.equalsIgnoreCase("show_location")
+                    || key.equalsIgnoreCase("show_owned_whops")
+                    || key.equalsIgnoreCase("show_user_ranking")
                     || key.equalsIgnoreCase("terms_accepted")
                     || key.equalsIgnoreCase("terms_accepted_at")) {
                 return;

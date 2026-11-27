@@ -147,7 +147,7 @@ public final class AccountCapabilities {
     }
 
     /**
-     * @return Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.
+     * @return Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.
      */
     @JsonProperty("run_ads")
     public AccountCapabilitiesRunAds getRunAds() {
@@ -289,7 +289,7 @@ public final class AccountCapabilities {
 
     public interface RunAdsStage {
         /**
-         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
+         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
          */
         StandardPayoutStage runAds(@NotNull AccountCapabilitiesRunAds runAds);
     }
@@ -478,7 +478,7 @@ public final class AccountCapabilities {
         }
 
         /**
-         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> until the account's identity or business is verified, while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
+         * <p>Launching ad campaigns through Whop Ads. <code>inactive</code> while a requested ads services agreement is awaiting the account's signature, and while the account is suspended from Whop Ads.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

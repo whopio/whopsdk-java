@@ -7,32 +7,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class AdDeliveryStatus {
+    public static final AdDeliveryStatus REVISE_CONTENT = new AdDeliveryStatus(Value.REVISE_CONTENT, "revise_content");
+
     public static final AdDeliveryStatus PROCESSING = new AdDeliveryStatus(Value.PROCESSING, "processing");
 
+    public static final AdDeliveryStatus PAUSED = new AdDeliveryStatus(Value.PAUSED, "paused");
+
     public static final AdDeliveryStatus SCHEDULED = new AdDeliveryStatus(Value.SCHEDULED, "scheduled");
+
+    public static final AdDeliveryStatus ISSUES = new AdDeliveryStatus(Value.ISSUES, "issues");
+
+    public static final AdDeliveryStatus REJECTED = new AdDeliveryStatus(Value.REJECTED, "rejected");
 
     public static final AdDeliveryStatus DRAFT = new AdDeliveryStatus(Value.DRAFT, "draft");
 
     public static final AdDeliveryStatus LEARNING = new AdDeliveryStatus(Value.LEARNING, "learning");
 
     public static final AdDeliveryStatus IN_REVIEW = new AdDeliveryStatus(Value.IN_REVIEW, "in_review");
-
-    public static final AdDeliveryStatus IN_APPEAL = new AdDeliveryStatus(Value.IN_APPEAL, "in_appeal");
-
-    public static final AdDeliveryStatus CAMPAIGN_PAUSED =
-            new AdDeliveryStatus(Value.CAMPAIGN_PAUSED, "campaign_paused");
-
-    public static final AdDeliveryStatus PAUSED = new AdDeliveryStatus(Value.PAUSED, "paused");
-
-    public static final AdDeliveryStatus ISSUES = new AdDeliveryStatus(Value.ISSUES, "issues");
-
-    public static final AdDeliveryStatus REJECTED = new AdDeliveryStatus(Value.REJECTED, "rejected");
-
-    public static final AdDeliveryStatus LEARNING_LIMITED =
-            new AdDeliveryStatus(Value.LEARNING_LIMITED, "learning_limited");
-
-    public static final AdDeliveryStatus AD_GROUP_PAUSED =
-            new AdDeliveryStatus(Value.AD_GROUP_PAUSED, "ad_group_paused");
 
     public static final AdDeliveryStatus ACTIVE = new AdDeliveryStatus(Value.ACTIVE, "active");
 
@@ -68,30 +59,24 @@ public final class AdDeliveryStatus {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case REVISE_CONTENT:
+                return visitor.visitReviseContent();
             case PROCESSING:
                 return visitor.visitProcessing();
+            case PAUSED:
+                return visitor.visitPaused();
             case SCHEDULED:
                 return visitor.visitScheduled();
+            case ISSUES:
+                return visitor.visitIssues();
+            case REJECTED:
+                return visitor.visitRejected();
             case DRAFT:
                 return visitor.visitDraft();
             case LEARNING:
                 return visitor.visitLearning();
             case IN_REVIEW:
                 return visitor.visitInReview();
-            case IN_APPEAL:
-                return visitor.visitInAppeal();
-            case CAMPAIGN_PAUSED:
-                return visitor.visitCampaignPaused();
-            case PAUSED:
-                return visitor.visitPaused();
-            case ISSUES:
-                return visitor.visitIssues();
-            case REJECTED:
-                return visitor.visitRejected();
-            case LEARNING_LIMITED:
-                return visitor.visitLearningLimited();
-            case AD_GROUP_PAUSED:
-                return visitor.visitAdGroupPaused();
             case ACTIVE:
                 return visitor.visitActive();
             case UNKNOWN:
@@ -103,30 +88,24 @@ public final class AdDeliveryStatus {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static AdDeliveryStatus valueOf(String value) {
         switch (value) {
+            case "revise_content":
+                return REVISE_CONTENT;
             case "processing":
                 return PROCESSING;
+            case "paused":
+                return PAUSED;
             case "scheduled":
                 return SCHEDULED;
+            case "issues":
+                return ISSUES;
+            case "rejected":
+                return REJECTED;
             case "draft":
                 return DRAFT;
             case "learning":
                 return LEARNING;
             case "in_review":
                 return IN_REVIEW;
-            case "in_appeal":
-                return IN_APPEAL;
-            case "campaign_paused":
-                return CAMPAIGN_PAUSED;
-            case "paused":
-                return PAUSED;
-            case "issues":
-                return ISSUES;
-            case "rejected":
-                return REJECTED;
-            case "learning_limited":
-                return LEARNING_LIMITED;
-            case "ad_group_paused":
-                return AD_GROUP_PAUSED;
             case "active":
                 return ACTIVE;
             default:
@@ -135,27 +114,21 @@ public final class AdDeliveryStatus {
     }
 
     public enum Value {
-        IN_APPEAL,
-
         REJECTED,
 
         IN_REVIEW,
 
         DRAFT,
 
-        CAMPAIGN_PAUSED,
-
-        AD_GROUP_PAUSED,
-
         PAUSED,
 
         PROCESSING,
 
+        REVISE_CONTENT,
+
         ISSUES,
 
         SCHEDULED,
-
-        LEARNING_LIMITED,
 
         LEARNING,
 
@@ -165,27 +138,21 @@ public final class AdDeliveryStatus {
     }
 
     public interface Visitor<T> {
-        T visitInAppeal();
-
         T visitRejected();
 
         T visitInReview();
 
         T visitDraft();
 
-        T visitCampaignPaused();
-
-        T visitAdGroupPaused();
-
         T visitPaused();
 
         T visitProcessing();
 
+        T visitReviseContent();
+
         T visitIssues();
 
         T visitScheduled();
-
-        T visitLearningLimited();
 
         T visitLearning();
 

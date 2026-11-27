@@ -50,7 +50,7 @@ public final class ConnectSocialAccountsRequest {
     }
 
     /**
-     * @return The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.
+     * @return The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks. Use <code>stripe</code> to let Whop read the past payments of the account’s Stripe account: pass <code>account_id</code>, and the user installs Whop’s app in Stripe. It requires the <code>payout:account:update</code> scope instead of <code>social_account:create</code>.
      */
     @JsonProperty("platform")
     public ConnectSocialAccountsRequestPlatform getPlatform() {
@@ -98,7 +98,7 @@ public final class ConnectSocialAccountsRequest {
 
     public interface PlatformStage {
         /**
-         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.</p>
+         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks. Use <code>stripe</code> to let Whop read the past payments of the account’s Stripe account: pass <code>account_id</code>, and the user installs Whop’s app in Stripe. It requires the <code>payout:account:update</code> scope instead of <code>social_account:create</code>.</p>
          */
         RedirectUrlStage platform(@NotNull ConnectSocialAccountsRequestPlatform platform);
 
@@ -148,7 +148,7 @@ public final class ConnectSocialAccountsRequest {
         }
 
         /**
-         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks.</p>
+         * <p>The platform to connect the external account on. Use <code>tiktok</code> to connect the authenticated user’s TikTok profile, <code>linkedin</code> for their LinkedIn profile, <code>youtube</code> for their YouTube channel, or <code>x</code> for their X profile. Use <code>quickbooks</code> to connect the account’s QuickBooks Online company: pass <code>account_id</code>, and the user picks the company in QuickBooks. Use <code>stripe</code> to let Whop read the past payments of the account’s Stripe account: pass <code>account_id</code>, and the user installs Whop’s app in Stripe. It requires the <code>payout:account:update</code> scope instead of <code>social_account:create</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

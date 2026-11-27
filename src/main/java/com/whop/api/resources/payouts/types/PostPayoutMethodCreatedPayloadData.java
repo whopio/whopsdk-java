@@ -39,6 +39,8 @@ public final class PostPayoutMethodCreatedPayloadData {
 
     private final String id;
 
+    private final Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason;
+
     private final Optional<String> institutionName;
 
     private final boolean isClone;
@@ -81,6 +83,7 @@ public final class PostPayoutMethodCreatedPayloadData {
             Optional<PostPayoutMethodCreatedPayloadDataEstimatedArrival> estimatedArrival,
             Optional<PostPayoutMethodCreatedPayloadDataFeeStructure> feeStructure,
             String id,
+            Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason,
             Optional<String> institutionName,
             boolean isClone,
             boolean isDefault,
@@ -105,6 +108,7 @@ public final class PostPayoutMethodCreatedPayloadData {
         this.estimatedArrival = estimatedArrival;
         this.feeStructure = feeStructure;
         this.id = id;
+        this.instantUnavailableReason = instantUnavailableReason;
         this.institutionName = institutionName;
         this.isClone = isClone;
         this.isDefault = isDefault;
@@ -190,6 +194,17 @@ public final class PostPayoutMethodCreatedPayloadData {
     @JsonProperty("id")
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.
+     */
+    @JsonIgnore
+    public Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> getInstantUnavailableReason() {
+        if (instantUnavailableReason == null) {
+            return Optional.empty();
+        }
+        return instantUnavailableReason;
     }
 
     /**
@@ -366,6 +381,12 @@ public final class PostPayoutMethodCreatedPayloadData {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("instant_unavailable_reason")
+    private Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> _getInstantUnavailableReason() {
+        return instantUnavailableReason;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("institution_name")
     private Optional<String> _getInstitutionName() {
         return institutionName;
@@ -433,6 +454,7 @@ public final class PostPayoutMethodCreatedPayloadData {
                 && estimatedArrival.equals(other.estimatedArrival)
                 && feeStructure.equals(other.feeStructure)
                 && id.equals(other.id)
+                && instantUnavailableReason.equals(other.instantUnavailableReason)
                 && institutionName.equals(other.institutionName)
                 && isClone == other.isClone
                 && isDefault == other.isDefault
@@ -461,6 +483,7 @@ public final class PostPayoutMethodCreatedPayloadData {
                 this.estimatedArrival,
                 this.feeStructure,
                 this.id,
+                this.instantUnavailableReason,
                 this.institutionName,
                 this.isClone,
                 this.isDefault,
@@ -604,6 +627,18 @@ public final class PostPayoutMethodCreatedPayloadData {
         _FinalStage feeStructure(Nullable<PostPayoutMethodCreatedPayloadDataFeeStructure> feeStructure);
 
         /**
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
+         */
+        _FinalStage instantUnavailableReason(
+                Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason);
+
+        _FinalStage instantUnavailableReason(
+                PostPayoutMethodCreatedPayloadDataInstantUnavailableReason instantUnavailableReason);
+
+        _FinalStage instantUnavailableReason(
+                Nullable<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason);
+
+        /**
          * <p>Name of the bank or institution receiving payouts.</p>
          */
         _FinalStage institutionName(Optional<String> institutionName);
@@ -738,6 +773,9 @@ public final class PostPayoutMethodCreatedPayloadData {
 
         private Optional<String> institutionName = Optional.empty();
 
+        private Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason =
+                Optional.empty();
+
         private Optional<PostPayoutMethodCreatedPayloadDataFeeStructure> feeStructure = Optional.empty();
 
         private Optional<PostPayoutMethodCreatedPayloadDataEstimatedArrival> estimatedArrival = Optional.empty();
@@ -760,6 +798,7 @@ public final class PostPayoutMethodCreatedPayloadData {
             estimatedArrival(other.getEstimatedArrival());
             feeStructure(other.getFeeStructure());
             id(other.getId());
+            instantUnavailableReason(other.getInstantUnavailableReason());
             institutionName(other.getInstitutionName());
             isClone(other.getIsClone());
             isDefault(other.getIsDefault());
@@ -1200,6 +1239,45 @@ public final class PostPayoutMethodCreatedPayloadData {
         }
 
         /**
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage instantUnavailableReason(
+                Nullable<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason) {
+            if (instantUnavailableReason.isNull()) {
+                this.instantUnavailableReason = null;
+            } else if (instantUnavailableReason.isEmpty()) {
+                this.instantUnavailableReason = Optional.empty();
+            } else {
+                this.instantUnavailableReason = Optional.of(instantUnavailableReason.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage instantUnavailableReason(
+                PostPayoutMethodCreatedPayloadDataInstantUnavailableReason instantUnavailableReason) {
+            this.instantUnavailableReason = Optional.ofNullable(instantUnavailableReason);
+            return this;
+        }
+
+        /**
+         * <p>Why instant delivery is unavailable. <code>new_payout_method_hold</code> means the payout method is within its initial instant delivery hold. <code>minimum_crypto_sales_not_met</code> means the account has not reached the sales requirement for instant cryptocurrency payouts. <code>null</code> means neither restriction applies.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "instant_unavailable_reason", nulls = Nulls.SKIP)
+        public _FinalStage instantUnavailableReason(
+                Optional<PostPayoutMethodCreatedPayloadDataInstantUnavailableReason> instantUnavailableReason) {
+            this.instantUnavailableReason = instantUnavailableReason;
+            return this;
+        }
+
+        /**
          * <p>Configured fee terms for this payout method. Null when the method is not currently eligible. An amount-specific quote remains authoritative.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
@@ -1358,6 +1436,7 @@ public final class PostPayoutMethodCreatedPayloadData {
                     estimatedArrival,
                     feeStructure,
                     id,
+                    instantUnavailableReason,
                     institutionName,
                     isClone,
                     isDefault,
@@ -1386,6 +1465,7 @@ public final class PostPayoutMethodCreatedPayloadData {
                     || key.equalsIgnoreCase("estimated_arrival")
                     || key.equalsIgnoreCase("fee_structure")
                     || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("instant_unavailable_reason")
                     || key.equalsIgnoreCase("institution_name")
                     || key.equalsIgnoreCase("is_clone")
                     || key.equalsIgnoreCase("is_default")

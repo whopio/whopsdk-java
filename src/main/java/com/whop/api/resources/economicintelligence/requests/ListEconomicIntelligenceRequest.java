@@ -27,8 +27,6 @@ public final class ListEconomicIntelligenceRequest {
 
     private final Optional<ListEconomicIntelligenceRequestStatus> status;
 
-    private final Optional<String> input;
-
     private final Optional<Boolean> hasRun;
 
     private final Optional<ListEconomicIntelligenceRequestOrder> order;
@@ -48,7 +46,6 @@ public final class ListEconomicIntelligenceRequest {
     private ListEconomicIntelligenceRequest(
             Optional<String> accountId,
             Optional<ListEconomicIntelligenceRequestStatus> status,
-            Optional<String> input,
             Optional<Boolean> hasRun,
             Optional<ListEconomicIntelligenceRequestOrder> order,
             Optional<ListEconomicIntelligenceRequestDirection> direction,
@@ -59,7 +56,6 @@ public final class ListEconomicIntelligenceRequest {
             Map<String, Object> additionalProperties) {
         this.accountId = accountId;
         this.status = status;
-        this.input = input;
         this.hasRun = hasRun;
         this.order = order;
         this.direction = direction;
@@ -84,14 +80,6 @@ public final class ListEconomicIntelligenceRequest {
     @JsonProperty("status")
     public Optional<ListEconomicIntelligenceRequestStatus> getStatus() {
         return status;
-    }
-
-    /**
-     * @return No longer read: recommendations are written for the business as it changes. Up to 1000 characters.
-     */
-    @JsonProperty("input")
-    public Optional<String> getInput() {
-        return input;
     }
 
     /**
@@ -164,7 +152,6 @@ public final class ListEconomicIntelligenceRequest {
     private boolean equalTo(ListEconomicIntelligenceRequest other) {
         return accountId.equals(other.accountId)
                 && status.equals(other.status)
-                && input.equals(other.input)
                 && hasRun.equals(other.hasRun)
                 && order.equals(other.order)
                 && direction.equals(other.direction)
@@ -179,7 +166,6 @@ public final class ListEconomicIntelligenceRequest {
         return Objects.hash(
                 this.accountId,
                 this.status,
-                this.input,
                 this.hasRun,
                 this.order,
                 this.direction,
@@ -204,8 +190,6 @@ public final class ListEconomicIntelligenceRequest {
 
         private Optional<ListEconomicIntelligenceRequestStatus> status = Optional.empty();
 
-        private Optional<String> input = Optional.empty();
-
         private Optional<Boolean> hasRun = Optional.empty();
 
         private Optional<ListEconomicIntelligenceRequestOrder> order = Optional.empty();
@@ -227,7 +211,6 @@ public final class ListEconomicIntelligenceRequest {
         public Builder from(ListEconomicIntelligenceRequest other) {
             accountId(other.getAccountId());
             status(other.getStatus());
-            input(other.getInput());
             hasRun(other.getHasRun());
             order(other.getOrder());
             direction(other.getDirection());
@@ -263,20 +246,6 @@ public final class ListEconomicIntelligenceRequest {
 
         public Builder status(ListEconomicIntelligenceRequestStatus status) {
             this.status = Optional.ofNullable(status);
-            return this;
-        }
-
-        /**
-         * <p>No longer read: recommendations are written for the business as it changes. Up to 1000 characters.</p>
-         */
-        @JsonSetter(value = "input", nulls = Nulls.SKIP)
-        public Builder input(Optional<String> input) {
-            this.input = input;
-            return this;
-        }
-
-        public Builder input(String input) {
-            this.input = Optional.ofNullable(input);
             return this;
         }
 
@@ -380,24 +349,13 @@ public final class ListEconomicIntelligenceRequest {
 
         public ListEconomicIntelligenceRequest build() {
             return new ListEconomicIntelligenceRequest(
-                    accountId,
-                    status,
-                    input,
-                    hasRun,
-                    order,
-                    direction,
-                    first,
-                    after,
-                    last,
-                    before,
-                    additionalProperties);
+                    accountId, status, hasRun, order, direction, first, after, last, before, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("account_id")
                     || key.equalsIgnoreCase("status")
-                    || key.equalsIgnoreCase("input")
                     || key.equalsIgnoreCase("has_run")
                     || key.equalsIgnoreCase("order")
                     || key.equalsIgnoreCase("direction")

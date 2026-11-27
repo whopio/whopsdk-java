@@ -30,16 +30,20 @@ public final class PostPayoutCreatedPayloadDataFailure {
 
     private final Optional<String> message;
 
+    private final Optional<PostPayoutCreatedPayloadDataFailureNextStep> nextStep;
+
     private final Map<String, Object> additionalProperties;
 
     private PostPayoutCreatedPayloadDataFailure(
             Optional<String> code,
             Optional<OffsetDateTime> fundsReturnedAt,
             Optional<String> message,
+            Optional<PostPayoutCreatedPayloadDataFailureNextStep> nextStep,
             Map<String, Object> additionalProperties) {
         this.code = code;
         this.fundsReturnedAt = fundsReturnedAt;
         this.message = message;
+        this.nextStep = nextStep;
         this.additionalProperties = additionalProperties;
     }
 
@@ -66,7 +70,7 @@ public final class PostPayoutCreatedPayloadDataFailure {
     }
 
     /**
-     * @return Human-readable explanation of the failure. Callers holding <code>payout:destination:read</code> may receive text personalized to the destination; other callers get the generic catalog message.
+     * @return Human-readable explanation of the failure. Callers holding <code>payout:destination:read</code> may receive text personalized to the destination. Other callers get the generic catalog message.
      */
     @JsonIgnore
     public Optional<String> getMessage() {
@@ -74,6 +78,17 @@ public final class PostPayoutCreatedPayloadDataFailure {
             return Optional.empty();
         }
         return message;
+    }
+
+    /**
+     * @return What to do before a new payout can succeed. <code>withdraw_again</code> means that the payout method needs no change. <code>null</code> when the failure has no code from the error catalog, or when the account owner canceled the payout.
+     */
+    @JsonIgnore
+    public Optional<PostPayoutCreatedPayloadDataFailureNextStep> getNextStep() {
+        if (nextStep == null) {
+            return Optional.empty();
+        }
+        return nextStep;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -94,6 +109,12 @@ public final class PostPayoutCreatedPayloadDataFailure {
         return message;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("next_step")
+    private Optional<PostPayoutCreatedPayloadDataFailureNextStep> _getNextStep() {
+        return nextStep;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -109,12 +130,13 @@ public final class PostPayoutCreatedPayloadDataFailure {
     private boolean equalTo(PostPayoutCreatedPayloadDataFailure other) {
         return code.equals(other.code)
                 && fundsReturnedAt.equals(other.fundsReturnedAt)
-                && message.equals(other.message);
+                && message.equals(other.message)
+                && nextStep.equals(other.nextStep);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.code, this.fundsReturnedAt, this.message);
+        return Objects.hash(this.code, this.fundsReturnedAt, this.message, this.nextStep);
     }
 
     @java.lang.Override
@@ -134,6 +156,8 @@ public final class PostPayoutCreatedPayloadDataFailure {
 
         private Optional<String> message = Optional.empty();
 
+        private Optional<PostPayoutCreatedPayloadDataFailureNextStep> nextStep = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -142,6 +166,7 @@ public final class PostPayoutCreatedPayloadDataFailure {
             code(other.getCode());
             fundsReturnedAt(other.getFundsReturnedAt());
             message(other.getMessage());
+            nextStep(other.getNextStep());
             return this;
         }
 
@@ -196,7 +221,7 @@ public final class PostPayoutCreatedPayloadDataFailure {
         }
 
         /**
-         * <p>Human-readable explanation of the failure. Callers holding <code>payout:destination:read</code> may receive text personalized to the destination; other callers get the generic catalog message.</p>
+         * <p>Human-readable explanation of the failure. Callers holding <code>payout:destination:read</code> may receive text personalized to the destination. Other callers get the generic catalog message.</p>
          */
         @JsonSetter(value = "message", nulls = Nulls.SKIP)
         public Builder message(Optional<String> message) {
@@ -220,15 +245,42 @@ public final class PostPayoutCreatedPayloadDataFailure {
             return this;
         }
 
+        /**
+         * <p>What to do before a new payout can succeed. <code>withdraw_again</code> means that the payout method needs no change. <code>null</code> when the failure has no code from the error catalog, or when the account owner canceled the payout.</p>
+         */
+        @JsonSetter(value = "next_step", nulls = Nulls.SKIP)
+        public Builder nextStep(Optional<PostPayoutCreatedPayloadDataFailureNextStep> nextStep) {
+            this.nextStep = nextStep;
+            return this;
+        }
+
+        public Builder nextStep(PostPayoutCreatedPayloadDataFailureNextStep nextStep) {
+            this.nextStep = Optional.ofNullable(nextStep);
+            return this;
+        }
+
+        public Builder nextStep(Nullable<PostPayoutCreatedPayloadDataFailureNextStep> nextStep) {
+            if (nextStep.isNull()) {
+                this.nextStep = null;
+            } else if (nextStep.isEmpty()) {
+                this.nextStep = Optional.empty();
+            } else {
+                this.nextStep = Optional.of(nextStep.get());
+            }
+            return this;
+        }
+
         public PostPayoutCreatedPayloadDataFailure build() {
-            return new PostPayoutCreatedPayloadDataFailure(code, fundsReturnedAt, message, additionalProperties);
+            return new PostPayoutCreatedPayloadDataFailure(
+                    code, fundsReturnedAt, message, nextStep, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
             if (key.equalsIgnoreCase("code")
                     || key.equalsIgnoreCase("funds_returned_at")
-                    || key.equalsIgnoreCase("message")) {
+                    || key.equalsIgnoreCase("message")
+                    || key.equalsIgnoreCase("next_step")) {
                 return;
             }
             this.additionalProperties.put(key, value);

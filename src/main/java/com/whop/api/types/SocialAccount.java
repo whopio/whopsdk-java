@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = SocialAccount.Builder.class)
 public final class SocialAccount {
-    private final Optional<String> error;
-
     private final Optional<String> externalId;
 
     private final String id;
@@ -53,7 +51,6 @@ public final class SocialAccount {
     private final Map<String, Object> additionalProperties;
 
     private SocialAccount(
-            Optional<String> error,
             Optional<String> externalId,
             String id,
             Optional<String> name,
@@ -66,7 +63,6 @@ public final class SocialAccount {
             Optional<String> username,
             boolean verified,
             Map<String, Object> additionalProperties) {
-        this.error = error;
         this.externalId = externalId;
         this.id = id;
         this.name = name;
@@ -79,17 +75,6 @@ public final class SocialAccount {
         this.username = username;
         this.verified = verified;
         this.additionalProperties = additionalProperties;
-    }
-
-    /**
-     * @return Why this social account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.
-     */
-    @JsonIgnore
-    public Optional<String> getError() {
-        if (error == null) {
-            return Optional.empty();
-        }
-        return error;
     }
 
     /**
@@ -199,12 +184,6 @@ public final class SocialAccount {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
-    @JsonProperty("error")
-    private Optional<String> _getError() {
-        return error;
-    }
-
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("external_id")
     private Optional<String> _getExternalId() {
         return externalId;
@@ -258,8 +237,7 @@ public final class SocialAccount {
     }
 
     private boolean equalTo(SocialAccount other) {
-        return error.equals(other.error)
-                && externalId.equals(other.externalId)
+        return externalId.equals(other.externalId)
                 && id.equals(other.id)
                 && name.equals(other.name)
                 && parentSocialAccount.equals(other.parentSocialAccount)
@@ -275,7 +253,6 @@ public final class SocialAccount {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
-                this.error,
                 this.externalId,
                 this.id,
                 this.name,
@@ -327,15 +304,6 @@ public final class SocialAccount {
         _FinalStage additionalProperty(String key, Object value);
 
         _FinalStage additionalProperties(Map<String, Object> additionalProperties);
-
-        /**
-         * <p>Why this social account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
-         */
-        _FinalStage error(Optional<String> error);
-
-        _FinalStage error(String error);
-
-        _FinalStage error(Nullable<String> error);
 
         /**
          * <p>The platform-specific ID for this social account.</p>
@@ -431,15 +399,12 @@ public final class SocialAccount {
 
         private Optional<String> externalId = Optional.empty();
 
-        private Optional<String> error = Optional.empty();
-
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
 
         @java.lang.Override
         public Builder from(SocialAccount other) {
-            error(other.getError());
             externalId(other.getExternalId());
             id(other.getId());
             name(other.getName());
@@ -763,46 +728,9 @@ public final class SocialAccount {
             return this;
         }
 
-        /**
-         * <p>Why this social account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage error(Nullable<String> error) {
-            if (error.isNull()) {
-                this.error = null;
-            } else if (error.isEmpty()) {
-                this.error = Optional.empty();
-            } else {
-                this.error = Optional.of(error.get());
-            }
-            return this;
-        }
-
-        /**
-         * <p>Why this social account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
-         * @return Reference to {@code this} so that method calls can be chained together.
-         */
-        @java.lang.Override
-        public _FinalStage error(String error) {
-            this.error = Optional.ofNullable(error);
-            return this;
-        }
-
-        /**
-         * <p>Why this social account currently can't be used for advertising — a failed share or a Meta-side restriction. Null when the account is healthy.</p>
-         */
-        @java.lang.Override
-        @JsonSetter(value = "error", nulls = Nulls.SKIP)
-        public _FinalStage error(Optional<String> error) {
-            this.error = error;
-            return this;
-        }
-
         @java.lang.Override
         public SocialAccount build() {
             return new SocialAccount(
-                    error,
                     externalId,
                     id,
                     name,
@@ -819,8 +747,7 @@ public final class SocialAccount {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("error")
-                    || key.equalsIgnoreCase("external_id")
+            if (key.equalsIgnoreCase("external_id")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("name")
                     || key.equalsIgnoreCase("parent_social_account")

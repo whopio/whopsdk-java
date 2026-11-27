@@ -102,7 +102,7 @@ public final class AutomationStep {
     }
 
     /**
-     * @return The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, <code>sender_id</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object.
+     * @return The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, and <code>sender_id</code> and <code>attachment_ids</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object, except that a step keeps its <code>attachment_ids</code> when the write leaves them out.
      */
     @JsonProperty("config")
     public AutomationStepConfig getConfig() {
@@ -285,7 +285,7 @@ public final class AutomationStep {
 
     public interface ConfigStage {
         /**
-         * <p>The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, <code>sender_id</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object.</p>
+         * <p>The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, and <code>sender_id</code> and <code>attachment_ids</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object, except that a step keeps its <code>attachment_ids</code> when the write leaves them out.</p>
          */
         CreatedAtStage config(@NotNull AutomationStepConfig config);
     }
@@ -456,7 +456,7 @@ public final class AutomationStep {
         }
 
         /**
-         * <p>The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, <code>sender_id</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object.</p>
+         * <p>The step's settings for its <code>action_type</code>: <code>delay_seconds</code> for a <code>wait</code>, and <code>sender_id</code> and <code>attachment_ids</code> for an <code>email</code> or <code>message</code>. Writing it replaces the whole object, except that a step keeps its <code>attachment_ids</code> when the write leaves them out.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

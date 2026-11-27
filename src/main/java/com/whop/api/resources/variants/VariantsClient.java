@@ -147,28 +147,28 @@ public class VariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public Variant update(String id) {
         return this.rawClient.update(id).body();
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public Variant update(String id, RequestOptions requestOptions) {
         return this.rawClient.update(id, requestOptions).body();
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public Variant update(String id, UpdateVariantsRequest request) {
         return this.rawClient.update(id, request).body();
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public Variant update(String id, UpdateVariantsRequest request, RequestOptions requestOptions) {
         return this.rawClient.update(id, request, requestOptions).body();

@@ -57,7 +57,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUsername {
     }
 
     /**
-     * @return Username of the user to request attribution for, with or without a leading @.
+     * @return Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.
      */
     @JsonProperty("target_username")
     public String getTargetUsername() {
@@ -98,7 +98,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUsername {
 
     public interface TargetUsernameStage {
         /**
-         * <p>Username of the user to request attribution for, with or without a leading @.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          */
         _FinalStage targetUsername(@NotNull String targetUsername);
 
@@ -148,7 +148,7 @@ public final class CreatePartnerReferralRequestsRequestBodyTargetUsername {
         }
 
         /**
-         * <p>Username of the user to request attribution for, with or without a leading @.</p>
+         * <p>Deprecated: requests to a user have ended. The API rejects this field with a <code>400</code>.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override

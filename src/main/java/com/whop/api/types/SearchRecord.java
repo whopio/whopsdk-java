@@ -198,7 +198,7 @@ public final class SearchRecord {
         T _visitUnknown(Object unknownType);
     }
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "object", visible = true, defaultImpl = _UnknownValue.class)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = _UnknownValue.class)
     @JsonSubTypes({
         @JsonSubTypes.Type(AccountValue.class),
         @JsonSubTypes.Type(AffiliateValue.class),
@@ -215,10 +215,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("account")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class AccountValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordAccount value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -255,10 +255,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("affiliate")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class AffiliateValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordAffiliate value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -295,10 +295,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("member")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class MemberValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordMember value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -335,10 +335,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("membership")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class MembershipValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordMembership value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -375,10 +375,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("payment")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class PaymentValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordPayment value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -415,10 +415,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("promo_code")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class PromoCodeValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordPromoCode value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -455,10 +455,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("resolution_center_case")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class ResolutionCenterCaseValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordResolutionCenterCase value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -495,10 +495,10 @@ public final class SearchRecord {
     }
 
     @JsonTypeName("review")
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class ReviewValue implements Value {
         @JsonUnwrapped
-        @JsonIgnoreProperties(value = "object", allowSetters = true)
+        @JsonIgnoreProperties(value = "type", allowSetters = true)
         private SearchRecordReview value;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
@@ -534,7 +534,7 @@ public final class SearchRecord {
         }
     }
 
-    @JsonIgnoreProperties("object")
+    @JsonIgnoreProperties("type")
     private static final class _UnknownValue implements Value {
         private String type;
 

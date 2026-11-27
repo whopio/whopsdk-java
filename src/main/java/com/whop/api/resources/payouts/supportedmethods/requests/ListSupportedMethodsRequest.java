@@ -39,6 +39,8 @@ public final class ListSupportedMethodsRequest {
 
     private final Optional<Boolean> includeIndividualBanks;
 
+    private final Optional<Boolean> genericOnly;
+
     private final Optional<Integer> first;
 
     private final Optional<String> after;
@@ -59,6 +61,7 @@ public final class ListSupportedMethodsRequest {
             Optional<String> destinationCurrency,
             Optional<ListSupportedMethodsRequestPartyType> partyType,
             Optional<Boolean> includeIndividualBanks,
+            Optional<Boolean> genericOnly,
             Optional<Integer> first,
             Optional<String> after,
             Optional<Integer> last,
@@ -73,6 +76,7 @@ public final class ListSupportedMethodsRequest {
         this.destinationCurrency = destinationCurrency;
         this.partyType = partyType;
         this.includeIndividualBanks = includeIndividualBanks;
+        this.genericOnly = genericOnly;
         this.first = first;
         this.after = after;
         this.last = last;
@@ -153,6 +157,14 @@ public final class ListSupportedMethodsRequest {
     }
 
     /**
+     * @return In countries that list methods by payout route, only list one generic method per route and receiving currency. Each is the method that costs least for the amount, and has <code>category</code> and <code>rail</code> set. Returns an empty list there when no generic method is available. Other countries list as without this parameter.
+     */
+    @JsonProperty("generic_only")
+    public Optional<Boolean> getGenericOnly() {
+        return genericOnly;
+    }
+
+    /**
      * @return Number of results to return from the start of the range.
      */
     @JsonProperty("first")
@@ -205,6 +217,7 @@ public final class ListSupportedMethodsRequest {
                 && destinationCurrency.equals(other.destinationCurrency)
                 && partyType.equals(other.partyType)
                 && includeIndividualBanks.equals(other.includeIndividualBanks)
+                && genericOnly.equals(other.genericOnly)
                 && first.equals(other.first)
                 && after.equals(other.after)
                 && last.equals(other.last)
@@ -223,6 +236,7 @@ public final class ListSupportedMethodsRequest {
                 this.destinationCurrency,
                 this.partyType,
                 this.includeIndividualBanks,
+                this.genericOnly,
                 this.first,
                 this.after,
                 this.last,
@@ -258,6 +272,8 @@ public final class ListSupportedMethodsRequest {
 
         private Optional<Boolean> includeIndividualBanks = Optional.empty();
 
+        private Optional<Boolean> genericOnly = Optional.empty();
+
         private Optional<Integer> first = Optional.empty();
 
         private Optional<String> after = Optional.empty();
@@ -280,6 +296,7 @@ public final class ListSupportedMethodsRequest {
             destinationCurrency(other.getDestinationCurrency());
             partyType(other.getPartyType());
             includeIndividualBanks(other.getIncludeIndividualBanks());
+            genericOnly(other.getGenericOnly());
             first(other.getFirst());
             after(other.getAfter());
             last(other.getLast());
@@ -414,6 +431,20 @@ public final class ListSupportedMethodsRequest {
         }
 
         /**
+         * <p>In countries that list methods by payout route, only list one generic method per route and receiving currency. Each is the method that costs least for the amount, and has <code>category</code> and <code>rail</code> set. Returns an empty list there when no generic method is available. Other countries list as without this parameter.</p>
+         */
+        @JsonSetter(value = "generic_only", nulls = Nulls.SKIP)
+        public Builder genericOnly(Optional<Boolean> genericOnly) {
+            this.genericOnly = genericOnly;
+            return this;
+        }
+
+        public Builder genericOnly(Boolean genericOnly) {
+            this.genericOnly = Optional.ofNullable(genericOnly);
+            return this;
+        }
+
+        /**
          * <p>Number of results to return from the start of the range.</p>
          */
         @JsonSetter(value = "first", nulls = Nulls.SKIP)
@@ -480,6 +511,7 @@ public final class ListSupportedMethodsRequest {
                     destinationCurrency,
                     partyType,
                     includeIndividualBanks,
+                    genericOnly,
                     first,
                     after,
                     last,
@@ -498,6 +530,7 @@ public final class ListSupportedMethodsRequest {
                     || key.equalsIgnoreCase("destination_currency")
                     || key.equalsIgnoreCase("party_type")
                     || key.equalsIgnoreCase("include_individual_banks")
+                    || key.equalsIgnoreCase("generic_only")
                     || key.equalsIgnoreCase("first")
                     || key.equalsIgnoreCase("after")
                     || key.equalsIgnoreCase("last")

@@ -32,6 +32,10 @@ public final class CreateAutomationsRequestTriggerEvent {
     public static final CreateAutomationsRequestTriggerEvent INVOICE_PAID =
             new CreateAutomationsRequestTriggerEvent(Value.INVOICE_PAID, "invoice.paid");
 
+    public static final CreateAutomationsRequestTriggerEvent MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED =
+            new CreateAutomationsRequestTriggerEvent(
+                    Value.MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED, "membership.cancel_at_period_end_changed");
+
     public static final CreateAutomationsRequestTriggerEvent MEMBERSHIP_TRIAL_ENDING_SOON =
             new CreateAutomationsRequestTriggerEvent(
                     Value.MEMBERSHIP_TRIAL_ENDING_SOON, "membership.trial_ending_soon");
@@ -99,6 +103,8 @@ public final class CreateAutomationsRequestTriggerEvent {
                 return visitor.visitMembershipActivated();
             case INVOICE_PAID:
                 return visitor.visitInvoicePaid();
+            case MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED:
+                return visitor.visitMembershipCancelAtPeriodEndChanged();
             case MEMBERSHIP_TRIAL_ENDING_SOON:
                 return visitor.visitMembershipTrialEndingSoon();
             case REFUND_CREATED:
@@ -134,6 +140,8 @@ public final class CreateAutomationsRequestTriggerEvent {
                 return MEMBERSHIP_ACTIVATED;
             case "invoice.paid":
                 return INVOICE_PAID;
+            case "membership.cancel_at_period_end_changed":
+                return MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED;
             case "membership.trial_ending_soon":
                 return MEMBERSHIP_TRIAL_ENDING_SOON;
             case "refund.created":
@@ -157,6 +165,8 @@ public final class CreateAutomationsRequestTriggerEvent {
         MEMBERSHIP_ACTIVATED,
 
         MEMBERSHIP_TRIAL_ENDING_SOON,
+
+        MEMBERSHIP_CANCEL_AT_PERIOD_END_CHANGED,
 
         MEMBER_CREATED,
 
@@ -187,6 +197,8 @@ public final class CreateAutomationsRequestTriggerEvent {
         T visitMembershipActivated();
 
         T visitMembershipTrialEndingSoon();
+
+        T visitMembershipCancelAtPeriodEndChanged();
 
         T visitMemberCreated();
 

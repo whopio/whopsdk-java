@@ -274,7 +274,7 @@ public class AsyncVariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<Variant> update(String id) {
         CompletableFuture<WhopApiHttpResponse<Variant>> rawFuture = this.rawClient.update(id);
@@ -288,7 +288,7 @@ public class AsyncVariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<Variant> update(String id, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Variant>> rawFuture = this.rawClient.update(id, requestOptions);
@@ -302,7 +302,7 @@ public class AsyncVariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<Variant> update(String id, UpdateVariantsRequest request) {
         CompletableFuture<WhopApiHttpResponse<Variant>> rawFuture = this.rawClient.update(id, request);
@@ -316,7 +316,7 @@ public class AsyncVariantsClient {
     }
 
     /**
-     * Updates a variant's pricing, billing interval, visibility, stock, and other settings.
+     * Updates a variant's pricing, billing interval, visibility, stock, and other settings. While <code>unpaid_invoice_count</code> is above <code>0</code>, a change to the prices, billing period, trial, number of payments, currency or billing type returns a <code>400</code>.
      */
     public CompletableFuture<Variant> update(String id, UpdateVariantsRequest request, RequestOptions requestOptions) {
         CompletableFuture<WhopApiHttpResponse<Variant>> rawFuture = this.rawClient.update(id, request, requestOptions);

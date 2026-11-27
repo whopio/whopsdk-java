@@ -23,6 +23,8 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = UpdateFeesRequestChildMarkups.Builder.class)
 public final class UpdateFeesRequestChildMarkups {
+    private final Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>>> cardRegions;
+
     private final Optional<UpdateFeesRequestChildMarkupsCardSpend> cardSpend;
 
     private final Optional<UpdateFeesRequestChildMarkupsCryptoSwaps> cryptoSwaps;
@@ -40,6 +42,7 @@ public final class UpdateFeesRequestChildMarkups {
     private final Map<String, Object> additionalProperties;
 
     private UpdateFeesRequestChildMarkups(
+            Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>>> cardRegions,
             Optional<UpdateFeesRequestChildMarkupsCardSpend> cardSpend,
             Optional<UpdateFeesRequestChildMarkupsCryptoSwaps> cryptoSwaps,
             Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsDepositsValue>>> deposits,
@@ -48,6 +51,7 @@ public final class UpdateFeesRequestChildMarkups {
             Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsPayoutsValue>>> payouts,
             Optional<UpdateFeesRequestChildMarkupsTransfers> transfers,
             Map<String, Object> additionalProperties) {
+        this.cardRegions = cardRegions;
         this.cardSpend = cardSpend;
         this.cryptoSwaps = cryptoSwaps;
         this.deposits = deposits;
@@ -56,6 +60,14 @@ public final class UpdateFeesRequestChildMarkups {
         this.payouts = payouts;
         this.transfers = transfers;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return Markups on card payments, keyed by acquiring region: <code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>. <code>null</code> clears a region's markup so it uses <code>payment_methods.card</code>.
+     */
+    @JsonProperty("card_regions")
+    public Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>>> getCardRegions() {
+        return cardRegions;
     }
 
     /**
@@ -162,7 +174,8 @@ public final class UpdateFeesRequestChildMarkups {
     }
 
     private boolean equalTo(UpdateFeesRequestChildMarkups other) {
-        return cardSpend.equals(other.cardSpend)
+        return cardRegions.equals(other.cardRegions)
+                && cardSpend.equals(other.cardSpend)
                 && cryptoSwaps.equals(other.cryptoSwaps)
                 && deposits.equals(other.deposits)
                 && paymentMethods.equals(other.paymentMethods)
@@ -174,6 +187,7 @@ public final class UpdateFeesRequestChildMarkups {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.cardRegions,
                 this.cardSpend,
                 this.cryptoSwaps,
                 this.deposits,
@@ -194,6 +208,9 @@ public final class UpdateFeesRequestChildMarkups {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>>> cardRegions =
+                Optional.empty();
+
         private Optional<UpdateFeesRequestChildMarkupsCardSpend> cardSpend = Optional.empty();
 
         private Optional<UpdateFeesRequestChildMarkupsCryptoSwaps> cryptoSwaps = Optional.empty();
@@ -214,6 +231,7 @@ public final class UpdateFeesRequestChildMarkups {
         private Builder() {}
 
         public Builder from(UpdateFeesRequestChildMarkups other) {
+            cardRegions(other.getCardRegions());
             cardSpend(other.getCardSpend());
             cryptoSwaps(other.getCryptoSwaps());
             deposits(other.getDeposits());
@@ -221,6 +239,21 @@ public final class UpdateFeesRequestChildMarkups {
             payments(other.getPayments());
             payouts(other.getPayouts());
             transfers(other.getTransfers());
+            return this;
+        }
+
+        /**
+         * <p>Markups on card payments, keyed by acquiring region: <code>usa</code>, <code>eu</code>, <code>uk</code>, <code>ca</code>, or <code>au</code>. <code>null</code> clears a region's markup so it uses <code>payment_methods.card</code>.</p>
+         */
+        @JsonSetter(value = "card_regions", nulls = Nulls.SKIP)
+        public Builder cardRegions(
+                Optional<Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>>> cardRegions) {
+            this.cardRegions = cardRegions;
+            return this;
+        }
+
+        public Builder cardRegions(Map<String, Optional<UpdateFeesRequestChildMarkupsCardRegionsValue>> cardRegions) {
+            this.cardRegions = Optional.ofNullable(cardRegions);
             return this;
         }
 
@@ -370,6 +403,7 @@ public final class UpdateFeesRequestChildMarkups {
 
         public UpdateFeesRequestChildMarkups build() {
             return new UpdateFeesRequestChildMarkups(
+                    cardRegions,
                     cardSpend,
                     cryptoSwaps,
                     deposits,
@@ -382,7 +416,8 @@ public final class UpdateFeesRequestChildMarkups {
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("card_spend")
+            if (key.equalsIgnoreCase("card_regions")
+                    || key.equalsIgnoreCase("card_spend")
                     || key.equalsIgnoreCase("crypto_swaps")
                     || key.equalsIgnoreCase("deposits")
                     || key.equalsIgnoreCase("payment_methods")

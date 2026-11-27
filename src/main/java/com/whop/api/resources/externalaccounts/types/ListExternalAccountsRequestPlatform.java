@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListExternalAccountsRequestPlatform {
-    public static final ListExternalAccountsRequestPlatform INSTAGRAM =
-            new ListExternalAccountsRequestPlatform(Value.INSTAGRAM, "instagram");
-
     public static final ListExternalAccountsRequestPlatform FACEBOOK =
             new ListExternalAccountsRequestPlatform(Value.FACEBOOK, "facebook");
 
@@ -25,11 +22,16 @@ public final class ListExternalAccountsRequestPlatform {
     public static final ListExternalAccountsRequestPlatform KLAVIYO =
             new ListExternalAccountsRequestPlatform(Value.KLAVIYO, "klaviyo");
 
-    public static final ListExternalAccountsRequestPlatform AIMERCE =
-            new ListExternalAccountsRequestPlatform(Value.AIMERCE, "aimerce");
-
     public static final ListExternalAccountsRequestPlatform TELEGRAM =
             new ListExternalAccountsRequestPlatform(Value.TELEGRAM, "telegram");
+
+    public static final ListExternalAccountsRequestPlatform X = new ListExternalAccountsRequestPlatform(Value.X, "x");
+
+    public static final ListExternalAccountsRequestPlatform INSTAGRAM =
+            new ListExternalAccountsRequestPlatform(Value.INSTAGRAM, "instagram");
+
+    public static final ListExternalAccountsRequestPlatform AIMERCE =
+            new ListExternalAccountsRequestPlatform(Value.AIMERCE, "aimerce");
 
     public static final ListExternalAccountsRequestPlatform QUICKBOOKS =
             new ListExternalAccountsRequestPlatform(Value.QUICKBOOKS, "quickbooks");
@@ -37,10 +39,11 @@ public final class ListExternalAccountsRequestPlatform {
     public static final ListExternalAccountsRequestPlatform LINKEDIN =
             new ListExternalAccountsRequestPlatform(Value.LINKEDIN, "linkedin");
 
-    public static final ListExternalAccountsRequestPlatform X = new ListExternalAccountsRequestPlatform(Value.X, "x");
-
     public static final ListExternalAccountsRequestPlatform TIKTOK =
             new ListExternalAccountsRequestPlatform(Value.TIKTOK, "tiktok");
+
+    public static final ListExternalAccountsRequestPlatform STRIPE =
+            new ListExternalAccountsRequestPlatform(Value.STRIPE, "stripe");
 
     private final Value value;
 
@@ -75,8 +78,6 @@ public final class ListExternalAccountsRequestPlatform {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case INSTAGRAM:
-                return visitor.visitInstagram();
             case FACEBOOK:
                 return visitor.visitFacebook();
             case YOUTUBE:
@@ -87,18 +88,22 @@ public final class ListExternalAccountsRequestPlatform {
                 return visitor.visitSnapchat();
             case KLAVIYO:
                 return visitor.visitKlaviyo();
-            case AIMERCE:
-                return visitor.visitAimerce();
             case TELEGRAM:
                 return visitor.visitTelegram();
+            case X:
+                return visitor.visitX();
+            case INSTAGRAM:
+                return visitor.visitInstagram();
+            case AIMERCE:
+                return visitor.visitAimerce();
             case QUICKBOOKS:
                 return visitor.visitQuickbooks();
             case LINKEDIN:
                 return visitor.visitLinkedin();
-            case X:
-                return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -108,8 +113,6 @@ public final class ListExternalAccountsRequestPlatform {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListExternalAccountsRequestPlatform valueOf(String value) {
         switch (value) {
-            case "instagram":
-                return INSTAGRAM;
             case "facebook":
                 return FACEBOOK;
             case "youtube":
@@ -120,18 +123,22 @@ public final class ListExternalAccountsRequestPlatform {
                 return SNAPCHAT;
             case "klaviyo":
                 return KLAVIYO;
-            case "aimerce":
-                return AIMERCE;
             case "telegram":
                 return TELEGRAM;
+            case "x":
+                return X;
+            case "instagram":
+                return INSTAGRAM;
+            case "aimerce":
+                return AIMERCE;
             case "quickbooks":
                 return QUICKBOOKS;
             case "linkedin":
                 return LINKEDIN;
-            case "x":
-                return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new ListExternalAccountsRequestPlatform(Value.UNKNOWN, value);
         }
@@ -162,6 +169,8 @@ public final class ListExternalAccountsRequestPlatform {
 
         AIMERCE,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -189,6 +198,8 @@ public final class ListExternalAccountsRequestPlatform {
         T visitQuickbooks();
 
         T visitAimerce();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

@@ -30,7 +30,7 @@ public class AsyncDepositsClient {
     }
 
     /**
-     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin and Tron deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance. That requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<CreateDepositsResponse> create(CreateDepositsRequest request) {
         CompletableFuture<WhopApiHttpResponse<CreateDepositsResponse>> rawFuture = this.rawClient.create(request);
@@ -44,7 +44,7 @@ public class AsyncDepositsClient {
     }
 
     /**
-     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance; that requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
+     * Returns the deposit methods for an account or user, including crypto addresses, bank transfer instructions, and, for a business, a hosted deposit page. Bitcoin and Tron deposits are converted to USDT on Plasma in the destination's wallet. Business destinations require no authentication. Pass <code>payment_method_id</code> to also charge a business's saved payment method for <code>amount</code> in USD and add it to the business's balance. That requires authentication with the <code>payment:charge</code> scope. The charge has no fees or taxes and does not count as revenue.
      */
     public CompletableFuture<CreateDepositsResponse> create(
             CreateDepositsRequest request, RequestOptions requestOptions) {

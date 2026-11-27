@@ -50,7 +50,7 @@ public class AsyncRawChannelMembersClient {
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChannelMember>>> list(
             ListChannelMembersRequest request) {
@@ -58,7 +58,7 @@ public class AsyncRawChannelMembersClient {
     }
 
     /**
-     * List or search the people in a channel.
+     * List or search the current members of a channel. Set include_deleted to true to include former members with a deleted_at timestamp.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<ChannelMember>>> list(
             ListChannelMembersRequest request, RequestOptions requestOptions) {
@@ -85,6 +85,10 @@ public class AsyncRawChannelMembersClient {
         if (request.getQuery().isPresent()) {
             QueryStringMapper.addQueryParameter(
                     httpUrl, "query", request.getQuery().get(), false);
+        }
+        if (request.getIncludeDeleted().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "include_deleted", request.getIncludeDeleted().get(), false);
         }
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {

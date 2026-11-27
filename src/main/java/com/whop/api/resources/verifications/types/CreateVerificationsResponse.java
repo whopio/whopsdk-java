@@ -45,6 +45,8 @@ public final class CreateVerificationsResponse {
 
     private final Optional<String> id;
 
+    private final Optional<CreateVerificationsResponseIdentityDocument> identityDocument;
+
     private final Optional<String> incorporationDate;
 
     private final Optional<CreateVerificationsResponseKind> kind;
@@ -62,6 +64,8 @@ public final class CreateVerificationsResponse {
     private final Optional<List<CreateVerificationsResponseRequestedInformationItem>> requestedInformation;
 
     private final Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> requiredDocuments;
+
+    private final Optional<CreateVerificationsResponseSelfie> selfie;
 
     private final Optional<String> sessionUrl;
 
@@ -82,6 +86,7 @@ public final class CreateVerificationsResponse {
             Optional<String> email,
             Optional<String> firstName,
             Optional<String> id,
+            Optional<CreateVerificationsResponseIdentityDocument> identityDocument,
             Optional<String> incorporationDate,
             Optional<CreateVerificationsResponseKind> kind,
             Optional<String> lastName,
@@ -91,6 +96,7 @@ public final class CreateVerificationsResponse {
             Optional<String> registrationNumber,
             Optional<List<CreateVerificationsResponseRequestedInformationItem>> requestedInformation,
             Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> requiredDocuments,
+            Optional<CreateVerificationsResponseSelfie> selfie,
             Optional<String> sessionUrl,
             Optional<CreateVerificationsResponseStatus> status,
             Optional<String> updatedAt,
@@ -105,6 +111,7 @@ public final class CreateVerificationsResponse {
         this.email = email;
         this.firstName = firstName;
         this.id = id;
+        this.identityDocument = identityDocument;
         this.incorporationDate = incorporationDate;
         this.kind = kind;
         this.lastName = lastName;
@@ -114,6 +121,7 @@ public final class CreateVerificationsResponse {
         this.registrationNumber = registrationNumber;
         this.requestedInformation = requestedInformation;
         this.requiredDocuments = requiredDocuments;
+        this.selfie = selfie;
         this.sessionUrl = sessionUrl;
         this.status = status;
         this.updatedAt = updatedAt;
@@ -219,6 +227,17 @@ public final class CreateVerificationsResponse {
     }
 
     /**
+     * @return Identity document on file for the person. Individual verifications only. <code>null</code> until the person sends a document.
+     */
+    @JsonIgnore
+    public Optional<CreateVerificationsResponseIdentityDocument> getIdentityDocument() {
+        if (identityDocument == null) {
+            return Optional.empty();
+        }
+        return identityDocument;
+    }
+
+    /**
      * @return Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.
      */
     @JsonIgnore
@@ -284,7 +303,7 @@ public final class CreateVerificationsResponse {
     }
 
     /**
-     * @return What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the company details and documents still missing before it can be sent for review; each owner's documents are listed under that owner.
+     * @return What Whop still needs before review can continue, with one requirement per entry. Answer with Update Verification. Nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the business details and documents still missing before it can be sent for review. Each owner's documents are listed under that owner.
      */
     @JsonProperty("requested_information")
     public Optional<List<CreateVerificationsResponseRequestedInformationItem>> getRequestedInformation() {
@@ -297,6 +316,17 @@ public final class CreateVerificationsResponse {
     @JsonProperty("required_documents")
     public Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> getRequiredDocuments() {
         return requiredDocuments;
+    }
+
+    /**
+     * @return Selfie check of the person. Individual verifications only. <code>null</code> when the verification has no selfie check.
+     */
+    @JsonIgnore
+    public Optional<CreateVerificationsResponseSelfie> getSelfie() {
+        if (selfie == null) {
+            return Optional.empty();
+        }
+        return selfie;
     }
 
     /**
@@ -369,6 +399,12 @@ public final class CreateVerificationsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("identity_document")
+    private Optional<CreateVerificationsResponseIdentityDocument> _getIdentityDocument() {
+        return identityDocument;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("incorporation_date")
     private Optional<String> _getIncorporationDate() {
         return incorporationDate;
@@ -399,6 +435,12 @@ public final class CreateVerificationsResponse {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("selfie")
+    private Optional<CreateVerificationsResponseSelfie> _getSelfie() {
+        return selfie;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("session_url")
     private Optional<String> _getSessionUrl() {
         return sessionUrl;
@@ -426,6 +468,7 @@ public final class CreateVerificationsResponse {
                 && email.equals(other.email)
                 && firstName.equals(other.firstName)
                 && id.equals(other.id)
+                && identityDocument.equals(other.identityDocument)
                 && incorporationDate.equals(other.incorporationDate)
                 && kind.equals(other.kind)
                 && lastName.equals(other.lastName)
@@ -435,6 +478,7 @@ public final class CreateVerificationsResponse {
                 && registrationNumber.equals(other.registrationNumber)
                 && requestedInformation.equals(other.requestedInformation)
                 && requiredDocuments.equals(other.requiredDocuments)
+                && selfie.equals(other.selfie)
                 && sessionUrl.equals(other.sessionUrl)
                 && status.equals(other.status)
                 && updatedAt.equals(other.updatedAt);
@@ -453,6 +497,7 @@ public final class CreateVerificationsResponse {
                 this.email,
                 this.firstName,
                 this.id,
+                this.identityDocument,
                 this.incorporationDate,
                 this.kind,
                 this.lastName,
@@ -462,6 +507,7 @@ public final class CreateVerificationsResponse {
                 this.registrationNumber,
                 this.requestedInformation,
                 this.requiredDocuments,
+                this.selfie,
                 this.sessionUrl,
                 this.status,
                 this.updatedAt);
@@ -498,6 +544,8 @@ public final class CreateVerificationsResponse {
 
         private Optional<String> id = Optional.empty();
 
+        private Optional<CreateVerificationsResponseIdentityDocument> identityDocument = Optional.empty();
+
         private Optional<String> incorporationDate = Optional.empty();
 
         private Optional<CreateVerificationsResponseKind> kind = Optional.empty();
@@ -516,6 +564,8 @@ public final class CreateVerificationsResponse {
                 Optional.empty();
 
         private Optional<List<CreateVerificationsResponseRequiredDocumentsItem>> requiredDocuments = Optional.empty();
+
+        private Optional<CreateVerificationsResponseSelfie> selfie = Optional.empty();
 
         private Optional<String> sessionUrl = Optional.empty();
 
@@ -538,6 +588,7 @@ public final class CreateVerificationsResponse {
             email(other.getEmail());
             firstName(other.getFirstName());
             id(other.getId());
+            identityDocument(other.getIdentityDocument());
             incorporationDate(other.getIncorporationDate());
             kind(other.getKind());
             lastName(other.getLastName());
@@ -547,6 +598,7 @@ public final class CreateVerificationsResponse {
             registrationNumber(other.getRegistrationNumber());
             requestedInformation(other.getRequestedInformation());
             requiredDocuments(other.getRequiredDocuments());
+            selfie(other.getSelfie());
             sessionUrl(other.getSessionUrl());
             status(other.getStatus());
             updatedAt(other.getUpdatedAt());
@@ -778,6 +830,31 @@ public final class CreateVerificationsResponse {
         }
 
         /**
+         * <p>Identity document on file for the person. Individual verifications only. <code>null</code> until the person sends a document.</p>
+         */
+        @JsonSetter(value = "identity_document", nulls = Nulls.SKIP)
+        public Builder identityDocument(Optional<CreateVerificationsResponseIdentityDocument> identityDocument) {
+            this.identityDocument = identityDocument;
+            return this;
+        }
+
+        public Builder identityDocument(CreateVerificationsResponseIdentityDocument identityDocument) {
+            this.identityDocument = Optional.ofNullable(identityDocument);
+            return this;
+        }
+
+        public Builder identityDocument(Nullable<CreateVerificationsResponseIdentityDocument> identityDocument) {
+            if (identityDocument.isNull()) {
+                this.identityDocument = null;
+            } else if (identityDocument.isEmpty()) {
+                this.identityDocument = Optional.empty();
+            } else {
+                this.identityDocument = Optional.of(identityDocument.get());
+            }
+            return this;
+        }
+
+        /**
          * <p>Date the business was incorporated, formatted as <code>YYYY-MM-DD</code>, as on file for the business verification. Business verifications only; <code>null</code> until it is sent.</p>
          */
         @JsonSetter(value = "incorporation_date", nulls = Nulls.SKIP)
@@ -935,7 +1012,7 @@ public final class CreateVerificationsResponse {
         }
 
         /**
-         * <p>What Whop still needs before review can continue — one requirement per entry. Answer with Update Verification; nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the company details and documents still missing before it can be sent for review; each owner's documents are listed under that owner.</p>
+         * <p>What Whop still needs before review can continue, with one requirement per entry. Answer with Update Verification. Nothing from the response is echoed back. Keys that don't apply are omitted. For a business verification created with <code>documents</code> or <code>owners</code>, this includes the business details and documents still missing before it can be sent for review. Each owner's documents are listed under that owner.</p>
          */
         @JsonSetter(value = "requested_information", nulls = Nulls.SKIP)
         public Builder requestedInformation(
@@ -962,6 +1039,31 @@ public final class CreateVerificationsResponse {
 
         public Builder requiredDocuments(List<CreateVerificationsResponseRequiredDocumentsItem> requiredDocuments) {
             this.requiredDocuments = Optional.ofNullable(requiredDocuments);
+            return this;
+        }
+
+        /**
+         * <p>Selfie check of the person. Individual verifications only. <code>null</code> when the verification has no selfie check.</p>
+         */
+        @JsonSetter(value = "selfie", nulls = Nulls.SKIP)
+        public Builder selfie(Optional<CreateVerificationsResponseSelfie> selfie) {
+            this.selfie = selfie;
+            return this;
+        }
+
+        public Builder selfie(CreateVerificationsResponseSelfie selfie) {
+            this.selfie = Optional.ofNullable(selfie);
+            return this;
+        }
+
+        public Builder selfie(Nullable<CreateVerificationsResponseSelfie> selfie) {
+            if (selfie.isNull()) {
+                this.selfie = null;
+            } else if (selfie.isEmpty()) {
+                this.selfie = Optional.empty();
+            } else {
+                this.selfie = Optional.of(selfie.get());
+            }
             return this;
         }
 
@@ -1030,6 +1132,7 @@ public final class CreateVerificationsResponse {
                     email,
                     firstName,
                     id,
+                    identityDocument,
                     incorporationDate,
                     kind,
                     lastName,
@@ -1039,6 +1142,7 @@ public final class CreateVerificationsResponse {
                     registrationNumber,
                     requestedInformation,
                     requiredDocuments,
+                    selfie,
                     sessionUrl,
                     status,
                     updatedAt,
@@ -1057,6 +1161,7 @@ public final class CreateVerificationsResponse {
                     || key.equalsIgnoreCase("email")
                     || key.equalsIgnoreCase("first_name")
                     || key.equalsIgnoreCase("id")
+                    || key.equalsIgnoreCase("identity_document")
                     || key.equalsIgnoreCase("incorporation_date")
                     || key.equalsIgnoreCase("kind")
                     || key.equalsIgnoreCase("last_name")
@@ -1066,6 +1171,7 @@ public final class CreateVerificationsResponse {
                     || key.equalsIgnoreCase("registration_number")
                     || key.equalsIgnoreCase("requested_information")
                     || key.equalsIgnoreCase("required_documents")
+                    || key.equalsIgnoreCase("selfie")
                     || key.equalsIgnoreCase("session_url")
                     || key.equalsIgnoreCase("status")
                     || key.equalsIgnoreCase("updated_at")) {

@@ -107,7 +107,7 @@ public final class ListSocialAccountsRequest {
     }
 
     /**
-     * @return Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>.
+     * @return Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>. A <code>stripe</code> account is also returned only with this filter, which requires the <code>payout:account:update</code> scope.
      */
     @JsonProperty("platform")
     public Optional<ListSocialAccountsRequestPlatform> getPlatform() {
@@ -324,7 +324,7 @@ public final class ListSocialAccountsRequest {
         }
 
         /**
-         * <p>Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>.</p>
+         * <p>Only return external accounts for the platform that is specified. An <code>aimerce</code> account is returned only with this filter, which requires the <code>company:manage_checkout</code> scope instead of <code>social_account:read</code>. A <code>stripe</code> account is also returned only with this filter, which requires the <code>payout:account:update</code> scope.</p>
          */
         @JsonSetter(value = "platform", nulls = Nulls.SKIP)
         public Builder platform(Optional<ListSocialAccountsRequestPlatform> platform) {

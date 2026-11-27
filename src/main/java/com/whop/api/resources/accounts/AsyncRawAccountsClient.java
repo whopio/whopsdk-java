@@ -494,7 +494,7 @@ public class AsyncRawAccountsClient {
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AccountSearchResult>>> search(
             SearchAccountsRequest request) {
@@ -502,7 +502,7 @@ public class AsyncRawAccountsClient {
     }
 
     /**
-     * Finds accounts by name among the accounts the credential can list. Support searches cover every company and return only the 50 best matches.
+     * Finds accounts by name among the accounts the credential can list. Support searches cover every account and return only the 50 best matches.
      */
     public CompletableFuture<WhopApiHttpResponse<SyncPagingIterable<AccountSearchResult>>> search(
             SearchAccountsRequest request, RequestOptions requestOptions) {

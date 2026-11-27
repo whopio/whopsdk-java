@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class AccountReserveTypeType {
+    public static final AccountReserveTypeType SUBACCOUNT_NEGATIVE_BALANCES =
+            new AccountReserveTypeType(Value.SUBACCOUNT_NEGATIVE_BALANCES, "subaccount_negative_balances");
+
     public static final AccountReserveTypeType SEQURA = new AccountReserveTypeType(Value.SEQURA, "sequra");
 
     public static final AccountReserveTypeType PRESHIPMENT_HOLD =
@@ -51,6 +54,8 @@ public final class AccountReserveTypeType {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
+            case SUBACCOUNT_NEGATIVE_BALANCES:
+                return visitor.visitSubaccountNegativeBalances();
             case SEQURA:
                 return visitor.visitSequra();
             case PRESHIPMENT_HOLD:
@@ -70,6 +75,8 @@ public final class AccountReserveTypeType {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static AccountReserveTypeType valueOf(String value) {
         switch (value) {
+            case "subaccount_negative_balances":
+                return SUBACCOUNT_NEGATIVE_BALANCES;
             case "sequra":
                 return SEQURA;
             case "preshipment_hold":
@@ -96,6 +103,8 @@ public final class AccountReserveTypeType {
 
         PRESHIPMENT_HOLD,
 
+        SUBACCOUNT_NEGATIVE_BALANCES,
+
         UNKNOWN
     }
 
@@ -109,6 +118,8 @@ public final class AccountReserveTypeType {
         T visitFraudHold();
 
         T visitPreshipmentHold();
+
+        T visitSubaccountNegativeBalances();
 
         T visitUnknown(String unknownType);
     }

@@ -118,28 +118,28 @@ public class SocialAccountsClient {
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public SocialAccount refresh(String id) {
         return this.rawClient.refresh(id).body();
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public SocialAccount refresh(String id, RequestOptions requestOptions) {
         return this.rawClient.refresh(id, requestOptions).body();
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public SocialAccount refresh(String id, RefreshSocialAccountsRequest request) {
         return this.rawClient.refresh(id, request).body();
     }
 
     /**
-     * Deprecated compatibility endpoint. Refresh external accounts with <code>POST /external_accounts/{id}/refresh</code> instead.
+     * Deprecated compatibility endpoint. Returns the social account unchanged.
      */
     public SocialAccount refresh(String id, RefreshSocialAccountsRequest request, RequestOptions requestOptions) {
         return this.rawClient.refresh(id, request, requestOptions).body();

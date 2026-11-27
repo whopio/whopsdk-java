@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.whop.api.core.ObjectMappers;
+import com.whop.api.types.PermissionGrant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,18 +22,17 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListPermissionsResponse.Builder.class)
 public final class ListPermissionsResponse {
-    private final List<ListPermissionsResponseDataItem> data;
+    private final List<PermissionGrant> data;
 
     private final Map<String, Object> additionalProperties;
 
-    private ListPermissionsResponse(
-            List<ListPermissionsResponseDataItem> data, Map<String, Object> additionalProperties) {
+    private ListPermissionsResponse(List<PermissionGrant> data, Map<String, Object> additionalProperties) {
         this.data = data;
         this.additionalProperties = additionalProperties;
     }
 
     @JsonProperty("data")
-    public List<ListPermissionsResponseDataItem> getData() {
+    public List<PermissionGrant> getData() {
         return data;
     }
 
@@ -67,7 +67,7 @@ public final class ListPermissionsResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
-        private List<ListPermissionsResponseDataItem> data = new ArrayList<>();
+        private List<PermissionGrant> data = new ArrayList<>();
 
         private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -79,7 +79,7 @@ public final class ListPermissionsResponse {
         }
 
         @JsonSetter(value = "data", nulls = Nulls.SKIP)
-        public Builder data(List<ListPermissionsResponseDataItem> data) {
+        public Builder data(List<PermissionGrant> data) {
             this.data.clear();
             if (data != null) {
                 this.data.addAll(data);
@@ -87,12 +87,12 @@ public final class ListPermissionsResponse {
             return this;
         }
 
-        public Builder addData(ListPermissionsResponseDataItem data) {
+        public Builder addData(PermissionGrant data) {
             this.data.add(data);
             return this;
         }
 
-        public Builder addAllData(List<ListPermissionsResponseDataItem> data) {
+        public Builder addAllData(List<PermissionGrant> data) {
             if (data != null) {
                 this.data.addAll(data);
             }

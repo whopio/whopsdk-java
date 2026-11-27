@@ -62,7 +62,7 @@ public final class NotificationPreferenceScope {
     }
 
     /**
-     * @return Delivery channel the preference applies to. <code>null</code> applies to every channel.
+     * @return Delivery channel the preference applies to. <code>null</code> applies to every channel. Email is the exception when the topic's <code>every_channel_covers_email</code> is <code>false</code>.
      */
     @JsonIgnore
     public Optional<NotificationPreferenceScopeChannel> getChannel() {
@@ -219,7 +219,7 @@ public final class NotificationPreferenceScope {
         }
 
         /**
-         * <p>Delivery channel the preference applies to. <code>null</code> applies to every channel.</p>
+         * <p>Delivery channel the preference applies to. <code>null</code> applies to every channel. Email is the exception when the topic's <code>every_channel_covers_email</code> is <code>false</code>.</p>
          */
         @JsonSetter(value = "channel", nulls = Nulls.SKIP)
         public Builder channel(Optional<NotificationPreferenceScopeChannel> channel) {

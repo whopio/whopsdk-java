@@ -36,6 +36,9 @@ public final class ExternalAccountParentPlatform {
     public static final ExternalAccountParentPlatform TIKTOK =
             new ExternalAccountParentPlatform(Value.TIKTOK, "tiktok");
 
+    public static final ExternalAccountParentPlatform STRIPE =
+            new ExternalAccountParentPlatform(Value.STRIPE, "stripe");
+
     private final Value value;
 
     private final String string;
@@ -89,6 +92,8 @@ public final class ExternalAccountParentPlatform {
                 return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -118,6 +123,8 @@ public final class ExternalAccountParentPlatform {
                 return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new ExternalAccountParentPlatform(Value.UNKNOWN, value);
         }
@@ -144,6 +151,8 @@ public final class ExternalAccountParentPlatform {
 
         AIMERCE,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -167,6 +176,8 @@ public final class ExternalAccountParentPlatform {
         T visitQuickbooks();
 
         T visitAimerce();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

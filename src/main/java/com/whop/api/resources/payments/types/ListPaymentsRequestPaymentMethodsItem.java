@@ -397,6 +397,9 @@ public final class ListPaymentsRequestPaymentMethodsItem {
     public static final ListPaymentsRequestPaymentMethodsItem CARD =
             new ListPaymentsRequestPaymentMethodsItem(Value.CARD, "card");
 
+    public static final ListPaymentsRequestPaymentMethodsItem PIX_AUTOMATICO =
+            new ListPaymentsRequestPaymentMethodsItem(Value.PIX_AUTOMATICO, "pix_automatico");
+
     public static final ListPaymentsRequestPaymentMethodsItem NG_WALLET =
             new ListPaymentsRequestPaymentMethodsItem(Value.NG_WALLET, "ng_wallet");
 
@@ -420,6 +423,9 @@ public final class ListPaymentsRequestPaymentMethodsItem {
 
     public static final ListPaymentsRequestPaymentMethodsItem ALMA =
             new ListPaymentsRequestPaymentMethodsItem(Value.ALMA, "alma");
+
+    public static final ListPaymentsRequestPaymentMethodsItem BIZUM =
+            new ListPaymentsRequestPaymentMethodsItem(Value.BIZUM, "bizum");
 
     public static final ListPaymentsRequestPaymentMethodsItem RECHNUNG =
             new ListPaymentsRequestPaymentMethodsItem(Value.RECHNUNG, "rechnung");
@@ -858,6 +864,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
                 return visitor.visitUpi();
             case CARD:
                 return visitor.visitCard();
+            case PIX_AUTOMATICO:
+                return visitor.visitPixAutomatico();
             case NG_WALLET:
                 return visitor.visitNgWallet();
             case CARD_INSTALLMENTS_TWELVE:
@@ -874,6 +882,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
                 return visitor.visitAlelo();
             case ALMA:
                 return visitor.visitAlma();
+            case BIZUM:
+                return visitor.visitBizum();
             case RECHNUNG:
                 return visitor.visitRechnung();
             case NETBANKING:
@@ -1239,6 +1249,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
                 return UPI;
             case "card":
                 return CARD;
+            case "pix_automatico":
+                return PIX_AUTOMATICO;
             case "ng_wallet":
                 return NG_WALLET;
             case "card_installments_twelve":
@@ -1255,6 +1267,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
                 return ALELO;
             case "alma":
                 return ALMA;
+            case "bizum":
+                return BIZUM;
             case "rechnung":
                 return RECHNUNG;
             case "netbanking":
@@ -1491,6 +1505,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
 
         BILLIE,
 
+        BIZUM,
+
         BLIK,
 
         BOLETO,
@@ -1652,6 +1668,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
         PAYTO_BANK_ACCOUNT,
 
         PIX,
+
+        PIX_AUTOMATICO,
 
         PLATFORM_BALANCE,
 
@@ -1867,6 +1885,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
 
         T visitBillie();
 
+        T visitBizum();
+
         T visitBlik();
 
         T visitBoleto();
@@ -2028,6 +2048,8 @@ public final class ListPaymentsRequestPaymentMethodsItem {
         T visitPaytoBankAccount();
 
         T visitPix();
+
+        T visitPixAutomatico();
 
         T visitPlatformBalance();
 

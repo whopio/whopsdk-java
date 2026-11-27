@@ -34,6 +34,8 @@ public final class ChatMessage {
 
     private final Optional<String> authorUserId;
 
+    private final Optional<MessageAutomation> automation;
+
     private final String channelId;
 
     private final Optional<String> content;
@@ -47,6 +49,8 @@ public final class ChatMessage {
     private final boolean edited;
 
     private final List<Embed> embeds;
+
+    private final Optional<ExternalMessageEmail> externalMessage;
 
     private final List<Gif> gifs;
 
@@ -66,6 +70,8 @@ public final class ChatMessage {
 
     private final List<MessageReactionCount> reactionCounts;
 
+    private final Optional<ChatMessage> replyingToMessage;
+
     private final Optional<String> replyingToMessageId;
 
     private final Optional<String> replyingToUserId;
@@ -81,6 +87,7 @@ public final class ChatMessage {
             Optional<UserSummary> author,
             boolean authorIsTeamMember,
             Optional<String> authorUserId,
+            Optional<MessageAutomation> automation,
             String channelId,
             Optional<String> content,
             String createdAt,
@@ -88,6 +95,7 @@ public final class ChatMessage {
             Optional<String> deletedAt,
             boolean edited,
             List<Embed> embeds,
+            Optional<ExternalMessageEmail> externalMessage,
             List<Gif> gifs,
             String id,
             List<MessageLinkPreview> linkPreviews,
@@ -97,6 +105,7 @@ public final class ChatMessage {
             Optional<String> plainContent,
             Optional<ChatMessagePoll> poll,
             List<MessageReactionCount> reactionCounts,
+            Optional<ChatMessage> replyingToMessage,
             Optional<String> replyingToMessageId,
             Optional<String> replyingToUserId,
             String updatedAt,
@@ -106,6 +115,7 @@ public final class ChatMessage {
         this.author = author;
         this.authorIsTeamMember = authorIsTeamMember;
         this.authorUserId = authorUserId;
+        this.automation = automation;
         this.channelId = channelId;
         this.content = content;
         this.createdAt = createdAt;
@@ -113,6 +123,7 @@ public final class ChatMessage {
         this.deletedAt = deletedAt;
         this.edited = edited;
         this.embeds = embeds;
+        this.externalMessage = externalMessage;
         this.gifs = gifs;
         this.id = id;
         this.linkPreviews = linkPreviews;
@@ -122,6 +133,7 @@ public final class ChatMessage {
         this.plainContent = plainContent;
         this.poll = poll;
         this.reactionCounts = reactionCounts;
+        this.replyingToMessage = replyingToMessage;
         this.replyingToMessageId = replyingToMessageId;
         this.replyingToUserId = replyingToUserId;
         this.updatedAt = updatedAt;
@@ -156,6 +168,17 @@ public final class ChatMessage {
             return Optional.empty();
         }
         return authorUserId;
+    }
+
+    /**
+     * @return The automation that sent this message. <code>null</code> for a message no automation sent, a deleted message, or a caller without <code>automation:read</code> on the automation's account.
+     */
+    @JsonIgnore
+    public Optional<MessageAutomation> getAutomation() {
+        if (automation == null) {
+            return Optional.empty();
+        }
+        return automation;
     }
 
     @JsonProperty("channel_id")
@@ -209,6 +232,17 @@ public final class ChatMessage {
     @JsonProperty("embeds")
     public List<Embed> getEmbeds() {
         return embeds;
+    }
+
+    /**
+     * @return The message outside chat that this message was sent or received as. <code>object</code> says which kind it is, such as <code>email_message</code>. For an email, the first file in <code>attachments</code> named <code>email.html</code> holds the email's HTML body. The email's own attachments are also in <code>attachments</code>. <code>null</code> for a message that exists only in chat, or a deleted message.
+     */
+    @JsonIgnore
+    public Optional<ExternalMessageEmail> getExternalMessage() {
+        if (externalMessage == null) {
+            return Optional.empty();
+        }
+        return externalMessage;
     }
 
     @JsonProperty("gifs")
@@ -268,6 +302,17 @@ public final class ChatMessage {
         return reactionCounts;
     }
 
+    /**
+     * @return The replied-to message. Omitted unless <code>include_replying_to_message=true</code>. Includes all message fields except <code>replying_to_message</code>. <code>null</code> when this message is deleted or no same-channel target exists.
+     */
+    @JsonIgnore
+    public Optional<ChatMessage> getReplyingToMessage() {
+        if (replyingToMessage == null) {
+            return Optional.empty();
+        }
+        return replyingToMessage;
+    }
+
     @JsonIgnore
     public Optional<String> getReplyingToMessageId() {
         if (replyingToMessageId == null) {
@@ -319,6 +364,12 @@ public final class ChatMessage {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("automation")
+    private Optional<MessageAutomation> _getAutomation() {
+        return automation;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("content")
     private Optional<String> _getContent() {
         return content;
@@ -337,6 +388,12 @@ public final class ChatMessage {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("external_message")
+    private Optional<ExternalMessageEmail> _getExternalMessage() {
+        return externalMessage;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("plain_content")
     private Optional<String> _getPlainContent() {
         return plainContent;
@@ -346,6 +403,12 @@ public final class ChatMessage {
     @JsonProperty("poll")
     private Optional<ChatMessagePoll> _getPoll() {
         return poll;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("replying_to_message")
+    private Optional<ChatMessage> _getReplyingToMessage() {
+        return replyingToMessage;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -382,6 +445,7 @@ public final class ChatMessage {
                 && author.equals(other.author)
                 && authorIsTeamMember == other.authorIsTeamMember
                 && authorUserId.equals(other.authorUserId)
+                && automation.equals(other.automation)
                 && channelId.equals(other.channelId)
                 && content.equals(other.content)
                 && createdAt.equals(other.createdAt)
@@ -389,6 +453,7 @@ public final class ChatMessage {
                 && deletedAt.equals(other.deletedAt)
                 && edited == other.edited
                 && embeds.equals(other.embeds)
+                && externalMessage.equals(other.externalMessage)
                 && gifs.equals(other.gifs)
                 && id.equals(other.id)
                 && linkPreviews.equals(other.linkPreviews)
@@ -398,6 +463,7 @@ public final class ChatMessage {
                 && plainContent.equals(other.plainContent)
                 && poll.equals(other.poll)
                 && reactionCounts.equals(other.reactionCounts)
+                && replyingToMessage.equals(other.replyingToMessage)
                 && replyingToMessageId.equals(other.replyingToMessageId)
                 && replyingToUserId.equals(other.replyingToUserId)
                 && updatedAt.equals(other.updatedAt)
@@ -411,6 +477,7 @@ public final class ChatMessage {
                 this.author,
                 this.authorIsTeamMember,
                 this.authorUserId,
+                this.automation,
                 this.channelId,
                 this.content,
                 this.createdAt,
@@ -418,6 +485,7 @@ public final class ChatMessage {
                 this.deletedAt,
                 this.edited,
                 this.embeds,
+                this.externalMessage,
                 this.gifs,
                 this.id,
                 this.linkPreviews,
@@ -427,6 +495,7 @@ public final class ChatMessage {
                 this.plainContent,
                 this.poll,
                 this.reactionCounts,
+                this.replyingToMessage,
                 this.replyingToMessageId,
                 this.replyingToUserId,
                 this.updatedAt,
@@ -514,6 +583,15 @@ public final class ChatMessage {
         _FinalStage authorUserId(Nullable<String> authorUserId);
 
         /**
+         * <p>The automation that sent this message. <code>null</code> for a message no automation sent, a deleted message, or a caller without <code>automation:read</code> on the automation's account.</p>
+         */
+        _FinalStage automation(Optional<MessageAutomation> automation);
+
+        _FinalStage automation(MessageAutomation automation);
+
+        _FinalStage automation(Nullable<MessageAutomation> automation);
+
+        /**
          * <p>Markdown content. <code>null</code> for a deleted message.</p>
          */
         _FinalStage content(Optional<String> content);
@@ -542,6 +620,15 @@ public final class ChatMessage {
         _FinalStage addEmbeds(Embed embeds);
 
         _FinalStage addAllEmbeds(List<Embed> embeds);
+
+        /**
+         * <p>The message outside chat that this message was sent or received as. <code>object</code> says which kind it is, such as <code>email_message</code>. For an email, the first file in <code>attachments</code> named <code>email.html</code> holds the email's HTML body. The email's own attachments are also in <code>attachments</code>. <code>null</code> for a message that exists only in chat, or a deleted message.</p>
+         */
+        _FinalStage externalMessage(Optional<ExternalMessageEmail> externalMessage);
+
+        _FinalStage externalMessage(ExternalMessageEmail externalMessage);
+
+        _FinalStage externalMessage(Nullable<ExternalMessageEmail> externalMessage);
 
         _FinalStage gifs(List<Gif> gifs);
 
@@ -581,6 +668,15 @@ public final class ChatMessage {
         _FinalStage addReactionCounts(MessageReactionCount reactionCounts);
 
         _FinalStage addAllReactionCounts(List<MessageReactionCount> reactionCounts);
+
+        /**
+         * <p>The replied-to message. Omitted unless <code>include_replying_to_message=true</code>. Includes all message fields except <code>replying_to_message</code>. <code>null</code> when this message is deleted or no same-channel target exists.</p>
+         */
+        _FinalStage replyingToMessage(Optional<ChatMessage> replyingToMessage);
+
+        _FinalStage replyingToMessage(ChatMessage replyingToMessage);
+
+        _FinalStage replyingToMessage(Nullable<ChatMessage> replyingToMessage);
 
         _FinalStage replyingToMessageId(Optional<String> replyingToMessageId);
 
@@ -640,6 +736,8 @@ public final class ChatMessage {
 
         private Optional<String> replyingToMessageId = Optional.empty();
 
+        private Optional<ChatMessage> replyingToMessage = Optional.empty();
+
         private List<MessageReactionCount> reactionCounts = new ArrayList<>();
 
         private Optional<ChatMessagePoll> poll = Optional.empty();
@@ -652,6 +750,8 @@ public final class ChatMessage {
 
         private List<Gif> gifs = new ArrayList<>();
 
+        private Optional<ExternalMessageEmail> externalMessage = Optional.empty();
+
         private List<Embed> embeds = new ArrayList<>();
 
         private Optional<String> deletedAt = Optional.empty();
@@ -659,6 +759,8 @@ public final class ChatMessage {
         private Optional<MessageCustomAuthor> customAuthor = Optional.empty();
 
         private Optional<String> content = Optional.empty();
+
+        private Optional<MessageAutomation> automation = Optional.empty();
 
         private Optional<String> authorUserId = Optional.empty();
 
@@ -676,6 +778,7 @@ public final class ChatMessage {
             author(other.getAuthor());
             authorIsTeamMember(other.getAuthorIsTeamMember());
             authorUserId(other.getAuthorUserId());
+            automation(other.getAutomation());
             channelId(other.getChannelId());
             content(other.getContent());
             createdAt(other.getCreatedAt());
@@ -683,6 +786,7 @@ public final class ChatMessage {
             deletedAt(other.getDeletedAt());
             edited(other.getEdited());
             embeds(other.getEmbeds());
+            externalMessage(other.getExternalMessage());
             gifs(other.getGifs());
             id(other.getId());
             linkPreviews(other.getLinkPreviews());
@@ -692,6 +796,7 @@ public final class ChatMessage {
             plainContent(other.getPlainContent());
             poll(other.getPoll());
             reactionCounts(other.getReactionCounts());
+            replyingToMessage(other.getReplyingToMessage());
             replyingToMessageId(other.getReplyingToMessageId());
             replyingToUserId(other.getReplyingToUserId());
             updatedAt(other.getUpdatedAt());
@@ -868,6 +973,42 @@ public final class ChatMessage {
             return this;
         }
 
+        /**
+         * <p>The replied-to message. Omitted unless <code>include_replying_to_message=true</code>. Includes all message fields except <code>replying_to_message</code>. <code>null</code> when this message is deleted or no same-channel target exists.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage replyingToMessage(Nullable<ChatMessage> replyingToMessage) {
+            if (replyingToMessage.isNull()) {
+                this.replyingToMessage = null;
+            } else if (replyingToMessage.isEmpty()) {
+                this.replyingToMessage = Optional.empty();
+            } else {
+                this.replyingToMessage = Optional.of(replyingToMessage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The replied-to message. Omitted unless <code>include_replying_to_message=true</code>. Includes all message fields except <code>replying_to_message</code>. <code>null</code> when this message is deleted or no same-channel target exists.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage replyingToMessage(ChatMessage replyingToMessage) {
+            this.replyingToMessage = Optional.ofNullable(replyingToMessage);
+            return this;
+        }
+
+        /**
+         * <p>The replied-to message. Omitted unless <code>include_replying_to_message=true</code>. Includes all message fields except <code>replying_to_message</code>. <code>null</code> when this message is deleted or no same-channel target exists.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "replying_to_message", nulls = Nulls.SKIP)
+        public _FinalStage replyingToMessage(Optional<ChatMessage> replyingToMessage) {
+            this.replyingToMessage = replyingToMessage;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage addAllReactionCounts(List<MessageReactionCount> reactionCounts) {
             if (reactionCounts != null) {
@@ -1025,6 +1166,42 @@ public final class ChatMessage {
             return this;
         }
 
+        /**
+         * <p>The message outside chat that this message was sent or received as. <code>object</code> says which kind it is, such as <code>email_message</code>. For an email, the first file in <code>attachments</code> named <code>email.html</code> holds the email's HTML body. The email's own attachments are also in <code>attachments</code>. <code>null</code> for a message that exists only in chat, or a deleted message.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalMessage(Nullable<ExternalMessageEmail> externalMessage) {
+            if (externalMessage.isNull()) {
+                this.externalMessage = null;
+            } else if (externalMessage.isEmpty()) {
+                this.externalMessage = Optional.empty();
+            } else {
+                this.externalMessage = Optional.of(externalMessage.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The message outside chat that this message was sent or received as. <code>object</code> says which kind it is, such as <code>email_message</code>. For an email, the first file in <code>attachments</code> named <code>email.html</code> holds the email's HTML body. The email's own attachments are also in <code>attachments</code>. <code>null</code> for a message that exists only in chat, or a deleted message.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage externalMessage(ExternalMessageEmail externalMessage) {
+            this.externalMessage = Optional.ofNullable(externalMessage);
+            return this;
+        }
+
+        /**
+         * <p>The message outside chat that this message was sent or received as. <code>object</code> says which kind it is, such as <code>email_message</code>. For an email, the first file in <code>attachments</code> named <code>email.html</code> holds the email's HTML body. The email's own attachments are also in <code>attachments</code>. <code>null</code> for a message that exists only in chat, or a deleted message.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "external_message", nulls = Nulls.SKIP)
+        public _FinalStage externalMessage(Optional<ExternalMessageEmail> externalMessage) {
+            this.externalMessage = externalMessage;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage addAllEmbeds(List<Embed> embeds) {
             if (embeds != null) {
@@ -1146,6 +1323,42 @@ public final class ChatMessage {
             return this;
         }
 
+        /**
+         * <p>The automation that sent this message. <code>null</code> for a message no automation sent, a deleted message, or a caller without <code>automation:read</code> on the automation's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage automation(Nullable<MessageAutomation> automation) {
+            if (automation.isNull()) {
+                this.automation = null;
+            } else if (automation.isEmpty()) {
+                this.automation = Optional.empty();
+            } else {
+                this.automation = Optional.of(automation.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>The automation that sent this message. <code>null</code> for a message no automation sent, a deleted message, or a caller without <code>automation:read</code> on the automation's account.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage automation(MessageAutomation automation) {
+            this.automation = Optional.ofNullable(automation);
+            return this;
+        }
+
+        /**
+         * <p>The automation that sent this message. <code>null</code> for a message no automation sent, a deleted message, or a caller without <code>automation:read</code> on the automation's account.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "automation", nulls = Nulls.SKIP)
+        public _FinalStage automation(Optional<MessageAutomation> automation) {
+            this.automation = automation;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage authorUserId(Nullable<String> authorUserId) {
             if (authorUserId.isNull()) {
@@ -1227,6 +1440,7 @@ public final class ChatMessage {
                     author,
                     authorIsTeamMember,
                     authorUserId,
+                    automation,
                     channelId,
                     content,
                     createdAt,
@@ -1234,6 +1448,7 @@ public final class ChatMessage {
                     deletedAt,
                     edited,
                     embeds,
+                    externalMessage,
                     gifs,
                     id,
                     linkPreviews,
@@ -1243,6 +1458,7 @@ public final class ChatMessage {
                     plainContent,
                     poll,
                     reactionCounts,
+                    replyingToMessage,
                     replyingToMessageId,
                     replyingToUserId,
                     updatedAt,
@@ -1256,6 +1472,7 @@ public final class ChatMessage {
                     || key.equalsIgnoreCase("author")
                     || key.equalsIgnoreCase("author_is_team_member")
                     || key.equalsIgnoreCase("author_user_id")
+                    || key.equalsIgnoreCase("automation")
                     || key.equalsIgnoreCase("channel_id")
                     || key.equalsIgnoreCase("content")
                     || key.equalsIgnoreCase("created_at")
@@ -1263,6 +1480,7 @@ public final class ChatMessage {
                     || key.equalsIgnoreCase("deleted_at")
                     || key.equalsIgnoreCase("edited")
                     || key.equalsIgnoreCase("embeds")
+                    || key.equalsIgnoreCase("external_message")
                     || key.equalsIgnoreCase("gifs")
                     || key.equalsIgnoreCase("id")
                     || key.equalsIgnoreCase("link_previews")
@@ -1272,6 +1490,7 @@ public final class ChatMessage {
                     || key.equalsIgnoreCase("plain_content")
                     || key.equalsIgnoreCase("poll")
                     || key.equalsIgnoreCase("reaction_counts")
+                    || key.equalsIgnoreCase("replying_to_message")
                     || key.equalsIgnoreCase("replying_to_message_id")
                     || key.equalsIgnoreCase("replying_to_user_id")
                     || key.equalsIgnoreCase("updated_at")

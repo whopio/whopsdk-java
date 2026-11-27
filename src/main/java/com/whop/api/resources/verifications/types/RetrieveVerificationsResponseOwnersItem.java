@@ -42,6 +42,8 @@ public final class RetrieveVerificationsResponseOwnersItem {
 
     private final List<RetrieveVerificationsResponseOwnersItemRolesItem> roles;
 
+    private final Optional<String> sessionUrl;
+
     private final RetrieveVerificationsResponseOwnersItemStatus status;
 
     private final Map<String, Object> additionalProperties;
@@ -55,6 +57,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
             List<RetrieveVerificationsResponseOwnersItemRejectedChecksItem> rejectedChecks,
             List<RetrieveVerificationsResponseOwnersItemRequiredDocumentsItem> requiredDocuments,
             List<RetrieveVerificationsResponseOwnersItemRolesItem> roles,
+            Optional<String> sessionUrl,
             RetrieveVerificationsResponseOwnersItemStatus status,
             Map<String, Object> additionalProperties) {
         this.dateOfBirth = dateOfBirth;
@@ -65,6 +68,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
         this.rejectedChecks = rejectedChecks;
         this.requiredDocuments = requiredDocuments;
         this.roles = roles;
+        this.sessionUrl = sessionUrl;
         this.status = status;
         this.additionalProperties = additionalProperties;
     }
@@ -140,6 +144,17 @@ public final class RetrieveVerificationsResponseOwnersItem {
     }
 
     /**
+     * @return Hosted verification session URL for the owner to complete their own identity checks. Expires 7 days after creation. <code>null</code> unless the business review waits on this owner to start or finish a hosted session.
+     */
+    @JsonIgnore
+    public Optional<String> getSessionUrl() {
+        if (sessionUrl == null) {
+            return Optional.empty();
+        }
+        return sessionUrl;
+    }
+
+    /**
      * @return Where the owner's own verification stands, in the same states as <code>status</code>. <code>action_required</code> when their documents need sending again.
      */
     @JsonProperty("status")
@@ -171,6 +186,12 @@ public final class RetrieveVerificationsResponseOwnersItem {
         return ownershipPercentage;
     }
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("session_url")
+    private Optional<String> _getSessionUrl() {
+        return sessionUrl;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -192,6 +213,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
                 && rejectedChecks.equals(other.rejectedChecks)
                 && requiredDocuments.equals(other.requiredDocuments)
                 && roles.equals(other.roles)
+                && sessionUrl.equals(other.sessionUrl)
                 && status.equals(other.status);
     }
 
@@ -206,6 +228,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
                 this.rejectedChecks,
                 this.requiredDocuments,
                 this.roles,
+                this.sessionUrl,
                 this.status);
     }
 
@@ -301,6 +324,15 @@ public final class RetrieveVerificationsResponseOwnersItem {
         _FinalStage addRoles(RetrieveVerificationsResponseOwnersItemRolesItem roles);
 
         _FinalStage addAllRoles(List<RetrieveVerificationsResponseOwnersItemRolesItem> roles);
+
+        /**
+         * <p>Hosted verification session URL for the owner to complete their own identity checks. Expires 7 days after creation. <code>null</code> unless the business review waits on this owner to start or finish a hosted session.</p>
+         */
+        _FinalStage sessionUrl(Optional<String> sessionUrl);
+
+        _FinalStage sessionUrl(String sessionUrl);
+
+        _FinalStage sessionUrl(Nullable<String> sessionUrl);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -308,6 +340,8 @@ public final class RetrieveVerificationsResponseOwnersItem {
         private String id;
 
         private RetrieveVerificationsResponseOwnersItemStatus status;
+
+        private Optional<String> sessionUrl = Optional.empty();
 
         private List<RetrieveVerificationsResponseOwnersItemRolesItem> roles = new ArrayList<>();
 
@@ -338,6 +372,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
             rejectedChecks(other.getRejectedChecks());
             requiredDocuments(other.getRequiredDocuments());
             roles(other.getRoles());
+            sessionUrl(other.getSessionUrl());
             status(other.getStatus());
             return this;
         }
@@ -361,6 +396,42 @@ public final class RetrieveVerificationsResponseOwnersItem {
         @JsonSetter("status")
         public _FinalStage status(@NotNull RetrieveVerificationsResponseOwnersItemStatus status) {
             this.status = Objects.requireNonNull(status, "status must not be null");
+            return this;
+        }
+
+        /**
+         * <p>Hosted verification session URL for the owner to complete their own identity checks. Expires 7 days after creation. <code>null</code> unless the business review waits on this owner to start or finish a hosted session.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sessionUrl(Nullable<String> sessionUrl) {
+            if (sessionUrl.isNull()) {
+                this.sessionUrl = null;
+            } else if (sessionUrl.isEmpty()) {
+                this.sessionUrl = Optional.empty();
+            } else {
+                this.sessionUrl = Optional.of(sessionUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>Hosted verification session URL for the owner to complete their own identity checks. Expires 7 days after creation. <code>null</code> unless the business review waits on this owner to start or finish a hosted session.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage sessionUrl(String sessionUrl) {
+            this.sessionUrl = Optional.ofNullable(sessionUrl);
+            return this;
+        }
+
+        /**
+         * <p>Hosted verification session URL for the owner to complete their own identity checks. Expires 7 days after creation. <code>null</code> unless the business review waits on this owner to start or finish a hosted session.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "session_url", nulls = Nulls.SKIP)
+        public _FinalStage sessionUrl(Optional<String> sessionUrl) {
+            this.sessionUrl = sessionUrl;
             return this;
         }
 
@@ -607,6 +678,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
                     rejectedChecks,
                     requiredDocuments,
                     roles,
+                    sessionUrl,
                     status,
                     additionalProperties);
         }
@@ -621,6 +693,7 @@ public final class RetrieveVerificationsResponseOwnersItem {
                     || key.equalsIgnoreCase("rejected_checks")
                     || key.equalsIgnoreCase("required_documents")
                     || key.equalsIgnoreCase("roles")
+                    || key.equalsIgnoreCase("session_url")
                     || key.equalsIgnoreCase("status")) {
                 return;
             }

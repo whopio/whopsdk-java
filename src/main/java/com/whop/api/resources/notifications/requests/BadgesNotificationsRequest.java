@@ -26,14 +26,18 @@ public final class BadgesNotificationsRequest {
 
     private final Optional<String> lastFetchedAt;
 
+    private final Optional<Boolean> unread;
+
     private final Map<String, Object> additionalProperties;
 
     private BadgesNotificationsRequest(
             Optional<List<String>> experienceIds,
             Optional<String> lastFetchedAt,
+            Optional<Boolean> unread,
             Map<String, Object> additionalProperties) {
         this.experienceIds = experienceIds;
         this.lastFetchedAt = lastFetchedAt;
+        this.unread = unread;
         this.additionalProperties = additionalProperties;
     }
 
@@ -53,6 +57,14 @@ public final class BadgesNotificationsRequest {
         return lastFetchedAt;
     }
 
+    /**
+     * @return Only return badges for experiences with unread notifications.
+     */
+    @JsonProperty("unread")
+    public Optional<Boolean> getUnread() {
+        return unread;
+    }
+
     @java.lang.Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -65,12 +77,14 @@ public final class BadgesNotificationsRequest {
     }
 
     private boolean equalTo(BadgesNotificationsRequest other) {
-        return experienceIds.equals(other.experienceIds) && lastFetchedAt.equals(other.lastFetchedAt);
+        return experienceIds.equals(other.experienceIds)
+                && lastFetchedAt.equals(other.lastFetchedAt)
+                && unread.equals(other.unread);
     }
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.experienceIds, this.lastFetchedAt);
+        return Objects.hash(this.experienceIds, this.lastFetchedAt, this.unread);
     }
 
     @java.lang.Override
@@ -88,6 +102,8 @@ public final class BadgesNotificationsRequest {
 
         private Optional<String> lastFetchedAt = Optional.empty();
 
+        private Optional<Boolean> unread = Optional.empty();
+
         private Map<String, Object> additionalProperties = new HashMap<>();
 
         private Builder() {}
@@ -95,6 +111,7 @@ public final class BadgesNotificationsRequest {
         public Builder from(BadgesNotificationsRequest other) {
             experienceIds(other.getExperienceIds());
             lastFetchedAt(other.getLastFetchedAt());
+            unread(other.getUnread());
             return this;
         }
 
@@ -131,13 +148,29 @@ public final class BadgesNotificationsRequest {
             return this;
         }
 
+        /**
+         * <p>Only return badges for experiences with unread notifications.</p>
+         */
+        @JsonSetter(value = "unread", nulls = Nulls.SKIP)
+        public Builder unread(Optional<Boolean> unread) {
+            this.unread = unread;
+            return this;
+        }
+
+        public Builder unread(Boolean unread) {
+            this.unread = Optional.ofNullable(unread);
+            return this;
+        }
+
         public BadgesNotificationsRequest build() {
-            return new BadgesNotificationsRequest(experienceIds, lastFetchedAt, additionalProperties);
+            return new BadgesNotificationsRequest(experienceIds, lastFetchedAt, unread, additionalProperties);
         }
 
         @JsonAnySetter
         private void putAdditionalPropertyFromJson(String key, Object value) {
-            if (key.equalsIgnoreCase("experience_ids") || key.equalsIgnoreCase("last_fetched_at")) {
+            if (key.equalsIgnoreCase("experience_ids")
+                    || key.equalsIgnoreCase("last_fetched_at")
+                    || key.equalsIgnoreCase("unread")) {
                 return;
             }
             this.additionalProperties.put(key, value);

@@ -55,7 +55,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegration {
     }
 
     /**
-     * @return The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.
+     * @return The shop domain spend is reported for, such as <code>shine-time.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.
      */
     @JsonIgnore
     public Optional<String> getShopDomain() {
@@ -143,7 +143,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegration {
         _FinalStage maskedApiKey(Nullable<String> maskedApiKey);
 
         /**
-         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
+         * <p>The shop domain spend is reported for, such as <code>shine-time.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          */
         _FinalStage shopDomain(Optional<String> shopDomain);
 
@@ -184,7 +184,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
+         * <p>The shop domain spend is reported for, such as <code>shine-time.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -200,7 +200,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
+         * <p>The shop domain spend is reported for, such as <code>shine-time.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -210,7 +210,7 @@ public final class UpdatePreferencesResponseAdsTripleWhaleIntegration {
         }
 
         /**
-         * <p>The shop domain spend is reported for, such as <code>acme.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
+         * <p>The shop domain spend is reported for, such as <code>shine-time.myshopify.com</code> or a custom domain for a non-Shopify store. <code>null</code> when none is set.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "shop_domain", nulls = Nulls.SKIP)

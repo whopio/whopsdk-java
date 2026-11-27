@@ -21,6 +21,9 @@ public final class ConnectSocialAccountsRequestPlatform {
     public static final ConnectSocialAccountsRequestPlatform TIKTOK =
             new ConnectSocialAccountsRequestPlatform(Value.TIKTOK, "tiktok");
 
+    public static final ConnectSocialAccountsRequestPlatform STRIPE =
+            new ConnectSocialAccountsRequestPlatform(Value.STRIPE, "stripe");
+
     private final Value value;
 
     private final String string;
@@ -64,6 +67,8 @@ public final class ConnectSocialAccountsRequestPlatform {
                 return visitor.visitX();
             case TIKTOK:
                 return visitor.visitTiktok();
+            case STRIPE:
+                return visitor.visitStripe();
             case UNKNOWN:
             default:
                 return visitor.visitUnknown(string);
@@ -83,6 +88,8 @@ public final class ConnectSocialAccountsRequestPlatform {
                 return X;
             case "tiktok":
                 return TIKTOK;
+            case "stripe":
+                return STRIPE;
             default:
                 return new ConnectSocialAccountsRequestPlatform(Value.UNKNOWN, value);
         }
@@ -99,6 +106,8 @@ public final class ConnectSocialAccountsRequestPlatform {
 
         QUICKBOOKS,
 
+        STRIPE,
+
         UNKNOWN
     }
 
@@ -112,6 +121,8 @@ public final class ConnectSocialAccountsRequestPlatform {
         T visitX();
 
         T visitQuickbooks();
+
+        T visitStripe();
 
         T visitUnknown(String unknownType);
     }

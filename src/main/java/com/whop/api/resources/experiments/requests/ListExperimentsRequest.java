@@ -124,7 +124,7 @@ public final class ListExperimentsRequest {
     }
 
     /**
-     * @return The field to sort experiments by.
+     * @return The field to sort experiments by. <code>lift</code> puts the experiment whose primary measure moved the most first. With <code>account_id=global</code> it is the only order allowed.
      */
     @JsonProperty("order")
     public Optional<ListExperimentsRequestOrder> getOrder() {
@@ -321,7 +321,7 @@ public final class ListExperimentsRequest {
         }
 
         /**
-         * <p>The field to sort experiments by.</p>
+         * <p>The field to sort experiments by. <code>lift</code> puts the experiment whose primary measure moved the most first. With <code>account_id=global</code> it is the only order allowed.</p>
          */
         @JsonSetter(value = "order", nulls = Nulls.SKIP)
         public Builder order(Optional<ListExperimentsRequestOrder> order) {

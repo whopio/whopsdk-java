@@ -47,6 +47,8 @@ public final class File {
 
     private final String object;
 
+    private final Optional<String> optimizedUrl;
+
     private final boolean removedByModeration;
 
     private final Optional<Integer> size;
@@ -79,6 +81,7 @@ public final class File {
             Optional<String> multipartUploadId,
             Optional<List<FileMultipartUrl>> multipartUploadUrls,
             String object,
+            Optional<String> optimizedUrl,
             boolean removedByModeration,
             Optional<Integer> size,
             Optional<Map<String, Object>> uploadHeaders,
@@ -100,6 +103,7 @@ public final class File {
         this.multipartUploadId = multipartUploadId;
         this.multipartUploadUrls = multipartUploadUrls;
         this.object = object;
+        this.optimizedUrl = optimizedUrl;
         this.removedByModeration = removedByModeration;
         this.size = size;
         this.uploadHeaders = uploadHeaders;
@@ -219,6 +223,17 @@ public final class File {
     @JsonProperty("object")
     public String getObject() {
         return object;
+    }
+
+    /**
+     * @return URL to the optimized file. <code>null</code> when no optimized version is available.
+     */
+    @JsonIgnore
+    public Optional<String> getOptimizedUrl() {
+        if (optimizedUrl == null) {
+            return Optional.empty();
+        }
+        return optimizedUrl;
     }
 
     /**
@@ -357,6 +372,12 @@ public final class File {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("optimized_url")
+    private Optional<String> _getOptimizedUrl() {
+        return optimizedUrl;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("size")
     private Optional<Integer> _getSize() {
         return size;
@@ -409,6 +430,7 @@ public final class File {
                 && multipartUploadId.equals(other.multipartUploadId)
                 && multipartUploadUrls.equals(other.multipartUploadUrls)
                 && object.equals(other.object)
+                && optimizedUrl.equals(other.optimizedUrl)
                 && removedByModeration == other.removedByModeration
                 && size.equals(other.size)
                 && uploadHeaders.equals(other.uploadHeaders)
@@ -434,6 +456,7 @@ public final class File {
                 this.multipartUploadId,
                 this.multipartUploadUrls,
                 this.object,
+                this.optimizedUrl,
                 this.removedByModeration,
                 this.size,
                 this.uploadHeaders,
@@ -575,6 +598,15 @@ public final class File {
         _FinalStage multipartUploadUrls(Nullable<List<FileMultipartUrl>> multipartUploadUrls);
 
         /**
+         * <p>URL to the optimized file. <code>null</code> when no optimized version is available.</p>
+         */
+        _FinalStage optimizedUrl(Optional<String> optimizedUrl);
+
+        _FinalStage optimizedUrl(String optimizedUrl);
+
+        _FinalStage optimizedUrl(Nullable<String> optimizedUrl);
+
+        /**
          * <p>The file size in bytes. <code>null</code> until the upload has finished.</p>
          */
         _FinalStage size(Optional<Integer> size);
@@ -660,6 +692,8 @@ public final class File {
 
         private Optional<Integer> size = Optional.empty();
 
+        private Optional<String> optimizedUrl = Optional.empty();
+
         private Optional<List<FileMultipartUrl>> multipartUploadUrls = Optional.empty();
 
         private Optional<String> multipartUploadId = Optional.empty();
@@ -693,6 +727,7 @@ public final class File {
             multipartUploadId(other.getMultipartUploadId());
             multipartUploadUrls(other.getMultipartUploadUrls());
             object(other.getObject());
+            optimizedUrl(other.getOptimizedUrl());
             removedByModeration(other.getRemovedByModeration());
             size(other.getSize());
             uploadHeaders(other.getUploadHeaders());
@@ -968,6 +1003,42 @@ public final class File {
         @JsonSetter(value = "size", nulls = Nulls.SKIP)
         public _FinalStage size(Optional<Integer> size) {
             this.size = size;
+            return this;
+        }
+
+        /**
+         * <p>URL to the optimized file. <code>null</code> when no optimized version is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage optimizedUrl(Nullable<String> optimizedUrl) {
+            if (optimizedUrl.isNull()) {
+                this.optimizedUrl = null;
+            } else if (optimizedUrl.isEmpty()) {
+                this.optimizedUrl = Optional.empty();
+            } else {
+                this.optimizedUrl = Optional.of(optimizedUrl.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>URL to the optimized file. <code>null</code> when no optimized version is available.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage optimizedUrl(String optimizedUrl) {
+            this.optimizedUrl = Optional.ofNullable(optimizedUrl);
+            return this;
+        }
+
+        /**
+         * <p>URL to the optimized file. <code>null</code> when no optimized version is available.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "optimized_url", nulls = Nulls.SKIP)
+        public _FinalStage optimizedUrl(Optional<String> optimizedUrl) {
+            this.optimizedUrl = optimizedUrl;
             return this;
         }
 
@@ -1262,6 +1333,7 @@ public final class File {
                     multipartUploadId,
                     multipartUploadUrls,
                     object,
+                    optimizedUrl,
                     removedByModeration,
                     size,
                     uploadHeaders,
@@ -1287,6 +1359,7 @@ public final class File {
                     || key.equalsIgnoreCase("multipart_upload_id")
                     || key.equalsIgnoreCase("multipart_upload_urls")
                     || key.equalsIgnoreCase("object")
+                    || key.equalsIgnoreCase("optimized_url")
                     || key.equalsIgnoreCase("removed_by_moderation")
                     || key.equalsIgnoreCase("size")
                     || key.equalsIgnoreCase("upload_headers")

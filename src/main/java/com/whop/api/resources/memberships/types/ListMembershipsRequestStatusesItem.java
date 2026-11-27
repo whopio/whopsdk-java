@@ -7,17 +7,29 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class ListMembershipsRequestStatusesItem {
-    public static final ListMembershipsRequestStatusesItem PAST_DUE =
-            new ListMembershipsRequestStatusesItem(Value.PAST_DUE, "past_due");
-
     public static final ListMembershipsRequestStatusesItem BANNED =
             new ListMembershipsRequestStatusesItem(Value.BANNED, "banned");
 
-    public static final ListMembershipsRequestStatusesItem CANCELED =
-            new ListMembershipsRequestStatusesItem(Value.CANCELED, "canceled");
-
     public static final ListMembershipsRequestStatusesItem COMPLETED =
             new ListMembershipsRequestStatusesItem(Value.COMPLETED, "completed");
+
+    public static final ListMembershipsRequestStatusesItem UNCLAIMED =
+            new ListMembershipsRequestStatusesItem(Value.UNCLAIMED, "unclaimed");
+
+    public static final ListMembershipsRequestStatusesItem SCHEDULED =
+            new ListMembershipsRequestStatusesItem(Value.SCHEDULED, "scheduled");
+
+    public static final ListMembershipsRequestStatusesItem ONE_TIME =
+            new ListMembershipsRequestStatusesItem(Value.ONE_TIME, "one_time");
+
+    public static final ListMembershipsRequestStatusesItem CANCELING =
+            new ListMembershipsRequestStatusesItem(Value.CANCELING, "canceling");
+
+    public static final ListMembershipsRequestStatusesItem PAST_DUE =
+            new ListMembershipsRequestStatusesItem(Value.PAST_DUE, "past_due");
+
+    public static final ListMembershipsRequestStatusesItem CANCELED =
+            new ListMembershipsRequestStatusesItem(Value.CANCELED, "canceled");
 
     public static final ListMembershipsRequestStatusesItem EXPIRED =
             new ListMembershipsRequestStatusesItem(Value.EXPIRED, "expired");
@@ -25,17 +37,8 @@ public final class ListMembershipsRequestStatusesItem {
     public static final ListMembershipsRequestStatusesItem EXPIRING =
             new ListMembershipsRequestStatusesItem(Value.EXPIRING, "expiring");
 
-    public static final ListMembershipsRequestStatusesItem UNCLAIMED =
-            new ListMembershipsRequestStatusesItem(Value.UNCLAIMED, "unclaimed");
-
     public static final ListMembershipsRequestStatusesItem PAUSED =
             new ListMembershipsRequestStatusesItem(Value.PAUSED, "paused");
-
-    public static final ListMembershipsRequestStatusesItem ONE_TIME =
-            new ListMembershipsRequestStatusesItem(Value.ONE_TIME, "one_time");
-
-    public static final ListMembershipsRequestStatusesItem CANCELING =
-            new ListMembershipsRequestStatusesItem(Value.CANCELING, "canceling");
 
     public static final ListMembershipsRequestStatusesItem TRIALING =
             new ListMembershipsRequestStatusesItem(Value.TRIALING, "trialing");
@@ -76,26 +79,28 @@ public final class ListMembershipsRequestStatusesItem {
 
     public <T> T visit(Visitor<T> visitor) {
         switch (value) {
-            case PAST_DUE:
-                return visitor.visitPastDue();
             case BANNED:
                 return visitor.visitBanned();
-            case CANCELED:
-                return visitor.visitCanceled();
             case COMPLETED:
                 return visitor.visitCompleted();
-            case EXPIRED:
-                return visitor.visitExpired();
-            case EXPIRING:
-                return visitor.visitExpiring();
             case UNCLAIMED:
                 return visitor.visitUnclaimed();
-            case PAUSED:
-                return visitor.visitPaused();
+            case SCHEDULED:
+                return visitor.visitScheduled();
             case ONE_TIME:
                 return visitor.visitOneTime();
             case CANCELING:
                 return visitor.visitCanceling();
+            case PAST_DUE:
+                return visitor.visitPastDue();
+            case CANCELED:
+                return visitor.visitCanceled();
+            case EXPIRED:
+                return visitor.visitExpired();
+            case EXPIRING:
+                return visitor.visitExpiring();
+            case PAUSED:
+                return visitor.visitPaused();
             case TRIALING:
                 return visitor.visitTrialing();
             case ACTIVE:
@@ -109,26 +114,28 @@ public final class ListMembershipsRequestStatusesItem {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static ListMembershipsRequestStatusesItem valueOf(String value) {
         switch (value) {
-            case "past_due":
-                return PAST_DUE;
             case "banned":
                 return BANNED;
-            case "canceled":
-                return CANCELED;
             case "completed":
                 return COMPLETED;
-            case "expired":
-                return EXPIRED;
-            case "expiring":
-                return EXPIRING;
             case "unclaimed":
                 return UNCLAIMED;
-            case "paused":
-                return PAUSED;
+            case "scheduled":
+                return SCHEDULED;
             case "one_time":
                 return ONE_TIME;
             case "canceling":
                 return CANCELING;
+            case "past_due":
+                return PAST_DUE;
+            case "canceled":
+                return CANCELED;
+            case "expired":
+                return EXPIRED;
+            case "expiring":
+                return EXPIRING;
+            case "paused":
+                return PAUSED;
             case "trialing":
                 return TRIALING;
             case "active":
@@ -142,6 +149,8 @@ public final class ListMembershipsRequestStatusesItem {
         ACTIVE,
 
         TRIALING,
+
+        SCHEDULED,
 
         PAST_DUE,
 
@@ -170,6 +179,8 @@ public final class ListMembershipsRequestStatusesItem {
         T visitActive();
 
         T visitTrialing();
+
+        T visitScheduled();
 
         T visitPastDue();
 
