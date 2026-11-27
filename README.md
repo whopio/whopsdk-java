@@ -54,6 +54,19 @@ On Android, run these calls on a background thread.
 Pass your API key to `.token(...)` to create products.
 Keep business API keys on your server.
 
+## Verify a webhook
+
+`WebhookVerifier.unwrap` checks the signature Whop sends with every webhook delivery and returns the parsed body.
+
+```java
+import com.fasterxml.jackson.databind.JsonNode;
+import com.whop.api.helpers.WebhookVerifier;
+
+JsonNode event = WebhookVerifier.unwrap(rawBody, headers, webhookSecret);
+```
+
+Pass the raw request body, its headers and the endpoint's `ws_` signing secret exactly as Whop shows it. A missing signature header, a signature that does not match, or a timestamp more than five minutes from now throws `WebhookVerificationException`.
+
 ## Watch a live read
 
 A live read answers now and again each time its answer changes. `Whop` is a `WhopApiClient` whose resource clients carry `watch` and `waitFor` beside each live read; both take exactly the read's parameters.

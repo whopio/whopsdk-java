@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whop.api.AsyncWhopApiClient;
 import com.whop.api.WhopApiClient;
 import com.whop.api.core.Environment;
+import com.whop.api.helpers.WebhookVerifier;
 import com.whop.api.helpers.oidc.OidcToken;
 import com.whop.api.helpers.oidc.WhopOidc;
 import com.whop.api.resources.stats.requests.RetrieveStatsRequest;
@@ -132,8 +133,25 @@ public final class PackageConsumer {
                         .build()) {
             require(syncOidc != null && asyncOidc != null, "OIDC helpers are missing from the installed jar");
         }
+        String secret = "ws_package_smoke";
+        String timestamp = Long.toString(System.currentTimeMillis() / 1000L);
+        byte[] delivery = "{\"id\":\"msg_smoke\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+        mac.init(new javax.crypto.spec.SecretKeySpec(
+                secret.getBytes(java.nio.charset.StandardCharsets.UTF_8), "HmacSHA256"));
+        mac.update(("msg_smoke." + timestamp + ".").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        java.util.Map<String, String> webhookHeaders = new java.util.HashMap<>();
+        webhookHeaders.put("webhook-id", "msg_smoke");
+        webhookHeaders.put("webhook-timestamp", timestamp);
+        webhookHeaders.put(
+                "webhook-signature", "v1," + java.util.Base64.getEncoder().encodeToString(mac.doFinal(delivery)));
+        require(
+                "msg_smoke".equals(WebhookVerifier.unwrap(delivery, webhookHeaders, secret)
+                        .get("id")
+                        .asText()),
+                "installed jar's webhook verifier rejected a correctly signed delivery");
         System.out.println(
-                "Verified Maven consumer, transitive dependencies, sync/async routing, version headers and OIDC entrypoints for "
+                "Verified Maven consumer, transitive dependencies, sync/async routing, version headers, OIDC entrypoints and webhook verification for "
                         + version);
     }
 
