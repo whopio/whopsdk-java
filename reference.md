@@ -44329,6 +44329,14 @@ client.variants().update(
 <dl>
 <dd>
 
+**stockAdjustment:** `Optional<Integer>` — The number of units to add to the current stock. Use a negative number to remove units. The change applies after the other changes in this request, to the stock at that time. This keeps a sale made at the same time. Do not send 0, and do not send it with `stock`. A variant with unlimited stock, or a change that takes the stock below 0, returns a `409`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **strikeThroughInitialPrice:** `Optional<Double>` — A comparison price displayed with a strikethrough for the initial price.
     
 </dd>

@@ -74,6 +74,8 @@ public final class UpdateVariantsRequest {
 
     private final Optional<Integer> stock;
 
+    private final Optional<Integer> stockAdjustment;
+
     private final Optional<Double> strikeThroughInitialPrice;
 
     private final Optional<Double> strikeThroughRenewalPrice;
@@ -114,6 +116,7 @@ public final class UpdateVariantsRequest {
             Optional<String> sku,
             Optional<Integer> splitPayRequiredPayments,
             Optional<Integer> stock,
+            Optional<Integer> stockAdjustment,
             Optional<Double> strikeThroughInitialPrice,
             Optional<Double> strikeThroughRenewalPrice,
             Optional<UpdateVariantsRequestThreeDsLevel> threeDsLevel,
@@ -145,6 +148,7 @@ public final class UpdateVariantsRequest {
         this.sku = sku;
         this.splitPayRequiredPayments = splitPayRequiredPayments;
         this.stock = stock;
+        this.stockAdjustment = stockAdjustment;
         this.strikeThroughInitialPrice = strikeThroughInitialPrice;
         this.strikeThroughRenewalPrice = strikeThroughRenewalPrice;
         this.threeDsLevel = threeDsLevel;
@@ -394,6 +398,14 @@ public final class UpdateVariantsRequest {
             return Optional.empty();
         }
         return stock;
+    }
+
+    /**
+     * @return The number of units to add to the current stock. Use a negative number to remove units. The change applies after the other changes in this request, to the stock at that time. This keeps a sale made at the same time. Do not send 0, and do not send it with <code>stock</code>. A variant with unlimited stock, or a change that takes the stock below 0, returns a <code>409</code>.
+     */
+    @JsonProperty("stock_adjustment")
+    public Optional<Integer> getStockAdjustment() {
+        return stockAdjustment;
     }
 
     /**
@@ -655,6 +667,7 @@ public final class UpdateVariantsRequest {
                 && sku.equals(other.sku)
                 && splitPayRequiredPayments.equals(other.splitPayRequiredPayments)
                 && stock.equals(other.stock)
+                && stockAdjustment.equals(other.stockAdjustment)
                 && strikeThroughInitialPrice.equals(other.strikeThroughInitialPrice)
                 && strikeThroughRenewalPrice.equals(other.strikeThroughRenewalPrice)
                 && threeDsLevel.equals(other.threeDsLevel)
@@ -690,6 +703,7 @@ public final class UpdateVariantsRequest {
                 this.sku,
                 this.splitPayRequiredPayments,
                 this.stock,
+                this.stockAdjustment,
                 this.strikeThroughInitialPrice,
                 this.strikeThroughRenewalPrice,
                 this.threeDsLevel,
@@ -756,6 +770,8 @@ public final class UpdateVariantsRequest {
 
         private Optional<Integer> stock = Optional.empty();
 
+        private Optional<Integer> stockAdjustment = Optional.empty();
+
         private Optional<Double> strikeThroughInitialPrice = Optional.empty();
 
         private Optional<Double> strikeThroughRenewalPrice = Optional.empty();
@@ -798,6 +814,7 @@ public final class UpdateVariantsRequest {
             sku(other.getSku());
             splitPayRequiredPayments(other.getSplitPayRequiredPayments());
             stock(other.getStock());
+            stockAdjustment(other.getStockAdjustment());
             strikeThroughInitialPrice(other.getStrikeThroughInitialPrice());
             strikeThroughRenewalPrice(other.getStrikeThroughRenewalPrice());
             threeDsLevel(other.getThreeDsLevel());
@@ -1343,6 +1360,20 @@ public final class UpdateVariantsRequest {
         }
 
         /**
+         * <p>The number of units to add to the current stock. Use a negative number to remove units. The change applies after the other changes in this request, to the stock at that time. This keeps a sale made at the same time. Do not send 0, and do not send it with <code>stock</code>. A variant with unlimited stock, or a change that takes the stock below 0, returns a <code>409</code>.</p>
+         */
+        @JsonSetter(value = "stock_adjustment", nulls = Nulls.SKIP)
+        public Builder stockAdjustment(Optional<Integer> stockAdjustment) {
+            this.stockAdjustment = stockAdjustment;
+            return this;
+        }
+
+        public Builder stockAdjustment(Integer stockAdjustment) {
+            this.stockAdjustment = Optional.ofNullable(stockAdjustment);
+            return this;
+        }
+
+        /**
          * <p>A comparison price displayed with a strikethrough for the initial price.</p>
          */
         @JsonSetter(value = "strike_through_initial_price", nulls = Nulls.SKIP)
@@ -1531,6 +1562,7 @@ public final class UpdateVariantsRequest {
                     sku,
                     splitPayRequiredPayments,
                     stock,
+                    stockAdjustment,
                     strikeThroughInitialPrice,
                     strikeThroughRenewalPrice,
                     threeDsLevel,
@@ -1566,6 +1598,7 @@ public final class UpdateVariantsRequest {
                     || key.equalsIgnoreCase("sku")
                     || key.equalsIgnoreCase("split_pay_required_payments")
                     || key.equalsIgnoreCase("stock")
+                    || key.equalsIgnoreCase("stock_adjustment")
                     || key.equalsIgnoreCase("strike_through_initial_price")
                     || key.equalsIgnoreCase("strike_through_renewal_price")
                     || key.equalsIgnoreCase("three_ds_level")
