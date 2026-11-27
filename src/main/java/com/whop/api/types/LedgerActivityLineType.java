@@ -74,6 +74,9 @@ public final class LedgerActivityLineType {
     public static final LedgerActivityLineType PAYMENT_REFERRAL_REVERSAL =
             new LedgerActivityLineType(Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
 
+    public static final LedgerActivityLineType PAYMENT_REVSHARE_REINSTATED_PAYOUT =
+            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_REINSTATED_PAYOUT, "payment_revshare_reinstated_payout");
+
     public static final LedgerActivityLineType DISPUTE_SETTLEMENT_REVERSAL =
             new LedgerActivityLineType(Value.DISPUTE_SETTLEMENT_REVERSAL, "dispute_settlement_reversal");
 
@@ -1038,6 +1041,9 @@ public final class LedgerActivityLineType {
 
     public static final LedgerActivityLineType BUYER_FEE = new LedgerActivityLineType(Value.BUYER_FEE, "buyer_fee");
 
+    public static final LedgerActivityLineType PAYMENT_REVSHARE_REINSTATED =
+            new LedgerActivityLineType(Value.PAYMENT_REVSHARE_REINSTATED, "payment_revshare_reinstated");
+
     public static final LedgerActivityLineType AIRDROP_LINK_FUNDED =
             new LedgerActivityLineType(Value.AIRDROP_LINK_FUNDED, "airdrop_link_funded");
 
@@ -1120,6 +1126,8 @@ public final class LedgerActivityLineType {
                 return visitor.visitSettlementShortfallLoss();
             case PAYMENT_REFERRAL_REVERSAL:
                 return visitor.visitPaymentReferralReversal();
+            case PAYMENT_REVSHARE_REINSTATED_PAYOUT:
+                return visitor.visitPaymentRevshareReinstatedPayout();
             case DISPUTE_SETTLEMENT_REVERSAL:
                 return visitor.visitDisputeSettlementReversal();
             case AD_BALANCE_FUNDING_RECEIPT:
@@ -1768,6 +1776,8 @@ public final class LedgerActivityLineType {
                 return visitor.visitWhopProcessingFee();
             case BUYER_FEE:
                 return visitor.visitBuyerFee();
+            case PAYMENT_REVSHARE_REINSTATED:
+                return visitor.visitPaymentRevshareReinstated();
             case AIRDROP_LINK_FUNDED:
                 return visitor.visitAirdropLinkFunded();
             case UNKNOWN:
@@ -1825,6 +1835,8 @@ public final class LedgerActivityLineType {
                 return SETTLEMENT_SHORTFALL_LOSS;
             case "payment_referral_reversal":
                 return PAYMENT_REFERRAL_REVERSAL;
+            case "payment_revshare_reinstated_payout":
+                return PAYMENT_REVSHARE_REINSTATED_PAYOUT;
             case "dispute_settlement_reversal":
                 return DISPUTE_SETTLEMENT_REVERSAL;
             case "ad_balance_funding_receipt":
@@ -2473,6 +2485,8 @@ public final class LedgerActivityLineType {
                 return WHOP_PROCESSING_FEE;
             case "buyer_fee":
                 return BUYER_FEE;
+            case "payment_revshare_reinstated":
+                return PAYMENT_REVSHARE_REINSTATED;
             case "airdrop_link_funded":
                 return AIRDROP_LINK_FUNDED;
             default:
@@ -2866,6 +2880,10 @@ public final class LedgerActivityLineType {
         PAYMENT_REVSHARE_REVERSAL,
 
         PAYMENT_REVSHARE_REFUND,
+
+        PAYMENT_REVSHARE_REINSTATED,
+
+        PAYMENT_REVSHARE_REINSTATED_PAYOUT,
 
         PAYMENT_REFERRAL,
 
@@ -3566,6 +3584,10 @@ public final class LedgerActivityLineType {
         T visitPaymentRevshareReversal();
 
         T visitPaymentRevshareRefund();
+
+        T visitPaymentRevshareReinstated();
+
+        T visitPaymentRevshareReinstatedPayout();
 
         T visitPaymentReferral();
 

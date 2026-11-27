@@ -85,6 +85,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.PAYMENT_REFERRAL_REVERSAL, "payment_referral_reversal");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PAYMENT_REVSHARE_REINSTATED_PAYOUT =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PAYMENT_REVSHARE_REINSTATED_PAYOUT, "payment_revshare_reinstated_payout");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory DISPUTE_SETTLEMENT_REVERSAL =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(
                     Value.DISPUTE_SETTLEMENT_REVERSAL, "dispute_settlement_reversal");
@@ -1252,6 +1256,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory BUYER_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.BUYER_FEE, "buyer_fee");
 
+    public static final RetrieveFinancialReportsResponseRowsItemLineCategory PAYMENT_REVSHARE_REINSTATED =
+            new RetrieveFinancialReportsResponseRowsItemLineCategory(
+                    Value.PAYMENT_REVSHARE_REINSTATED, "payment_revshare_reinstated");
+
     public static final RetrieveFinancialReportsResponseRowsItemLineCategory WHOP_PROCESSING_FEE =
             new RetrieveFinancialReportsResponseRowsItemLineCategory(Value.WHOP_PROCESSING_FEE, "whop_processing_fee");
 
@@ -1332,6 +1340,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitSettlementShortfallLoss();
             case PAYMENT_REFERRAL_REVERSAL:
                 return visitor.visitPaymentReferralReversal();
+            case PAYMENT_REVSHARE_REINSTATED_PAYOUT:
+                return visitor.visitPaymentRevshareReinstatedPayout();
             case DISPUTE_SETTLEMENT_REVERSAL:
                 return visitor.visitDisputeSettlementReversal();
             case AD_BALANCE_FUNDING_RECEIPT:
@@ -1982,6 +1992,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return visitor.visitAirdropLinkFunded();
             case BUYER_FEE:
                 return visitor.visitBuyerFee();
+            case PAYMENT_REVSHARE_REINSTATED:
+                return visitor.visitPaymentRevshareReinstated();
             case WHOP_PROCESSING_FEE:
                 return visitor.visitWhopProcessingFee();
             case UNKNOWN:
@@ -2037,6 +2049,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return SETTLEMENT_SHORTFALL_LOSS;
             case "payment_referral_reversal":
                 return PAYMENT_REFERRAL_REVERSAL;
+            case "payment_revshare_reinstated_payout":
+                return PAYMENT_REVSHARE_REINSTATED_PAYOUT;
             case "dispute_settlement_reversal":
                 return DISPUTE_SETTLEMENT_REVERSAL;
             case "ad_balance_funding_receipt":
@@ -2687,6 +2701,8 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
                 return AIRDROP_LINK_FUNDED;
             case "buyer_fee":
                 return BUYER_FEE;
+            case "payment_revshare_reinstated":
+                return PAYMENT_REVSHARE_REINSTATED;
             case "whop_processing_fee":
                 return WHOP_PROCESSING_FEE;
             default:
@@ -3050,6 +3066,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         PAYMENT_REVSHARE_PAYOUT,
 
         PAYMENT_REVSHARE_REFUND,
+
+        PAYMENT_REVSHARE_REINSTATED,
+
+        PAYMENT_REVSHARE_REINSTATED_PAYOUT,
 
         PAYMENT_REVSHARE_REVERSAL,
 
@@ -3750,6 +3770,10 @@ public final class RetrieveFinancialReportsResponseRowsItemLineCategory {
         T visitPaymentRevsharePayout();
 
         T visitPaymentRevshareRefund();
+
+        T visitPaymentRevshareReinstated();
+
+        T visitPaymentRevshareReinstatedPayout();
 
         T visitPaymentRevshareReversal();
 

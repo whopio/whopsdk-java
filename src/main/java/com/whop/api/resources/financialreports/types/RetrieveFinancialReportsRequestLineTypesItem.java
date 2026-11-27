@@ -90,6 +90,10 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
     public static final RetrieveFinancialReportsRequestLineTypesItem LEGACY_CRYPTO_PAYMENT =
             new RetrieveFinancialReportsRequestLineTypesItem(Value.LEGACY_CRYPTO_PAYMENT, "legacy_crypto_payment");
 
+    public static final RetrieveFinancialReportsRequestLineTypesItem PAYMENT_REVSHARE_REINSTATED_PAYOUT =
+            new RetrieveFinancialReportsRequestLineTypesItem(
+                    Value.PAYMENT_REVSHARE_REINSTATED_PAYOUT, "payment_revshare_reinstated_payout");
+
     public static final RetrieveFinancialReportsRequestLineTypesItem AD_BALANCE_FUNDING_RECEIPT =
             new RetrieveFinancialReportsRequestLineTypesItem(
                     Value.AD_BALANCE_FUNDING_RECEIPT, "ad_balance_funding_receipt");
@@ -546,6 +550,10 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
     public static final RetrieveFinancialReportsRequestLineTypesItem BUYER_FEE =
             new RetrieveFinancialReportsRequestLineTypesItem(Value.BUYER_FEE, "buyer_fee");
 
+    public static final RetrieveFinancialReportsRequestLineTypesItem PAYMENT_REVSHARE_REINSTATED =
+            new RetrieveFinancialReportsRequestLineTypesItem(
+                    Value.PAYMENT_REVSHARE_REINSTATED, "payment_revshare_reinstated");
+
     public static final RetrieveFinancialReportsRequestLineTypesItem WHOP_PROCESSING_FEE =
             new RetrieveFinancialReportsRequestLineTypesItem(Value.WHOP_PROCESSING_FEE, "whop_processing_fee");
 
@@ -628,6 +636,8 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
                 return visitor.visitPaymentReferralReversal();
             case LEGACY_CRYPTO_PAYMENT:
                 return visitor.visitLegacyCryptoPayment();
+            case PAYMENT_REVSHARE_REINSTATED_PAYOUT:
+                return visitor.visitPaymentRevshareReinstatedPayout();
             case AD_BALANCE_FUNDING_RECEIPT:
                 return visitor.visitAdBalanceFundingReceipt();
             case PLATFORM_MARKUP_FEE:
@@ -894,6 +904,8 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
                 return visitor.visitSoftwareRentalRevshare();
             case BUYER_FEE:
                 return visitor.visitBuyerFee();
+            case PAYMENT_REVSHARE_REINSTATED:
+                return visitor.visitPaymentRevshareReinstated();
             case WHOP_PROCESSING_FEE:
                 return visitor.visitWhopProcessingFee();
             case UNKNOWN:
@@ -951,6 +963,8 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
                 return PAYMENT_REFERRAL_REVERSAL;
             case "legacy_crypto_payment":
                 return LEGACY_CRYPTO_PAYMENT;
+            case "payment_revshare_reinstated_payout":
+                return PAYMENT_REVSHARE_REINSTATED_PAYOUT;
             case "ad_balance_funding_receipt":
                 return AD_BALANCE_FUNDING_RECEIPT;
             case "platform_markup_fee":
@@ -1217,6 +1231,8 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
                 return SOFTWARE_RENTAL_REVSHARE;
             case "buyer_fee":
                 return BUYER_FEE;
+            case "payment_revshare_reinstated":
+                return PAYMENT_REVSHARE_REINSTATED;
             case "whop_processing_fee":
                 return WHOP_PROCESSING_FEE;
             default:
@@ -1436,6 +1452,10 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
         PAYMENT_REVSHARE_PAYOUT,
 
         PAYMENT_REVSHARE_REFUND,
+
+        PAYMENT_REVSHARE_REINSTATED,
+
+        PAYMENT_REVSHARE_REINSTATED_PAYOUT,
 
         PAYMENT_REVSHARE_REVERSAL,
 
@@ -1754,6 +1774,10 @@ public final class RetrieveFinancialReportsRequestLineTypesItem {
         T visitPaymentRevsharePayout();
 
         T visitPaymentRevshareRefund();
+
+        T visitPaymentRevshareReinstated();
+
+        T visitPaymentRevshareReinstatedPayout();
 
         T visitPaymentRevshareReversal();
 
