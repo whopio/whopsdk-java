@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# whopsdk-java's release check: .github/workflows/publish-main.yml runs it after the release, to install the
-# published version from Whop's public Maven repository as an anonymous consumer would.
+# whopsdk-java's release check: .github/workflows/publish-main.yml runs it once the maven job has published
+# the version, to install it from Whop's public Maven repository as an anonymous consumer would; the github
+# job tags the version only after it passes.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

@@ -38,7 +38,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/release
 
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           package-manager-cache: false
@@ -147,7 +147,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           package-manager-cache: false
@@ -159,7 +159,7 @@ jobs:
   # and a repo shipped dark writes nothing. A new tag goes only on the commit of the run that planned
   # to publish (PUBLISHED): re-run that run's failed jobs.
   github:
-    needs: [plan, build, maven]
+    needs: [plan, build, maven, verify]
     if: ${{ !cancelled() && needs.plan.result == 'success' && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     permissions:
@@ -170,7 +170,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/release
 
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           package-manager-cache: false
@@ -181,8 +181,9 @@ jobs:
           PUBLISHED: ${{ needs.plan.outputs.publish == 'true' }}
 
   # The release as a consumer gets it from where the modules published it: scripts/verify.sh.
+  # The github job tags the version only once this passes.
   verify:
-    needs: [plan, github]
+    needs: [plan, maven]
     if: needs.plan.outputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:

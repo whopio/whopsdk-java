@@ -1,5 +1,4 @@
 .fern/metadata.json
-CONTRIBUTING.md
 reference.md
 src/main/java/com/whop/api/AsyncWhopApiClient.java
 src/main/java/com/whop/api/AsyncWhopApiClientBuilder.java
